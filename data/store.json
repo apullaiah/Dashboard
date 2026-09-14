@@ -251,6 +251,58 @@
       "lastError": "",
       "nextSync": "2026-09-13T20:12:43.711Z",
       "lastRecords": 122
+    },
+    {
+      "id": "source-phase-4-targets",
+      "name": "Phase IV Resurvey Targets & Timelines (Govt Official)",
+      "spreadsheetId": "GOVT_PDF_PHASE_4",
+      "googleSheet": "Phase - IV – Resurvey Targets & Timelines.pdf",
+      "tab": "Targets & Timelines",
+      "purpose": "Official Stage Targets, Timelines & Progress for Phase IV",
+      "direction": "READ ONLY",
+      "accessMode": "LOCAL",
+      "recordType": "phase_targets",
+      "status": "Connected",
+      "lastSync": "2026-09-14T06:12:08.288Z"
+    },
+    {
+      "id": "source-phase-5-targets",
+      "name": "Phase V Resurvey Targets & Timelines (Govt Official)",
+      "spreadsheetId": "GOVT_PDF_PHASE_5",
+      "googleSheet": "Phase-V – Resurvey Targets & Timelines.pdf",
+      "tab": "Targets & Timelines",
+      "purpose": "Official Stage Targets, Timelines & Progress for Phase V",
+      "direction": "READ ONLY",
+      "accessMode": "LOCAL",
+      "recordType": "phase_targets",
+      "status": "Connected",
+      "lastSync": "2026-09-14T06:12:08.290Z"
+    },
+    {
+      "id": "source-phase-6-targets",
+      "name": "Phase VI Resurvey Targets & Timelines (Govt Official)",
+      "spreadsheetId": "GOVT_PDF_PHASE_6",
+      "googleSheet": "Phase-VI– Resurvey Targets & Timelines.pdf",
+      "tab": "Targets & Timelines",
+      "purpose": "Official Stage Targets, Timelines & Progress for Phase VI",
+      "direction": "READ ONLY",
+      "accessMode": "LOCAL",
+      "recordType": "phase_targets",
+      "status": "Connected",
+      "lastSync": "2026-09-14T06:12:08.290Z"
+    },
+    {
+      "id": "source-phase-7-targets",
+      "name": "Phase 7 Resurvey Targets & Timelines (Govt Official)",
+      "spreadsheetId": "GOVT_PDF_PHASE_7",
+      "googleSheet": "Phase 7 - Resurvey Targets & Timelines.pdf",
+      "tab": "Targets & Timelines",
+      "purpose": "Official Stage Targets, Timelines & Progress for Phase 7",
+      "direction": "READ ONLY",
+      "accessMode": "LOCAL",
+      "recordType": "phase_targets",
+      "status": "Connected",
+      "lastSync": "2026-09-14T06:12:08.290Z"
     }
   ],
   "villages": [
@@ -618,20 +670,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "11-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.544Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
@@ -641,7 +693,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "15-09-2026",
+          "08-10-2026",
+          "11-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "4974d6f5-4a23-438e-9eee-4c1028cb3639",
@@ -787,9 +851,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-11-2026",
       "days_delayed": 0,
-      "gt_status": "Completed",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -882,7 +946,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "18-09-2026",
+          "27-09-2026",
+          "11-10-2026",
+          "26-10-2026",
+          "09-11-2026",
+          "26-11-2026",
+          "28-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "d034dfe1-17ef-4549-aabf-041418a79ee3",
@@ -1056,7 +1134,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "15-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -1223,6 +1301,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.643Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "19-11-2026",
+          "25-11-2026",
+          "04-12-2026",
+          "15-12-2026",
+          "21-12-2026",
+          "13-01-2027",
+          "15-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -1785,20 +1876,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "06-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.544Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
@@ -1808,7 +1899,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "10-09-2026",
+          "03-10-2026",
+          "06-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "22261424-b431-4c6c-ac57-2d0439e3143c",
@@ -1829,20 +1932,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "24-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.544Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
@@ -1852,7 +1955,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "21-09-2026",
+          "24-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "b6c0eedf-3f02-4202-8238-40d6525f43b4",
@@ -2018,7 +2133,8 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.872Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "385c3724-c376-4c7a-8fc4-0b80ca4f123e",
@@ -2155,7 +2271,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "21-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -2178,6 +2294,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "24-11-2026",
+          "01-12-2026",
+          "10-12-2026",
+          "21-12-2026",
+          "28-12-2026",
+          "19-01-2027",
+          "21-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -2199,7 +2328,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "18-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -2212,7 +2341,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.544Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
@@ -2222,7 +2351,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "17-09-2026",
+          "23-09-2026",
+          "05-10-2026",
+          "18-10-2026",
+          "30-10-2026",
+          "16-11-2026",
+          "18-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "2afed4c2-cebc-4872-ae12-7fae2ce1e288",
@@ -2243,7 +2386,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "16-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -2256,7 +2399,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.544Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
@@ -2266,7 +2409,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "22-09-2026",
+          "28-09-2026",
+          "08-10-2026",
+          "18-10-2026",
+          "28-10-2026",
+          "14-11-2026",
+          "16-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "79044068-ca9f-4194-80ab-c3d55eb86a63",
@@ -2287,9 +2444,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-01-2027",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -2454,6 +2611,20 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.647Z"
         }
+      },
+      "current_stage": "GT",
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "25-11-2026",
+          "02-12-2026",
+          "11-12-2026",
+          "22-12-2026",
+          "29-12-2026",
+          "21-01-2027",
+          "23-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -2563,7 +2734,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "18-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -2730,6 +2901,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.646Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "21-11-2026",
+          "27-11-2026",
+          "07-12-2026",
+          "17-12-2026",
+          "23-12-2026",
+          "15-01-2027",
+          "18-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -2795,7 +2979,7 @@
       "deletions": 0,
       "online_khatas": 1515,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-01-2027",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -3015,7 +3199,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.648Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "20-11-2026",
+          "29-11-2026",
+          "08-12-2026",
+          "17-12-2026",
+          "03-01-2027",
+          "20-01-2027",
+          "22-01-2027"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "6379ba84-b409-4dba-9a70-f4fea807095f",
@@ -3106,7 +3304,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "746.09",
+      "extent": "746.091298",
       "govt_extent": 186.38,
       "patta_extent": 559.71,
       "khatas": 681,
@@ -3117,7 +3315,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -3212,6 +3410,19 @@
           "stage": "VRO Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "08-09-2026",
+          "16-09-2026",
+          "03-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -3233,20 +3444,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "24-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
@@ -3256,7 +3467,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "21-09-2026",
+          "24-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "b4f621b6-733f-41c4-88d1-ca50e1dd8591",
@@ -3266,7 +3489,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "4562.79",
+      "extent": "1078.09",
       "govt_extent": 507.62,
       "patta_extent": 4055.17,
       "khatas": 2104,
@@ -3277,20 +3500,20 @@
       "deletions": 86,
       "online_khatas": 2099,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-09-2026",
       "days_delayed": 0,
-      "gt_status": "In Progress",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T19:18:27.873Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
@@ -3385,7 +3608,19 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.873Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "19-09-2026",
+          "22-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "0608acb9-4397-4f41-beb3-ab0aec739534",
@@ -3524,7 +3759,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -3535,10 +3770,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "fa864848-5057-4bc0-b67e-5197dcba8c4a",
@@ -3666,7 +3902,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "2987.2",
+      "extent": "2987.202013",
       "govt_extent": 326.56,
       "patta_extent": 2660.64,
       "khatas": 974,
@@ -3677,7 +3913,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -3772,6 +4008,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "17-08-2025",
+          "09-09-2026",
+          "17-09-2026",
+          "25-09-2026",
+          "04-10-2026",
+          "21-10-2026",
+          "23-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -3900,7 +4149,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase-4",
-      "extent": "1900.1",
+      "extent": "1900.10",
       "govt_extent": 141.89,
       "patta_extent": 1758.21,
       "khatas": 1140,
@@ -3911,20 +4160,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "06-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
@@ -3934,7 +4183,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "10-09-2026",
+          "03-10-2026",
+          "06-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "a66d5b1d-3226-4db6-86fb-ddd26d864752",
@@ -4029,7 +4290,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -4196,6 +4457,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.690Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "05-11-2026",
+          "10-11-2026",
+          "17-11-2026",
+          "23-11-2026",
+          "27-11-2026",
+          "19-12-2026",
+          "22-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -4217,7 +4491,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "06-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -4240,6 +4514,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "13-11-2026",
+          "20-11-2026",
+          "28-11-2026",
+          "07-12-2026",
+          "14-12-2026",
+          "04-01-2027",
+          "06-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -4298,7 +4585,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -4465,6 +4752,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.689Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "25-11-2026",
+          "02-12-2026",
+          "11-12-2026",
+          "22-12-2026",
+          "29-12-2026",
+          "20-01-2027",
+          "22-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -4849,7 +5149,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -4860,10 +5160,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "954412df-bcb3-4cfb-9084-bd1a02e0ca6c",
@@ -5004,7 +5305,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -5015,10 +5316,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "35541aa5-13ce-4834-bd95-73b6602b18e6",
@@ -5041,7 +5343,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -5052,10 +5354,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.545Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "ff39d858-211e-4134-86bb-dedecf389af1",
@@ -5496,7 +5799,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "04-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -5663,6 +5966,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.583Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "12-11-2026",
+          "19-11-2026",
+          "27-11-2026",
+          "05-12-2026",
+          "11-12-2026",
+          "01-01-2027",
+          "04-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -5686,7 +6002,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -5697,10 +6013,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.546Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "c91a6dbe-3e5d-4abf-92ab-9350fac6d69f",
@@ -5710,7 +6027,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "566.6",
+      "extent": "566.60",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 283,
@@ -5721,9 +6038,9 @@
       "deletions": 44,
       "online_khatas": 283,
       "target_month": null,
-      "target_date": "",
+      "target_date": "13-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -5734,7 +6051,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "In Progress",
       "last_synced": "2026-09-13T19:18:27.873Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
@@ -5818,7 +6135,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.873Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "14-09-2026",
+          "16-09-2026",
+          "19-09-2026",
+          "21-09-2026",
+          "24-09-2026",
+          "11-10-2026",
+          "13-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "c1ca8044-51bb-4eac-981c-28500a0a84c5",
@@ -5876,20 +6207,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "02-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.546Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
@@ -5899,7 +6230,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "29-09-2026",
+          "02-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "3f799b2e-0755-46bc-be3c-3dc24d2893dc",
@@ -6230,7 +6573,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -6253,6 +6596,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "09-11-2026",
+          "13-11-2026",
+          "21-11-2026",
+          "28-11-2026",
+          "03-12-2026",
+          "25-12-2026",
+          "28-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -6274,7 +6630,7 @@
       "deletions": 7,
       "online_khatas": 242,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "25-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -6489,7 +6845,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.581Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "24-09-2026",
+          "27-09-2026",
+          "30-09-2026",
+          "03-10-2026",
+          "06-10-2026",
+          "23-10-2026",
+          "25-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "efe4f979-e16b-48ea-a9eb-f77c5de3aab0",
@@ -6499,7 +6869,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "1855.71",
+      "extent": "1855.711753",
       "govt_extent": 421.49,
       "patta_extent": 1434.22,
       "khatas": 828,
@@ -6510,7 +6880,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "27-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -6605,6 +6975,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "06-08-2026",
+          "07-09-2026",
+          "24-09-2026",
+          "01-10-2026",
+          "08-10-2026",
+          "25-10-2026",
+          "27-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -6742,7 +7125,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -6909,6 +7292,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.585Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "03-02-2027",
+          "05-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -6974,7 +7370,7 @@
       "deletions": 0,
       "online_khatas": 283,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "20-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -7082,7 +7478,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.873Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "23-09-2026",
+          "25-09-2026",
+          "27-09-2026",
+          "29-09-2026",
+          "01-10-2026",
+          "18-10-2026",
+          "20-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "a1fce29d-db74-43ed-90b3-abbc17525781",
@@ -7092,7 +7502,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-7",
-      "extent": "1226.59",
+      "extent": "315.27",
       "govt_extent": 626.92,
       "patta_extent": 599.67,
       "khatas": 406,
@@ -7103,9 +7513,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-02-2027",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -7126,7 +7536,21 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "01-02-2027",
+          "03-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "19dee575-ff5b-4509-a724-95d6738a5315",
@@ -7385,7 +7809,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -7396,10 +7820,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.546Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "46da7a39-3fb5-40f9-9500-e3ee1bdf8a8e",
@@ -8052,7 +8477,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "11-01-2027",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -8147,6 +8572,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "18-11-2026",
+          "24-11-2026",
+          "02-12-2026",
+          "10-12-2026",
+          "17-12-2026",
+          "07-01-2027",
+          "11-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -8409,7 +8847,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "01-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -8576,6 +9014,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.574Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "29-01-2027",
+          "01-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -8597,7 +9048,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "12-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -8764,6 +9215,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.572Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "18-11-2026",
+          "24-11-2026",
+          "02-12-2026",
+          "10-12-2026",
+          "17-12-2026",
+          "08-01-2027",
+          "12-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -8785,20 +9249,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.547Z",
       "last_modified": "2026-09-13T18:29:59.547Z",
       "source_meta": {
@@ -8808,7 +9272,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "7c01c7f1-01fd-45ed-aec4-8ac3e06f6ea5",
@@ -9241,7 +9717,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -9252,10 +9728,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.547Z",
       "last_modified": "2026-09-13T18:29:59.547Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "8f123208-475c-489e-b926-c202780144d6",
@@ -9598,7 +10075,7 @@
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "",
+      "extent": "1845.46",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -9609,23 +10086,35 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": null,
-      "target_date": "",
+      "target_date": "27-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.547Z",
       "last_modified": "2026-09-13T18:29:59.547Z",
-      "source_meta": {}
+      "source_meta": {},
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "24-09-2026",
+          "27-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "27db986c-7086-4033-b652-c984ebcbdd14",
@@ -9646,9 +10135,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-11-2026",
       "days_delayed": 0,
-      "gt_status": "Completed",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -9741,7 +10230,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "07-10-2026",
+          "13-10-2026",
+          "21-10-2026",
+          "28-10-2026",
+          "04-11-2026",
+          "21-11-2026",
+          "23-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "01dae911-303c-4c4a-a498-c20c15c8df2b",
@@ -10087,7 +10590,7 @@
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
       "phase": "Phase-4",
-      "extent": "3206",
+      "extent": "3206.00",
       "govt_extent": 423,
       "patta_extent": 2783,
       "khatas": 1370,
@@ -10098,20 +10601,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "06-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.547Z",
       "last_modified": "2026-09-13T18:29:59.547Z",
       "source_meta": {
@@ -10121,7 +10624,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "10-09-2026",
+          "03-10-2026",
+          "06-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "ef1fb016-4e9c-4a41-9cf2-9ff0cd8143a6",
@@ -10753,20 +11268,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "22-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.548Z",
       "last_modified": "2026-09-13T18:29:59.548Z",
       "source_meta": {
@@ -10776,7 +11291,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "19-09-2026",
+          "22-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "6d5a0e7f-c851-4332-bd7e-5a630aaab692",
@@ -11334,7 +11861,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "09-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -11347,7 +11874,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.548Z",
       "last_modified": "2026-09-13T18:29:59.548Z",
       "source_meta": {
@@ -11357,7 +11884,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "01-10-2026",
+          "10-10-2026",
+          "24-10-2026",
+          "07-11-2026",
+          "20-11-2026",
+          "07-12-2026",
+          "09-12-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "7e99f5e7-9bc3-42a0-972d-cb1a583840b2",
@@ -11378,7 +11919,7 @@
       "deletions": 0,
       "online_khatas": 2268,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "29-01-2027",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -11598,7 +12139,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.613Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "21-11-2026",
+          "01-12-2026",
+          "11-12-2026",
+          "21-12-2026",
+          "10-01-2027",
+          "27-01-2027",
+          "29-01-2027"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "baab5050-eafc-47f7-a734-e0c489942987",
@@ -11811,7 +12366,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -11824,7 +12379,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.549Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
@@ -11834,7 +12389,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "21-09-2026",
+          "30-09-2026",
+          "14-10-2026",
+          "28-10-2026",
+          "11-11-2026",
+          "28-11-2026",
+          "30-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "d08c6bd5-3204-47ae-bd19-12fd617f0bdb",
@@ -11899,7 +12468,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "15-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "Completed",
@@ -11922,7 +12491,19 @@
           "stage": "VRO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "10-09-2026",
+          "19-09-2026",
+          "12-10-2026",
+          "15-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "VRO Login"
     },
     {
       "id": "ae0ef94c-db00-4b7e-b6a5-02321e9bf7be",
@@ -11943,7 +12524,7 @@
       "deletions": 0,
       "online_khatas": 1085,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "26-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -12051,7 +12632,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.875Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "16-10-2026",
+          "29-10-2026",
+          "11-11-2026",
+          "24-11-2026",
+          "07-12-2026",
+          "24-12-2026",
+          "26-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "8c98d99d-be42-4108-9f6d-cb602fae92ae",
@@ -12153,20 +12748,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.549Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
@@ -12176,7 +12771,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "95df36db-781e-4e0c-afec-0dae37e5ca15",
@@ -12403,20 +13010,20 @@
       "deletions": 0,
       "online_khatas": 493,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "14-11-2026",
       "days_delayed": 0,
-      "gt_status": "In Progress",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T19:18:27.879Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
@@ -12511,7 +13118,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.880Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "09-10-2026",
+          "13-10-2026",
+          "17-10-2026",
+          "22-10-2026",
+          "26-10-2026",
+          "12-11-2026",
+          "14-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "63067bb5-439a-40e0-a087-2ea768d40f34",
@@ -12773,20 +13394,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "12-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.549Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
@@ -12796,7 +13417,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "09-09-2026",
+          "12-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "b37f9926-5d24-4e8b-8cc6-00b9e7a2a18a",
@@ -12898,7 +13531,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "07-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -13065,6 +13698,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.703Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "16-11-2026",
+          "21-11-2026",
+          "30-11-2026",
+          "08-12-2026",
+          "15-12-2026",
+          "05-01-2027",
+          "07-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -13086,7 +13732,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -13109,6 +13755,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "01-02-2027",
+          "03-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -13415,7 +14074,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -13582,6 +14241,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.691Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "03-02-2027",
+          "05-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -13603,7 +14275,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "29-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -13770,6 +14442,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.692Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "27-01-2027",
+          "29-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -14053,7 +14738,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "16-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -14220,6 +14905,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.693Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "21-11-2026",
+          "27-11-2026",
+          "07-12-2026",
+          "17-12-2026",
+          "23-12-2026",
+          "14-01-2027",
+          "16-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -14241,7 +14939,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "15-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -14264,6 +14962,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "20-11-2026",
+          "26-11-2026",
+          "05-12-2026",
+          "16-12-2026",
+          "22-12-2026",
+          "13-01-2027",
+          "15-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -14517,7 +15228,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "18-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -14684,6 +15395,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.697Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "21-11-2026",
+          "27-11-2026",
+          "07-12-2026",
+          "17-12-2026",
+          "23-12-2026",
+          "15-01-2027",
+          "18-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -14884,7 +15608,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "1732.42",
+      "extent": "1732.421561",
       "govt_extent": 1095.5,
       "patta_extent": 636.92,
       "khatas": 485,
@@ -14895,7 +15619,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "07-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -14990,6 +15714,19 @@
           "stage": "VRO Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "12-09-2026",
+          "18-09-2026",
+          "05-10-2026",
+          "07-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -15011,7 +15748,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -15178,6 +15915,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.704Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "28-01-2027",
+          "30-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -15199,7 +15949,7 @@
       "deletions": 0,
       "online_khatas": 210,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "15-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -15419,7 +16169,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.695Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "14-09-2026",
+          "17-09-2026",
+          "20-09-2026",
+          "23-09-2026",
+          "26-09-2026",
+          "13-10-2026",
+          "15-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "9527d53f-d4c5-4ab6-9d52-c6df7a16723d",
@@ -15484,7 +16248,7 @@
       "deletions": 3,
       "online_khatas": 251,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "15-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -15699,7 +16463,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.701Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "09-10-2026",
+          "14-10-2026",
+          "18-10-2026",
+          "23-10-2026",
+          "27-10-2026",
+          "13-11-2026",
+          "15-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "2f4b866f-9173-46ce-9f3c-c14c564f1f99",
@@ -15720,7 +16498,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -15887,6 +16665,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.702Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "28-01-2027",
+          "30-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -16172,7 +16963,8 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.698Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "1428bfe8-9309-4b30-86e7-6f01596e6e0d",
@@ -16740,7 +17532,7 @@
       "deletions": 30,
       "online_khatas": 1191,
       "target_month": "46080",
-      "target_date": "2027-03-31",
+      "target_date": "25-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -16848,7 +17640,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.880Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "21-10-2026",
+          "01-11-2026",
+          "13-11-2026",
+          "24-11-2026",
+          "06-12-2026",
+          "23-12-2026",
+          "25-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "1cb3dccd-d9c6-4062-a3c0-64a94c3bd209",
@@ -17540,7 +18346,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -17563,6 +18369,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "13-11-2026",
+          "20-11-2026",
+          "28-11-2026",
+          "07-12-2026",
+          "14-12-2026",
+          "02-01-2027",
+          "05-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -17816,7 +18635,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "27-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -17983,6 +18802,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.678Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "27-11-2026",
+          "04-12-2026",
+          "16-12-2026",
+          "26-12-2026",
+          "02-01-2027",
+          "25-01-2027",
+          "27-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -18004,7 +18836,7 @@
       "deletions": 10,
       "online_khatas": 334,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "27-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -18224,7 +19056,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.677Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "27-09-2026",
+          "30-09-2026",
+          "02-10-2026",
+          "05-10-2026",
+          "08-10-2026",
+          "25-10-2026",
+          "27-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "b4a2a4e7-c85b-4d17-8a54-35f517df9ea5",
@@ -18234,7 +19080,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "237",
+      "extent": "237.00",
       "govt_extent": 98.98,
       "patta_extent": 138.02,
       "khatas": 152,
@@ -18245,7 +19091,7 @@
       "deletions": 0,
       "online_khatas": 185,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "06-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -18465,7 +19311,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.683Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "13-09-2026",
+          "14-09-2026",
+          "15-09-2026",
+          "16-09-2026",
+          "17-09-2026",
+          "04-10-2026",
+          "06-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "b79eb43f-a4cb-4343-9247-b8d194bf825d",
@@ -19156,7 +20016,7 @@
       "deletions": 2,
       "online_khatas": 176,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "07-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -19264,7 +20124,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.886Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "14-09-2026",
+          "15-09-2026",
+          "16-09-2026",
+          "17-09-2026",
+          "18-09-2026",
+          "05-10-2026",
+          "07-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "126731ba-c0f8-4fc6-a1e6-497812093745",
@@ -19628,7 +20502,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -19795,6 +20669,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.677Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "01-02-2027",
+          "03-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -20192,7 +21079,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "11-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -20359,6 +21246,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.686Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "18-11-2026",
+          "24-11-2026",
+          "02-12-2026",
+          "10-12-2026",
+          "17-12-2026",
+          "07-01-2027",
+          "11-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -20417,20 +21317,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.551Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
@@ -20440,7 +21340,19 @@
           "stage": "JC Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "dc0e5d5e-acf9-4802-9c18-21ad76ee6f9e",
@@ -20586,7 +21498,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "21-11-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -20753,6 +21665,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.680Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "16-10-2026",
+          "19-10-2026",
+          "23-10-2026",
+          "27-10-2026",
+          "29-10-2026",
+          "19-11-2026",
+          "21-11-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -21256,7 +22181,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "24-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -21423,6 +22348,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.681Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "06-11-2026",
+          "11-11-2026",
+          "19-11-2026",
+          "26-11-2026",
+          "01-12-2026",
+          "22-12-2026",
+          "24-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -21488,7 +22426,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -21655,6 +22593,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.685Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "01-02-2027",
+          "03-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -21720,7 +22671,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -21743,6 +22694,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "13-11-2026",
+          "20-11-2026",
+          "28-11-2026",
+          "07-12-2026",
+          "14-12-2026",
+          "02-01-2027",
+          "05-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -21753,7 +22717,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "2634.97",
+      "extent": "2634.973011",
       "govt_extent": 675.11,
       "patta_extent": 1959.86,
       "khatas": 1177,
@@ -21764,7 +22728,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "02-11-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -21859,6 +22823,19 @@
           "stage": "vectorization",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "30-07-2026",
+          "07-09-2026",
+          "19-09-2026",
+          "02-10-2026",
+          "14-10-2026",
+          "31-10-2026",
+          "02-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -21880,7 +22857,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "29-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -22047,7 +23024,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.645Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "09-11-2026",
+          "15-11-2026",
+          "21-11-2026",
+          "28-11-2026",
+          "10-12-2026",
+          "27-12-2026",
+          "29-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "e835309e-5ea2-4752-9714-ec018d364565",
@@ -22068,20 +23059,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.551Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
@@ -22091,7 +23082,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "05d73f36-9899-4f50-988f-ede46a0ba5fe",
@@ -22215,7 +23218,8 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.891Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "8fef2a25-3315-4245-ae00-70de803f4233",
@@ -22236,7 +23240,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "11-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -22403,6 +23407,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.644Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "17-11-2026",
+          "23-11-2026",
+          "01-12-2026",
+          "09-12-2026",
+          "16-12-2026",
+          "07-01-2027",
+          "11-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -22586,7 +23603,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "16-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -22609,6 +23626,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "20-11-2026",
+          "26-11-2026",
+          "05-12-2026",
+          "16-12-2026",
+          "22-12-2026",
+          "14-01-2027",
+          "16-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -22630,7 +23660,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "04-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -22653,6 +23683,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "02-02-2027",
+          "04-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -22663,7 +23706,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "1940.03",
+      "extent": "1940.032136",
       "govt_extent": 532.15,
       "patta_extent": 1407.88,
       "khatas": 844,
@@ -22674,7 +23717,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -22769,6 +23812,19 @@
           "stage": "vectorization",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "07-08-2026",
+          "07-09-2026",
+          "15-09-2026",
+          "24-09-2026",
+          "03-10-2026",
+          "20-10-2026",
+          "22-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -22823,7 +23879,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "2081.67",
+      "extent": "2081.672963",
       "govt_extent": 298.07,
       "patta_extent": 1783.6,
       "khatas": 1262,
@@ -22834,7 +23890,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-11-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -22929,6 +23985,19 @@
           "stage": "vectorization",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "24-08-2026",
+          "10-09-2026",
+          "22-09-2026",
+          "04-10-2026",
+          "17-10-2026",
+          "03-11-2026",
+          "05-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -23204,7 +24273,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -23227,6 +24296,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "27-11-2026",
+          "04-12-2026",
+          "16-12-2026",
+          "26-12-2026",
+          "02-01-2027",
+          "28-01-2027",
+          "30-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -23248,20 +24330,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "11-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.552Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
@@ -23271,7 +24353,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "15-09-2026",
+          "08-10-2026",
+          "11-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "579a676c-512d-4baf-b3c0-ab5fac3a652f",
@@ -23292,7 +24386,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "06-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -23315,6 +24409,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "07-12-2026",
+          "18-12-2026",
+          "29-12-2026",
+          "05-01-2027",
+          "04-02-2027",
+          "06-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -23336,7 +24443,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "20-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -23349,7 +24456,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.552Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
@@ -23359,7 +24466,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "15-09-2026",
+          "27-09-2026",
+          "19-10-2026",
+          "09-11-2026",
+          "01-12-2026",
+          "18-12-2026",
+          "20-12-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "8395e2d7-61e8-46f9-b762-36be81676ffe",
@@ -23575,7 +24696,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "401.16",
+      "extent": "401.16347",
       "govt_extent": 47.37,
       "patta_extent": 353.79,
       "khatas": 209,
@@ -23681,6 +24802,16 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -23702,7 +24833,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "29-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -23725,6 +24856,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "27-11-2026",
+          "04-12-2026",
+          "16-12-2026",
+          "26-12-2026",
+          "02-01-2027",
+          "27-01-2027",
+          "29-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -23779,7 +24923,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "1680.01",
+      "extent": "1680.001520",
       "govt_extent": 420.47,
       "patta_extent": 1259.54,
       "khatas": 830,
@@ -23790,7 +24934,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "15-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -23885,6 +25029,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "31-07-2026",
+          "07-09-2026",
+          "13-09-2026",
+          "19-09-2026",
+          "26-09-2026",
+          "13-10-2026",
+          "15-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -24024,20 +25181,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "12-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.552Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
@@ -24047,7 +25204,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "09-09-2026",
+          "12-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "fb77d591-754d-4ba8-81ff-2a94f95de95c",
@@ -24068,7 +25237,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "16-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -24235,6 +25404,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.566Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "20-11-2026",
+          "26-11-2026",
+          "05-12-2026",
+          "16-12-2026",
+          "22-12-2026",
+          "14-01-2027",
+          "16-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -24282,7 +25464,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "3350.76",
+      "extent": "3350.762730",
       "govt_extent": 1228.44,
       "patta_extent": 2122.32,
       "khatas": 1273,
@@ -24293,7 +25475,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -24388,6 +25570,19 @@
           "stage": "Area & Correlation",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "11-08-2026",
+          "07-09-2026",
+          "18-09-2026",
+          "29-09-2026",
+          "11-10-2026",
+          "28-10-2026",
+          "30-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -24409,7 +25604,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "03-02-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -24432,6 +25627,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "30-11-2026",
+          "08-12-2026",
+          "21-12-2026",
+          "01-01-2027",
+          "11-01-2027",
+          "01-02-2027",
+          "03-02-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -24686,7 +25894,8 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.892Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "95845037-5eb7-4f6c-9bac-aa7dcef13343",
@@ -24985,7 +26194,7 @@
       "deletions": 0,
       "online_khatas": 809,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "26-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -25205,7 +26414,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.564Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "08-11-2026",
+          "14-11-2026",
+          "19-11-2026",
+          "25-11-2026",
+          "07-12-2026",
+          "24-12-2026",
+          "26-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "907225f4-37e6-4d04-b105-bc9aa4c55a8b",
@@ -25518,20 +26741,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.552Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
@@ -25541,7 +26764,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "727e45a9-6d55-4ac9-b4d5-15f13d896116",
@@ -25820,7 +27055,8 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.893Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "a46ee562-6e96-4652-b66c-da3b06c936d8",
@@ -28244,7 +29480,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase-4",
-      "extent": "1294.27",
+      "extent": "1845.46",
       "govt_extent": 159.51,
       "patta_extent": 1134.76,
       "khatas": 727,
@@ -28255,20 +29491,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "27-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.553Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
@@ -28278,7 +29514,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "24-09-2026",
+          "27-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "24d35dde-aaca-42d2-8ba9-df52659a8c28",
@@ -28983,7 +30231,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase V",
-      "extent": "1395.54",
+      "extent": "1395.542270",
       "govt_extent": 264.25,
       "patta_extent": 1131.29,
       "khatas": 723,
@@ -28994,7 +30242,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "24-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -29089,6 +30337,19 @@
           "stage": "Area & Correlation",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "25-07-2026",
+          "07-09-2026",
+          "16-09-2026",
+          "25-09-2026",
+          "05-10-2026",
+          "22-10-2026",
+          "24-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -29353,14 +30614,14 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "12-09-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
@@ -29376,7 +30637,19 @@
           "stage": "13 Completed",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "09-09-2026",
+          "12-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "65d9ae35-f0be-4d4f-8376-1d27dbbc45b3",
@@ -29386,7 +30659,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase V",
-      "extent": "1372.8",
+      "extent": "1372.801189",
       "govt_extent": 1092.78,
       "patta_extent": 280.02,
       "khatas": 225,
@@ -29492,7 +30765,19 @@
           "stage": "RDO",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "remarks": "26-09-2026"
     },
     {
       "id": "839b5ae5-260d-4ab5-86fe-c182378084cc",
@@ -29764,7 +31049,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase VI",
-      "extent": "",
+      "extent": "1250.022350",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -29775,9 +31060,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": null,
-      "target_date": "",
+      "target_date": "27-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -29788,10 +31073,24 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.553Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT",
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "23-07-2026",
+          "09-09-2026",
+          "18-09-2026",
+          "28-09-2026",
+          "08-10-2026",
+          "25-10-2026",
+          "27-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      }
     },
     {
       "id": "2783dadd-3df9-49c8-9c85-76f41018612d",
@@ -30196,20 +31495,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.553Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
@@ -30219,7 +31518,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "9c7f9f3c-76e1-4e7a-b1eb-68a07d8d1bef",
@@ -30495,7 +31806,7 @@
       "mandal": "Nindra",
       "division": "Nagari",
       "phase": "Phase V",
-      "extent": "3622.76",
+      "extent": "3622.762596",
       "govt_extent": 1958.1,
       "patta_extent": 1664.66,
       "khatas": 794,
@@ -30506,7 +31817,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "01-11-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -30601,6 +31912,19 @@
           "stage": "vectorization",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "20-08-2026",
+          "11-09-2026",
+          "21-09-2026",
+          "02-10-2026",
+          "13-10-2026",
+          "30-10-2026",
+          "01-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -30828,7 +32152,7 @@
       "deletions": 20,
       "online_khatas": 0,
       "target_month": "46080",
-      "target_date": "2027-03-31",
+      "target_date": "24-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -30936,7 +32260,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.896Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "17-10-2026",
+          "03-11-2026",
+          "11-11-2026",
+          "19-11-2026",
+          "05-12-2026",
+          "22-12-2026",
+          "24-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "d4195638-47da-4b0c-8229-9b53778553a5",
@@ -31108,7 +32446,7 @@
       "mandal": "Vijayapuram",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": "1020",
+      "extent": "1020.00",
       "govt_extent": 366.66,
       "patta_extent": 653.34,
       "khatas": 564,
@@ -31119,7 +32457,7 @@
       "deletions": 3,
       "online_khatas": 531,
       "target_month": "46080",
-      "target_date": "2027-03-31",
+      "target_date": "24-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -31222,7 +32560,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.896Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "18-09-2026",
+          "22-09-2026",
+          "26-09-2026",
+          "01-10-2026",
+          "05-10-2026",
+          "22-10-2026",
+          "24-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "2bb48350-da8e-465b-810f-b451c573b029",
@@ -31572,7 +32924,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "27-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -31585,7 +32937,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.554Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
@@ -31595,7 +32947,21 @@
           "stage": "GT Ongoing",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "14-09-2026",
+          "26-09-2026",
+          "10-10-2026",
+          "24-10-2026",
+          "08-11-2026",
+          "25-11-2026",
+          "27-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "90dd5ea2-062a-4506-b178-0a32ccf3f52e",
@@ -31605,7 +32971,7 @@
       "mandal": "Peddapanjani",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "1867.76",
+      "extent": "1867.762624",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -31705,6 +33071,16 @@
           "column": "",
           "lastSynced": "2026-09-13T19:24:32.102Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -31948,20 +33324,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "25-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.554Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
@@ -31971,7 +33347,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "22-09-2026",
+          "25-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "61e8ee69-7121-49b3-a307-7384ab3b026e",
@@ -32222,7 +33610,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase VI",
-      "extent": "91.45",
+      "extent": "6307.76",
       "govt_extent": 1236.99,
       "patta_extent": 2786.59,
       "khatas": 51,
@@ -32233,7 +33621,7 @@
       "deletions": 0,
       "online_khatas": 89,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-02-2027",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -32376,7 +33764,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.898Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "05-12-2026",
+          "18-12-2026",
+          "31-12-2026",
+          "13-01-2027",
+          "09-02-2027",
+          "26-02-2027",
+          "28-02-2027"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "67dcb6de-edd2-4509-96ac-8f708f9157e2",
@@ -32606,7 +34008,7 @@
       "deletions": 1,
       "online_khatas": 42,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "02-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -32749,6 +34151,19 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.897Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "03-09-2026",
+          "05-09-2026",
+          "08-09-2026",
+          "10-09-2026",
+          "13-09-2026",
+          "30-09-2026",
+          "02-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
       }
     },
     {
@@ -32770,7 +34185,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "22-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -32793,6 +34208,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "23-11-2026",
+          "30-11-2026",
+          "09-12-2026",
+          "19-12-2026",
+          "26-12-2026",
+          "20-01-2027",
+          "22-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -32814,20 +34242,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.554Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
@@ -32837,7 +34265,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "a9f187fb-fc9d-49ae-a15e-6d8853775347",
@@ -32858,7 +34298,7 @@
       "deletions": 4,
       "online_khatas": 831,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "25-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -33078,7 +34518,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.636Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "03-10-2026",
+          "12-10-2026",
+          "20-10-2026",
+          "29-10-2026",
+          "06-11-2026",
+          "23-11-2026",
+          "25-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "869ab132-9a5a-4cd3-b238-4a8d34bce1d5",
@@ -33132,7 +34586,7 @@
       "mandal": "Peddapanjani",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "1460.41",
+      "extent": "1460.411715",
       "govt_extent": 572.06,
       "patta_extent": 888.35,
       "khatas": 746,
@@ -33238,6 +34692,16 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -33375,7 +34839,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "19-09-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -33470,6 +34934,13 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "19-09-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -33811,7 +35282,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-11-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -33978,6 +35449,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.637Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "17-10-2026",
+          "21-10-2026",
+          "24-10-2026",
+          "28-10-2026",
+          "30-10-2026",
+          "20-11-2026",
+          "23-11-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -34846,7 +36330,7 @@
       "deletions": 0,
       "online_khatas": 1844,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -34954,7 +36438,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.899Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "19-10-2026",
+          "05-11-2026",
+          "14-11-2026",
+          "23-11-2026",
+          "11-12-2026",
+          "28-12-2026",
+          "30-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "7fee7db4-bbad-45c1-8db6-be9d11994c38",
@@ -35107,20 +36605,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "14-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.555Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
@@ -35130,7 +36628,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "11-09-2026",
+          "14-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "86c7a01d-b65f-492a-a596-c38a328362f2",
@@ -35239,7 +36749,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "27-01-2027",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -35334,6 +36844,19 @@
           "stage": "VRO Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "27-11-2026",
+          "04-12-2026",
+          "16-12-2026",
+          "26-12-2026",
+          "02-01-2027",
+          "25-01-2027",
+          "27-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -35504,7 +37027,7 @@
       "mandal": "Gangavaram",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "1051.97",
+      "extent": "1051.97973",
       "govt_extent": 268,
       "patta_extent": 783.97,
       "khatas": 589,
@@ -35610,6 +37133,16 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -36076,7 +37609,7 @@
       "mandal": "Palamaner",
       "division": "Palamaner",
       "phase": "Phase-4",
-      "extent": "1583.68",
+      "extent": "1683.68",
       "govt_extent": 307.92,
       "patta_extent": 1275.76,
       "khatas": 897,
@@ -36087,20 +37620,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "14-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.555Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
@@ -36110,7 +37643,19 @@
           "stage": "RDO Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "11-09-2026",
+          "14-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "b526ad54-3125-4e9d-9802-d9a41e73ce19",
@@ -36258,7 +37803,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -36269,10 +37814,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.555Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "570f2624-b250-4024-9acf-faf3550cd309",
@@ -36487,7 +38033,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -36498,10 +38044,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.555Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "9f10b5d5-c670-49ac-a47c-9d93a88b6c9c",
@@ -36707,7 +38254,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "08-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -36730,6 +38277,19 @@
           "stage": "GT Not Started",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "16-11-2026",
+          "21-11-2026",
+          "30-11-2026",
+          "08-12-2026",
+          "15-12-2026",
+          "06-01-2027",
+          "08-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -36751,20 +38311,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.555Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
@@ -36774,7 +38334,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "244a8345-dcaa-43a2-a743-5674b8845266",
@@ -36911,7 +38483,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Sep-26",
-      "target_date": "2027-03-31",
+      "target_date": "12-01-2027",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -36934,6 +38506,19 @@
           "stage": "Final ROR Completed",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "18-11-2026",
+          "24-11-2026",
+          "02-12-2026",
+          "10-12-2026",
+          "17-12-2026",
+          "08-01-2027",
+          "12-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -36955,7 +38540,7 @@
       "deletions": 0,
       "online_khatas": 1366,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "26-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -37175,7 +38760,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.553Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "19-10-2026",
+          "31-10-2026",
+          "13-11-2026",
+          "25-11-2026",
+          "07-12-2026",
+          "24-12-2026",
+          "26-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "b5773efb-a9cf-4a35-b6ad-b06c3665afa4",
@@ -37389,7 +38988,7 @@
       "mandal": "Baireddipalle",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "1398.52",
+      "extent": "1398.522431",
       "govt_extent": 290.3,
       "patta_extent": 1108.22,
       "khatas": 723,
@@ -37400,7 +38999,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "08-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -37495,6 +39094,19 @@
           "stage": "VRO Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "11-09-2026",
+          "19-09-2026",
+          "06-10-2026",
+          "08-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -37604,7 +39216,7 @@
       "deletions": 0,
       "online_khatas": 1431,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -37824,7 +39436,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.559Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "28-10-2026",
+          "06-11-2026",
+          "15-11-2026",
+          "23-11-2026",
+          "11-12-2026",
+          "28-12-2026",
+          "30-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "165b83be-74d3-4d18-91b0-1e8084dde1fb",
@@ -38088,7 +39714,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -38099,10 +39725,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.557Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "c4e03186-deb6-4d4a-a04c-cd63f0f422fb",
@@ -38871,7 +40498,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "3639.98",
+      "extent": "3639.984124",
       "govt_extent": 749.87,
       "patta_extent": 2890.11,
       "khatas": 1839,
@@ -38882,7 +40509,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Jan-27",
-      "target_date": "2027-03-31",
+      "target_date": "24-11-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -38977,6 +40604,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "20-08-2026",
+          "15-09-2026",
+          "02-10-2026",
+          "19-10-2026",
+          "05-11-2026",
+          "22-11-2026",
+          "24-11-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -39186,7 +40826,7 @@
       "deletions": 0,
       "online_khatas": 886,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "20-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -39294,7 +40934,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.903Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "06-10-2026",
+          "13-10-2026",
+          "19-10-2026",
+          "26-10-2026",
+          "01-11-2026",
+          "18-11-2026",
+          "20-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "2d666206-d55e-4c1a-8128-acb95c40f078",
@@ -39685,20 +41339,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.557Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
@@ -39708,7 +41362,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "8ae3f832-ef97-428c-8ed6-cb54002a4f61",
@@ -39729,20 +41395,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "46382",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.557Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
@@ -39752,7 +41418,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "dbd5aed3-c4b6-434a-8284-0621dca32967",
@@ -40413,7 +42091,8 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.709Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "19377718-796d-45ec-b8de-9e3c0f957126",
@@ -40467,7 +42146,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
       "phase": "Phase V",
-      "extent": "262.53",
+      "extent": "262.53178",
       "govt_extent": 93.29,
       "patta_extent": 169.24,
       "khatas": 125,
@@ -40573,7 +42252,19 @@
           "stage": "RDO",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed",
+          "Completed"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "remarks": "26-09-2026"
     },
     {
       "id": "5e709ce5-f0a9-4ccd-9c95-18631eb3eb9e",
@@ -41046,7 +42737,7 @@
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -41057,10 +42748,11 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.557Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
-      "source_meta": {}
+      "source_meta": {},
+      "current_stage": "GT"
     },
     {
       "id": "8302d4ad-7934-4789-a79d-c2af3232707d",
@@ -41081,7 +42773,7 @@
       "deletions": 0,
       "online_khatas": 80,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "30-09-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -41296,6 +42988,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.629Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "25-08-2025",
+          "08-09-2026",
+          "09-09-2026",
+          "10-09-2026",
+          "11-09-2026",
+          "28-09-2026",
+          "30-09-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
       }
     },
     {
@@ -41720,7 +43425,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase V",
-      "extent": "1284.8",
+      "extent": "1284.801780",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -41731,7 +43436,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": null,
-      "target_date": "",
+      "target_date": "11-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -41820,6 +43525,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:24:32.102Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "Completed",
+          "Completed",
+          "Completed",
+          "14-09-2026",
+          "22-09-2026",
+          "09-10-2026",
+          "11-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -43234,7 +44952,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-4",
-      "extent": "687.07",
+      "extent": "689.81",
       "govt_extent": 157.63,
       "patta_extent": 529.44,
       "khatas": 250,
@@ -43245,20 +44963,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "10-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
-      "jc_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "Completed",
+      "jc_status": "In Progress",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.558Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
@@ -43268,7 +44986,19 @@
           "stage": "JC login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "Completed",
+          "10-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "JC Login"
     },
     {
       "id": "addd1757-33aa-4169-b142-fe87d02afa54",
@@ -43697,7 +45427,8 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.622Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "ced524e2-b2fd-4d3b-b4e9-2093fa80d63b",
@@ -43718,20 +45449,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.558Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
@@ -43741,7 +45472,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "66d5d4a4-b1fd-4745-957c-05dce5fd074c",
@@ -43862,7 +45605,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2476",
+      "extent": "2476.00",
       "govt_extent": 1457.81,
       "patta_extent": 1018.19,
       "khatas": 775,
@@ -43873,7 +45616,7 @@
       "deletions": 0,
       "online_khatas": 662,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "16-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -44088,7 +45831,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.626Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "16-10-2026",
+          "27-10-2026",
+          "06-11-2026",
+          "16-11-2026",
+          "27-11-2026",
+          "14-12-2026",
+          "16-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "7f480780-ad07-4af7-b824-acac324bba64",
@@ -44098,7 +45855,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-4",
-      "extent": "1650.23",
+      "extent": "1650.00",
       "govt_extent": 354.02,
       "patta_extent": 1296.21,
       "khatas": 936,
@@ -44109,20 +45866,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.558Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
@@ -44132,7 +45889,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "c09937a4-4288-427f-8bce-f85e54174348",
@@ -44234,7 +46003,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "18-11-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -44401,6 +46170,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.627Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "15-10-2026",
+          "17-10-2026",
+          "21-10-2026",
+          "23-10-2026",
+          "26-10-2026",
+          "16-11-2026",
+          "18-11-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -44936,20 +46718,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.558Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
@@ -44959,7 +46741,19 @@
           "stage": "Tah Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "1686f21b-02c9-4ead-870e-14bda1d1c58d",
@@ -45154,7 +46948,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "",
+      "extent": "1250.022350",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -45165,9 +46959,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": null,
-      "target_date": "",
+      "target_date": "27-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "Pending",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -45178,10 +46972,24 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "Pending",
       "last_synced": "2026-09-13T18:29:59.558Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
-      "source_meta": {}
+      "source_meta": {},
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "23-07-2026",
+          "09-09-2026",
+          "18-09-2026",
+          "28-09-2026",
+          "08-10-2026",
+          "25-10-2026",
+          "27-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "adce851d-b611-4e5b-bae6-c265459b47a4",
@@ -45693,9 +47501,9 @@
       "deletions": 119,
       "online_khatas": 1171,
       "target_month": null,
-      "target_date": "",
+      "target_date": "20-12-2026",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -45706,7 +47514,7 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "In Progress",
       "last_synced": "2026-09-13T19:18:27.908Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
@@ -45795,7 +47603,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.908Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "18-10-2026",
+          "29-10-2026",
+          "09-11-2026",
+          "20-11-2026",
+          "01-12-2026",
+          "18-12-2026",
+          "20-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "364a2c09-0259-4046-8a17-9605f1beafd3",
@@ -46765,7 +48587,7 @@
       "deletions": 0,
       "online_khatas": 140,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -46985,6 +48807,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.664Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "05-09-2026",
+          "07-09-2026",
+          "09-09-2026",
+          "11-09-2026",
+          "14-09-2026",
+          "01-10-2026",
+          "03-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
       }
     },
     {
@@ -48485,20 +50320,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.559Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
@@ -48508,7 +50343,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "4c9a0d0a-73a9-459e-916d-fbbd211f1a14",
@@ -48529,7 +50376,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "07-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -48696,6 +50543,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.661Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "28-10-2026",
+          "31-10-2026",
+          "05-11-2026",
+          "10-11-2026",
+          "13-11-2026",
+          "04-12-2026",
+          "07-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -48967,7 +50827,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "",
+      "extent": "610.39",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -48978,9 +50838,9 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": null,
-      "target_date": "",
+      "target_date": "28-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
+      "gt_status": "In Progress",
       "vectorization_status": "",
       "vs_status": "",
       "vro_status": "",
@@ -48991,10 +50851,24 @@
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Not Updated",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.559Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
-      "source_meta": {}
+      "source_meta": {},
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "28-09-2026",
+          "01-10-2026",
+          "03-10-2026",
+          "06-10-2026",
+          "09-10-2026",
+          "26-10-2026",
+          "28-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "46fc49e4-eb8e-45ef-9acd-c36305ebbddd",
@@ -49643,7 +51517,7 @@
       "deletions": 0,
       "online_khatas": 128,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "11-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -49863,7 +51737,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.660Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "16-09-2026",
+          "17-09-2026",
+          "19-09-2026",
+          "20-09-2026",
+          "22-09-2026",
+          "09-10-2026",
+          "11-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "f01464ae-3291-4c43-8637-d613becb561a",
@@ -50759,7 +52647,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -50926,6 +52814,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.593Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "10-11-2026",
+          "16-11-2026",
+          "23-11-2026",
+          "30-11-2026",
+          "04-12-2026",
+          "25-12-2026",
+          "28-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -50991,20 +52892,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.559Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
@@ -51014,7 +52915,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "e067196b-a674-4ab8-8fc9-9fc5121b440a",
@@ -51112,7 +53025,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-4",
-      "extent": "738.7",
+      "extent": "738.70",
       "govt_extent": 98.79,
       "patta_extent": 639.91,
       "khatas": 330,
@@ -51123,20 +53036,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Nov-26",
-      "target_date": "2027-03-31",
+      "target_date": "12-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.559Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
@@ -51146,7 +53059,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "09-09-2026",
+          "12-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "6692e1aa-266a-42a5-ae17-18965b6b283b",
@@ -51167,7 +53092,7 @@
       "deletions": 0,
       "online_khatas": 271,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -51387,7 +53312,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.595Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "28-09-2026",
+          "01-10-2026",
+          "03-10-2026",
+          "06-10-2026",
+          "09-10-2026",
+          "26-10-2026",
+          "28-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "df48cd2f-0d5c-4035-825a-5876c62ea94a",
@@ -51737,7 +53676,7 @@
       "deletions": 0,
       "online_khatas": 278,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -51957,7 +53896,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.598Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "23-09-2026",
+          "26-09-2026",
+          "28-09-2026",
+          "01-10-2026",
+          "04-10-2026",
+          "21-10-2026",
+          "23-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "e42ba373-48a2-4b47-9548-f87a2577e817",
@@ -52425,7 +54378,7 @@
       "deletions": 4,
       "online_khatas": 145,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -52645,7 +54598,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.601Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "11-09-2026",
+          "12-09-2026",
+          "14-09-2026",
+          "15-09-2026",
+          "16-09-2026",
+          "03-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "1496a899-b9b5-4321-8e26-7d9bf787da57",
@@ -52703,7 +54670,7 @@
       "deletions": 10,
       "online_khatas": 506,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "23-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -52811,7 +54778,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.913Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "14-10-2026",
+          "19-10-2026",
+          "24-10-2026",
+          "29-10-2026",
+          "04-11-2026",
+          "21-11-2026",
+          "23-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "9d95a6db-4161-44fd-bca2-a15d12d38d8c",
@@ -52961,7 +54942,7 @@
       "deletions": 0,
       "online_khatas": 149,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "03-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -53176,7 +55157,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.603Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "09-09-2026",
+          "11-09-2026",
+          "12-09-2026",
+          "13-09-2026",
+          "14-09-2026",
+          "01-10-2026",
+          "03-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "b6f7f748-3662-42b6-8a16-56393e84064a",
@@ -53429,7 +55424,7 @@
       "deletions": 0,
       "online_khatas": 161,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "10-10-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -53649,7 +55644,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.608Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "15-09-2026",
+          "17-09-2026",
+          "18-09-2026",
+          "19-09-2026",
+          "21-09-2026",
+          "08-10-2026",
+          "10-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "a3eafb55-b4a7-44fd-93b9-d11289c22898",
@@ -53659,7 +55668,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-4",
-      "extent": "315.27",
+      "extent": "198.24",
       "govt_extent": 39.84,
       "patta_extent": 275.43,
       "khatas": 202,
@@ -53670,20 +55679,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Oct-26",
-      "target_date": "2027-03-31",
+      "target_date": "18-09-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
-      "rdo_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "Completed",
+      "rdo_status": "In Progress",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.559Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
@@ -53693,7 +55702,19 @@
           "stage": "Rdo Login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "Completed",
+          "15-09-2026",
+          "18-09-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "RDO Login"
     },
     {
       "id": "307f38e1-46e9-4344-bd6f-7c4908f72f6c",
@@ -53995,7 +56016,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "08-12-2026",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -54162,6 +56183,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.609Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "29-10-2026",
+          "02-11-2026",
+          "06-11-2026",
+          "11-11-2026",
+          "16-11-2026",
+          "05-12-2026",
+          "08-12-2026"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -54408,7 +56442,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "28-01-2027",
       "days_delayed": 0,
       "gt_status": "",
       "vectorization_status": "",
@@ -54575,6 +56609,19 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.611Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-7",
+        "dates": [
+          "28-11-2026",
+          "05-12-2026",
+          "17-12-2026",
+          "28-12-2026",
+          "04-01-2027",
+          "26-01-2027",
+          "28-01-2027"
+        ],
+        "source": "Phase 7 Resurvey Targets & Timelines"
       }
     },
     {
@@ -56434,20 +58481,20 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Dec-26",
-      "target_date": "2027-03-31",
+      "target_date": "05-10-2026",
       "days_delayed": 0,
-      "gt_status": "",
-      "vectorization_status": "",
-      "vs_status": "",
-      "vro_status": "",
-      "tahsildar_status": "",
+      "gt_status": "Completed",
+      "vectorization_status": "Completed",
+      "vs_status": "Completed",
+      "vro_status": "Completed",
+      "tahsildar_status": "In Progress",
       "rdo_status": "",
       "jc_status": "",
       "section13_status": "",
       "draft_ror_status": "",
       "final_ror_status": "",
       "ppb_status": "",
-      "status": "Pending",
+      "status": "In Progress",
       "last_synced": "2026-09-13T18:29:59.560Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
@@ -56457,7 +58504,19 @@
           "stage": "Tah login",
           "daysDelayed": 0
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-4",
+        "dates": [
+          "08-09-2026",
+          "Completed",
+          "09-09-2026",
+          "02-10-2026",
+          "05-10-2026"
+        ],
+        "source": "Phase IV Resurvey Targets & Timelines"
+      },
+      "current_stage": "Tahsildar Login"
     },
     {
       "id": "12648e3c-08db-468c-9e5e-754c4ba8b2fa",
@@ -56478,7 +58537,7 @@
       "deletions": 5,
       "online_khatas": 729,
       "target_month": "Mar-27",
-      "target_date": "2027-03-31",
+      "target_date": "29-12-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -56698,7 +58757,21 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.654Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "27-10-2026",
+          "07-11-2026",
+          "18-11-2026",
+          "29-11-2026",
+          "10-12-2026",
+          "27-12-2026",
+          "29-12-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "0e792201-dee1-40d5-a307-3b979398777e",
@@ -56856,7 +58929,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "1250.1",
+      "extent": "1250.10",
       "govt_extent": 230.47,
       "patta_extent": 1019.63,
       "khatas": 707,
@@ -56867,7 +58940,7 @@
       "deletions": 0,
       "online_khatas": 663,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "20-11-2026",
       "days_delayed": 0,
       "gt_status": "In Progress",
       "vectorization_status": "",
@@ -56975,7 +59048,21 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.916Z"
         }
-      }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "11-10-2026",
+          "16-10-2026",
+          "21-10-2026",
+          "26-10-2026",
+          "01-11-2026",
+          "18-11-2026",
+          "20-11-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
+      },
+      "current_stage": "GT"
     },
     {
       "id": "0e6ede77-9eae-4ad3-9901-349150f4307f",
@@ -57226,7 +59313,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase V",
-      "extent": "1901.91",
+      "extent": "1901.911895",
       "govt_extent": 237.58,
       "patta_extent": 1664.33,
       "khatas": 1236,
@@ -57237,7 +59324,7 @@
       "deletions": null,
       "online_khatas": null,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "19-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -57332,6 +59419,19 @@
           "stage": "VS Login",
           "daysDelayed": 0
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-5",
+        "dates": [
+          "04-08-2026",
+          "07-09-2026",
+          "14-09-2026",
+          "22-09-2026",
+          "30-09-2026",
+          "17-10-2026",
+          "19-10-2026"
+        ],
+        "source": "Phase-V Resurvey Targets & Timelines"
       }
     },
     {
@@ -57661,7 +59761,8 @@
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.652Z"
         }
-      }
+      },
+      "current_stage": "GT"
     },
     {
       "id": "b291834c-2991-42a9-b925-693e9af2820f",
@@ -57770,7 +59871,7 @@
       "deletions": 1,
       "online_khatas": 80,
       "target_month": "Feb-27",
-      "target_date": "2027-03-31",
+      "target_date": "01-10-2026",
       "days_delayed": 0,
       "gt_status": "Completed",
       "vectorization_status": "",
@@ -57918,6 +60019,19 @@
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.914Z"
         }
+      },
+      "stage_targets": {
+        "phase": "Phase-6",
+        "dates": [
+          "18-08-2026",
+          "08-09-2026",
+          "09-09-2026",
+          "10-09-2026",
+          "12-09-2026",
+          "29-09-2026",
+          "01-10-2026"
+        ],
+        "source": "Phase-VI Resurvey Targets & Timelines"
       }
     },
     {

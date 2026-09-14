@@ -8,6 +8,7 @@ node_modules/
 # Raw spreadsheets and intermediate extraction files
 *.xlsx
 *.xls
+*.pdf
 data/action_plan.json
 data/master_villages.json
 scratch/
