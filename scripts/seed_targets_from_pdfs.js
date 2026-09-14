@@ -40,6 +40,23 @@ function normalizeTelugu(str) {
   return s;
 }
 
+function normalizePhase(val) {
+  if (!val) return '';
+  const str = String(val).trim();
+  const m = str.match(/^(?:Phase[\s\-_]*)?(1|2|3|4|5|6|7|I|II|III|IV|V|VI|VII)$/i);
+  if (m) {
+    const p = m[1].toUpperCase();
+    if (p === '1' || p === 'I') return 'Phase I';
+    if (p === '2' || p === 'II') return 'Phase II';
+    if (p === '3' || p === 'III') return 'Phase III';
+    if (p === '4' || p === 'IV') return 'Phase IV';
+    if (p === '5' || p === 'V') return 'Phase V';
+    if (p === '6' || p === 'VI') return 'Phase VI';
+    if (p === '7' || p === 'VII') return 'Phase VII';
+  }
+  return str;
+}
+
 function parseDates(str) {
   const dates = [];
   const regex = /(\d{2}-\d{2}-\d{4})|(Completed)/gi;
@@ -183,10 +200,10 @@ function matchMasterVillage(division, mandal, villageName, targetPhase) {
   // 3. Match in target phase if specified
   if (!v && targetPhase) {
     v = store.villages.find(x => {
-      const xp = clean(x.phase);
-      const tp = clean(targetPhase);
+      const xp = normalizePhase(x.phase);
+      const tp = normalizePhase(targetPhase);
       const xv = normalizeTelugu(x.village_name);
-      return xp.includes(tp.slice(-1)) && (xv === normV || xv.includes(normV) || normV.includes(xv));
+      return xp === tp && (xv === normV || xv.includes(normV) || normV.includes(xv));
     });
   }
 

@@ -293,7 +293,7 @@
     },
     {
       "id": "source-phase-7-targets",
-      "name": "Phase 7 Resurvey Targets & Timelines (Govt Official)",
+      "name": "Phase VII Resurvey Targets & Timelines (Govt Official)",
       "spreadsheetId": "GOVT_PDF_PHASE_7",
       "googleSheet": "Phase 7 - Resurvey Targets & Timelines.pdf",
       "tab": "Targets & Timelines",
@@ -614,7 +614,7 @@
       "village_name": "Samireddipalle",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1976.89",
       "govt_extent": 646.53,
       "patta_extent": 1330.36,
@@ -658,7 +658,7 @@
       "village_name": "Pulikallu",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2929.24",
       "govt_extent": 1219.67,
       "patta_extent": 1709.57,
@@ -695,7 +695,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -714,7 +714,7 @@
       "village_name": "Chinnamareddi Khandriga",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1776.41",
       "govt_extent": 394.11,
       "patta_extent": 1382.3,
@@ -795,7 +795,7 @@
       "village_name": "Nanjarapalle",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "820.12",
       "govt_extent": 115.5,
       "patta_extent": 704.62,
@@ -948,7 +948,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "18-09-2026",
           "27-09-2026",
@@ -1122,7 +1122,7 @@
       "village_name": "Penumuru",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2835.13",
       "govt_extent": 408.46,
       "patta_extent": 2426.67,
@@ -1303,7 +1303,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "19-11-2026",
           "25-11-2026",
@@ -1323,7 +1323,7 @@
       "village_name": "Kamachinnaiahpalle",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4636.91",
       "govt_extent": 858.25,
       "patta_extent": 3778.66,
@@ -1522,7 +1522,7 @@
       "village_name": "Guntipalle",
       "mandal": "Penumuru",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2789.66",
       "govt_extent": 1169.65,
       "patta_extent": 1620.01,
@@ -1751,7 +1751,7 @@
       "village_name": "Kothakota",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2084.23",
       "govt_extent": 624.6,
       "patta_extent": 3554.43,
@@ -1886,7 +1886,7 @@
       "village_name": "Polavaram",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1881.35",
       "govt_extent": 236.04,
       "patta_extent": 1645.31,
@@ -1923,7 +1923,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -1942,7 +1942,7 @@
       "village_name": "Akanambattu",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1016.65",
       "govt_extent": 99.21,
       "patta_extent": 917.44,
@@ -1979,7 +1979,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -2035,7 +2035,7 @@
       "village_name": "Potukanuma",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "3376.96",
       "govt_extent": 595.45,
       "patta_extent": 2781.51,
@@ -2287,7 +2287,7 @@
       "village_name": "Paturu",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2065.7",
       "govt_extent": 273.14,
       "patta_extent": 1792.56,
@@ -2324,7 +2324,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "24-11-2026",
           "01-12-2026",
@@ -2344,7 +2344,7 @@
       "village_name": "Baitapalle",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "2095.59",
       "govt_extent": 343.85,
       "patta_extent": 1751.74,
@@ -2381,7 +2381,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "17-09-2026",
           "23-09-2026",
@@ -2402,7 +2402,7 @@
       "village_name": "Erracheruvupalle",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "2152.69",
       "govt_extent": 496.18,
       "patta_extent": 1656.51,
@@ -2439,7 +2439,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "22-09-2026",
           "28-09-2026",
@@ -2460,7 +2460,7 @@
       "village_name": "Thenepalle",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "222.03",
       "govt_extent": 768.12,
       "patta_extent": 2411.07,
@@ -2653,7 +2653,7 @@
       },
       "current_stage": "GT",
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "25-11-2026",
           "02-12-2026",
@@ -2673,7 +2673,7 @@
       "village_name": "Palakuru",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1935.02",
       "govt_extent": 343.53,
       "patta_extent": 1591.49,
@@ -2717,7 +2717,7 @@
       "village_name": "Peta Agraharam",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "803.91",
       "govt_extent": 162.14,
       "patta_extent": 641.77,
@@ -2761,7 +2761,7 @@
       "village_name": "Puthalapattu",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2960.87",
       "govt_extent": 409.28,
       "patta_extent": 2551.59,
@@ -2942,7 +2942,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "21-11-2026",
           "27-11-2026",
@@ -2962,7 +2962,7 @@
       "village_name": "Oddepalle",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "1573.61",
       "govt_extent": 323.05,
       "patta_extent": 1250.56,
@@ -3006,7 +3006,7 @@
       "village_name": "Vavilthota",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4210.63",
       "govt_extent": 520.14,
       "patta_extent": 3690.49,
@@ -3246,7 +3246,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "20-11-2026",
           "29-11-2026",
@@ -3267,7 +3267,7 @@
       "village_name": "Muthirevula",
       "mandal": "Puthalapattu",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1672.76",
       "govt_extent": 321.7,
       "patta_extent": 1351.06,
@@ -3457,7 +3457,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -3477,7 +3477,7 @@
       "village_name": "Punyasamudram",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1123.32",
       "govt_extent": 384.46,
       "patta_extent": 738.86,
@@ -3514,7 +3514,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -3533,7 +3533,7 @@
       "village_name": "Patnam",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4562.79",
       "govt_extent": 507.62,
       "patta_extent": 4055.17,
@@ -3661,7 +3661,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -3834,7 +3834,7 @@
       "village_name": "Thavanampalle",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2023.19",
       "govt_extent": 346.24,
       "patta_extent": 1676.95,
@@ -4061,7 +4061,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "17-08-2025",
           "09-09-2026",
@@ -4081,7 +4081,7 @@
       "village_name": "Pallecheruvu",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "751.57",
       "govt_extent": 302.54,
       "patta_extent": 449.03,
@@ -4199,7 +4199,7 @@
       "village_name": "Paimagham",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1900.10",
       "govt_extent": 141.89,
       "patta_extent": 1758.21,
@@ -4236,7 +4236,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -4329,7 +4329,7 @@
       "village_name": "Madhavaram",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1328.143",
       "govt_extent": 283.37,
       "patta_extent": 1044.773,
@@ -4510,7 +4510,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "05-11-2026",
           "10-11-2026",
@@ -4530,7 +4530,7 @@
       "village_name": "Mallakunta",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1652.15",
       "govt_extent": 344.7,
       "patta_extent": 1307.45,
@@ -4567,7 +4567,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "13-11-2026",
           "20-11-2026",
@@ -4624,7 +4624,7 @@
       "village_name": "Kattakindapalle",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1055.16",
       "govt_extent": 421.83,
       "patta_extent": 633.33,
@@ -4805,7 +4805,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "25-11-2026",
           "02-12-2026",
@@ -4825,7 +4825,7 @@
       "village_name": "Govindareddipalle",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "164",
       "govt_extent": 13.19,
       "patta_extent": 150.81,
@@ -4943,7 +4943,7 @@
       "village_name": "Cherlopalle",
       "mandal": "Thavanampalli",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "2114.65",
       "govt_extent": 779.41,
       "patta_extent": 1335.2400000000002,
@@ -5061,7 +5061,7 @@
       "village_name": "Basavapalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "883.38",
       "govt_extent": 98.14,
       "patta_extent": 785.24,
@@ -5105,7 +5105,7 @@
       "village_name": "Cheelapalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1101.48",
       "govt_extent": 203.14,
       "patta_extent": 898.34,
@@ -5224,7 +5224,7 @@
       "village_name": "Mandikrishnapuram",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "938.98",
       "govt_extent": 177.74,
       "patta_extent": 761.24,
@@ -5430,7 +5430,7 @@
       "village_name": "Pasumanda Part",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "",
       "govt_extent": null,
       "patta_extent": null,
@@ -5618,7 +5618,7 @@
       "village_name": "Adilakshmambapuram",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "566.6",
       "govt_extent": 215.9,
       "patta_extent": 350.7,
@@ -5817,7 +5817,7 @@
       "village_name": "Cheruvu Mundara Khandri",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "491.02",
       "govt_extent": 53.52,
       "patta_extent": 437.5,
@@ -5861,7 +5861,7 @@
       "village_name": "Kaidugani Khandriga",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "823.3199999999999",
       "govt_extent": 114.26,
       "patta_extent": 709.06,
@@ -6042,7 +6042,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "12-11-2026",
           "19-11-2026",
@@ -6211,7 +6211,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "14-09-2026",
           "16-09-2026",
@@ -6269,7 +6269,7 @@
       "village_name": "Gudipala",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1250.59",
       "govt_extent": 150.37,
       "patta_extent": 1100.22,
@@ -6306,7 +6306,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -6399,7 +6399,7 @@
       "village_name": "190 Ramapuram",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2845.49",
       "govt_extent": 931.48,
       "patta_extent": 1914.01,
@@ -6646,7 +6646,7 @@
       "village_name": "Ramapuram 197",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1462.2",
       "govt_extent": 220.4,
       "patta_extent": 1241.8,
@@ -6683,7 +6683,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "09-11-2026",
           "13-11-2026",
@@ -6703,7 +6703,7 @@
       "village_name": "C Bandapalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "677.07",
       "govt_extent": 2.75,
       "patta_extent": 674.32,
@@ -6943,7 +6943,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "24-09-2026",
           "27-09-2026",
@@ -7073,7 +7073,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "06-08-2026",
           "07-09-2026",
@@ -7209,7 +7209,7 @@
       "village_name": "Naragallu",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "4815.43",
       "govt_extent": 2356.2,
       "patta_extent": 2459.23,
@@ -7390,7 +7390,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -7410,7 +7410,7 @@
       "village_name": "Srirangampalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "496.05",
       "govt_extent": 168.63,
       "patta_extent": 327.42,
@@ -7454,7 +7454,7 @@
       "village_name": "Thimmaiahpalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "462.72",
       "govt_extent": 71.1,
       "patta_extent": 391.62,
@@ -7582,7 +7582,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "23-09-2026",
           "25-09-2026",
@@ -7603,7 +7603,7 @@
       "village_name": "Gollapalle",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "315.27",
       "govt_extent": 626.92,
       "patta_extent": 599.67,
@@ -7651,7 +7651,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -7672,7 +7672,7 @@
       "village_name": "Ragimanupatteda",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "94.35",
       "govt_extent": 19.04,
       "patta_extent": 75.31,
@@ -7716,7 +7716,7 @@
       "village_name": "Venkatalakshmambapuram",
       "mandal": "Gudipala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "195.85",
       "govt_extent": 98.05,
       "patta_extent": 97.8,
@@ -7946,7 +7946,7 @@
       "village_name": "Paluru",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "191.67",
       "govt_extent": 47.51,
       "patta_extent": 144.16,
@@ -8182,7 +8182,7 @@
       "village_name": "Diguvamasapalle",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2330.38",
       "govt_extent": 435.06,
       "patta_extent": 1895.32,
@@ -8540,7 +8540,7 @@
       "village_name": "Siddampalle",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "618.25",
       "govt_extent": 304.74,
       "patta_extent": 313.51,
@@ -8693,7 +8693,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "18-11-2026",
           "24-11-2026",
@@ -8829,7 +8829,7 @@
       "village_name": "Anagallu",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "599.71",
       "govt_extent": 181.37,
       "patta_extent": 418.34,
@@ -8910,7 +8910,7 @@
       "village_name": "Ananthapuram",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "529.28",
       "govt_extent": 87.26,
       "patta_extent": 442.02,
@@ -8954,7 +8954,7 @@
       "village_name": "Thumminda",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "4604.12",
       "govt_extent": 1617.9,
       "patta_extent": 2986.22,
@@ -9135,7 +9135,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -9155,7 +9155,7 @@
       "village_name": "Peddisettipalle",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2749.49",
       "govt_extent": 1179.82,
       "patta_extent": 1569.67,
@@ -9336,7 +9336,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "18-11-2026",
           "24-11-2026",
@@ -9356,7 +9356,7 @@
       "village_name": "Thenebanda",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2958.94",
       "govt_extent": 972.48,
       "patta_extent": 1986.46,
@@ -9393,7 +9393,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -9412,7 +9412,7 @@
       "village_name": "Bakaranarasingarayanipeta",
       "mandal": "Chittoor",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "411.09",
       "govt_extent": 157.64,
       "patta_extent": 253.45,
@@ -10223,7 +10223,7 @@
       "last_modified": "2026-09-13T18:29:59.547Z",
       "source_meta": {},
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -10351,7 +10351,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "07-10-2026",
           "13-10-2026",
@@ -10446,7 +10446,7 @@
       "village_name": "Vinjam",
       "mandal": "Gangadhara Nellore",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4045.49",
       "govt_extent": 1776,
       "patta_extent": 2269.49,
@@ -10719,7 +10719,7 @@
       "village_name": "Nandanoor",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "3206.00",
       "govt_extent": 423,
       "patta_extent": 2783,
@@ -10756,7 +10756,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -10981,7 +10981,7 @@
       "village_name": "Gangadhara Nellore",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "2775.45",
       "govt_extent": 330.58,
       "patta_extent": 2444.87,
@@ -11099,7 +11099,7 @@
       "village_name": "Vepanjeri",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2112.09",
       "govt_extent": 156.62,
       "patta_extent": 1955.47,
@@ -11254,7 +11254,7 @@
       "village_name": "Kadapagunta",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "464.33",
       "govt_extent": 178.62,
       "patta_extent": 285.71,
@@ -11298,7 +11298,7 @@
       "village_name": "Atmakur",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "318.57",
       "govt_extent": 103.37,
       "patta_extent": 215.2,
@@ -11342,7 +11342,7 @@
       "village_name": "Murthinayanipalle",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "454.13",
       "govt_extent": 59.33,
       "patta_extent": 394.8,
@@ -11386,7 +11386,7 @@
       "village_name": "Bukkapatnam",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1078.09",
       "govt_extent": 380.25,
       "patta_extent": 697.84,
@@ -11423,7 +11423,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -11479,7 +11479,7 @@
       "village_name": "Tungundram",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "3009.06",
       "govt_extent": 1328,
       "patta_extent": 1681.06,
@@ -11898,7 +11898,7 @@
       "village_name": "Garigalapalle",
       "mandal": "G.D.Nellore",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "397.14",
       "govt_extent": 47.11,
       "patta_extent": 350.03,
@@ -11979,7 +11979,7 @@
       "village_name": "Kothapalle",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "3000.66",
       "govt_extent": 589.805,
       "patta_extent": 2410.86,
@@ -12016,7 +12016,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "01-10-2026",
           "10-10-2026",
@@ -12037,7 +12037,7 @@
       "village_name": "Mudigolam",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4798.32",
       "govt_extent": 777.93,
       "patta_extent": 4020.39,
@@ -12277,7 +12277,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "21-11-2026",
           "01-12-2026",
@@ -12446,7 +12446,7 @@
       "village_name": "Venkatasamudra Agraharam",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "207.88",
       "govt_extent": 61.73,
       "patta_extent": 146.15,
@@ -12490,7 +12490,7 @@
       "village_name": "Nampalle",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "3549.91",
       "govt_extent": 586.5,
       "patta_extent": 2963.41,
@@ -12527,7 +12527,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "21-09-2026",
           "30-09-2026",
@@ -12548,7 +12548,7 @@
       "village_name": "Irala",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "3331.18",
       "govt_extent": 499.62,
       "patta_extent": 2831.56,
@@ -12592,7 +12592,7 @@
       "village_name": "Polakala",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "4650.18",
       "govt_extent": 756.18,
       "patta_extent": 3894,
@@ -12629,7 +12629,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "10-09-2026",
@@ -12648,7 +12648,7 @@
       "village_name": "Gundlapalli",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "3089.09",
       "govt_extent": 1150.37,
       "patta_extent": 1938.72,
@@ -12776,7 +12776,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "16-10-2026",
           "29-10-2026",
@@ -12797,7 +12797,7 @@
       "village_name": "Morampalle",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1839.77",
       "govt_extent": 742.79,
       "patta_extent": 1096.98,
@@ -12878,7 +12878,7 @@
       "village_name": "Puthramaddi",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2505.38",
       "govt_extent": 770.49,
       "patta_extent": 1734.89,
@@ -12915,7 +12915,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -12934,7 +12934,7 @@
       "village_name": "Pulluru",
       "mandal": "Irala",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "3764.64",
       "govt_extent": 1107.96,
       "patta_extent": 2656.68,
@@ -13052,7 +13052,7 @@
       "village_name": "Aggichenupalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "972.58",
       "govt_extent": 167.59,
       "patta_extent": 804.99,
@@ -13096,7 +13096,7 @@
       "village_name": "Kondakindapalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "792.54",
       "govt_extent": 87.74,
       "patta_extent": 704.8,
@@ -13140,7 +13140,7 @@
       "village_name": "Venugopalapuram",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1028.88",
       "govt_extent": 248,
       "patta_extent": 780.88,
@@ -13268,7 +13268,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "09-10-2026",
           "13-10-2026",
@@ -13289,7 +13289,7 @@
       "village_name": "Goduguchintha",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "865.05",
       "govt_extent": 200.28,
       "patta_extent": 664.77,
@@ -13536,7 +13536,7 @@
       "village_name": "Etteranganipalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "454.28",
       "govt_extent": 159.49,
       "patta_extent": 294.79,
@@ -13573,7 +13573,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -13592,7 +13592,7 @@
       "village_name": "Bommaiahpalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "329.95",
       "govt_extent": 66.51,
       "patta_extent": 263.44,
@@ -13673,7 +13673,7 @@
       "village_name": "Thippinaidupalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "867.04",
       "govt_extent": 209.17,
       "patta_extent": 657.87,
@@ -13854,7 +13854,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "16-11-2026",
           "21-11-2026",
@@ -13874,7 +13874,7 @@
       "village_name": "Chenchugudi",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1298.35",
       "govt_extent": 797.41,
       "patta_extent": 500.94,
@@ -13911,7 +13911,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -13931,7 +13931,7 @@
       "village_name": "Makamabapuram",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "343.73",
       "govt_extent": 99.91,
       "patta_extent": 243.82,
@@ -13975,7 +13975,7 @@
       "village_name": "Jakkidona",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1893.63",
       "govt_extent": 829.69,
       "patta_extent": 1063.94,
@@ -14222,7 +14222,7 @@
       "village_name": "Allamadugu",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "10511.34",
       "govt_extent": 4010,
       "patta_extent": 6501.34,
@@ -14403,7 +14403,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -14423,7 +14423,7 @@
       "village_name": "Devalampeta",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1173.3",
       "govt_extent": 247.69,
       "patta_extent": 925.61,
@@ -14604,7 +14604,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -14698,7 +14698,7 @@
       "village_name": "Marripalleuttarapu Khandrika",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1022.32",
       "govt_extent": 311.85,
       "patta_extent": 710.47,
@@ -14897,7 +14897,7 @@
       "village_name": "Devaragudipalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1977.6",
       "govt_extent": 467.85,
       "patta_extent": 1509.75,
@@ -15078,7 +15078,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "21-11-2026",
           "27-11-2026",
@@ -15098,7 +15098,7 @@
       "village_name": "Mambedu",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1936.62",
       "govt_extent": 796.57,
       "patta_extent": 1140.05,
@@ -15135,7 +15135,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "20-11-2026",
           "26-11-2026",
@@ -15155,7 +15155,7 @@
       "village_name": "T K M Puram",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "638.65",
       "govt_extent": 165.4,
       "patta_extent": 473.25,
@@ -15199,7 +15199,7 @@
       "village_name": "Pachikapallem",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1689.98",
       "govt_extent": 645.52,
       "patta_extent": 1044.46,
@@ -15398,7 +15398,7 @@
       "village_name": "Komaragunta",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2939.25",
       "govt_extent": 1124.55,
       "patta_extent": 1814.7,
@@ -15579,7 +15579,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "21-11-2026",
           "27-11-2026",
@@ -15898,7 +15898,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -15918,7 +15918,7 @@
       "village_name": "Vedurukuppam",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2324.4700000000003",
       "govt_extent": 1033.4,
       "patta_extent": 1291.07,
@@ -16099,7 +16099,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -16119,7 +16119,7 @@
       "village_name": "Inamkothuru",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "747.63",
       "govt_extent": 243.46,
       "patta_extent": 504.17,
@@ -16359,7 +16359,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "14-09-2026",
           "17-09-2026",
@@ -16380,7 +16380,7 @@
       "village_name": "Marepalle",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "318.41",
       "govt_extent": 167.45,
       "patta_extent": 150.96,
@@ -16424,7 +16424,7 @@
       "village_name": "Perumallapalli",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1075.65",
       "govt_extent": 262.16,
       "patta_extent": 813.49,
@@ -16664,7 +16664,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "09-10-2026",
           "14-10-2026",
@@ -16685,7 +16685,7 @@
       "village_name": "Tarlabylu",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "3460.43",
       "govt_extent": 2065.68,
       "patta_extent": 1394.75,
@@ -16866,7 +16866,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -16930,7 +16930,7 @@
       "village_name": "kurivikuppam",
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1192.66",
       "govt_extent": 391.59,
       "patta_extent": 801.07,
@@ -17331,7 +17331,7 @@
       "village_name": "Konapalle",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "683.02",
       "govt_extent": 143.3,
       "patta_extent": 539.72,
@@ -17581,7 +17581,7 @@
       "village_name": "Periyambadi",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "686.76",
       "govt_extent": 107.1,
       "patta_extent": 579.66,
@@ -17736,7 +17736,7 @@
       "village_name": "Madireddipalli",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2788.95",
       "govt_extent": 253.37,
       "patta_extent": 2535.58,
@@ -17864,7 +17864,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "21-10-2026",
           "01-11-2026",
@@ -17959,7 +17959,7 @@
       "village_name": "Dasarapalle",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1867.96",
       "govt_extent": 325.42,
       "patta_extent": 1542.54,
@@ -18040,7 +18040,7 @@
       "village_name": "Yadamari",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2932.6",
       "govt_extent": 590.97,
       "patta_extent": 2341.63,
@@ -18195,7 +18195,7 @@
       "village_name": "Siddareddipalle",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "484.06",
       "govt_extent": 64.4,
       "patta_extent": 419.65999999999997,
@@ -18239,7 +18239,7 @@
       "village_name": "Patrapalle",
       "mandal": "Yadamari",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "627",
       "govt_extent": 146.71,
       "patta_extent": 480.29,
@@ -18431,7 +18431,7 @@
       "village_name": "Pillarikuppam",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "849.81",
       "govt_extent": 197.86,
       "patta_extent": 651.95,
@@ -18512,7 +18512,7 @@
       "village_name": "China Thayyur",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1245.6",
       "govt_extent": 340.37,
       "patta_extent": 905.23,
@@ -18556,7 +18556,7 @@
       "village_name": "Kannikapuram 52",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "138.2",
       "govt_extent": 65.12,
       "patta_extent": 73.08,
@@ -18604,7 +18604,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "13-11-2026",
           "20-11-2026",
@@ -18624,7 +18624,7 @@
       "village_name": "Mangunta",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1020",
       "govt_extent": 196.82,
       "patta_extent": 823.18,
@@ -18668,7 +18668,7 @@
       "village_name": "Donnibommireddibylu",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "116.67",
       "govt_extent": 32.98,
       "patta_extent": 83.69,
@@ -18867,7 +18867,7 @@
       "village_name": "Kothapalle",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1107.59",
       "govt_extent": 161.72,
       "patta_extent": 945.87,
@@ -19048,7 +19048,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "27-11-2026",
           "04-12-2026",
@@ -19068,7 +19068,7 @@
       "village_name": "Kotarlapalli",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "655.24",
       "govt_extent": 173.23,
       "patta_extent": 482.01,
@@ -19308,7 +19308,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "27-09-2026",
           "30-09-2026",
@@ -19329,7 +19329,7 @@
       "village_name": "Oddupalli",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "237",
       "govt_extent": 98.98,
       "patta_extent": 138.02,
@@ -19569,7 +19569,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "13-09-2026",
           "14-09-2026",
@@ -19590,7 +19590,7 @@
       "village_name": "Vilasavarahapuram",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "284.36",
       "govt_extent": 95.64,
       "patta_extent": 188.72,
@@ -19789,7 +19789,7 @@
       "village_name": "Arimakulapalli",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "312.24",
       "govt_extent": 89.56,
       "patta_extent": 222.68,
@@ -20073,7 +20073,7 @@
       "village_name": "50.Basivireddipalle",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "258.36",
       "govt_extent": 82.7,
       "patta_extent": 175.66,
@@ -20233,7 +20233,7 @@
       "village_name": "Srungarasekhararajupuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "396.64",
       "govt_extent": 48.5,
       "patta_extent": 348.14,
@@ -20288,7 +20288,7 @@
       "village_name": "Peddakondepalle",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "246.15",
       "govt_extent": 82.72,
       "patta_extent": 163.43,
@@ -20416,7 +20416,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "14-09-2026",
           "15-09-2026",
@@ -20474,7 +20474,7 @@
       "village_name": "Giddamakarajapuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "1368.35",
       "govt_extent": 278.05,
       "patta_extent": 1090.3,
@@ -20518,7 +20518,7 @@
       "village_name": "Nelavoy",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1764.13",
       "govt_extent": 560.85,
       "patta_extent": 1203.28,
@@ -20780,7 +20780,7 @@
       "village_name": "Katikapalle",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1206",
       "govt_extent": 339.63,
       "patta_extent": 866.37,
@@ -20961,7 +20961,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -20981,7 +20981,7 @@
       "village_name": "48.Basivireddipalle",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "986.24",
       "govt_extent": 136.18,
       "patta_extent": 850.06,
@@ -21169,7 +21169,7 @@
       "village_name": "Marripalle Dakshinapu Khandriga",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "244",
       "govt_extent": 108.2,
       "patta_extent": 135.8,
@@ -21368,7 +21368,7 @@
       "village_name": "Venkatapuram",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1818.12",
       "govt_extent": 1096.19,
       "patta_extent": 721.93,
@@ -21549,7 +21549,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "18-11-2026",
           "24-11-2026",
@@ -21606,7 +21606,7 @@
       "village_name": "Venugopalapuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1365.71",
       "govt_extent": 571.14,
       "patta_extent": 794.57,
@@ -21643,7 +21643,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -21662,7 +21662,7 @@
       "village_name": "Kondrajupuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "773.58",
       "govt_extent": 337.84,
       "patta_extent": 435.74,
@@ -21706,7 +21706,7 @@
       "village_name": "Padmapuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "320",
       "govt_extent": 94.59,
       "patta_extent": 225.41,
@@ -21787,7 +21787,7 @@
       "village_name": "Nallapalle",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "272.6",
       "govt_extent": 110.12,
       "patta_extent": 162.48,
@@ -21968,7 +21968,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "16-10-2026",
           "19-10-2026",
@@ -22235,7 +22235,7 @@
       "village_name": "Jangalapalle",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "136.2",
       "govt_extent": 56.1,
       "patta_extent": 80.1,
@@ -22476,7 +22476,7 @@
       "village_name": "Narasimharajapuram",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "699.72",
       "govt_extent": 204.12,
       "patta_extent": 495.6,
@@ -22657,7 +22657,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "06-11-2026",
           "11-11-2026",
@@ -22677,7 +22677,7 @@
       "village_name": "Durgarajapuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "163.77",
       "govt_extent": 35.24,
       "patta_extent": 128.53,
@@ -22721,7 +22721,7 @@
       "village_name": "Sreerangarajapuram",
       "mandal": "Srirangarajapuram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1277.56",
       "govt_extent": 512.73,
       "patta_extent": 764.83,
@@ -22902,7 +22902,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -22922,7 +22922,7 @@
       "village_name": "Ripunjayarajapuram",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "273.9",
       "govt_extent": 67.49,
       "patta_extent": 206.41,
@@ -22966,7 +22966,7 @@
       "village_name": "Kannikapuram 56",
       "mandal": "S.R.Puram",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "833.55",
       "govt_extent": 522.4,
       "patta_extent": 311.15,
@@ -23003,7 +23003,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "13-11-2026",
           "20-11-2026",
@@ -23143,7 +23143,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "30-07-2026",
           "07-09-2026",
@@ -23163,7 +23163,7 @@
       "village_name": "Venkatadasaripalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2948.22",
       "govt_extent": 985.85,
       "patta_extent": 1962.37,
@@ -23355,7 +23355,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "09-11-2026",
           "15-11-2026",
@@ -23376,7 +23376,7 @@
       "village_name": "Ayyavandlapalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2995.46",
       "govt_extent": 726.64,
       "patta_extent": 2268.82,
@@ -23413,7 +23413,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -23432,7 +23432,7 @@
       "village_name": "102- Ramireddygaripalli",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "3740.58",
       "govt_extent": 1150.41,
       "patta_extent": 2590.17,
@@ -23568,7 +23568,7 @@
       "village_name": "Kalluru",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2685.64",
       "govt_extent": 364.45,
       "patta_extent": 2321.19,
@@ -23749,7 +23749,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "17-11-2026",
           "23-11-2026",
@@ -23806,7 +23806,7 @@
       "village_name": "Bandaruvaripalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "2484.87",
       "govt_extent": 563.09,
       "patta_extent": 1921.78,
@@ -23887,7 +23887,7 @@
       "village_name": "106 Ramireddigaripalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1660.76",
       "govt_extent": 114.73,
       "patta_extent": 1546.03,
@@ -23931,7 +23931,7 @@
       "village_name": "Gaddamvaripalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2887.2300000000005",
       "govt_extent": 408.22,
       "patta_extent": 2479.01,
@@ -23968,7 +23968,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "20-11-2026",
           "26-11-2026",
@@ -23988,7 +23988,7 @@
       "village_name": "Mangalampeta",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2424.41",
       "govt_extent": 691.99,
       "patta_extent": 1732.42,
@@ -24025,7 +24025,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -24154,7 +24154,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "07-08-2026",
           "07-09-2026",
@@ -24174,7 +24174,7 @@
       "village_name": "Vallivetivaripalle",
       "mandal": "Pulicherla",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "913.64",
       "govt_extent": 259.14,
       "patta_extent": 654.5,
@@ -24327,7 +24327,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "24-08-2026",
           "10-09-2026",
@@ -24384,7 +24384,7 @@
       "village_name": "Bandakindapalle",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "1493.61",
       "govt_extent": 353.33,
       "patta_extent": 1140.28,
@@ -24428,7 +24428,7 @@
       "village_name": "Peddagottigallu",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "2081.53",
       "govt_extent": 507.91,
       "patta_extent": 1573.62,
@@ -24472,7 +24472,7 @@
       "village_name": "Bommaiahgaripalle",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4467.54",
       "govt_extent": 1108.1,
       "patta_extent": 3359.44,
@@ -24607,7 +24607,7 @@
       "village_name": "Ganugachintha",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "5515.99",
       "govt_extent": 1249.67,
       "patta_extent": 4266.32,
@@ -24644,7 +24644,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "27-11-2026",
           "04-12-2026",
@@ -24664,7 +24664,7 @@
       "village_name": "Motumallela",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "5386.32",
       "govt_extent": 1382.45,
       "patta_extent": 4003.87,
@@ -24701,7 +24701,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -24720,7 +24720,7 @@
       "village_name": "Peddamallela",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "11724.94",
       "govt_extent": 2203.1,
       "patta_extent": 9521.84,
@@ -24757,7 +24757,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "07-12-2026",
@@ -24777,7 +24777,7 @@
       "village_name": "Rompicherla",
       "mandal": "Rompicherla",
       "division": "Chittoor",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "4271.74",
       "govt_extent": 514.6,
       "patta_extent": 3757.14,
@@ -24814,7 +24814,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "15-09-2026",
           "27-09-2026",
@@ -24909,7 +24909,7 @@
       "village_name": "Mahasamudram",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "756.36",
       "govt_extent": 125,
       "patta_extent": 631.36,
@@ -24953,7 +24953,7 @@
       "village_name": "Paleru",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2097.28",
       "govt_extent": 347.22,
       "patta_extent": 1750.06,
@@ -24997,7 +24997,7 @@
       "village_name": "Mothagunta",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "234.22",
       "govt_extent": 19.43,
       "patta_extent": 214.79,
@@ -25150,7 +25150,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -25167,7 +25167,7 @@
       "village_name": "Nalagampalli",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "4456",
       "govt_extent": 801.18,
       "patta_extent": 3654.82,
@@ -25204,7 +25204,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "27-11-2026",
           "04-12-2026",
@@ -25224,7 +25224,7 @@
       "village_name": "Gundlakattamanchi",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1905.42",
       "govt_extent": 490.14,
       "patta_extent": 1415.28,
@@ -25377,7 +25377,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "31-07-2026",
           "07-09-2026",
@@ -25471,7 +25471,7 @@
       "village_name": "Sadakuppam",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1095.25",
       "govt_extent": 143.33,
       "patta_extent": 951.92,
@@ -25515,7 +25515,7 @@
       "village_name": "Nallangadu",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1600.82",
       "govt_extent": 588.26,
       "patta_extent": 1012.56,
@@ -25552,7 +25552,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -25571,7 +25571,7 @@
       "village_name": "Thumbakuppam",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2854.21",
       "govt_extent": 843.63,
       "patta_extent": 2010.58,
@@ -25752,7 +25752,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "20-11-2026",
           "26-11-2026",
@@ -25918,7 +25918,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "11-08-2026",
           "07-09-2026",
@@ -25938,7 +25938,7 @@
       "village_name": "Gollapalli",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2886.25",
       "govt_extent": 681.45,
       "patta_extent": 2204.8,
@@ -25975,7 +25975,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "30-11-2026",
           "08-12-2026",
@@ -26120,7 +26120,7 @@
       "village_name": "Tekumanda",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1828.24",
       "govt_extent": 264.53,
       "patta_extent": 1563.71,
@@ -26293,7 +26293,7 @@
       "village_name": "Kallurupalle",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "3290.42",
       "govt_extent": 1241.08,
       "patta_extent": 2049.34,
@@ -26540,7 +26540,7 @@
       "village_name": "Keeramanda",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2773.84",
       "govt_extent": 848.49,
       "patta_extent": 1925.35,
@@ -26780,7 +26780,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "08-11-2026",
           "14-11-2026",
@@ -26845,7 +26845,7 @@
       "village_name": "Ragimanipenta",
       "mandal": "Bangarupalem",
       "division": "Chittoor",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4839.56",
       "govt_extent": 1628.96,
       "patta_extent": 3210.6,
@@ -27060,7 +27060,7 @@
       "village_name": "Krishnajmmapuram",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "779.62",
       "govt_extent": 229.25,
       "patta_extent": 550.37,
@@ -27104,7 +27104,7 @@
       "village_name": "Srikaverirajupuram",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2126.76",
       "govt_extent": 849.1,
       "patta_extent": 1277.66,
@@ -27141,7 +27141,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -27271,7 +27271,7 @@
       "village_name": "Vengalarajukuppam",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1440.14",
       "govt_extent": 298.49,
       "patta_extent": 1141.65,
@@ -27643,7 +27643,7 @@
       "village_name": "Mamidimanumoola",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "132.3",
       "govt_extent": 57.7,
       "patta_extent": 74.6,
@@ -27956,7 +27956,7 @@
       "village_name": "Narasimhapuram @ A Khandrika",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2104.26",
       "govt_extent": 258.56,
       "patta_extent": 1845.7,
@@ -28144,7 +28144,7 @@
       "village_name": "Vanadurgapuram",
       "mandal": "Palasamudram",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "931.71",
       "govt_extent": 205.7,
       "patta_extent": 726.01,
@@ -28188,7 +28188,7 @@
       "village_name": "Viratapuram",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "199.48",
       "govt_extent": 78.8,
       "patta_extent": 120.68,
@@ -28232,7 +28232,7 @@
       "village_name": "Erramarajupalle",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1340.27",
       "govt_extent": 732.7,
       "patta_extent": 607.57,
@@ -28364,7 +28364,7 @@
       "village_name": "Ponnagallu",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1586.63",
       "govt_extent": 635.97,
       "patta_extent": 950.66,
@@ -28552,7 +28552,7 @@
       "village_name": "Katherapalle",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "625.45",
       "govt_extent": 106.11,
       "patta_extent": 519.34,
@@ -28633,7 +28633,7 @@
       "village_name": "Tirumalakondamambagaripeta",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "8373.52",
       "govt_extent": 6468.54,
       "patta_extent": 1904.98,
@@ -28862,7 +28862,7 @@
       "village_name": "Battuvaripalle",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "347.6",
       "govt_extent": 71.84,
       "patta_extent": 275.76,
@@ -28906,7 +28906,7 @@
       "village_name": "Kethumal Maharajapuram",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1692.98",
       "govt_extent": 422.37,
       "patta_extent": 1270.61,
@@ -29066,7 +29066,7 @@
       "village_name": "Rajakumaravenkata Bahadurpeta",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2435.95",
       "govt_extent": 1155.8,
       "patta_extent": 1280.15,
@@ -29110,7 +29110,7 @@
       "village_name": "Lakshmirajupeta",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1216.9",
       "govt_extent": 102.46,
       "patta_extent": 1114.44,
@@ -29394,7 +29394,7 @@
       "village_name": "Eduvaripalle",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "218.8",
       "govt_extent": 28.99,
       "patta_extent": 189.81,
@@ -29438,7 +29438,7 @@
       "village_name": "Gopichettipalle",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "363.8",
       "govt_extent": 94.53,
       "patta_extent": 269.27,
@@ -29519,7 +29519,7 @@
       "village_name": "Kotarvedu",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "954.55",
       "govt_extent": 177.48,
       "patta_extent": 777.07,
@@ -29563,7 +29563,7 @@
       "village_name": "Karvetinagar",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "8565.32",
       "govt_extent": 4713.54,
       "patta_extent": 3851.78,
@@ -29751,7 +29751,7 @@
       "village_name": "Nissankadurgam",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1216.9",
       "govt_extent": 102.46,
       "patta_extent": 1114.44,
@@ -29795,7 +29795,7 @@
       "village_name": "Surendranagaram",
       "mandal": "Karvetinagar",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "8373.52",
       "govt_extent": 7504.99,
       "patta_extent": 1879.48,
@@ -29887,7 +29887,7 @@
       "village_name": "Agaram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1845.46",
       "govt_extent": 159.51,
       "patta_extent": 1134.76,
@@ -29924,7 +29924,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -29980,7 +29980,7 @@
       "village_name": "Kavetipuram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "616.72",
       "govt_extent": 209.8,
       "patta_extent": 406.92,
@@ -30024,7 +30024,7 @@
       "village_name": "Nagarajukuppam",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "1250.02",
       "govt_extent": 439.12,
       "patta_extent": 810.9,
@@ -30068,7 +30068,7 @@
       "village_name": "Kannikapuram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "300.65",
       "govt_extent": 39.77,
       "patta_extent": 260.88,
@@ -30149,7 +30149,7 @@
       "village_name": "Veerakaverirajupuram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1661.18",
       "govt_extent": 454.58,
       "patta_extent": 1206.6,
@@ -30523,7 +30523,7 @@
       "village_name": "Saraswathvilasapuram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "333.55",
       "govt_extent": 78.61,
       "patta_extent": 254.94,
@@ -30567,7 +30567,7 @@
       "village_name": "Venkatanarasimharajupet",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "134.31",
       "govt_extent": 41.09,
       "patta_extent": 93.22,
@@ -30611,7 +30611,7 @@
       "village_name": "Srinivasapuram",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "690.88",
       "govt_extent": 96.9,
       "patta_extent": 593.98,
@@ -30764,7 +30764,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "25-07-2026",
           "07-09-2026",
@@ -30946,7 +30946,7 @@
       "village_name": "Mittapalem",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "510.97",
       "govt_extent": 197.75,
       "patta_extent": 313.22,
@@ -31027,7 +31027,7 @@
       "village_name": "Mudipalle",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2222.62",
       "govt_extent": 1034.7,
       "patta_extent": 1187.92,
@@ -31064,7 +31064,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -31192,7 +31192,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -31211,7 +31211,7 @@
       "village_name": "Gundrajukuppam",
       "mandal": "Nagari",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2148.02",
       "govt_extent": 966.25,
       "patta_extent": 1181.77,
@@ -31504,7 +31504,7 @@
       "source_meta": {},
       "current_stage": "GT",
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "23-07-2026",
           "09-09-2026",
@@ -31746,7 +31746,7 @@
       "village_name": "Kacharavedu (1 to 101, 172 to 237)",
       "mandal": "Nindra",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1075.3",
       "govt_extent": 294.18,
       "patta_extent": 781.12,
@@ -31790,7 +31790,7 @@
       "village_name": "Nindra",
       "mandal": "Nindra",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "2658",
       "govt_extent": 762.81,
       "patta_extent": 1895.19,
@@ -31908,7 +31908,7 @@
       "village_name": "Iruguvai",
       "mandal": "Nindra",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2014.77",
       "govt_extent": 383.14,
       "patta_extent": 1631.63,
@@ -31945,7 +31945,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -31964,7 +31964,7 @@
       "village_name": "Kunamaraju palem(1-70,149-199)",
       "mandal": "Nindra",
       "division": "Nagari",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "852.62",
       "govt_extent": 138.03,
       "patta_extent": 714.59,
@@ -32339,7 +32339,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "20-08-2026",
           "11-09-2026",
@@ -32359,7 +32359,7 @@
       "village_name": "Kaliambakam",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1500.01",
       "govt_extent": 373.13,
       "patta_extent": 1126.88,
@@ -32403,7 +32403,7 @@
       "village_name": "Alapakam",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "1480.3",
       "govt_extent": 551.4,
       "patta_extent": 928.9,
@@ -32521,7 +32521,7 @@
       "village_name": "Pannuru",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2155.77",
       "govt_extent": 326.38,
       "patta_extent": 1829.39,
@@ -32565,7 +32565,7 @@
       "village_name": "Vijayapuram",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "3858.42",
       "govt_extent": 1625.83,
       "patta_extent": 2232.59,
@@ -32693,7 +32693,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "17-10-2026",
           "03-11-2026",
@@ -32714,7 +32714,7 @@
       "village_name": "Gangamambapuram",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "767.39",
       "govt_extent": 111.64,
       "patta_extent": 655.75,
@@ -32795,7 +32795,7 @@
       "village_name": "Mangalam",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1146.02",
       "govt_extent": 194.38,
       "patta_extent": 951.64,
@@ -32876,7 +32876,7 @@
       "village_name": "Illathuru",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1020",
       "govt_extent": 366.66,
       "patta_extent": 653.34,
@@ -33004,7 +33004,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "18-09-2026",
           "22-09-2026",
@@ -33025,7 +33025,7 @@
       "village_name": "Kalikapuram",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "434.11",
       "govt_extent": 54.41,
       "patta_extent": 379.7,
@@ -33150,7 +33150,7 @@
       "village_name": "Pathaarcot",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1744.1000000000001",
       "govt_extent": 333.2,
       "patta_extent": 1410.9,
@@ -33194,7 +33194,7 @@
       "village_name": "Kosalanagaram",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2962.49",
       "govt_extent": 240.37,
       "patta_extent": 2722.12,
@@ -33354,7 +33354,7 @@
       "village_name": "Sriharipuram",
       "mandal": "Vijayapuram",
       "division": "Nagari",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "3694.08",
       "govt_extent": 947.97,
       "patta_extent": 2746.11,
@@ -33391,7 +33391,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "14-09-2026",
           "26-09-2026",
@@ -33515,7 +33515,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -33754,7 +33754,7 @@
       "village_name": "Bommarajupalle",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2946.19",
       "govt_extent": 1232.36,
       "patta_extent": 1713.83,
@@ -33791,7 +33791,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -33810,7 +33810,7 @@
       "village_name": "Thurlapalli",
       "mandal": "Peddapanjani",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1419.9",
       "govt_extent": 454.3,
       "patta_extent": 965.6,
@@ -34225,7 +34225,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "05-12-2026",
           "18-12-2026",
@@ -34246,7 +34246,7 @@
       "village_name": "Muthukur",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "6307.76",
       "govt_extent": 1786.54,
       "patta_extent": 4521.22,
@@ -34295,7 +34295,7 @@
       "village_name": "Chalamangalam",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "2495.17",
       "govt_extent": 511,
       "patta_extent": 1984.17,
@@ -34623,7 +34623,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "03-09-2026",
           "05-09-2026",
@@ -34643,7 +34643,7 @@
       "village_name": "Kogileru",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "4022.46",
       "govt_extent": 1308.8,
       "patta_extent": 2713.66,
@@ -34680,7 +34680,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "23-11-2026",
           "30-11-2026",
@@ -34700,7 +34700,7 @@
       "village_name": "Gamkonda",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "3377.62",
       "govt_extent": 2308.7,
       "patta_extent": 1068.92,
@@ -34737,7 +34737,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -34756,7 +34756,7 @@
       "village_name": "Kolathur",
       "mandal": "Peddapanjani",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2023.27",
       "govt_extent": 647.29,
       "patta_extent": 1375.98,
@@ -34996,7 +34996,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "03-10-2026",
           "12-10-2026",
@@ -35017,7 +35017,7 @@
       "village_name": "Veerapalle",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1417.47",
       "govt_extent": 476.42,
       "patta_extent": 941.05,
@@ -35170,7 +35170,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -35412,7 +35412,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "19-09-2026"
         ],
@@ -35426,7 +35426,7 @@
       "village_name": "Peddakappalle",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "5485.360000000001",
       "govt_extent": 1948.71,
       "patta_extent": 3536.65,
@@ -35614,7 +35614,7 @@
       "village_name": "Thurlapalle -  Kothakota",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "732.78",
       "govt_extent": 338.53,
       "patta_extent": 394.25,
@@ -35658,7 +35658,7 @@
       "village_name": "Muthukur - Panjani",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "99.83",
       "govt_extent": 25.41,
       "patta_extent": 74.42,
@@ -35702,7 +35702,7 @@
       "village_name": "Kolathur (Nelapally)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1300.63",
       "govt_extent": 231.09,
       "patta_extent": 1069.54,
@@ -35746,7 +35746,7 @@
       "village_name": "Kolathur (Guttivaripalli)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "281.15",
       "govt_extent": 112.25,
       "patta_extent": 168.9,
@@ -35927,7 +35927,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "17-10-2026",
           "21-10-2026",
@@ -35947,7 +35947,7 @@
       "village_name": "Royal Peta (Gangonda)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "170.48000000000002",
       "govt_extent": 43.92,
       "patta_extent": 126.56,
@@ -36135,7 +36135,7 @@
       "village_name": "Karasanapally (Kattarlapally)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1168.1",
       "govt_extent": 99.15,
       "patta_extent": 1068.95,
@@ -36334,7 +36334,7 @@
       "village_name": "Muthukur (Kondepalle)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "278.81",
       "govt_extent": 10.31,
       "patta_extent": 268.5,
@@ -36378,7 +36378,7 @@
       "village_name": "Muthukur-Karasanapalli",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "91.45",
       "govt_extent": 52.91,
       "patta_extent": 436.5,
@@ -36571,7 +36571,7 @@
       "village_name": "Battandoddi (Dasarlapalle)",
       "mandal": "Peddapanjani",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "489.41",
       "govt_extent": 52.91,
       "patta_extent": 436.5,
@@ -36805,7 +36805,7 @@
       "village_name": "Dandapalli",
       "mandal": "Gangavaram",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4272.11",
       "govt_extent": 1164.62,
       "patta_extent": 3107.49,
@@ -36933,7 +36933,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "19-10-2026",
           "05-11-2026",
@@ -36954,7 +36954,7 @@
       "village_name": "Kalagatoor",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "2023.75",
       "govt_extent": 479.54,
       "patta_extent": 1544.21,
@@ -37042,7 +37042,7 @@
       "village_name": "Gundugallu",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2764.86",
       "govt_extent": 813.98,
       "patta_extent": 1950.88,
@@ -37086,7 +37086,7 @@
       "village_name": "Pasupathuru",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2280.16",
       "govt_extent": 521.68,
       "patta_extent": 1758.48,
@@ -37123,7 +37123,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -37142,7 +37142,7 @@
       "village_name": "Gandrajupalle",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "3797.05",
       "govt_extent": 1151.48,
       "patta_extent": 2645.57,
@@ -37186,7 +37186,7 @@
       "village_name": "Melumoy",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "2534.66",
       "govt_extent": 324.37,
       "patta_extent": 2210.29,
@@ -37339,7 +37339,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "27-11-2026",
           "04-12-2026",
@@ -37359,7 +37359,7 @@
       "village_name": "Gangavaram",
       "mandal": "Gangavaram",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2717.52",
       "govt_extent": 694.6,
       "patta_extent": 2022.92,
@@ -37628,7 +37628,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -38057,7 +38057,7 @@
       "village_name": "Kurmoi",
       "mandal": "Palamaner",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1691.25",
       "govt_extent": 274.47,
       "patta_extent": 1416.78,
@@ -38101,7 +38101,7 @@
       "village_name": "Karidimadugu",
       "mandal": "Palamaner",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1683.68",
       "govt_extent": 307.92,
       "patta_extent": 1275.76,
@@ -38138,7 +38138,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -38157,7 +38157,7 @@
       "village_name": "Baippagaripalle",
       "mandal": "Palamaner",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2299.28",
       "govt_extent": 333.94,
       "patta_extent": 1965.34,
@@ -38201,7 +38201,7 @@
       "village_name": "Chethapenta",
       "mandal": "Palamaner",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "405.25",
       "govt_extent": 154.46,
       "patta_extent": 250.79,
@@ -38320,7 +38320,7 @@
       "village_name": "Jagamarla",
       "mandal": "Palamaner",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "895",
       "govt_extent": 154.47,
       "patta_extent": 740.53,
@@ -38735,7 +38735,7 @@
       "village_name": "Nellipatla",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2608.36",
       "govt_extent": 626.17,
       "patta_extent": 1982.19,
@@ -38772,7 +38772,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "16-11-2026",
           "21-11-2026",
@@ -38792,7 +38792,7 @@
       "village_name": "Kammanapalli",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1516.36",
       "govt_extent": 328.35,
       "patta_extent": 1188.01,
@@ -38829,7 +38829,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -38964,7 +38964,7 @@
       "village_name": "Settipalli",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "406.05",
       "govt_extent": 183.94,
       "patta_extent": 1274.74,
@@ -39012,7 +39012,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "18-11-2026",
           "24-11-2026",
@@ -39032,7 +39032,7 @@
       "village_name": "Belupalli",
       "mandal": "Baireddipalle",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2987.34",
       "govt_extent": 550.08,
       "patta_extent": 2437.26,
@@ -39272,7 +39272,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "19-10-2026",
           "31-10-2026",
@@ -39293,7 +39293,7 @@
       "village_name": "Dharmapuri",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "634.49",
       "govt_extent": 155.01,
       "patta_extent": 479.48,
@@ -39453,7 +39453,7 @@
       "village_name": "Mulathimmepalli",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-1",
+      "phase": "Phase I",
       "extent": "386.81",
       "govt_extent": 64.41,
       "patta_extent": 322.4,
@@ -39606,7 +39606,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -39626,7 +39626,7 @@
       "village_name": "Devadoddi",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2808.1",
       "govt_extent": 547.93,
       "patta_extent": 2260.17,
@@ -39670,7 +39670,7 @@
       "village_name": "Kaigal",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1123.1100000000001",
       "govt_extent": 669.26,
       "patta_extent": 453.85,
@@ -39714,7 +39714,7 @@
       "village_name": "Theertham",
       "mandal": "Baireddipalle",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "4178.53",
       "govt_extent": 1238.56,
       "patta_extent": 2939.97,
@@ -39954,7 +39954,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "28-10-2026",
           "06-11-2026",
@@ -39975,7 +39975,7 @@
       "village_name": "kambhampalli",
       "mandal": "Baireddipalle",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1656.6",
       "govt_extent": 326.58,
       "patta_extent": 1330.02,
@@ -40376,7 +40376,7 @@
       "village_name": "Ganginayanapalli",
       "mandal": "Baireddipalle",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1187.35",
       "govt_extent": 278.9,
       "patta_extent": 908.45,
@@ -40975,7 +40975,7 @@
       "village_name": "Thotakanuma",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "3050.97",
       "govt_extent": 639.06,
       "patta_extent": 2411.91,
@@ -41128,7 +41128,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "20-08-2026",
           "15-09-2026",
@@ -41148,7 +41148,7 @@
       "village_name": "Jounipalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "3048.15",
       "govt_extent": 481.85,
       "patta_extent": 2566.3,
@@ -41336,7 +41336,7 @@
       "village_name": "Nernipalli",
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1532.68",
       "govt_extent": 495.9,
       "patta_extent": 1036.78,
@@ -41464,7 +41464,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "06-10-2026",
           "13-10-2026",
@@ -41485,7 +41485,7 @@
       "village_name": "Paipalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "348.56",
       "govt_extent": 71.18,
       "patta_extent": 277.38,
@@ -41566,7 +41566,7 @@
       "village_name": "Bodiguttapalli",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-2",
+      "phase": "Phase II",
       "extent": "1172.02",
       "govt_extent": 242.29,
       "patta_extent": 929.73,
@@ -41610,7 +41610,7 @@
       "village_name": "Patrapalli",
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "908.99",
       "govt_extent": 263.66,
       "patta_extent": 645.33,
@@ -41861,7 +41861,7 @@
       "village_name": "Gonumakulapalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2446.68",
       "govt_extent": 546.74,
       "patta_extent": 1899.94,
@@ -41898,7 +41898,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -41917,7 +41917,7 @@
       "village_name": "Kumbarlapalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1943.16",
       "govt_extent": 339.49,
       "patta_extent": 1603.67,
@@ -41954,7 +41954,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -41973,7 +41973,7 @@
       "village_name": "Yalakallu",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2471.26",
       "govt_extent": 710.71,
       "patta_extent": 1760.55,
@@ -42017,7 +42017,7 @@
       "village_name": "Mudaramdoddi",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "4424.41",
       "govt_extent": 567.81,
       "patta_extent": 3856.6,
@@ -42205,7 +42205,7 @@
       "village_name": "Venkatagirikota",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1858.06",
       "govt_extent": 382.06,
       "patta_extent": 1476,
@@ -42393,7 +42393,7 @@
       "village_name": "Padigalakuppam",
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2481.61",
       "govt_extent": 256.12,
       "patta_extent": 2225.49,
@@ -42641,7 +42641,7 @@
       "village_name": "Pamuganipalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2240.02",
       "govt_extent": 408.46,
       "patta_extent": 1831.56,
@@ -42794,7 +42794,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -42813,7 +42813,7 @@
       "village_name": "Kothakota",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2084.23",
       "govt_extent": 611.21,
       "patta_extent": 1473.02,
@@ -43001,7 +43001,7 @@
       "village_name": "Boya Chinnagannapalle",
       "mandal": "Venkatagirikota",
       "division": "Palamaner",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1588",
       "govt_extent": 340.59,
       "patta_extent": 1247.41,
@@ -43552,7 +43552,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "25-08-2025",
           "08-09-2026",
@@ -43609,7 +43609,7 @@
       "village_name": "Bathalapalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "129.67000000000002",
       "govt_extent": 39.41,
       "patta_extent": 90.26,
@@ -44089,7 +44089,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "Completed",
           "Completed",
@@ -44442,7 +44442,7 @@
       "village_name": "Adavi Budugur",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "7024.63",
       "govt_extent": 2404.46,
       "patta_extent": 4620.17,
@@ -44630,7 +44630,7 @@
       "village_name": "Adavimulakapalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "714.62",
       "govt_extent": 138.22,
       "patta_extent": 576.4,
@@ -44711,7 +44711,7 @@
       "village_name": "Chalarlapalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "230.93",
       "govt_extent": 53.59,
       "patta_extent": 177.34,
@@ -45089,7 +45089,7 @@
       "village_name": "Dasegowniyuru",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1444.3",
       "govt_extent": 303.76,
       "patta_extent": 1140.54,
@@ -45336,7 +45336,7 @@
       "village_name": "Gudlanayanipalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "637.62",
       "govt_extent": 121.03,
       "patta_extent": 516.59,
@@ -45524,7 +45524,7 @@
       "village_name": "Kakimadugu",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "689.81",
       "govt_extent": 157.63,
       "patta_extent": 529.44,
@@ -45561,7 +45561,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -45580,7 +45580,7 @@
       "village_name": "Kanamapacharlapalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1081.3700000000001",
       "govt_extent": 310.18,
       "patta_extent": 771.19,
@@ -45768,7 +45768,7 @@
       "village_name": "Kangundi",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2010.14",
       "govt_extent": 627.24,
       "patta_extent": 1382.9,
@@ -46016,7 +46016,7 @@
       "village_name": "Koormanipalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2439.95",
       "govt_extent": 1843.58,
       "patta_extent": 596.37,
@@ -46053,7 +46053,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -46183,7 +46183,7 @@
       "village_name": "Nadimuru",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2476",
       "govt_extent": 1457.81,
       "patta_extent": 1018.19,
@@ -46423,7 +46423,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "16-10-2026",
           "27-10-2026",
@@ -46444,7 +46444,7 @@
       "village_name": "Noolakunta",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1650.00",
       "govt_extent": 354.02,
       "patta_extent": 1296.21,
@@ -46481,7 +46481,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -46581,7 +46581,7 @@
       "village_name": "Peddagopanapalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "232.6",
       "govt_extent": 41.19,
       "patta_extent": 191.41,
@@ -46762,7 +46762,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "15-10-2026",
           "17-10-2026",
@@ -46782,7 +46782,7 @@
       "village_name": "Ponnangur",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1857.41",
       "govt_extent": 394.7,
       "patta_extent": 1462.71,
@@ -46826,7 +46826,7 @@
       "village_name": "Porakuntlapalli",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "614.24",
       "govt_extent": 189.15,
       "patta_extent": 425.09,
@@ -46961,7 +46961,7 @@
       "village_name": "Tsadamur",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1734.07",
       "govt_extent": 236.7,
       "patta_extent": 1497.37,
@@ -47313,7 +47313,7 @@
       "village_name": "Yanadipalle",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1241.54",
       "govt_extent": 412.52,
       "patta_extent": 829.02,
@@ -47350,7 +47350,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -47584,7 +47584,7 @@
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {},
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "23-07-2026",
           "09-09-2026",
@@ -47753,7 +47753,7 @@
       "village_name": "Bandasettipalli Bit II",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "7024.63",
       "govt_extent": 2404.46,
       "patta_extent": 4620.17,
@@ -47871,7 +47871,7 @@
       "village_name": "Kangundi RF",
       "mandal": "Kuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "51576.78999999999",
       "govt_extent": 46021.02,
       "patta_extent": 5555.77,
@@ -48218,7 +48218,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "18-10-2026",
           "29-10-2026",
@@ -48831,7 +48831,7 @@
       "village_name": "Kadapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1167.1",
       "govt_extent": 445.03,
       "patta_extent": 722.07,
@@ -49056,7 +49056,7 @@
       "village_name": "Veduruguttapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "753.97",
       "govt_extent": 302.76,
       "patta_extent": 451.21,
@@ -49100,7 +49100,7 @@
       "village_name": "Donkumanupalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-5",
+      "phase": "Phase V",
       "extent": "1541.54",
       "govt_extent": 396.04,
       "patta_extent": 1145.5,
@@ -49144,7 +49144,7 @@
       "village_name": "Chillimanipalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "244.4",
       "govt_extent": 120.73,
       "patta_extent": 123.67,
@@ -49428,7 +49428,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "05-09-2026",
           "07-09-2026",
@@ -49448,7 +49448,7 @@
       "village_name": "Preethichamanuru",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "376.06",
       "govt_extent": 147.38,
       "patta_extent": 228.68,
@@ -49610,7 +49610,7 @@
       "village_name": "Rallabuduguru",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2260.68",
       "govt_extent": 656.73,
       "patta_extent": 1603.95,
@@ -49857,7 +49857,7 @@
       "village_name": "Gesikapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1461.98",
       "govt_extent": 433.6,
       "patta_extent": 1028.38,
@@ -50045,7 +50045,7 @@
       "village_name": "Muddanapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "2811.81",
       "govt_extent": 1478.97,
       "patta_extent": 1332.84,
@@ -50163,7 +50163,7 @@
       "village_name": "11 Pedduru",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "937.5600000000001",
       "govt_extent": 288.87,
       "patta_extent": 648.69,
@@ -50351,7 +50351,7 @@
       "village_name": "Settiballa",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1147.91",
       "govt_extent": 229.68,
       "patta_extent": 918.23,
@@ -50664,7 +50664,7 @@
       "village_name": "Kadirimuthanapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "222.03",
       "govt_extent": 14.54,
       "patta_extent": 207.49,
@@ -50933,7 +50933,7 @@
       "village_name": "Morasanipalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "754.09",
       "govt_extent": 88.34,
       "patta_extent": 665.75,
@@ -50970,7 +50970,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -50989,7 +50989,7 @@
       "village_name": "Bellakogila",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "480.14",
       "govt_extent": 43.75,
       "patta_extent": 436.39,
@@ -51170,7 +51170,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "28-10-2026",
           "31-10-2026",
@@ -51190,7 +51190,7 @@
       "village_name": "Vadagandlapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1005.6800000000001",
       "govt_extent": 205.35,
       "patta_extent": 800.33,
@@ -51234,7 +51234,7 @@
       "village_name": "Anikera",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "452.89",
       "govt_extent": 58.47,
       "patta_extent": 394.42,
@@ -51369,7 +51369,7 @@
       "village_name": "Nalapareddiyuru",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "337.3",
       "govt_extent": 66.91,
       "patta_extent": 270.39,
@@ -51413,7 +51413,7 @@
       "village_name": "Motakothuru",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1255.62",
       "govt_extent": 137.63,
       "patta_extent": 1117.99,
@@ -51499,7 +51499,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "28-09-2026",
           "01-10-2026",
@@ -51520,7 +51520,7 @@
       "village_name": "Chinnagandlapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "429.3",
       "govt_extent": 60.78,
       "patta_extent": 368.52,
@@ -51767,7 +51767,7 @@
       "village_name": "Mulluru Krishnapuram",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "581.8",
       "govt_extent": 124.02,
       "patta_extent": 457.78,
@@ -52066,7 +52066,7 @@
       "village_name": "Sivaramapuram",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "456.23",
       "govt_extent": 82.5,
       "patta_extent": 373.73,
@@ -52110,7 +52110,7 @@
       "village_name": "Nanjampeta",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "854.91",
       "govt_extent": 249.62,
       "patta_extent": 605.29,
@@ -52154,7 +52154,7 @@
       "village_name": "Anchinayanikuppam",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "233.23",
       "govt_extent": 19.15,
       "patta_extent": 214.08,
@@ -52394,7 +52394,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "16-09-2026",
           "17-09-2026",
@@ -52415,7 +52415,7 @@
       "village_name": "30 Sonnegownipalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2633.43",
       "govt_extent": 405.78,
       "patta_extent": 2227.65,
@@ -52677,7 +52677,7 @@
       "village_name": "Gunjarlapalli",
       "mandal": "Santhipuram",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "750.26",
       "govt_extent": 117.28,
       "patta_extent": 632.98,
@@ -53246,7 +53246,7 @@
       "village_name": "Agaram",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1845.46",
       "govt_extent": 454.21,
       "patta_extent": 1391.25,
@@ -53290,7 +53290,7 @@
       "village_name": "Alugumanipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "762.92",
       "govt_extent": 497.33,
       "patta_extent": 265.59,
@@ -53471,7 +53471,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "10-11-2026",
           "16-11-2026",
@@ -53491,7 +53491,7 @@
       "village_name": "Anganamalakothur",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-3",
+      "phase": "Phase III",
       "extent": "140.02",
       "govt_extent": 55.28,
       "patta_extent": 84.74,
@@ -53535,7 +53535,7 @@
       "village_name": "Athinatham",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1213.18",
       "govt_extent": 158.92,
       "patta_extent": 1054.26,
@@ -53572,7 +53572,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -53591,7 +53591,7 @@
       "village_name": "Avulathimmanpalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1388.7",
       "govt_extent": 691.91,
       "patta_extent": 696.79,
@@ -53646,7 +53646,7 @@
       "village_name": "Bijiganipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "393.14",
       "govt_extent": 204.71,
       "patta_extent": 188.43,
@@ -53690,7 +53690,7 @@
       "village_name": "Bisanatham",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "738.70",
       "govt_extent": 98.79,
       "patta_extent": 639.91,
@@ -53727,7 +53727,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -53746,7 +53746,7 @@
       "village_name": "Boyanapalli",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "610.39",
       "govt_extent": 94.38,
       "patta_extent": 516.01,
@@ -53980,7 +53980,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "28-09-2026",
           "01-10-2026",
@@ -54001,7 +54001,7 @@
       "village_name": "Burugulapalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "227.47",
       "govt_extent": 64.32,
       "patta_extent": 163.15,
@@ -54045,7 +54045,7 @@
       "village_name": "Cheekatipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "473.64",
       "govt_extent": 97.26,
       "patta_extent": 376.38,
@@ -54089,7 +54089,7 @@
       "village_name": "Chinnagollapalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "714.21",
       "govt_extent": 215.14,
       "patta_extent": 389.51,
@@ -54330,7 +54330,7 @@
       "village_name": "Chinnaparthikunta",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "604.65",
       "govt_extent": 344.66,
       "patta_extent": 369.55,
@@ -54570,7 +54570,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "23-09-2026",
           "26-09-2026",
@@ -54591,7 +54591,7 @@
       "village_name": "Dasimanipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "428.9",
       "govt_extent": 87.93,
       "patta_extent": 340.97,
@@ -54753,7 +54753,7 @@
       "village_name": "Kanamanapalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1192.58",
       "govt_extent": 352.14,
       "patta_extent": 840.44,
@@ -54797,7 +54797,7 @@
       "village_name": "kodiganipalli",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "353.78",
       "govt_extent": 145.63,
       "patta_extent": 208.15,
@@ -55044,7 +55044,7 @@
       "village_name": "Kotachembagiri",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "318.04",
       "govt_extent": 229.29,
       "patta_extent": 88.75,
@@ -55284,7 +55284,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "11-09-2026",
           "12-09-2026",
@@ -55342,7 +55342,7 @@
       "village_name": "kuppiganipalli",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": 1267.35,
       "govt_extent": 303.3,
       "patta_extent": 964.05,
@@ -55464,7 +55464,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "14-10-2026",
           "19-10-2026",
@@ -55485,7 +55485,7 @@
       "village_name": "Lingapuramdinne",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "545.97",
       "govt_extent": 337.14,
       "patta_extent": 208.83,
@@ -55620,7 +55620,7 @@
       "village_name": "Malavanikothuru",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "292.24",
       "govt_extent": 169.09,
       "patta_extent": 123.15,
@@ -55860,7 +55860,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "09-09-2026",
           "11-09-2026",
@@ -55925,7 +55925,7 @@
       "village_name": "Ontipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "390.69",
       "govt_extent": 154.95,
       "patta_extent": 235.74,
@@ -56113,7 +56113,7 @@
       "village_name": "Peddagollapalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "315.27",
       "govt_extent": 121.5,
       "patta_extent": 193.77,
@@ -56347,7 +56347,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "15-09-2026",
           "17-09-2026",
@@ -56368,7 +56368,7 @@
       "village_name": "Peddaparthikunta",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "198.24",
       "govt_extent": 39.84,
       "patta_extent": 275.43,
@@ -56405,7 +56405,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -56424,7 +56424,7 @@
       "village_name": "Pogurupalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2169.487",
       "govt_extent": 1455.58,
       "patta_extent": 713.907,
@@ -56468,7 +56468,7 @@
       "village_name": "Sanganapalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "671.66",
       "govt_extent": 230.32,
       "patta_extent": 441.34,
@@ -56512,7 +56512,7 @@
       "village_name": "114 Settipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "406.05",
       "govt_extent": 54.38,
       "patta_extent": 351.67,
@@ -56705,7 +56705,7 @@
       "village_name": "Sirigiripalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "521.795",
       "govt_extent": 290.77,
       "patta_extent": 231.025,
@@ -56886,7 +56886,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "29-10-2026",
           "02-11-2026",
@@ -56906,7 +56906,7 @@
       "village_name": "Thalai Agraharam",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "132.435",
       "govt_extent": 39.135,
       "patta_extent": 93.3,
@@ -57131,7 +57131,7 @@
       "village_name": "Yamaganipalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2286.13",
       "govt_extent": 1096.27,
       "patta_extent": 1189.86,
@@ -57312,7 +57312,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-7",
+        "phase": "Phase VII",
         "dates": [
           "28-11-2026",
           "05-12-2026",
@@ -57332,7 +57332,7 @@
       "village_name": "Jarugukonda",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "6033",
       "govt_extent": 6033,
       "patta_extent": null,
@@ -57520,7 +57520,7 @@
       "village_name": "Onnapanayanikothur",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2170.575",
       "govt_extent": 1959.05,
       "patta_extent": 211.525,
@@ -57708,7 +57708,7 @@
       "village_name": "Kotamakanepalle",
       "mandal": "Gudipalle",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "1489.2050000000002",
       "govt_extent": 1118.005,
       "patta_extent": 371.2,
@@ -58525,7 +58525,7 @@
       "village_name": "Kenchanaballa",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "539.86",
       "govt_extent": 142.83,
       "patta_extent": 397.03,
@@ -58606,7 +58606,7 @@
       "village_name": "Peddakurabalapalle",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "545.21",
       "govt_extent": 137.24,
       "patta_extent": 407.97,
@@ -58794,7 +58794,7 @@
       "village_name": "Balla",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2922.06",
       "govt_extent": 415.32,
       "patta_extent": 2506.74,
@@ -58982,7 +58982,7 @@
       "village_name": "Veeranamala",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "2697.56",
       "govt_extent": 1038.53,
       "patta_extent": 1659.03,
@@ -59170,7 +59170,7 @@
       "village_name": "Pacharumakulapalle",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "680.81",
       "govt_extent": 104.33,
       "patta_extent": 576.48,
@@ -59207,7 +59207,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-4",
+        "phase": "Phase IV",
         "dates": [
           "08-09-2026",
           "Completed",
@@ -59226,7 +59226,7 @@
       "village_name": "Singasamudram",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2610.89",
       "govt_extent": 1189.29,
       "patta_extent": 1421.6,
@@ -59466,7 +59466,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "27-10-2026",
           "07-11-2026",
@@ -59635,7 +59635,7 @@
       "village_name": "Muddanapalli",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "1250.1",
       "govt_extent": 230.47,
       "patta_extent": 1019.63,
@@ -59763,7 +59763,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "11-10-2026",
           "16-10-2026",
@@ -59784,7 +59784,7 @@
       "village_name": "Bondalagunta",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "861.2",
       "govt_extent": 205.11,
       "patta_extent": 656.09,
@@ -60140,7 +60140,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-5",
+        "phase": "Phase V",
         "dates": [
           "04-08-2026",
           "07-09-2026",
@@ -60160,7 +60160,7 @@
       "village_name": "Baipparedlapalle",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1189.75",
       "govt_extent": 190.3,
       "patta_extent": 999.45,
@@ -60204,7 +60204,7 @@
       "village_name": "Kempasamudram",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1385.44",
       "govt_extent": 156.68,
       "patta_extent": 1228.76,
@@ -60248,7 +60248,7 @@
       "village_name": "Gorivimakulapalli",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-6",
+      "phase": "Phase VI",
       "extent": "2097.61",
       "govt_extent": 334.12,
       "patta_extent": 1763.49,
@@ -60496,7 +60496,7 @@
       "village_name": "Pandyalamadugu",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-4",
+      "phase": "Phase IV",
       "extent": "1984.64",
       "govt_extent": 314.91,
       "patta_extent": 1669.73,
@@ -60540,7 +60540,7 @@
       "village_name": "Bandarlapalle",
       "mandal": "Ramakuppam",
       "division": "Kuppam",
-      "phase": "Phase-7",
+      "phase": "Phase VII",
       "extent": "6344.5599999999995",
       "govt_extent": 614.62,
       "patta_extent": 5729.94,
@@ -60752,7 +60752,7 @@
         }
       },
       "stage_targets": {
-        "phase": "Phase-6",
+        "phase": "Phase VI",
         "dates": [
           "18-08-2026",
           "08-09-2026",

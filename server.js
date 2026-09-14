@@ -38,6 +38,25 @@ const MANDAL_ALIASES = {
   's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
 };
 
+const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Before 2024'];
+
+function normalizePhase(val) {
+  if (!val) return '';
+  const str = String(val).trim();
+  const m = str.match(/^(?:Phase[\s\-_]*)?(1|2|3|4|5|6|7|I|II|III|IV|V|VI|VII)$/i);
+  if (m) {
+    const p = m[1].toUpperCase();
+    if (p === '1' || p === 'I') return 'Phase I';
+    if (p === '2' || p === 'II') return 'Phase II';
+    if (p === '3' || p === 'III') return 'Phase III';
+    if (p === '4' || p === 'IV') return 'Phase IV';
+    if (p === '5' || p === 'V') return 'Phase V';
+    if (p === '6' || p === 'VI') return 'Phase VI';
+    if (p === '7' || p === 'VII') return 'Phase VII';
+  }
+  return str;
+}
+
 let bundledStore = null;
 try {
   bundledStore = require('./data/store.json');
@@ -156,7 +175,8 @@ function recordView(v, store) {
   const conflict = (store.conflicts || []).some(c => c.villageId === v.id && c.status === 'Open');
   const mandal = normalizeMandal(v.mandal, store);
   const division = normalizeDivision(v.division, mandal);
-  return { ...v, mandal, division, current_stage: currentStage(v),
+  const phase = normalizePhase(v.phase);
+  return { ...v, mandal, division, phase, current_stage: currentStage(v),
     status: villageStatus(v, store), days_delayed: daysDelayed(v), has_conflict: conflict,
     workflow_conflict: isComplete(v.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(v[key]) && !isComplete(v[key])) };
 }
@@ -208,7 +228,14 @@ function dashboard(store) {
   const bottleneck = stageProgress.some(stage => stage.available) ? [...stageProgress.filter(stage => stage.available)].sort((a, b) => b.pending - a.pending)[0] : null;
   const divisions = Object.entries(grouped(villages, 'division')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (b.overall ?? 0) - (a.overall ?? 0));
   const mandals = Object.entries(grouped(villages, 'mandal')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (a.overall ?? 0) - (b.overall ?? 0));
-  const phases = Object.entries(grouped(villages, 'phase')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const phases = Object.entries(grouped(villages, 'phase')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => {
+    const ia = PHASE_ORDER.indexOf(a.name);
+    const ib = PHASE_ORDER.indexOf(b.name);
+    if (ia !== -1 && ib !== -1) return ia - ib;
+    if (ia !== -1) return -1;
+    if (ib !== -1) return 1;
+    return String(a.name).localeCompare(String(b.name));
+  });
   const delayed = villages.filter(v => v.status === 'Delayed').sort((a,b) => b.days_delayed - a.days_delayed);
   const conflicts = store.conflicts.filter(c => c.status === 'Open');
   const quality = dataQuality(villages);
@@ -378,7 +405,7 @@ async function syncSource(store, source) {
           extent: teIdx >= 0 ? clean(row[teIdx]) : '',
           total_khatas: khIdx >= 0 ? (parseInt(clean(row[khIdx]), 10) || null) : null,
           khatas: khIdx >= 0 ? (parseInt(clean(row[khIdx]), 10) || null) : null,
-          phase: phIdx >= 0 ? clean(row[phIdx]) : '',
+          phase: phIdx >= 0 ? normalizePhase(clean(row[phIdx])) : '',
           current_stage: csIdx >= 0 ? clean(row[csIdx]) : '',
           days_delayed: ddIdx >= 0 ? (parseInt(clean(row[ddIdx]), 10) || 0) : 0
         };
@@ -400,6 +427,7 @@ async function syncSource(store, source) {
         Object.assign(incoming, source.fixedFields || {});
       }
       incoming.mandal = normalizeMandal(incoming.mandal, store);
+      if (incoming.phase) incoming.phase = normalizePhase(incoming.phase);
       if (!clean(incoming.village_code) && !clean(incoming.village_name)) return;
       let existing = findVillageMatch(incoming, store.villages, store);
       if (!existing) {
@@ -560,9 +588,9 @@ function requireAuthorized(req, res) { const role = req.headers['x-user-role'] |
 function filterVillages(items, query) {
   return items.filter(v => {
     const search = normalKey(query.search); const normalizedSearch = MANDAL_ALIASES[search] ? normalKey(MANDAL_ALIASES[search]) : search;
-    const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, v.target_month].map(normalKey).join(' ');
+    const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, normalizePhase(v.phase), v.target_month].map(normalKey).join(' ');
     return (!search || searchable.includes(search) || normalKey(v.mandal) === normalizedSearch) &&
-      (!query.phase || v.phase === query.phase) &&
+      (!query.phase || normalizePhase(v.phase) === normalizePhase(query.phase)) &&
       (!query.division || v.division === query.division) &&
       (!query.mandal || v.mandal === query.mandal) &&
       (!query.status || v.status === query.status) &&
@@ -617,7 +645,15 @@ async function handleApi(req, res, url) {
   if (req.method === 'GET' && pathname === '/api/conflicts') return json(res, 200, { conflicts: store.conflicts });
   if (req.method === 'GET' && pathname === '/api/villages') {
     const villages = filterVillages(store.villages.map(v => recordView(v, store)), Object.fromEntries(url.searchParams));
-    return json(res, 200, { villages, filters: { phases: [...new Set(store.villages.map(v => v.phase).filter(Boolean))], divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))], mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort() } });
+    const uniquePhases = [...new Set(store.villages.map(v => normalizePhase(v.phase)).filter(Boolean))].sort((a, b) => {
+      const ia = PHASE_ORDER.indexOf(a);
+      const ib = PHASE_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
+    return json(res, 200, { villages, filters: { phases: uniquePhases, divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))], mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort() } });
   }
   const villageMatch = pathname.match(/^\/api\/villages\/([^/]+)$/);
   if (req.method === 'GET' && villageMatch) { const v = store.villages.find(x => x.id === villageMatch[1]); return v ? json(res, 200, recordView(v, store)) : json(res, 404, { error: 'Village not found.' }); }
