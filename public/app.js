@@ -19,22 +19,27 @@ const statusClass = value => String(value || 'not-updated').toLowerCase().replac
 const stageStatus = value => value || 'Not Updated';
 const api = async (endpoint, options = {}) => {
   const token = sessionStorage.getItem('ctr_officer_token');
-  const response = await fetch(endpoint, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Role': 'ADMIN',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...(options.headers || {})
-    },
-    ...options
-  });
+  let response;
+  try {
+    response = await fetch(endpoint, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-User-Role': 'ADMIN',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...(options.headers || {})
+      },
+      ...options
+    });
+  } catch (netErr) {
+    throw new Error(`Connection failed (${netErr.message || 'Network unavailable'}). Please verify your internet connection, office DNS/VPN, and ensure the domain URL is reachable.`);
+  }
   const body = await response.json().catch(() => ({}));
   if (response.status === 401) {
     sessionStorage.removeItem('ctr_officer_token');
     renderAuthGate();
     throw new Error('Authorized officer credentials required.');
   }
-  if (!response.ok) throw new Error(body.error || 'The request could not be completed.');
+  if (!response.ok) throw new Error(body.error || `Server returned error (${response.status}).`);
   return body;
 };
 

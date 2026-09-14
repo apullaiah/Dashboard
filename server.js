@@ -607,7 +607,7 @@ function filterVillages(items, query) {
   });
 }
 async function handleApi(req, res, url) {
-  const pathname = url.pathname;
+  let pathname = (url.pathname || '').replace(/\/+$/, '') || '/';
   const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
 
   // Public authentication endpoints
@@ -759,9 +759,21 @@ async function requestHandler(req, res) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const url = new URL(req.url, `${proto}://${host}`);
 
-  const route = url.searchParams.get('route');
-  if (route) {
-    url.pathname = '/api/' + route.replace(/^\/+/, '');
+  const routeParam = url.searchParams.get('route');
+  if (routeParam) {
+    url.searchParams.delete('route');
+    const [cleanRoute, extraQuery] = routeParam.split('?');
+    url.pathname = '/api/' + cleanRoute.replace(/^\/+/, '');
+    if (extraQuery) {
+      const q = new URLSearchParams(extraQuery);
+      for (const [k, v] of q.entries()) {
+        if (!url.searchParams.has(k)) url.searchParams.set(k, v);
+      }
+    }
+  }
+
+  if (url.pathname.length > 1 && url.pathname.endsWith('/')) {
+    url.pathname = url.pathname.slice(0, -1);
   }
 
   try {
