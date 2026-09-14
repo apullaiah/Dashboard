@@ -228,7 +228,7 @@
       "recordType": "khata_monitoring",
       "refreshFrequency": "15 minutes",
       "status": "Connected",
-      "lastSync": "2026-09-14T06:27:14.749Z",
+      "lastSync": "2026-09-14T06:33:45.175Z",
       "createdAt": "2026-09-13T18:29:59.560Z",
       "nextSync": "2026-09-13T19:33:27.916Z",
       "lastError": "",
@@ -1328,12 +1328,12 @@
       "govt_extent": 858.25,
       "patta_extent": 3778.66,
       "khatas": 2295,
-      "total_khatas": 2295,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 2334,
+      "patta_khatas": 1966,
+      "govt_khatas": 62,
+      "both_khatas": 281,
+      "deletions": 25,
+      "online_khatas": 2102,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -1349,7 +1349,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.641Z",
+      "last_synced": "2026-09-14T06:33:45.092Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -1501,6 +1501,17 @@
           "row": 60,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.642Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.094Z",
+          "patta_khatas": 1966,
+          "govt_khatas": 62,
+          "both_khatas": 281,
+          "deletions": 25,
+          "total_khatas": 2334,
+          "online_khatas": 2102
         }
       }
     },
@@ -1741,16 +1752,16 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 4179.03,
+      "extent": "2084.23",
       "govt_extent": 624.6,
       "patta_extent": 3554.43,
       "khatas": 1748,
-      "total_khatas": 1748,
-      "patta_khatas": 1212,
-      "govt_khatas": 14,
-      "both_khatas": 522,
+      "total_khatas": 986,
+      "patta_khatas": 104,
+      "govt_khatas": 102,
+      "both_khatas": 780,
       "deletions": 0,
-      "online_khatas": 1612,
+      "online_khatas": 985,
       "target_month": "Feb-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -1766,7 +1777,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.648Z",
+      "last_synced": "2026-09-14T06:33:45.128Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -1854,6 +1865,17 @@
           "row": 3,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.872Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.128Z",
+          "patta_khatas": 104,
+          "govt_khatas": 102,
+          "both_khatas": 780,
+          "deletions": 0,
+          "total_khatas": 986,
+          "online_khatas": 985
         }
       }
     },
@@ -2014,7 +2036,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 3376.96,
+      "extent": "3376.96",
       "govt_extent": 595.45,
       "patta_extent": 2781.51,
       "khatas": 1103,
@@ -2039,7 +2061,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.649Z",
+      "last_synced": "2026-09-14T06:33:45.096Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -2051,7 +2073,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.231Z"
+          "lastSynced": "2026-09-14T06:33:45.096Z",
+          "patta_khatas": 685,
+          "govt_khatas": 10,
+          "both_khatas": 408,
+          "deletions": 0,
+          "total_khatas": 1103,
+          "online_khatas": 1046
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -2433,7 +2461,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-7",
-      "extent": 222.03,
+      "extent": "222.03",
       "govt_extent": 768.12,
       "patta_extent": 2411.07,
       "khatas": 1255,
@@ -2458,7 +2486,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.718Z",
+      "last_synced": "2026-09-14T06:33:45.139Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -2610,6 +2638,17 @@
           "row": 65,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.647Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.139Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 65
         }
       },
       "current_stage": "GT",
@@ -2968,7 +3007,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 4210.63,
+      "extent": "4210.63",
       "govt_extent": 520.14,
       "patta_extent": 3690.49,
       "khatas": 2048,
@@ -2993,7 +3032,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.649Z",
+      "last_synced": "2026-09-14T06:33:45.096Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -3005,7 +3044,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.233Z"
+          "lastSynced": "2026-09-14T06:33:45.096Z",
+          "patta_khatas": 1775,
+          "govt_khatas": 57,
+          "both_khatas": 216,
+          "deletions": 0,
+          "total_khatas": 2048,
+          "online_khatas": 1515
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -3489,7 +3534,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 4562.79,
+      "extent": "4562.79",
       "govt_extent": 507.62,
       "patta_extent": 4055.17,
       "khatas": 2104,
@@ -3514,7 +3559,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.649Z",
+      "last_synced": "2026-09-14T06:33:45.097Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
         "action_plan": {
@@ -3526,7 +3571,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.233Z"
+          "lastSynced": "2026-09-14T06:33:45.097Z",
+          "patta_khatas": 1420,
+          "govt_khatas": 56,
+          "both_khatas": 542,
+          "deletions": 86,
+          "total_khatas": 2104,
+          "online_khatas": 2099
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -5218,7 +5269,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": 1267.35,
+      "extent": "1267.35",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -5243,9 +5294,21 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Not Updated",
-      "last_synced": "2026-09-14T06:27:14.735Z",
+      "last_synced": "2026-09-14T06:33:45.157Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
-      "source_meta": {}
+      "source_meta": {
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.157Z",
+          "patta_khatas": 592,
+          "govt_khatas": 30,
+          "both_khatas": 132,
+          "deletions": 10,
+          "total_khatas": 764,
+          "online_khatas": 506
+        }
+      }
     },
     {
       "id": "0d21acda-e99a-48e1-a07e-51ea031aa0e7",
@@ -5556,7 +5619,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 566.6,
+      "extent": "566.6",
       "govt_extent": 215.9,
       "patta_extent": 350.7,
       "khatas": 295,
@@ -5581,7 +5644,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.650Z",
+      "last_synced": "2026-09-14T06:33:45.097Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
         "action_plan": {
@@ -5733,6 +5796,17 @@
           "row": 13,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.579Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.097Z",
+          "patta_khatas": 185,
+          "govt_khatas": 15,
+          "both_khatas": 39,
+          "deletions": 44,
+          "total_khatas": 283,
+          "online_khatas": 283
         }
       }
     },
@@ -6326,7 +6400,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 2845.49,
+      "extent": "2845.49",
       "govt_extent": 931.48,
       "patta_extent": 1914.01,
       "khatas": 1031,
@@ -6351,7 +6425,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.650Z",
+      "last_synced": "2026-09-14T06:33:45.099Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -6551,6 +6625,17 @@
           "row": 18,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.589Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.099Z",
+          "patta_khatas": 621,
+          "govt_khatas": 103,
+          "both_khatas": 286,
+          "deletions": 21,
+          "total_khatas": 1031,
+          "online_khatas": 797
         }
       }
     },
@@ -6619,7 +6704,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 677.07,
+      "extent": "677.07",
       "govt_extent": 2.75,
       "patta_extent": 674.32,
       "khatas": 271,
@@ -6644,7 +6729,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.650Z",
+      "last_synced": "2026-09-14T06:33:45.098Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -6844,6 +6929,17 @@
           "row": 14,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.581Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.098Z",
+          "patta_khatas": 225,
+          "govt_khatas": 9,
+          "both_khatas": 30,
+          "deletions": 7,
+          "total_khatas": 271,
+          "online_khatas": 242
         }
       },
       "stage_targets": {
@@ -7359,7 +7455,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 462.72,
+      "extent": "462.72",
       "govt_extent": 71.1,
       "patta_extent": 391.62,
       "khatas": 321,
@@ -7384,7 +7480,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.650Z",
+      "last_synced": "2026-09-14T06:33:45.099Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -7396,7 +7492,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.234Z"
+          "lastSynced": "2026-09-14T06:33:45.099Z",
+          "patta_khatas": 191,
+          "govt_khatas": 32,
+          "both_khatas": 98,
+          "deletions": 0,
+          "total_khatas": 321,
+          "online_khatas": 283
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -7502,7 +7604,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-7",
-      "extent": 315.27,
+      "extent": "315.27",
       "govt_extent": 626.92,
       "patta_extent": 599.67,
       "khatas": 406,
@@ -7527,7 +7629,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.740Z",
+      "last_synced": "2026-09-14T06:33:45.166Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -7535,6 +7637,17 @@
           "targetMonth": "Feb-27",
           "stage": "GT Not Started",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.166Z",
+          "patta_khatas": 121,
+          "govt_khatas": 30,
+          "both_khatas": 20,
+          "deletions": 0,
+          "total_khatas": 171,
+          "online_khatas": 161
         }
       },
       "stage_targets": {
@@ -8070,7 +8183,7 @@
       "mandal": "Chittoor",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 2330.38,
+      "extent": "2330.38",
       "govt_extent": 435.06,
       "patta_extent": 1895.32,
       "khatas": 1316,
@@ -8095,7 +8208,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.652Z",
+      "last_synced": "2026-09-14T06:33:45.100Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -8107,7 +8220,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.234Z"
+          "lastSynced": "2026-09-14T06:33:45.100Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 1192
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -10332,12 +10451,12 @@
       "govt_extent": 1776,
       "patta_extent": 2269.49,
       "khatas": 2025,
-      "total_khatas": 2025,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 1844,
+      "patta_khatas": 1050,
+      "govt_khatas": 210,
+      "both_khatas": 504,
+      "deletions": 80,
+      "online_khatas": 1844,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -10353,7 +10472,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.575Z",
+      "last_synced": "2026-09-14T06:33:45.106Z",
       "last_modified": "2026-09-13T18:29:59.547Z",
       "source_meta": {
         "action_plan": {
@@ -10505,6 +10624,17 @@
           "row": 12,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.577Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.106Z",
+          "patta_khatas": 1050,
+          "govt_khatas": 210,
+          "both_khatas": 504,
+          "deletions": 80,
+          "total_khatas": 1844,
+          "online_khatas": 1844
         }
       }
     },
@@ -11908,7 +12038,7 @@
       "mandal": "Irala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 4798.32,
+      "extent": "4798.32",
       "govt_extent": 777.93,
       "patta_extent": 4020.39,
       "khatas": 2362,
@@ -11933,7 +12063,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.653Z",
+      "last_synced": "2026-09-14T06:33:45.100Z",
       "last_modified": "2026-09-13T18:29:59.548Z",
       "source_meta": {
         "action_plan": {
@@ -11945,7 +12075,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.100Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 2268
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -12513,7 +12649,7 @@
       "mandal": "Irala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 3089.09,
+      "extent": "3089.09",
       "govt_extent": 1150.37,
       "patta_extent": 1938.72,
       "khatas": 1142,
@@ -12538,7 +12674,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.653Z",
+      "last_synced": "2026-09-14T06:33:45.101Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -12550,7 +12686,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.101Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 1085
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -12999,7 +13141,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 1028.88,
+      "extent": "1028.88",
       "govt_extent": 248,
       "patta_extent": 780.88,
       "khatas": 502,
@@ -13024,7 +13166,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.660Z",
+      "last_synced": "2026-09-14T06:33:45.103Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -13036,7 +13178,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.103Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 493
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -13142,7 +13290,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 865.05,
+      "extent": "865.05",
       "govt_extent": 200.28,
       "patta_extent": 664.77,
       "khatas": 396,
@@ -13167,7 +13315,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.660Z",
+      "last_synced": "2026-09-14T06:33:45.102Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -13179,7 +13327,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.102Z",
+          "patta_khatas": 314,
+          "govt_khatas": 63,
+          "both_khatas": 19,
+          "deletions": 0,
+          "total_khatas": 396,
+          "online_khatas": 312
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -13822,7 +13976,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 1893.63,
+      "extent": "1893.63",
       "govt_extent": 829.69,
       "patta_extent": 1063.94,
       "khatas": 1093,
@@ -13847,7 +14001,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.661Z",
+      "last_synced": "2026-09-14T06:33:45.105Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -13859,7 +14013,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.105Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 1057
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -14543,12 +14703,12 @@
       "govt_extent": 311.85,
       "patta_extent": 710.47,
       "khatas": 333,
-      "total_khatas": 333,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 0,
+      "patta_khatas": 0,
+      "govt_khatas": 0,
+      "both_khatas": 0,
+      "deletions": 0,
+      "online_khatas": 310,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -14564,7 +14724,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.698Z",
+      "last_synced": "2026-09-14T06:33:45.101Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -14716,6 +14876,17 @@
           "row": 111,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.699Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.101Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 310
         }
       }
     },
@@ -15033,12 +15204,12 @@
       "govt_extent": 645.52,
       "patta_extent": 1044.46,
       "khatas": 1152,
-      "total_khatas": 1152,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 0,
+      "patta_khatas": 0,
+      "govt_khatas": 0,
+      "both_khatas": 0,
+      "deletions": 0,
+      "online_khatas": 1061,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -15054,7 +15225,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.699Z",
+      "last_synced": "2026-09-14T06:33:45.101Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -15206,6 +15377,17 @@
           "row": 112,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.700Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.101Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 1061
         }
       }
     },
@@ -15938,7 +16120,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 747.63,
+      "extent": "747.63",
       "govt_extent": 243.46,
       "patta_extent": 504.17,
       "khatas": 225,
@@ -15963,7 +16145,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.660Z",
+      "last_synced": "2026-09-14T06:33:45.104Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -15975,7 +16157,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.104Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 210
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -16237,7 +16425,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 1075.65,
+      "extent": "1075.65",
       "govt_extent": 262.16,
       "patta_extent": 813.49,
       "khatas": 298,
@@ -16262,7 +16450,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.659Z",
+      "last_synced": "2026-09-14T06:33:45.102Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -16462,6 +16650,17 @@
           "row": 113,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.701Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.102Z",
+          "patta_khatas": 252,
+          "govt_khatas": 23,
+          "both_khatas": 20,
+          "deletions": 3,
+          "total_khatas": 298,
+          "online_khatas": 251
         }
       },
       "stage_targets": {
@@ -16732,7 +16931,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 1192.66,
+      "extent": "1192.66",
       "govt_extent": 391.59,
       "patta_extent": 801.07,
       "khatas": 507,
@@ -16757,7 +16956,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.661Z",
+      "last_synced": "2026-09-14T06:33:45.105Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -16769,7 +16968,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.235Z"
+          "lastSynced": "2026-09-14T06:33:45.105Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 479
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -17208,7 +17413,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": 136.2,
+      "extent": "136.2",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 99,
@@ -17233,7 +17438,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Not Updated",
-      "last_synced": "2026-09-14T06:27:14.665Z",
+      "last_synced": "2026-09-14T06:33:45.106Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "division": {
@@ -17355,6 +17560,17 @@
           "row": 3,
           "column": "",
           "lastSynced": "2026-09-13T19:24:29.946Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.106Z",
+          "patta_khatas": 59,
+          "govt_khatas": 10,
+          "both_khatas": 26,
+          "deletions": 4,
+          "total_khatas": 99,
+          "online_khatas": 84
         }
       }
     },
@@ -17521,7 +17737,7 @@
       "mandal": "Yadamari",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 2788.95,
+      "extent": "2788.95",
       "govt_extent": 253.37,
       "patta_extent": 2535.58,
       "khatas": 1522,
@@ -17546,7 +17762,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.661Z",
+      "last_synced": "2026-09-14T06:33:45.106Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -17558,7 +17774,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.106Z",
+          "patta_khatas": 470,
+          "govt_khatas": 38,
+          "both_khatas": 984,
+          "deletions": 30,
+          "total_khatas": 1522,
+          "online_khatas": 1191
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -18339,12 +18561,12 @@
       "govt_extent": 65.12,
       "patta_extent": 73.08,
       "khatas": 65,
-      "total_khatas": 65,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 74,
+      "patta_khatas": 61,
+      "govt_khatas": 6,
+      "both_khatas": 2,
+      "deletions": 5,
+      "online_khatas": 68,
       "target_month": "Feb-27",
       "target_date": "05-01-2027",
       "days_delayed": 0,
@@ -18360,7 +18582,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.550Z",
+      "last_synced": "2026-09-14T06:33:45.106Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -18368,6 +18590,17 @@
           "targetMonth": "Feb-27",
           "stage": "VS Login",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.106Z",
+          "patta_khatas": 61,
+          "govt_khatas": 6,
+          "both_khatas": 2,
+          "deletions": 5,
+          "total_khatas": 74,
+          "online_khatas": 68
         }
       },
       "stage_targets": {
@@ -18440,12 +18673,12 @@
       "govt_extent": 32.98,
       "patta_extent": 83.69,
       "khatas": 69,
-      "total_khatas": 69,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 72,
+      "patta_khatas": 55,
+      "govt_khatas": 5,
+      "both_khatas": 12,
+      "deletions": 0,
+      "online_khatas": 65,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -18461,7 +18694,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.674Z",
+      "last_synced": "2026-09-14T06:33:45.106Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -18613,6 +18846,17 @@
           "row": 88,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.674Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.106Z",
+          "patta_khatas": 55,
+          "govt_khatas": 5,
+          "both_khatas": 12,
+          "deletions": 0,
+          "total_khatas": 72,
+          "online_khatas": 65
         }
       }
     },
@@ -18825,7 +19069,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 655.24,
+      "extent": "655.24",
       "govt_extent": 173.23,
       "patta_extent": 482.01,
       "khatas": 354,
@@ -18850,7 +19094,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.679Z",
+      "last_synced": "2026-09-14T06:33:45.112Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -18862,7 +19106,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.112Z",
+          "patta_khatas": 263,
+          "govt_khatas": 41,
+          "both_khatas": 40,
+          "deletions": 10,
+          "total_khatas": 354,
+          "online_khatas": 334
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -19080,7 +19330,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 237,
+      "extent": "237",
       "govt_extent": 98.98,
       "patta_extent": 138.02,
       "khatas": 152,
@@ -19105,7 +19355,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.676Z",
+      "last_synced": "2026-09-14T06:33:45.109Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19117,7 +19367,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.109Z",
+          "patta_khatas": 119,
+          "govt_khatas": 22,
+          "both_khatas": 11,
+          "deletions": 0,
+          "total_khatas": 152,
+          "online_khatas": 185
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -19339,12 +19595,12 @@
       "govt_extent": 95.64,
       "patta_extent": 188.72,
       "khatas": 123,
-      "total_khatas": 123,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 128,
+      "patta_khatas": 82,
+      "govt_khatas": 13,
+      "both_khatas": 30,
+      "deletions": 3,
+      "online_khatas": 125,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -19360,7 +19616,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.687Z",
+      "last_synced": "2026-09-14T06:33:45.108Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19512,6 +19768,17 @@
           "row": 100,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.687Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.108Z",
+          "patta_khatas": 82,
+          "govt_khatas": 13,
+          "both_khatas": 30,
+          "deletions": 3,
+          "total_khatas": 128,
+          "online_khatas": 125
         }
       }
     },
@@ -19523,7 +19790,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 312.24,
+      "extent": "312.24",
       "govt_extent": 89.56,
       "patta_extent": 222.68,
       "khatas": 250,
@@ -19548,7 +19815,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.670Z",
+      "last_synced": "2026-09-14T06:33:45.107Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19560,7 +19827,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.107Z",
+          "patta_khatas": 214,
+          "govt_khatas": 19,
+          "both_khatas": 16,
+          "deletions": 1,
+          "total_khatas": 250,
+          "online_khatas": 244
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -19965,12 +20238,12 @@
       "govt_extent": 48.5,
       "patta_extent": 348.14,
       "khatas": 279,
-      "total_khatas": 279,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 331,
+      "patta_khatas": 232,
+      "govt_khatas": 60,
+      "both_khatas": 39,
+      "deletions": 0,
+      "online_khatas": 271,
       "target_month": "Feb-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -19986,7 +20259,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.551Z",
+      "last_synced": "2026-09-14T06:33:45.107Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19994,6 +20267,17 @@
           "targetMonth": "Feb-27",
           "stage": "GT Ongoing",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.107Z",
+          "patta_khatas": 232,
+          "govt_khatas": 60,
+          "both_khatas": 39,
+          "deletions": 0,
+          "total_khatas": 331,
+          "online_khatas": 271
         }
       }
     },
@@ -20005,7 +20289,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 246.15,
+      "extent": "246.15",
       "govt_extent": 82.72,
       "patta_extent": 163.43,
       "khatas": 229,
@@ -20030,7 +20314,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.673Z",
+      "last_synced": "2026-09-14T06:33:45.108Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -20042,7 +20326,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.108Z",
+          "patta_khatas": 190,
+          "govt_khatas": 28,
+          "both_khatas": 9,
+          "deletions": 2,
+          "total_khatas": 229,
+          "online_khatas": 176
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -20884,12 +21174,12 @@
       "govt_extent": 108.2,
       "patta_extent": 135.8,
       "khatas": 183,
-      "total_khatas": 183,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 196,
+      "patta_khatas": 150,
+      "govt_khatas": 13,
+      "both_khatas": 16,
+      "deletions": 17,
+      "online_khatas": 177,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -20905,7 +21195,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.679Z",
+      "last_synced": "2026-09-14T06:33:45.109Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -21057,6 +21347,17 @@
           "row": 93,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.680Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.109Z",
+          "patta_khatas": 150,
+          "govt_khatas": 13,
+          "both_khatas": 16,
+          "deletions": 17,
+          "total_khatas": 196,
+          "online_khatas": 177
         }
       }
     },
@@ -21688,7 +21989,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": 358.98,
+      "extent": "358.98",
       "govt_extent": 65.86,
       "patta_extent": 293.12,
       "khatas": 274,
@@ -21713,7 +22014,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.678Z",
+      "last_synced": "2026-09-14T06:33:45.112Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -21797,7 +22098,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.112Z",
+          "patta_khatas": 226,
+          "govt_khatas": 18,
+          "both_khatas": 16,
+          "deletions": 14,
+          "total_khatas": 274,
+          "online_khatas": 240
         },
         "patta_khatas": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -22717,16 +23024,16 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase V",
-      "extent": "2634.973011",
+      "extent": "411.09",
       "govt_extent": 675.11,
       "patta_extent": 1959.86,
       "khatas": 1177,
-      "total_khatas": 1177,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 0,
+      "patta_khatas": 0,
+      "govt_khatas": 0,
+      "both_khatas": 0,
+      "deletions": 0,
+      "online_khatas": 159,
       "target_month": "Jan-27",
       "target_date": "02-11-2026",
       "days_delayed": 0,
@@ -22742,7 +23049,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:24:32.110Z",
+      "last_synced": "2026-09-14T06:33:45.099Z",
       "last_modified": "2026-09-13T17:33:19.524Z",
       "source_meta": {
         "vro_status": {
@@ -22822,6 +23129,17 @@
           "targetMonth": "Jan-27",
           "stage": "vectorization",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.099Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 159
         }
       },
       "stage_targets": {
@@ -22846,7 +23164,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 2948.22,
+      "extent": "2948.22",
       "govt_extent": 985.85,
       "patta_extent": 1962.37,
       "khatas": 1001,
@@ -22871,7 +23189,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.679Z",
+      "last_synced": "2026-09-14T06:33:45.112Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -23023,6 +23341,17 @@
           "row": 63,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.645Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.112Z",
+          "patta_khatas": 605,
+          "govt_khatas": 341,
+          "both_khatas": 284,
+          "deletions": 39,
+          "total_khatas": 1269,
+          "online_khatas": 945
         }
       },
       "stage_targets": {
@@ -23104,7 +23433,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 3740.58,
+      "extent": "3740.58",
       "govt_extent": 1150.41,
       "patta_extent": 2590.17,
       "khatas": 1368,
@@ -23129,7 +23458,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.680Z",
+      "last_synced": "2026-09-14T06:33:45.113Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -23217,6 +23546,17 @@
           "row": 37,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.891Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.113Z",
+          "patta_khatas": 884,
+          "govt_khatas": 41,
+          "both_khatas": 415,
+          "deletions": 28,
+          "total_khatas": 1368,
+          "online_khatas": 1044
         }
       },
       "current_stage": "GT"
@@ -24133,7 +24473,7 @@
       "mandal": "Rompicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 4467.54,
+      "extent": "4467.54",
       "govt_extent": 1108.1,
       "patta_extent": 3359.44,
       "khatas": 1919,
@@ -24158,7 +24498,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.680Z",
+      "last_synced": "2026-09-14T06:33:45.113Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -24170,7 +24510,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.113Z",
+          "patta_khatas": 946,
+          "govt_khatas": 123,
+          "both_khatas": 850,
+          "deletions": 0,
+          "total_khatas": 1919,
+          "online_khatas": 1839
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -25775,7 +26121,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 1828.24,
+      "extent": "1828.24",
       "govt_extent": 264.53,
       "patta_extent": 1563.71,
       "khatas": 1195,
@@ -25800,7 +26146,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.681Z",
+      "last_synced": "2026-09-14T06:33:45.114Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -25812,7 +26158,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.114Z",
+          "patta_khatas": 870,
+          "govt_khatas": 210,
+          "both_khatas": 90,
+          "deletions": 25,
+          "total_khatas": 1195,
+          "online_khatas": 759
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -25942,7 +26294,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 3290.42,
+      "extent": "3290.42",
       "govt_extent": 1241.08,
       "patta_extent": 2049.34,
       "khatas": 1524,
@@ -25967,7 +26319,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.682Z",
+      "last_synced": "2026-09-14T06:33:45.115Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -25979,7 +26331,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.115Z",
+          "patta_khatas": 723,
+          "govt_khatas": 419,
+          "both_khatas": 356,
+          "deletions": 26,
+          "total_khatas": 1524,
+          "online_khatas": 1244
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -26183,7 +26541,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": 2773.84,
+      "extent": "2773.84",
       "govt_extent": 848.49,
       "patta_extent": 1925.35,
       "khatas": 837,
@@ -26208,7 +26566,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.681Z",
+      "last_synced": "2026-09-14T06:33:45.114Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -26220,7 +26578,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.237Z"
+          "lastSynced": "2026-09-14T06:33:45.114Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 809
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -26486,12 +26850,12 @@
       "govt_extent": 1628.96,
       "patta_extent": 3210.6,
       "khatas": 1644,
-      "total_khatas": 1644,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 1529,
+      "patta_khatas": 654,
+      "govt_khatas": 399,
+      "both_khatas": 423,
+      "deletions": 53,
+      "online_khatas": 1529,
       "target_month": "Feb-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -26507,7 +26871,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.552Z",
+      "last_synced": "2026-09-14T06:33:45.115Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -26515,6 +26879,17 @@
           "targetMonth": "Feb-27",
           "stage": "GT Ongoing",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.115Z",
+          "patta_khatas": 654,
+          "govt_khatas": 399,
+          "both_khatas": 423,
+          "deletions": 53,
+          "total_khatas": 1529,
+          "online_khatas": 1529
         }
       }
     },
@@ -26941,7 +27316,7 @@
       "mandal": "Palasamudram",
       "division": "Nagari",
       "phase": "Before 2024",
-      "extent": 2104.26,
+      "extent": "2104.26",
       "govt_extent": 90.92,
       "patta_extent": 326.72999999999996,
       "khatas": 1152,
@@ -26966,7 +27341,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.685Z",
+      "last_synced": "2026-09-14T06:33:45.116Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -27054,6 +27429,17 @@
           "row": 43,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.893Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.116Z",
+          "patta_khatas": 668,
+          "govt_khatas": 213,
+          "both_khatas": 271,
+          "deletions": 0,
+          "total_khatas": 1152,
+          "online_khatas": 1097
         }
       },
       "current_stage": "GT"
@@ -28725,7 +29111,7 @@
       "mandal": "Karvetinagar",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": 1216.9,
+      "extent": "1216.9",
       "govt_extent": 102.46,
       "patta_extent": 1114.44,
       "khatas": 386,
@@ -28750,7 +29136,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.685Z",
+      "last_synced": "2026-09-14T06:33:45.116Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
         "action_plan": {
@@ -28950,6 +29336,17 @@
           "row": 37,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.615Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.116Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 380,
+          "deletions": 6,
+          "total_khatas": 386,
+          "online_khatas": 380
         }
       }
     },
@@ -29399,16 +29796,16 @@
       "mandal": "Karvetinagar",
       "division": "Nagari",
       "phase": "Phase-7",
-      "extent": "9384.47",
+      "extent": "8373.52",
       "govt_extent": 7504.99,
       "patta_extent": 1879.48,
       "khatas": 909,
-      "total_khatas": 909,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 1331,
+      "patta_khatas": 928,
+      "govt_khatas": 83,
+      "both_khatas": 312,
+      "deletions": 8,
+      "online_khatas": 1276,
       "target_month": "Feb-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -29424,7 +29821,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.553Z",
+      "last_synced": "2026-09-14T06:33:45.116Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
         "action_plan": {
@@ -29432,6 +29829,17 @@
           "targetMonth": "Feb-27",
           "stage": "GT Not Started",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.116Z",
+          "patta_khatas": 928,
+          "govt_khatas": 83,
+          "both_khatas": 312,
+          "deletions": 8,
+          "total_khatas": 1331,
+          "online_khatas": 1276
         }
       }
     },
@@ -29747,11 +30155,11 @@
       "patta_extent": 1206.6,
       "khatas": 595,
       "total_khatas": 595,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "patta_khatas": 532,
+      "govt_khatas": 31,
+      "both_khatas": 23,
+      "deletions": 9,
+      "online_khatas": 565,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -29767,7 +30175,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.631Z",
+      "last_synced": "2026-09-14T06:33:45.117Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
         "action_plan": {
@@ -29919,6 +30327,17 @@
           "row": 51,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.631Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.117Z",
+          "patta_khatas": 532,
+          "govt_khatas": 31,
+          "both_khatas": 23,
+          "deletions": 9,
+          "total_khatas": 595,
+          "online_khatas": 565
         }
       }
     },
@@ -29930,7 +30349,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase VI",
-      "extent": 854.69,
+      "extent": "854.69",
       "govt_extent": 474.39,
       "patta_extent": 380.3,
       "khatas": 274,
@@ -29955,7 +30374,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.688Z",
+      "last_synced": "2026-09-14T06:33:45.117Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -30039,7 +30458,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.238Z"
+          "lastSynced": "2026-09-14T06:33:45.117Z",
+          "patta_khatas": 195,
+          "govt_khatas": 21,
+          "both_khatas": 56,
+          "deletions": 2,
+          "total_khatas": 274,
+          "online_khatas": 224
         },
         "patta_khatas": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -32141,7 +32566,7 @@
       "mandal": "Vijayapuram",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": 3858.42,
+      "extent": "3858.42",
       "govt_extent": 1625.83,
       "patta_extent": 2232.59,
       "khatas": 1364,
@@ -32166,7 +32591,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.691Z",
+      "last_synced": "2026-09-14T06:33:45.119Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -32178,7 +32603,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.238Z"
+          "lastSynced": "2026-09-14T06:33:45.119Z",
+          "patta_khatas": 1152,
+          "govt_khatas": 120,
+          "both_khatas": 72,
+          "deletions": 20,
+          "total_khatas": 1364,
+          "online_khatas": 0
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -32446,7 +32877,7 @@
       "mandal": "Vijayapuram",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": 1020,
+      "extent": "1020",
       "govt_extent": 366.66,
       "patta_extent": 653.34,
       "khatas": 564,
@@ -32471,7 +32902,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.691Z",
+      "last_synced": "2026-09-14T06:33:45.119Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -32559,6 +32990,17 @@
           "row": 49,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.896Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.119Z",
+          "patta_khatas": 517,
+          "govt_khatas": 42,
+          "both_khatas": 2,
+          "deletions": 3,
+          "total_khatas": 564,
+          "online_khatas": 531
         }
       },
       "stage_targets": {
@@ -33369,7 +33811,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 1419.9,
+      "extent": "1419.9",
       "govt_extent": 454.3,
       "patta_extent": 965.6,
       "khatas": 642,
@@ -33394,7 +33836,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.692Z",
+      "last_synced": "2026-09-14T06:33:45.120Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -33406,7 +33848,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.238Z"
+          "lastSynced": "2026-09-14T06:33:45.120Z",
+          "patta_khatas": 458,
+          "govt_khatas": 28,
+          "both_khatas": 156,
+          "deletions": 0,
+          "total_khatas": 642,
+          "online_khatas": 489
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -33610,7 +34058,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase VI",
-      "extent": 91.45,
+      "extent": "91.45",
       "govt_extent": 1236.99,
       "patta_extent": 2786.59,
       "khatas": 51,
@@ -33635,7 +34083,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.697Z",
+      "last_synced": "2026-09-14T06:33:45.123Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -33763,6 +34211,17 @@
           "row": 55,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.898Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.123Z",
+          "patta_khatas": 42,
+          "govt_khatas": 9,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 51,
+          "online_khatas": 89
         }
       },
       "stage_targets": {
@@ -33997,7 +34456,7 @@
       "mandal": "Peddapanjani",
       "division": "Palamaner",
       "phase": "Phase VI",
-      "extent": 489.41,
+      "extent": "489.41",
       "govt_extent": 481.23,
       "patta_extent": 3917.35,
       "khatas": 193,
@@ -34022,7 +34481,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.693Z",
+      "last_synced": "2026-09-14T06:33:45.121Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -34150,6 +34609,17 @@
           "row": 51,
           "column": "L",
           "lastSynced": "2026-09-13T19:18:27.897Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.121Z",
+          "patta_khatas": 96,
+          "govt_khatas": 10,
+          "both_khatas": 86,
+          "deletions": 1,
+          "total_khatas": 193,
+          "online_khatas": 42
         }
       },
       "stage_targets": {
@@ -34287,7 +34757,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 2023.27,
+      "extent": "2023.27",
       "govt_extent": 647.29,
       "patta_extent": 1375.98,
       "khatas": 1080,
@@ -34312,7 +34782,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.696Z",
+      "last_synced": "2026-09-14T06:33:45.123Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -34324,7 +34794,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.238Z"
+          "lastSynced": "2026-09-14T06:33:45.123Z",
+          "patta_khatas": 715,
+          "govt_khatas": 61,
+          "both_khatas": 300,
+          "deletions": 4,
+          "total_khatas": 1080,
+          "online_khatas": 831
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -35664,12 +36140,12 @@
       "govt_extent": 99.15,
       "patta_extent": 1068.95,
       "khatas": 526,
-      "total_khatas": 526,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 321,
+      "patta_khatas": 207,
+      "govt_khatas": 14,
+      "both_khatas": 81,
+      "deletions": 19,
+      "online_khatas": 481,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -35685,7 +36161,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.634Z",
+      "last_synced": "2026-09-14T06:33:45.122Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -35837,6 +36313,17 @@
           "row": 54,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.634Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.122Z",
+          "patta_khatas": 207,
+          "govt_khatas": 14,
+          "both_khatas": 81,
+          "deletions": 19,
+          "total_khatas": 321,
+          "online_khatas": 481
         }
       }
     },
@@ -36319,7 +36806,7 @@
       "mandal": "Gangavaram",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 4272.11,
+      "extent": "4272.11",
       "govt_extent": 1164.62,
       "patta_extent": 3107.49,
       "khatas": 1983,
@@ -36344,7 +36831,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.698Z",
+      "last_synced": "2026-09-14T06:33:45.124Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -36356,7 +36843,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.238Z"
+          "lastSynced": "2026-09-14T06:33:45.124Z",
+          "patta_khatas": 1621,
+          "govt_khatas": 41,
+          "both_khatas": 321,
+          "deletions": 0,
+          "total_khatas": 1983,
+          "online_khatas": 1844
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -38472,7 +38965,7 @@
       "mandal": "Baireddipalle",
       "division": "Palamaner",
       "phase": "Phase-2",
-      "extent": 406.05,
+      "extent": "406.05",
       "govt_extent": 183.94,
       "patta_extent": 1274.74,
       "khatas": 767,
@@ -38497,7 +38990,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.743Z",
+      "last_synced": "2026-09-14T06:33:45.168Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
         "action_plan": {
@@ -38505,6 +38998,17 @@
           "targetMonth": "Sep-26",
           "stage": "Final ROR Completed",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.168Z",
+          "patta_khatas": 635,
+          "govt_khatas": 1,
+          "both_khatas": 6,
+          "deletions": 14,
+          "total_khatas": 656,
+          "online_khatas": 630
         }
       },
       "stage_targets": {
@@ -38529,7 +39033,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 2987.34,
+      "extent": "2987.34",
       "govt_extent": 550.08,
       "patta_extent": 2437.26,
       "khatas": 1566,
@@ -38554,7 +39058,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.700Z",
+      "last_synced": "2026-09-14T06:33:45.127Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
         "action_plan": {
@@ -38566,7 +39070,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.127Z",
+          "patta_khatas": 748,
+          "govt_khatas": 35,
+          "both_khatas": 783,
+          "deletions": 0,
+          "total_khatas": 1566,
+          "online_khatas": 1366
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -39205,7 +39715,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 4178.53,
+      "extent": "4178.53",
       "govt_extent": 1238.56,
       "patta_extent": 2939.97,
       "khatas": 1545,
@@ -39230,7 +39740,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.699Z",
+      "last_synced": "2026-09-14T06:33:45.125Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -39242,7 +39752,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.125Z",
+          "patta_khatas": 439,
+          "govt_khatas": 36,
+          "both_khatas": 1070,
+          "deletions": 0,
+          "total_khatas": 1545,
+          "online_khatas": 1431
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -39460,7 +39976,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 1656.6,
+      "extent": "1656.6",
       "govt_extent": 326.58,
       "patta_extent": 1330.02,
       "khatas": 727,
@@ -39485,7 +40001,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.700Z",
+      "last_synced": "2026-09-14T06:33:45.126Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -39497,7 +40013,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.126Z",
+          "patta_khatas": 359,
+          "govt_khatas": 16,
+          "both_khatas": 352,
+          "deletions": 0,
+          "total_khatas": 727,
+          "online_khatas": 666
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -40815,7 +41337,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 1532.68,
+      "extent": "1532.68",
       "govt_extent": 495.9,
       "patta_extent": 1036.78,
       "khatas": 1042,
@@ -40840,7 +41362,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.707Z",
+      "last_synced": "2026-09-14T06:33:45.129Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -40852,7 +41374,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.129Z",
+          "patta_khatas": 410,
+          "govt_khatas": 165,
+          "both_khatas": 467,
+          "deletions": 0,
+          "total_khatas": 1042,
+          "online_khatas": 886
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -41083,7 +41611,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 908.99,
+      "extent": "908.99",
       "govt_extent": 263.66,
       "patta_extent": 645.33,
       "khatas": 713,
@@ -41108,7 +41636,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.703Z",
+      "last_synced": "2026-09-14T06:33:45.128Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -41120,7 +41648,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.128Z",
+          "patta_khatas": 435,
+          "govt_khatas": 33,
+          "both_khatas": 245,
+          "deletions": 0,
+          "total_khatas": 713,
+          "online_khatas": 645
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -41860,7 +42394,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": 2481.61,
+      "extent": "2481.61",
       "govt_extent": 256.12,
       "patta_extent": 2225.49,
       "khatas": 1418,
@@ -41885,7 +42419,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.708Z",
+      "last_synced": "2026-09-14T06:33:45.130Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -41897,7 +42431,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.130Z",
+          "patta_khatas": 1160,
+          "govt_khatas": 131,
+          "both_khatas": 111,
+          "deletions": 16,
+          "total_khatas": 1418,
+          "online_khatas": 1275
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -42466,12 +43006,12 @@
       "govt_extent": 340.59,
       "patta_extent": 1247.41,
       "khatas": 899,
-      "total_khatas": 899,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 1411,
+      "patta_khatas": 512,
+      "govt_khatas": 185,
+      "both_khatas": 714,
+      "deletions": 0,
+      "online_khatas": 864,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -42487,7 +43027,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.704Z",
+      "last_synced": "2026-09-14T06:33:45.127Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -42639,6 +43179,17 @@
           "row": 117,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.705Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.127Z",
+          "patta_khatas": 512,
+          "govt_khatas": 185,
+          "both_khatas": 714,
+          "deletions": 0,
+          "total_khatas": 1411,
+          "online_khatas": 864
         }
       }
     },
@@ -42762,7 +43313,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": 133.73,
+      "extent": "133.73",
       "govt_extent": 17.83,
       "patta_extent": 115.9,
       "khatas": 98,
@@ -42787,7 +43338,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.710Z",
+      "last_synced": "2026-09-14T06:33:45.132Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -42987,6 +43538,17 @@
           "row": 49,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.629Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.132Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 80
         }
       },
       "stage_targets": {
@@ -44528,7 +45090,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 1444.3,
+      "extent": "1444.3",
       "govt_extent": 303.76,
       "patta_extent": 1140.54,
       "khatas": 654,
@@ -44553,7 +45115,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.711Z",
+      "last_synced": "2026-09-14T06:33:45.135Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -44753,6 +45315,17 @@
           "row": 41,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.619Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.135Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 501
         }
       }
     },
@@ -45196,7 +45769,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 2010.14,
+      "extent": "2010.14",
       "govt_extent": 627.24,
       "patta_extent": 1382.9,
       "khatas": 716,
@@ -45221,7 +45794,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.710Z",
+      "last_synced": "2026-09-14T06:33:45.133Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -45233,7 +45806,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.133Z",
+          "patta_khatas": 0,
+          "govt_khatas": 16,
+          "both_khatas": 700,
+          "deletions": 0,
+          "total_khatas": 716,
+          "online_khatas": 473
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -45605,7 +46184,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 2476,
+      "extent": "2476",
       "govt_extent": 1457.81,
       "patta_extent": 1018.19,
       "khatas": 775,
@@ -45630,7 +46209,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.712Z",
+      "last_synced": "2026-09-14T06:33:45.136Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -45830,6 +46409,17 @@
           "row": 46,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.626Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.136Z",
+          "patta_khatas": 765,
+          "govt_khatas": 10,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 775,
+          "online_khatas": 662
         }
       },
       "stage_targets": {
@@ -46237,7 +46827,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 614.24,
+      "extent": "614.24",
       "govt_extent": 189.15,
       "patta_extent": 425.09,
       "khatas": 334,
@@ -46262,7 +46852,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.709Z",
+      "last_synced": "2026-09-14T06:33:45.131Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -46274,7 +46864,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.239Z"
+          "lastSynced": "2026-09-14T06:33:45.131Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 270
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -46370,12 +46966,12 @@
       "govt_extent": 236.7,
       "patta_extent": 1497.37,
       "khatas": 706,
-      "total_khatas": 706,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 0,
+      "patta_khatas": 0,
+      "govt_khatas": 0,
+      "both_khatas": 0,
+      "deletions": 0,
+      "online_khatas": 565,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -46391,7 +46987,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.627Z",
+      "last_synced": "2026-09-14T06:33:45.136Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -46543,6 +47139,17 @@
           "row": 48,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.628Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.136Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 565
         }
       }
     },
@@ -47490,7 +48097,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": 2633.43,
+      "extent": "2633.43",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 1176,
@@ -47515,13 +48122,19 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.720Z",
+      "last_synced": "2026-09-14T06:33:45.142Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.142Z",
+          "patta_khatas": 692,
+          "govt_khatas": 29,
+          "both_khatas": 336,
+          "deletions": 119,
+          "total_khatas": 1176,
+          "online_khatas": 1171
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -48576,7 +49189,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": 337.15,
+      "extent": "337.15",
       "govt_extent": 177.61,
       "patta_extent": 159.54,
       "khatas": 142,
@@ -48601,7 +49214,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.717Z",
+      "last_synced": "2026-09-14T06:33:45.138Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -48685,7 +49298,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.138Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 140
         },
         "patta_khatas": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -48992,7 +49611,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 2260.68,
+      "extent": "2260.68",
       "govt_extent": 656.73,
       "patta_extent": 1603.95,
       "khatas": 1000,
@@ -49017,7 +49636,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.716Z",
+      "last_synced": "2026-09-14T06:33:45.137Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -49029,7 +49648,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.137Z",
+          "patta_khatas": 901,
+          "govt_khatas": 99,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 1000,
+          "online_khatas": 1214
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -50610,7 +51235,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 452.89,
+      "extent": "452.89",
       "govt_extent": 58.47,
       "patta_extent": 394.42,
       "khatas": 295,
@@ -50635,7 +51260,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.722Z",
+      "last_synced": "2026-09-14T06:33:45.144Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -50647,7 +51272,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.144Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 267
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -50827,7 +51458,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": 610.39,
+      "extent": "610.39",
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
@@ -50852,9 +51483,21 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.724Z",
+      "last_synced": "2026-09-14T06:33:45.147Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
-      "source_meta": {},
+      "source_meta": {
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.147Z",
+          "patta_khatas": 196,
+          "govt_khatas": 24,
+          "both_khatas": 52,
+          "deletions": 0,
+          "total_khatas": 272,
+          "online_khatas": 271
+        }
+      },
       "stage_targets": {
         "phase": "Phase-6",
         "dates": [
@@ -50878,7 +51521,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 429.3,
+      "extent": "429.3",
       "govt_extent": 60.78,
       "patta_extent": 368.52,
       "khatas": 279,
@@ -50903,7 +51546,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.719Z",
+      "last_synced": "2026-09-14T06:33:45.141Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -50915,7 +51558,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.141Z",
+          "patta_khatas": 139,
+          "govt_khatas": 50,
+          "both_khatas": 90,
+          "deletions": 0,
+          "total_khatas": 279,
+          "online_khatas": 221
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -51506,7 +52155,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 233.23,
+      "extent": "233.23",
       "govt_extent": 19.15,
       "patta_extent": 214.08,
       "khatas": 137,
@@ -51531,7 +52180,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.721Z",
+      "last_synced": "2026-09-14T06:33:45.143Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -51543,7 +52192,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.143Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 128
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -52941,12 +53596,12 @@
       "govt_extent": 691.91,
       "patta_extent": 696.79,
       "khatas": 822,
-      "total_khatas": 822,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 795,
+      "patta_khatas": 625,
+      "govt_khatas": 50,
+      "both_khatas": 120,
+      "deletions": 0,
+      "online_khatas": 857,
       "target_month": "Feb-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -52962,7 +53617,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.559Z",
+      "last_synced": "2026-09-14T06:33:45.152Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -52970,6 +53625,17 @@
           "targetMonth": "Feb-27",
           "stage": "GT Ongoing",
           "daysDelayed": 0
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.152Z",
+          "patta_khatas": 625,
+          "govt_khatas": 50,
+          "both_khatas": 120,
+          "deletions": 0,
+          "total_khatas": 795,
+          "online_khatas": 857
         }
       }
     },
@@ -53665,7 +54331,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 604.65,
+      "extent": "604.65",
       "govt_extent": 344.66,
       "patta_extent": 369.55,
       "khatas": 308,
@@ -53690,7 +54356,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.726Z",
+      "last_synced": "2026-09-14T06:33:45.149Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -53702,7 +54368,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.149Z",
+          "patta_khatas": 208,
+          "govt_khatas": 50,
+          "both_khatas": 50,
+          "deletions": 0,
+          "total_khatas": 308,
+          "online_khatas": 278
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -54126,7 +54798,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 353.78,
+      "extent": "353.78",
       "govt_extent": 145.63,
       "patta_extent": 208.15,
       "khatas": 183,
@@ -54151,7 +54823,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.737Z",
+      "last_synced": "2026-09-14T06:33:45.161Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54163,7 +54835,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.161Z",
+          "patta_khatas": 106,
+          "govt_khatas": 13,
+          "both_khatas": 64,
+          "deletions": 0,
+          "total_khatas": 183,
+          "online_khatas": 175
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -54367,7 +55045,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 318.04,
+      "extent": "318.04",
       "govt_extent": 229.29,
       "patta_extent": 88.75,
       "khatas": 79,
@@ -54392,7 +55070,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.734Z",
+      "last_synced": "2026-09-14T06:33:45.155Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54404,7 +55082,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.155Z",
+          "patta_khatas": 54,
+          "govt_khatas": 6,
+          "both_khatas": 15,
+          "deletions": 4,
+          "total_khatas": 79,
+          "online_khatas": 145
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -54802,7 +55486,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 545.97,
+      "extent": "545.97",
       "govt_extent": 337.14,
       "patta_extent": 208.83,
       "khatas": 227,
@@ -54827,7 +55511,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.730Z",
+      "last_synced": "2026-09-14T06:33:45.152Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54839,7 +55523,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.240Z"
+          "lastSynced": "2026-09-14T06:33:45.152Z",
+          "patta_khatas": 171,
+          "govt_khatas": 33,
+          "both_khatas": 20,
+          "deletions": 3,
+          "total_khatas": 227,
+          "online_khatas": 183
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -54931,7 +55621,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 292.24,
+      "extent": "292.24",
       "govt_extent": 169.09,
       "patta_extent": 123.15,
       "khatas": 192,
@@ -54956,7 +55646,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.739Z",
+      "last_synced": "2026-09-14T06:33:45.164Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -55156,6 +55846,17 @@
           "row": 28,
           "column": "",
           "lastSynced": "2026-09-13T19:12:43.603Z"
+        },
+        "khata_monitoring": {
+          "source": "Phase VI Khata Monitoring",
+          "tab": "Phase - 6",
+          "lastSynced": "2026-09-14T06:33:45.164Z",
+          "patta_khatas": 90,
+          "govt_khatas": 42,
+          "both_khatas": 60,
+          "deletions": 0,
+          "total_khatas": 192,
+          "online_khatas": 149
         }
       },
       "stage_targets": {
@@ -58526,7 +59227,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 2610.89,
+      "extent": "2610.89",
       "govt_extent": 1189.29,
       "patta_extent": 1421.6,
       "khatas": 518,
@@ -58551,7 +59252,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.745Z",
+      "last_synced": "2026-09-14T06:33:45.170Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -58563,7 +59264,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.241Z"
+          "lastSynced": "2026-09-14T06:33:45.170Z",
+          "patta_khatas": 164,
+          "govt_khatas": 19,
+          "both_khatas": 330,
+          "deletions": 5,
+          "total_khatas": 518,
+          "online_khatas": 729
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -58929,7 +59636,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 1250.1,
+      "extent": "1250.1",
       "govt_extent": 230.47,
       "patta_extent": 1019.63,
       "khatas": 707,
@@ -58954,7 +59661,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.749Z",
+      "last_synced": "2026-09-14T06:33:45.175Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -58966,7 +59673,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.241Z"
+          "lastSynced": "2026-09-14T06:33:45.175Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 663
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -59072,7 +59785,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 861.2,
+      "extent": "861.2",
       "govt_extent": 205.11,
       "patta_extent": 656.09,
       "khatas": 529,
@@ -59097,7 +59810,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.748Z",
+      "last_synced": "2026-09-14T06:33:45.173Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -59109,7 +59822,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.241Z"
+          "lastSynced": "2026-09-14T06:33:45.173Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 489
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -59530,7 +60249,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": 2097.61,
+      "extent": "2097.61",
       "govt_extent": 334.12,
       "patta_extent": 1763.49,
       "khatas": 1099,
@@ -59555,7 +60274,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-14T06:27:14.747Z",
+      "last_synced": "2026-09-14T06:33:45.172Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -59567,7 +60286,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.241Z"
+          "lastSynced": "2026-09-14T06:33:45.172Z",
+          "patta_khatas": 0,
+          "govt_khatas": 0,
+          "both_khatas": 0,
+          "deletions": 0,
+          "total_khatas": 0,
+          "online_khatas": 1010
         },
         "division": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
@@ -59860,7 +60585,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": 197.68,
+      "extent": "197.68",
       "govt_extent": 21.61,
       "patta_extent": 176.07,
       "khatas": 97,
@@ -59885,7 +60610,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-14T06:27:14.744Z",
+      "last_synced": "2026-09-14T06:33:45.169Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -59969,7 +60694,13 @@
         "khata_monitoring": {
           "source": "Phase VI Khata Monitoring",
           "tab": "Phase - 6",
-          "lastSynced": "2026-09-13T18:33:55.241Z"
+          "lastSynced": "2026-09-14T06:33:45.169Z",
+          "patta_khatas": 0,
+          "govt_khatas": 8,
+          "both_khatas": 88,
+          "deletions": 1,
+          "total_khatas": 97,
+          "online_khatas": 80
         },
         "patta_khatas": {
           "sourceId": "1fe2303f-0224-4ba0-a505-37c88433c81b",
