@@ -38,7 +38,7 @@ const MANDAL_ALIASES = {
   's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
 };
 
-const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Before 2024'];
+const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Yet to be Scheduled', 'Before 2024'];
 
 function normalizePhase(val) {
   if (!val) return '';
@@ -53,6 +53,14 @@ function normalizePhase(val) {
     if (p === '5' || p === 'V') return 'Phase V';
     if (p === '6' || p === 'VI') return 'Phase VI';
     if (p === '7' || p === 'VII') return 'Phase VII';
+  }
+  const m2 = str.match(/^P[-_ ]?([1-7])$/i);
+  if (m2) {
+    const map = { '1': 'Phase I', '2': 'Phase II', '3': 'Phase III', '4': 'Phase IV', '5': 'Phase V', '6': 'Phase VI', '7': 'Phase VII' };
+    return map[m2[1]];
+  }
+  if (/^yet\s*to\s*be\s*scheduled$/i.test(str) || /^unscheduled$/i.test(str)) {
+    return 'Yet to be Scheduled';
   }
   return str;
 }
