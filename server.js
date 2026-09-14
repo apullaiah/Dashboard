@@ -877,6 +877,9 @@ function serveStatic(req, res, url) {
   return new Promise((resolve) => {
     let file = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
     if (file.startsWith('public/')) file = file.slice(7);
+    if (file === 'favicon.ico' && !fs.existsSync(path.resolve(PUBLIC, 'favicon.ico'))) {
+      file = 'favicon.svg';
+    }
     const full = path.resolve(PUBLIC, file);
     if (!full.startsWith(PUBLIC)) {
       text(res, 403, 'Forbidden');

@@ -69,7 +69,7 @@ function renderAuthGate(errorMsg = '') {
     <div class="auth-gate-wrapper">
       <div class="auth-gate-card">
         <div class="auth-emblem">
-          <div class="district-mark" aria-hidden="true"><span></span><i></i><b></b></div>
+          <svg class="auth-logo-svg"><use href="#icon-resurvey-logo" /></svg>
         </div>
         <span class="auth-badge">OFFICIAL GOVERNMENT SYSTEM</span>
         <h2>Chittoor District Resurvey Portal</h2>
@@ -1052,6 +1052,7 @@ document.addEventListener('click', async event => {
     renderVillageMonitoring();
     return;
   }
+  if (el.dataset.action === 'logout') return performLogout();
   if (el.dataset.action === 'close-modal') return closeModal();
   if (el.dataset.action === 'open-source-modal') return sourceModal();
   if (el.dataset.action === 'open-alias-modal') return aliasModal();
@@ -1086,14 +1087,22 @@ document.addEventListener('input', event => {
     renderPerformance();
   }
 });
+
+function performLogout() {
+  sessionStorage.removeItem('ctr_officer_token');
+  localStorage.removeItem('ctr_officer_token');
+  state.dashboard = null;
+  state.villages = [];
+  state.villageFilters = {};
+  renderAuthGate();
+  toast('Officer session locked. Logged out securely.');
+}
+
 $('#refresh-button').addEventListener('click', syncAll);
 $('#source-status').addEventListener('click', () => navigate('sources'));
 $('#mobile-menu').addEventListener('click', () => document.querySelector('.sidebar').classList.toggle('open'));
-$('#lock-session-btn')?.addEventListener('click', () => {
-  sessionStorage.removeItem('ctr_officer_token');
-  renderAuthGate();
-  toast('Officer session locked.');
-});
+$('#lock-session-btn')?.addEventListener('click', performLogout);
+$('#topbar-logout-btn')?.addEventListener('click', performLogout);
 
 if (!sessionStorage.getItem('ctr_officer_token')) {
   renderAuthGate();

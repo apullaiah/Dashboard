@@ -5,13 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0b1324" />
     <title>Chittoor District | AP Resurvey Monitoring</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <div class="app-shell">
       <aside class="sidebar" aria-label="Primary navigation">
         <div class="brand-block">
-          <div class="district-mark" aria-hidden="true"><span></span><i></i><b></b></div>
+          <div class="brand-logo-wrap" aria-hidden="true">
+            <svg class="brand-logo-svg"><use href="#icon-resurvey-logo" /></svg>
+          </div>
           <div><p class="eyebrow">CHITTOOR DISTRICT</p><h1>Resurvey<br />Monitoring</h1></div>
         </div>
         <nav class="primary-nav">
@@ -25,8 +29,8 @@
           <button class="nav-link" data-view="audit"><svg><use href="#icon-history" /></svg>Audit history</button>
         </nav>
         <div class="sidebar-foot">
-          <div class="user-avatar">AD</div><div><strong>Revenue Officer</strong><span>District access</span></div>
-          <button id="lock-session-btn" class="lock-button" title="Lock session / Logout" aria-label="Lock session"><svg><use href="#icon-shield" /></svg></button>
+          <div class="user-avatar">RO</div><div><strong>Revenue Officer</strong><span>District access</span></div>
+          <button id="lock-session-btn" class="lock-button" data-action="logout" title="Lock session / Logout" aria-label="Lock session"><svg><use href="#icon-logout" /></svg></button>
         </div>
       </aside>
       <main class="main-content">
@@ -37,6 +41,7 @@
             <div class="updated-stamp"><span>LAST UPDATED</span><strong id="last-updated">Not synchronized</strong></div>
             <button id="source-status" class="source-status" title="View data source status"><span class="status-dot neutral"></span><span id="source-status-label">Sources not connected</span></button>
             <button id="refresh-button" class="refresh-button"><svg><use href="#icon-refresh" /></svg><span>Refresh data</span></button>
+            <button id="topbar-logout-btn" class="logout-button" data-action="logout" title="Lock session / Logout"><svg><use href="#icon-logout" /></svg><span>Logout</span></button>
           </div>
         </header>
         <section id="view-root" class="view-root" aria-live="polite"></section>
@@ -66,6 +71,43 @@
       <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></symbol>
       <symbol id="icon-filter" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
       <symbol id="icon-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+      <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+      <symbol id="icon-resurvey-logo" viewBox="0 0 64 64">
+        <defs>
+          <linearGradient id="logoShield" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#0f172a" />
+            <stop offset="100%" stop-color="#1e3a8a" />
+          </linearGradient>
+          <linearGradient id="logoTeal" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#2dd4bf" />
+            <stop offset="100%" stop-color="#0d9488" />
+          </linearGradient>
+          <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fbbf24" />
+            <stop offset="100%" stop-color="#d97706" />
+          </linearGradient>
+        </defs>
+        <path d="M32 3 L56 12 C56 37 45 53 32 61 C19 53 8 37 8 12 Z" fill="url(#logoShield)" stroke="#38bdf8" stroke-width="1.8" />
+        <path d="M15 28 L49 28 M32 28 L32 52 M16 40 L48 40 M23 28 L20 50 M41 28 L44 50" stroke="#334155" stroke-width="1.2" stroke-dasharray="2 1" />
+        <polygon points="23,28 32,28 32,40 21.5,40" fill="url(#logoTeal)" opacity="0.45" />
+        <polygon points="32,28 41,28 42.5,40 32,40" fill="url(#logoGold)" opacity="0.4" />
+        <polygon points="21.5,40 32,40 32,52 20,49" fill="url(#logoGold)" opacity="0.3" />
+        <polygon points="32,40 42.5,40 44,49 32,52" fill="url(#logoTeal)" opacity="0.5" />
+        <polygon points="32,18 20,34 44,34" fill="none" stroke="#38bdf8" stroke-width="0.8" opacity="0.6" />
+        <line x1="32" y1="18" x2="32" y2="40" stroke="#38bdf8" stroke-width="1" stroke-dasharray="1.5 1.5" opacity="0.8" />
+        <g transform="translate(32, 16)">
+          <ellipse cx="-11" cy="-4" rx="4.5" ry="1.2" fill="#38bdf8" />
+          <ellipse cx="11" cy="-4" rx="4.5" ry="1.2" fill="#38bdf8" />
+          <ellipse cx="-11" cy="4" rx="4.5" ry="1.2" fill="#38bdf8" />
+          <ellipse cx="11" cy="4" rx="4.5" ry="1.2" fill="#38bdf8" />
+          <line x1="-10" y1="-3" x2="10" y2="3" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" />
+          <line x1="-10" y1="3" x2="10" y2="-3" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="0" cy="0" r="3.2" fill="#0d9488" stroke="#ffffff" stroke-width="1.2" />
+          <circle cx="0" cy="0" r="1.2" fill="#fbbf24" />
+        </g>
+        <circle cx="32" cy="40" r="2.8" fill="#ffffff" stroke="#0d9488" stroke-width="1.2" />
+        <circle cx="32" cy="40" r="1.2" fill="#ef4444" />
+      </symbol>
     </svg>
     <script src="/app.js"></script>
   </body>

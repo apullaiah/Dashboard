@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Outer Shield Container -->
+  <path d="M32 3 L55 12 C55 36 45 52 32 61 C19 52 9 36 9 12 Z" fill="url(#shieldGrad)" stroke="#38bdf8" stroke-width="1.5" />
+  
+  <!-- Cadastral Land Parcel Grid Boundaries -->
+  <path d="M16 28 L48 28 M32 28 L32 52 M16 40 L48 40 M23 28 L20 50 M41 28 L44 50" stroke="#334155" stroke-width="1.2" stroke-dasharray="2 1" />
+  
+  <!-- Verified Land Parcels (Highlighted green and gold) -->
+  <polygon points="23,28 32,28 32,40 21.5,40" fill="url(#accentGrad)" opacity="0.4" />
+  <polygon points="32,28 41,28 42.5,40 32,40" fill="url(#goldGrad)" opacity="0.35" />
+  <polygon points="21.5,40 32,40 32,52 20,49" fill="url(#goldGrad)" opacity="0.25" />
+  <polygon points="32,40 42.5,40 44,49 32,52" fill="url(#accentGrad)" opacity="0.45" />
+
+  <!-- Drone Sensor Triangulation Lines -->
+  <polygon points="32,18 20,34 44,34" fill="none" stroke="#38bdf8" stroke-width="0.8" opacity="0.5" />
+  <line x1="32" y1="18" x2="32" y2="40" stroke="#38bdf8" stroke-width="1" stroke-dasharray="1.5 1.5" opacity="0.7" />
+
+  <!-- Survey Drone (UAV) in Flight -->
+  <g transform="translate(32, 16)">
+    <ellipse cx="-11" cy="-4" rx="4.5" ry="1.2" fill="#38bdf8" />
+    <ellipse cx="11" cy="-4" rx="4.5" ry="1.2" fill="#38bdf8" />
+    <ellipse cx="-11" cy="4" rx="4.5" ry="1.2" fill="#38bdf8" />
+    <ellipse cx="11" cy="4" rx="4.5" ry="1.2" fill="#38bdf8" />
+    <line x1="-10" y1="-3" x2="10" y2="3" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="-10" y1="3" x2="10" y2="-3" stroke="#94a3b8" stroke-width="1.8" stroke-linecap="round" />
+    <circle cx="0" cy="0" r="3.2" fill="#0d9488" stroke="#ffffff" stroke-width="1.2" />
+    <circle cx="0" cy="0" r="1.2" fill="#fbbf24" />
+  </g>
+
+  <!-- Cadastral Survey Benchmark Target Pin -->
+  <circle cx="32" cy="40" r="2.8" fill="#ffffff" stroke="#0d9488" stroke-width="1.2" />
+  <circle cx="32" cy="40" r="1.2" fill="#ef4444" />
+</svg>
