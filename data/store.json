@@ -228,7 +228,7 @@
       "recordType": "khata_monitoring",
       "refreshFrequency": "15 minutes",
       "status": "Connected",
-      "lastSync": "2026-09-13T19:18:27.916Z",
+      "lastSync": "2026-09-14T06:27:14.749Z",
       "createdAt": "2026-09-13T18:29:59.560Z",
       "nextSync": "2026-09-13T19:33:27.916Z",
       "lastError": "",
@@ -1741,7 +1741,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "4179.03",
+      "extent": 4179.03,
       "govt_extent": 624.6,
       "patta_extent": 3554.43,
       "khatas": 1748,
@@ -1766,7 +1766,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.870Z",
+      "last_synced": "2026-09-14T06:27:14.648Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -2014,7 +2014,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "3376.96",
+      "extent": 3376.96,
       "govt_extent": 595.45,
       "patta_extent": 2781.51,
       "khatas": 1103,
@@ -2039,7 +2039,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.872Z",
+      "last_synced": "2026-09-14T06:27:14.649Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -2433,16 +2433,16 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-7",
-      "extent": "3179.19",
+      "extent": 222.03,
       "govt_extent": 768.12,
       "patta_extent": 2411.07,
       "khatas": 1255,
-      "total_khatas": 1255,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 0,
+      "patta_khatas": 0,
+      "govt_khatas": 0,
+      "both_khatas": 0,
+      "deletions": 0,
+      "online_khatas": 65,
       "target_month": "Mar-27",
       "target_date": "23-01-2027",
       "days_delayed": 0,
@@ -2458,7 +2458,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.647Z",
+      "last_synced": "2026-09-14T06:27:14.718Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -2968,7 +2968,7 @@
       "mandal": "Puthalapattu",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "4210.63",
+      "extent": 4210.63,
       "govt_extent": 520.14,
       "patta_extent": 3690.49,
       "khatas": 2048,
@@ -2993,7 +2993,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.872Z",
+      "last_synced": "2026-09-14T06:27:14.649Z",
       "last_modified": "2026-09-13T18:29:59.544Z",
       "source_meta": {
         "action_plan": {
@@ -3489,7 +3489,7 @@
       "mandal": "Thavanampalli",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1078.09",
+      "extent": 4562.79,
       "govt_extent": 507.62,
       "patta_extent": 4055.17,
       "khatas": 2104,
@@ -3514,7 +3514,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:18:27.873Z",
+      "last_synced": "2026-09-14T06:27:14.649Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
         "action_plan": {
@@ -5218,16 +5218,16 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "",
+      "extent": 1267.35,
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
-      "total_khatas": null,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 764,
+      "patta_khatas": 592,
+      "govt_khatas": 30,
+      "both_khatas": 132,
+      "deletions": 10,
+      "online_khatas": 506,
       "target_month": null,
       "target_date": "",
       "days_delayed": 0,
@@ -5243,7 +5243,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Not Updated",
-      "last_synced": "2026-09-13T18:29:59.545Z",
+      "last_synced": "2026-09-14T06:27:14.735Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {}
     },
@@ -5556,16 +5556,16 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "566.6",
+      "extent": 566.6,
       "govt_extent": 215.9,
       "patta_extent": 350.7,
       "khatas": 295,
-      "total_khatas": 295,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 283,
+      "patta_khatas": 185,
+      "govt_khatas": 15,
+      "both_khatas": 39,
+      "deletions": 44,
+      "online_khatas": 283,
       "target_month": "Mar-27",
       "target_date": "2027-03-31",
       "days_delayed": 0,
@@ -5581,7 +5581,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.578Z",
+      "last_synced": "2026-09-14T06:27:14.650Z",
       "last_modified": "2026-09-13T18:29:59.545Z",
       "source_meta": {
         "action_plan": {
@@ -6027,7 +6027,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "566.60",
+      "extent": 566.6,
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 283,
@@ -6052,7 +6052,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:18:27.873Z",
+      "last_synced": "2026-09-14T06:26:07.238Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "division": {
@@ -6326,7 +6326,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "2845.49",
+      "extent": 2845.49,
       "govt_extent": 931.48,
       "patta_extent": 1914.01,
       "khatas": 1031,
@@ -6351,7 +6351,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.873Z",
+      "last_synced": "2026-09-14T06:27:14.650Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -6619,7 +6619,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "677.07",
+      "extent": 677.07,
       "govt_extent": 2.75,
       "patta_extent": 674.32,
       "khatas": 271,
@@ -6644,7 +6644,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.873Z",
+      "last_synced": "2026-09-14T06:27:14.650Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -7359,7 +7359,7 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "462.72",
+      "extent": 462.72,
       "govt_extent": 71.1,
       "patta_extent": 391.62,
       "khatas": 321,
@@ -7384,7 +7384,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.873Z",
+      "last_synced": "2026-09-14T06:27:14.650Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -7502,16 +7502,16 @@
       "mandal": "Gudipala",
       "division": "Chittoor",
       "phase": "Phase-7",
-      "extent": "315.27",
+      "extent": 315.27,
       "govt_extent": 626.92,
       "patta_extent": 599.67,
       "khatas": 406,
-      "total_khatas": 406,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 171,
+      "patta_khatas": 121,
+      "govt_khatas": 30,
+      "both_khatas": 20,
+      "deletions": 0,
+      "online_khatas": 161,
       "target_month": "Feb-27",
       "target_date": "03-02-2027",
       "days_delayed": 0,
@@ -7527,7 +7527,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T18:29:59.546Z",
+      "last_synced": "2026-09-14T06:27:14.740Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -8070,7 +8070,7 @@
       "mandal": "Chittoor",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "2330.38",
+      "extent": 2330.38,
       "govt_extent": 435.06,
       "patta_extent": 1895.32,
       "khatas": 1316,
@@ -8095,7 +8095,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.875Z",
+      "last_synced": "2026-09-14T06:27:14.652Z",
       "last_modified": "2026-09-13T18:29:59.546Z",
       "source_meta": {
         "action_plan": {
@@ -11908,7 +11908,7 @@
       "mandal": "Irala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "4798.32",
+      "extent": 4798.32,
       "govt_extent": 777.93,
       "patta_extent": 4020.39,
       "khatas": 2362,
@@ -11933,7 +11933,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.875Z",
+      "last_synced": "2026-09-14T06:27:14.653Z",
       "last_modified": "2026-09-13T18:29:59.548Z",
       "source_meta": {
         "action_plan": {
@@ -12513,7 +12513,7 @@
       "mandal": "Irala",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "3089.09",
+      "extent": 3089.09,
       "govt_extent": 1150.37,
       "patta_extent": 1938.72,
       "khatas": 1142,
@@ -12538,7 +12538,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.875Z",
+      "last_synced": "2026-09-14T06:27:14.653Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -12999,7 +12999,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1028.88",
+      "extent": 1028.88,
       "govt_extent": 248,
       "patta_extent": 780.88,
       "khatas": 502,
@@ -13024,7 +13024,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:18:27.879Z",
+      "last_synced": "2026-09-14T06:27:14.660Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -13142,7 +13142,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "865.05",
+      "extent": 865.05,
       "govt_extent": 200.28,
       "patta_extent": 664.77,
       "khatas": 396,
@@ -13167,7 +13167,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.879Z",
+      "last_synced": "2026-09-14T06:27:14.660Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -13822,7 +13822,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1893.63",
+      "extent": 1893.63,
       "govt_extent": 829.69,
       "patta_extent": 1063.94,
       "khatas": 1093,
@@ -13847,7 +13847,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.880Z",
+      "last_synced": "2026-09-14T06:27:14.661Z",
       "last_modified": "2026-09-13T18:29:59.549Z",
       "source_meta": {
         "action_plan": {
@@ -15938,7 +15938,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "747.63",
+      "extent": 747.63,
       "govt_extent": 243.46,
       "patta_extent": 504.17,
       "khatas": 225,
@@ -15963,7 +15963,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.880Z",
+      "last_synced": "2026-09-14T06:27:14.660Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -16237,7 +16237,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1075.65",
+      "extent": 1075.65,
       "govt_extent": 262.16,
       "patta_extent": 813.49,
       "khatas": 298,
@@ -16262,7 +16262,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.879Z",
+      "last_synced": "2026-09-14T06:27:14.659Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -16732,7 +16732,7 @@
       "mandal": "Vedurukuppam",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1192.66",
+      "extent": 1192.66,
       "govt_extent": 391.59,
       "patta_extent": 801.07,
       "khatas": 507,
@@ -16757,7 +16757,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.880Z",
+      "last_synced": "2026-09-14T06:27:14.661Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -17208,7 +17208,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "136.2",
+      "extent": 136.2,
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 99,
@@ -17233,7 +17233,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Not Updated",
-      "last_synced": "2026-09-13T19:24:29.946Z",
+      "last_synced": "2026-09-14T06:27:14.665Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "division": {
@@ -17521,7 +17521,7 @@
       "mandal": "Yadamari",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "2788.95",
+      "extent": 2788.95,
       "govt_extent": 253.37,
       "patta_extent": 2535.58,
       "khatas": 1522,
@@ -17546,7 +17546,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.880Z",
+      "last_synced": "2026-09-14T06:27:14.661Z",
       "last_modified": "2026-09-13T18:29:59.550Z",
       "source_meta": {
         "action_plan": {
@@ -18825,7 +18825,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "655.24",
+      "extent": 655.24,
       "govt_extent": 173.23,
       "patta_extent": 482.01,
       "khatas": 354,
@@ -18850,7 +18850,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.890Z",
+      "last_synced": "2026-09-14T06:27:14.679Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19080,7 +19080,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "237.00",
+      "extent": 237,
       "govt_extent": 98.98,
       "patta_extent": 138.02,
       "khatas": 152,
@@ -19105,7 +19105,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.888Z",
+      "last_synced": "2026-09-14T06:27:14.676Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -19523,7 +19523,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "312.24",
+      "extent": 312.24,
       "govt_extent": 89.56,
       "patta_extent": 222.68,
       "khatas": 250,
@@ -19548,7 +19548,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.885Z",
+      "last_synced": "2026-09-14T06:27:14.670Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -20005,7 +20005,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "246.15",
+      "extent": 246.15,
       "govt_extent": 82.72,
       "patta_extent": 163.43,
       "khatas": 229,
@@ -20030,7 +20030,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.886Z",
+      "last_synced": "2026-09-14T06:27:14.673Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -21688,7 +21688,7 @@
       "mandal": "S.R.Puram",
       "division": "Chittoor",
       "phase": "Phase VI",
-      "extent": "358.98",
+      "extent": 358.98,
       "govt_extent": 65.86,
       "patta_extent": 293.12,
       "khatas": 274,
@@ -21713,7 +21713,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:24:29.947Z",
+      "last_synced": "2026-09-14T06:27:14.678Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -22846,16 +22846,16 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "2948.22",
+      "extent": 2948.22,
       "govt_extent": 985.85,
       "patta_extent": 1962.37,
       "khatas": 1001,
-      "total_khatas": 1001,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 1269,
+      "patta_khatas": 605,
+      "govt_khatas": 341,
+      "both_khatas": 284,
+      "deletions": 39,
+      "online_khatas": 945,
       "target_month": "Mar-27",
       "target_date": "29-12-2026",
       "days_delayed": 0,
@@ -22871,7 +22871,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:12:43.645Z",
+      "last_synced": "2026-09-14T06:27:14.679Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -23104,7 +23104,7 @@
       "mandal": "Pulicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "3740.58",
+      "extent": 3740.58,
       "govt_extent": 1150.41,
       "patta_extent": 2590.17,
       "khatas": 1368,
@@ -23129,7 +23129,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.891Z",
+      "last_synced": "2026-09-14T06:27:14.680Z",
       "last_modified": "2026-09-13T18:29:59.551Z",
       "source_meta": {
         "action_plan": {
@@ -24133,7 +24133,7 @@
       "mandal": "Rompicherla",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "4467.54",
+      "extent": 4467.54,
       "govt_extent": 1108.1,
       "patta_extent": 3359.44,
       "khatas": 1919,
@@ -24158,7 +24158,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.891Z",
+      "last_synced": "2026-09-14T06:27:14.680Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -25775,7 +25775,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "1828.24",
+      "extent": 1828.24,
       "govt_extent": 264.53,
       "patta_extent": 1563.71,
       "khatas": 1195,
@@ -25800,7 +25800,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.891Z",
+      "last_synced": "2026-09-14T06:27:14.681Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -25942,7 +25942,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "3290.42",
+      "extent": 3290.42,
       "govt_extent": 1241.08,
       "patta_extent": 2049.34,
       "khatas": 1524,
@@ -25967,7 +25967,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.892Z",
+      "last_synced": "2026-09-14T06:27:14.682Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -26183,7 +26183,7 @@
       "mandal": "Bangarupalem",
       "division": "Chittoor",
       "phase": "Phase-6",
-      "extent": "2773.84",
+      "extent": 2773.84,
       "govt_extent": 848.49,
       "patta_extent": 1925.35,
       "khatas": 837,
@@ -26208,7 +26208,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.891Z",
+      "last_synced": "2026-09-14T06:27:14.681Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -26941,7 +26941,7 @@
       "mandal": "Palasamudram",
       "division": "Nagari",
       "phase": "Before 2024",
-      "extent": "2104.26",
+      "extent": 2104.26,
       "govt_extent": 90.92,
       "patta_extent": 326.72999999999996,
       "khatas": 1152,
@@ -26966,7 +26966,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:18:27.893Z",
+      "last_synced": "2026-09-14T06:27:14.685Z",
       "last_modified": "2026-09-13T18:29:59.552Z",
       "source_meta": {
         "action_plan": {
@@ -28725,7 +28725,7 @@
       "mandal": "Karvetinagar",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": "1216.9",
+      "extent": 1216.9,
       "govt_extent": 102.46,
       "patta_extent": 1114.44,
       "khatas": 386,
@@ -28750,7 +28750,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.893Z",
+      "last_synced": "2026-09-14T06:27:14.685Z",
       "last_modified": "2026-09-13T18:29:59.553Z",
       "source_meta": {
         "action_plan": {
@@ -29930,7 +29930,7 @@
       "mandal": "Nagari",
       "division": "Nagari",
       "phase": "Phase VI",
-      "extent": "854.69",
+      "extent": 854.69,
       "govt_extent": 474.39,
       "patta_extent": 380.3,
       "khatas": 274,
@@ -29955,7 +29955,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:24:29.947Z",
+      "last_synced": "2026-09-14T06:27:14.688Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -32141,7 +32141,7 @@
       "mandal": "Vijayapuram",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": "3858.42",
+      "extent": 3858.42,
       "govt_extent": 1625.83,
       "patta_extent": 2232.59,
       "khatas": 1364,
@@ -32166,7 +32166,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.896Z",
+      "last_synced": "2026-09-14T06:27:14.691Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -32446,7 +32446,7 @@
       "mandal": "Vijayapuram",
       "division": "Nagari",
       "phase": "Phase-6",
-      "extent": "1020.00",
+      "extent": 1020,
       "govt_extent": 366.66,
       "patta_extent": 653.34,
       "khatas": 564,
@@ -32471,7 +32471,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.896Z",
+      "last_synced": "2026-09-14T06:27:14.691Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -33369,7 +33369,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "1419.9",
+      "extent": 1419.9,
       "govt_extent": 454.3,
       "patta_extent": 965.6,
       "khatas": 642,
@@ -33394,7 +33394,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.896Z",
+      "last_synced": "2026-09-14T06:27:14.692Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -33610,7 +33610,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase VI",
-      "extent": "6307.76",
+      "extent": 91.45,
       "govt_extent": 1236.99,
       "patta_extent": 2786.59,
       "khatas": 51,
@@ -33635,7 +33635,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:24:29.948Z",
+      "last_synced": "2026-09-14T06:27:14.697Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -33997,7 +33997,7 @@
       "mandal": "Peddapanjani",
       "division": "Palamaner",
       "phase": "Phase VI",
-      "extent": "489.41",
+      "extent": 489.41,
       "govt_extent": 481.23,
       "patta_extent": 3917.35,
       "khatas": 193,
@@ -34022,7 +34022,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:24:29.948Z",
+      "last_synced": "2026-09-14T06:27:14.693Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -34287,7 +34287,7 @@
       "mandal": "Peddapanjani",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "2023.27",
+      "extent": 2023.27,
       "govt_extent": 647.29,
       "patta_extent": 1375.98,
       "khatas": 1080,
@@ -34312,7 +34312,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.898Z",
+      "last_synced": "2026-09-14T06:27:14.696Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -36319,7 +36319,7 @@
       "mandal": "Gangavaram",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "4272.11",
+      "extent": 4272.11,
       "govt_extent": 1164.62,
       "patta_extent": 3107.49,
       "khatas": 1983,
@@ -36344,7 +36344,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.899Z",
+      "last_synced": "2026-09-14T06:27:14.698Z",
       "last_modified": "2026-09-13T18:29:59.554Z",
       "source_meta": {
         "action_plan": {
@@ -38472,16 +38472,16 @@
       "mandal": "Baireddipalle",
       "division": "Palamaner",
       "phase": "Phase-2",
-      "extent": "1458.68",
+      "extent": 406.05,
       "govt_extent": 183.94,
       "patta_extent": 1274.74,
       "khatas": 767,
-      "total_khatas": 767,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 656,
+      "patta_khatas": 635,
+      "govt_khatas": 1,
+      "both_khatas": 6,
+      "deletions": 14,
+      "online_khatas": 630,
       "target_month": "Sep-26",
       "target_date": "12-01-2027",
       "days_delayed": 0,
@@ -38497,7 +38497,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T18:29:59.555Z",
+      "last_synced": "2026-09-14T06:27:14.743Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
         "action_plan": {
@@ -38529,7 +38529,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "2987.34",
+      "extent": 2987.34,
       "govt_extent": 550.08,
       "patta_extent": 2437.26,
       "khatas": 1566,
@@ -38554,7 +38554,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.900Z",
+      "last_synced": "2026-09-14T06:27:14.700Z",
       "last_modified": "2026-09-13T18:29:59.555Z",
       "source_meta": {
         "action_plan": {
@@ -39205,7 +39205,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "4178.53",
+      "extent": 4178.53,
       "govt_extent": 1238.56,
       "patta_extent": 2939.97,
       "khatas": 1545,
@@ -39230,7 +39230,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.899Z",
+      "last_synced": "2026-09-14T06:27:14.699Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -39460,7 +39460,7 @@
       "mandal": "Baireddipalle",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "1656.6",
+      "extent": 1656.6,
       "govt_extent": 326.58,
       "patta_extent": 1330.02,
       "khatas": 727,
@@ -39485,7 +39485,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.900Z",
+      "last_synced": "2026-09-14T06:27:14.700Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -40815,7 +40815,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "1532.68",
+      "extent": 1532.68,
       "govt_extent": 495.9,
       "patta_extent": 1036.78,
       "khatas": 1042,
@@ -40840,7 +40840,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.902Z",
+      "last_synced": "2026-09-14T06:27:14.707Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -41083,7 +41083,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "908.99",
+      "extent": 908.99,
       "govt_extent": 263.66,
       "patta_extent": 645.33,
       "khatas": 713,
@@ -41108,7 +41108,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.901Z",
+      "last_synced": "2026-09-14T06:27:14.703Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -41860,7 +41860,7 @@
       "mandal": "Venkatagirikota",
       "division": "Palmaner",
       "phase": "Phase-6",
-      "extent": "2481.61",
+      "extent": 2481.61,
       "govt_extent": 256.12,
       "patta_extent": 2225.49,
       "khatas": 1418,
@@ -41885,7 +41885,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.903Z",
+      "last_synced": "2026-09-14T06:27:14.708Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -42762,7 +42762,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "133.73",
+      "extent": 133.73,
       "govt_extent": 17.83,
       "patta_extent": 115.9,
       "khatas": 98,
@@ -42787,7 +42787,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:24:29.947Z",
+      "last_synced": "2026-09-14T06:27:14.710Z",
       "last_modified": "2026-09-13T18:29:59.557Z",
       "source_meta": {
         "action_plan": {
@@ -44528,7 +44528,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "1444.3",
+      "extent": 1444.3,
       "govt_extent": 303.76,
       "patta_extent": 1140.54,
       "khatas": 654,
@@ -44553,7 +44553,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.904Z",
+      "last_synced": "2026-09-14T06:27:14.711Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -45196,7 +45196,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2010.14",
+      "extent": 2010.14,
       "govt_extent": 627.24,
       "patta_extent": 1382.9,
       "khatas": 716,
@@ -45221,7 +45221,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.904Z",
+      "last_synced": "2026-09-14T06:27:14.710Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -45605,7 +45605,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2476.00",
+      "extent": 2476,
       "govt_extent": 1457.81,
       "patta_extent": 1018.19,
       "khatas": 775,
@@ -45630,7 +45630,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.905Z",
+      "last_synced": "2026-09-14T06:27:14.712Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -46237,7 +46237,7 @@
       "mandal": "Kuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "614.24",
+      "extent": 614.24,
       "govt_extent": 189.15,
       "patta_extent": 425.09,
       "khatas": 334,
@@ -46262,7 +46262,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.903Z",
+      "last_synced": "2026-09-14T06:27:14.709Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -47490,7 +47490,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "2633.43",
+      "extent": 2633.43,
       "govt_extent": null,
       "patta_extent": null,
       "khatas": 1176,
@@ -47515,7 +47515,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:18:27.908Z",
+      "last_synced": "2026-09-14T06:27:14.720Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "khata_monitoring": {
@@ -48576,7 +48576,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "337.15",
+      "extent": 337.15,
       "govt_extent": 177.61,
       "patta_extent": 159.54,
       "khatas": 142,
@@ -48601,7 +48601,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:24:29.948Z",
+      "last_synced": "2026-09-14T06:27:14.717Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
@@ -48992,7 +48992,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2260.68",
+      "extent": 2260.68,
       "govt_extent": 656.73,
       "patta_extent": 1603.95,
       "khatas": 1000,
@@ -49017,7 +49017,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.906Z",
+      "last_synced": "2026-09-14T06:27:14.716Z",
       "last_modified": "2026-09-13T18:29:59.558Z",
       "source_meta": {
         "action_plan": {
@@ -50610,7 +50610,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "452.89",
+      "extent": 452.89,
       "govt_extent": 58.47,
       "patta_extent": 394.42,
       "khatas": 295,
@@ -50635,7 +50635,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.909Z",
+      "last_synced": "2026-09-14T06:27:14.722Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -50827,16 +50827,16 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "610.39",
+      "extent": 610.39,
       "govt_extent": null,
       "patta_extent": null,
       "khatas": null,
-      "total_khatas": null,
-      "patta_khatas": null,
-      "govt_khatas": null,
-      "both_khatas": null,
-      "deletions": null,
-      "online_khatas": null,
+      "total_khatas": 272,
+      "patta_khatas": 196,
+      "govt_khatas": 24,
+      "both_khatas": 52,
+      "deletions": 0,
+      "online_khatas": 271,
       "target_month": null,
       "target_date": "28-10-2026",
       "days_delayed": 0,
@@ -50852,7 +50852,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T18:29:59.559Z",
+      "last_synced": "2026-09-14T06:27:14.724Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {},
       "stage_targets": {
@@ -50878,7 +50878,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "429.3",
+      "extent": 429.3,
       "govt_extent": 60.78,
       "patta_extent": 368.52,
       "khatas": 279,
@@ -50903,7 +50903,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.908Z",
+      "last_synced": "2026-09-14T06:27:14.719Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -51506,7 +51506,7 @@
       "mandal": "Santhipuram",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "233.23",
+      "extent": 233.23,
       "govt_extent": 19.15,
       "patta_extent": 214.08,
       "khatas": 137,
@@ -51531,7 +51531,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.909Z",
+      "last_synced": "2026-09-14T06:27:14.721Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -53665,7 +53665,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "604.65",
+      "extent": 604.65,
       "govt_extent": 344.66,
       "patta_extent": 369.55,
       "khatas": 308,
@@ -53690,7 +53690,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.910Z",
+      "last_synced": "2026-09-14T06:27:14.726Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54126,7 +54126,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "353.78",
+      "extent": 353.78,
       "govt_extent": 145.63,
       "patta_extent": 208.15,
       "khatas": 183,
@@ -54151,7 +54151,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.913Z",
+      "last_synced": "2026-09-14T06:27:14.737Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54367,7 +54367,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "318.04",
+      "extent": 318.04,
       "govt_extent": 229.29,
       "patta_extent": 88.75,
       "khatas": 79,
@@ -54392,7 +54392,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.912Z",
+      "last_synced": "2026-09-14T06:27:14.734Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54659,7 +54659,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "1267.35",
+      "extent": 1267.35,
       "govt_extent": 303.3,
       "patta_extent": 964.05,
       "khatas": 764,
@@ -54684,7 +54684,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.912Z",
+      "last_synced": "2026-09-14T06:26:07.260Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54802,7 +54802,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "545.97",
+      "extent": 545.97,
       "govt_extent": 337.14,
       "patta_extent": 208.83,
       "khatas": 227,
@@ -54827,7 +54827,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.911Z",
+      "last_synced": "2026-09-14T06:27:14.730Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -54931,7 +54931,7 @@
       "mandal": "Gudipalle",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "292.24",
+      "extent": 292.24,
       "govt_extent": 169.09,
       "patta_extent": 123.15,
       "khatas": 192,
@@ -54956,7 +54956,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.913Z",
+      "last_synced": "2026-09-14T06:27:14.739Z",
       "last_modified": "2026-09-13T18:29:59.559Z",
       "source_meta": {
         "action_plan": {
@@ -58526,7 +58526,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2610.89",
+      "extent": 2610.89,
       "govt_extent": 1189.29,
       "patta_extent": 1421.6,
       "khatas": 518,
@@ -58551,7 +58551,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.915Z",
+      "last_synced": "2026-09-14T06:27:14.745Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -58929,7 +58929,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "1250.10",
+      "extent": 1250.1,
       "govt_extent": 230.47,
       "patta_extent": 1019.63,
       "khatas": 707,
@@ -58954,7 +58954,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.916Z",
+      "last_synced": "2026-09-14T06:27:14.749Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -59072,7 +59072,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "861.2",
+      "extent": 861.2,
       "govt_extent": 205.11,
       "patta_extent": 656.09,
       "khatas": 529,
@@ -59097,7 +59097,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.916Z",
+      "last_synced": "2026-09-14T06:27:14.748Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -59530,7 +59530,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase-6",
-      "extent": "2097.61",
+      "extent": 2097.61,
       "govt_extent": 334.12,
       "patta_extent": 1763.49,
       "khatas": 1099,
@@ -59555,7 +59555,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "Pending",
-      "last_synced": "2026-09-13T19:18:27.915Z",
+      "last_synced": "2026-09-14T06:27:14.747Z",
       "last_modified": "2026-09-13T18:29:59.560Z",
       "source_meta": {
         "action_plan": {
@@ -59860,7 +59860,7 @@
       "mandal": "Ramakuppam",
       "division": "Kuppam",
       "phase": "Phase VI",
-      "extent": "197.68",
+      "extent": 197.68,
       "govt_extent": 21.61,
       "patta_extent": 176.07,
       "khatas": 97,
@@ -59885,7 +59885,7 @@
       "final_ror_status": "",
       "ppb_status": "",
       "status": "In Progress",
-      "last_synced": "2026-09-13T19:24:29.946Z",
+      "last_synced": "2026-09-14T06:27:14.744Z",
       "last_modified": "2026-09-13T17:33:18.029Z",
       "source_meta": {
         "vro_status": {
