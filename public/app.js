@@ -86,7 +86,7 @@ function renderAuthGate(errorMsg = '') {
           <label for="officer-pin-input">OFFICER ACCESS PIN</label>
           <div class="pin-input-wrap">
             <input type="password" id="officer-pin-input" name="pin" required autocomplete="current-password" placeholder="Enter Access PIN" autofocus />
-            <button type="button" id="toggle-pin-vis" title="Toggle PIN visibility">👁</button>
+            <button type="button" id="toggle-pin-vis" title="Toggle PIN visibility">${icon('eye')}</button>
           </div>
           <button type="submit" class="auth-submit-btn">
             ${icon('shield')} Verify Officer Identity
@@ -244,8 +244,8 @@ function renderVillageMonitoring() {
     { id: 'phase:Phase 5', label: 'Phase 5', count: 60 },
     { id: 'phase:Phase 6', label: 'Phase 6', count: 92 },
     { id: 'phase:Phase 7', label: 'Phase 7', count: 91 },
-    { id: 'delayed:true', label: '⚠️ Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 16, alert: true },
-    { id: 'stage:Final RoR', label: '✅ Final RoR Ready', count: state.dashboard?.kpis?.completed ?? 33, success: true }
+    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 16, alert: true },
+    { id: 'stage:Final RoR', label: 'Final RoR Ready', count: state.dashboard?.kpis?.completed ?? 33, success: true }
   ];
 
   function isPillActive(pId) {
@@ -289,7 +289,7 @@ function renderVillageMonitoring() {
       ${selectFilter('mandal', 'All Mandals', f.mandals, active.mandal)}
       ${selectFilter('status', 'All Statuses', ['Completed', 'Pending', 'Delayed', 'In Progress', 'Not Started'], active.status)}
       <button class="adv-filter-toggle ${state.advancedFilterOpen ? 'active' : ''}" data-action="toggle-adv-filter">
-        ${icon('filter')} ⚡ Workflow Stage Filters ${activeStageCount > 0 ? `<span class="pill-count" style="background:#fff;color:var(--blue);padding:1px 6px;border-radius:10px;margin-left:4px;">${activeStageCount}</span>` : ''}
+        ${icon('sliders')} Workflow Stage Filters ${activeStageCount > 0 ? `<span class="pill-count" style="background:#fff;color:var(--blue);padding:1px 6px;border-radius:10px;margin-left:4px;">${activeStageCount}</span>` : ''}
       </button>
       <span class="filter-count">${has ? `${state.villages.length} village record${state.villages.length === 1 ? '' : 's'}` : 'No records available'}</span>
     </div>
@@ -298,7 +298,7 @@ function renderVillageMonitoring() {
       <div class="adv-filter-drawer">
         <div class="adv-filter-header">
           <h4>${icon('filter')} Stage & Bottleneck Analysis Filters</h4>
-          <button class="outline-button" style="padding:4px 8px;font-size:10px;" data-action="toggle-adv-filter">✕ Close Drawer</button>
+          <button class="outline-button" style="padding:4px 8px;font-size:10px;" data-action="toggle-adv-filter">${icon('close')} Close Drawer</button>
         </div>
         <div class="adv-filter-grid">
           <div class="filter-field-box">
@@ -371,7 +371,7 @@ function renderActiveChips(active) {
   return `
     <div class="active-chips-strip">
       <span style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;">Active Filters:</span>
-      ${chips.map(c => `<span class="active-chip">${h(c.label)} <button data-clear-chip="${c.key}" title="Remove filter">✕</button></span>`).join('')}
+      ${chips.map(c => `<span class="active-chip">${h(c.label)} <button data-clear-chip="${c.key}" title="Remove filter">${icon('close')}</button></span>`).join('')}
       <button class="clear-all-link" data-action="clear-all-filters">Clear all filters</button>
     </div>
   `;
@@ -441,16 +441,16 @@ function renderPerformance() {
 
     <div class="analysis-tabs-nav">
       <button class="analysis-tab-btn ${state.analysisTab === 'phases' ? 'active' : ''}" data-analysis-tab="phases">
-        ${icon('map')} 📍 Phase-Wise Progress
+        ${icon('map')} Phase-Wise Progress
       </button>
       <button class="analysis-tab-btn ${state.analysisTab === 'divisions' ? 'active' : ''}" data-analysis-tab="divisions">
-        ${icon('chart')} 🏛️ Division & Mandal Hub
+        ${icon('chart')} Division & Mandal Hub
       </button>
       <button class="analysis-tab-btn ${state.analysisTab === 'stages' ? 'active' : ''}" data-analysis-tab="stages">
-        ${icon('shield')} ⚡ 10-Stage Workflow Journey
+        ${icon('workflow')} 10-Stage Workflow Journey
       </button>
       <button class="analysis-tab-btn ${state.analysisTab === 'matrix' ? 'active' : ''}" data-analysis-tab="matrix">
-        ${icon('document')} 📋 Executive Summary Matrix
+        ${icon('document')} Executive Summary Matrix
       </button>
     </div>
 
@@ -468,7 +468,7 @@ function renderPhaseAnalysis(d) {
   return `
     <div class="analysis-intro-box">
       <div>
-        <h3>📍 Government Phase-Wise Resurvey Tracking</h3>
+        <h3>${icon('map')} Government Phase-Wise Resurvey Tracking</h3>
         <p>The resurvey across Chittoor district is scheduled across 7 government phases, plus remaining unscheduled villages. Click any phase to inspect its villages.</p>
       </div>
       <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 774 Villages</button>
@@ -577,7 +577,7 @@ function renderDivisionAnalysis(d) {
   return `
     <div class="analysis-intro-box">
       <div>
-        <h3>🏛️ Revenue Division & Mandal Resurvey Performance</h3>
+        <h3>${icon('chart')} Revenue Division & Mandal Resurvey Performance</h3>
         <p>Comparative progress across Chittoor, Kuppam, Nagari, and Palamaner revenue divisions and their 27 composite mandals.</p>
       </div>
     </div>
@@ -666,7 +666,7 @@ function renderStageAnalysis(d) {
   return `
     <div class="analysis-intro-box">
       <div>
-        <h3>⚡ 10-Step Sequential Resurvey Workflow Journey</h3>
+        <h3>${icon('workflow')} 10-Step Sequential Resurvey Workflow Journey</h3>
         <p>Clear, citizen-friendly walkthrough of each statutory step in the Andhra Pradesh Resurvey Programme, with accountable revenue tiers and active backlogs.</p>
       </div>
     </div>
@@ -725,7 +725,7 @@ function renderMatrixAnalysis(d) {
   return `
     <div class="analysis-intro-box">
       <div>
-        <h3>📋 Executive Summary & Cross-Tabulation Matrix</h3>
+        <h3>${icon('document')} Executive Summary & Cross-Tabulation Matrix</h3>
         <p>Distribution of all 774 villages across Revenue Divisions and Government Phases, alongside district-wide Khata proforma totals.</p>
       </div>
     </div>
@@ -900,7 +900,7 @@ async function openVillage(id) {
             return `
               <div class="citizen-step-row ${rowClass}">
                 <div class="citizen-step-circle">
-                  ${comp ? '✓' : step.num}
+                  ${comp ? icon('check') : step.num}
                 </div>
                 <div class="citizen-step-body">
                   <div class="citizen-step-head">
@@ -913,7 +913,7 @@ async function openVillage(id) {
                   <div class="citizen-step-meta">
                     <span>Accountable Tier: <b>${h(step.tier)}</b></span>
                     ${v.target_date ? `<span>Target: <b>${h(v.target_date)}</b></span>` : ''}
-                    ${isDel && v.days_delayed ? `<span style="color:var(--red);font-weight:700;">⚠️ ${v.days_delayed} days overdue</span>` : ''}
+                    ${isDel && v.days_delayed ? `<span style="color:var(--red);font-weight:700;">${icon('warning')} ${v.days_delayed} days overdue</span>` : ''}
                   </div>
                 </div>
               </div>
@@ -923,7 +923,7 @@ async function openVillage(id) {
 
         <div class="citizen-officer-box">
           <button type="button" class="citizen-officer-toggle" data-officer-toggle="true">
-            <span>⚙️ Authorized Officer Controls & Stage Status Overrides</span>
+            <span>${icon('sliders')} Authorized Officer Controls & Stage Status Overrides</span>
             <span>▼</span>
           </button>
           <div id="officer-updates-section" class="officer-updates-body">

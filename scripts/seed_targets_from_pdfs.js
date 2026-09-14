@@ -426,12 +426,12 @@ const officialSources = [
   {
     id: 'source-phase-4-targets',
     name: 'Phase IV Resurvey Targets & Timelines (Govt Official)',
-    spreadsheetId: 'GOVT_PDF_PHASE_4',
-    googleSheet: 'Phase - IV – Resurvey Targets & Timelines.pdf',
+    spreadsheetId: '17M7sj_XzRKkiM9C-GpHernk_EEQnctOD8MOB0fnVr0A',
+    googleSheet: 'https://docs.google.com/spreadsheets/d/17M7sj_XzRKkiM9C-GpHernk_EEQnctOD8MOB0fnVr0A',
     tab: 'Targets & Timelines',
     purpose: 'Official Stage Targets, Timelines & Progress for Phase IV',
     direction: 'READ ONLY',
-    accessMode: 'LOCAL',
+    accessMode: 'PUBLIC',
     recordType: 'phase_targets',
     status: 'Connected',
     lastSync: new Date().toISOString()
@@ -439,12 +439,12 @@ const officialSources = [
   {
     id: 'source-phase-5-targets',
     name: 'Phase V Resurvey Targets & Timelines (Govt Official)',
-    spreadsheetId: 'GOVT_PDF_PHASE_5',
-    googleSheet: 'Phase-V – Resurvey Targets & Timelines.pdf',
+    spreadsheetId: '1bjvwI7f-heRZxahA7JmL8ZweJWGAu5e1sQPztSergBU',
+    googleSheet: 'https://docs.google.com/spreadsheets/d/1bjvwI7f-heRZxahA7JmL8ZweJWGAu5e1sQPztSergBU',
     tab: 'Targets & Timelines',
     purpose: 'Official Stage Targets, Timelines & Progress for Phase V',
     direction: 'READ ONLY',
-    accessMode: 'LOCAL',
+    accessMode: 'PUBLIC',
     recordType: 'phase_targets',
     status: 'Connected',
     lastSync: new Date().toISOString()
@@ -452,12 +452,12 @@ const officialSources = [
   {
     id: 'source-phase-6-targets',
     name: 'Phase VI Resurvey Targets & Timelines (Govt Official)',
-    spreadsheetId: 'GOVT_PDF_PHASE_6',
-    googleSheet: 'Phase-VI– Resurvey Targets & Timelines.pdf',
+    spreadsheetId: '18kcvSTkGP1Vlc5LVGeotVG-3jLr2jx4sLajrouH8dEQ',
+    googleSheet: 'https://docs.google.com/spreadsheets/d/18kcvSTkGP1Vlc5LVGeotVG-3jLr2jx4sLajrouH8dEQ',
     tab: 'Targets & Timelines',
     purpose: 'Official Stage Targets, Timelines & Progress for Phase VI',
     direction: 'READ ONLY',
-    accessMode: 'LOCAL',
+    accessMode: 'PUBLIC',
     recordType: 'phase_targets',
     status: 'Connected',
     lastSync: new Date().toISOString()
@@ -465,12 +465,12 @@ const officialSources = [
   {
     id: 'source-phase-7-targets',
     name: 'Phase 7 Resurvey Targets & Timelines (Govt Official)',
-    spreadsheetId: 'GOVT_PDF_PHASE_7',
-    googleSheet: 'Phase 7 - Resurvey Targets & Timelines.pdf',
+    spreadsheetId: '16RIo0Z4KPCFMDBG67qKB7nF8ztlUT6DQ5nMIbXYh9KA',
+    googleSheet: 'https://docs.google.com/spreadsheets/d/16RIo0Z4KPCFMDBG67qKB7nF8ztlUT6DQ5nMIbXYh9KA',
     tab: 'Targets & Timelines',
     purpose: 'Official Stage Targets, Timelines & Progress for Phase 7',
     direction: 'READ ONLY',
-    accessMode: 'LOCAL',
+    accessMode: 'PUBLIC',
     recordType: 'phase_targets',
     status: 'Connected',
     lastSync: new Date().toISOString()

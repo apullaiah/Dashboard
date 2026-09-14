@@ -379,6 +379,21 @@ async function googleRequest(url, options = {}) {
   if (!response.ok) { const body = await response.text(); throw new Error(`Google Sheets API ${response.status}: ${body.slice(0, 180)}`); }
   return response.status === 204 ? {} : response.json();
 }
+function formatCellVal(cell) {
+  if (!cell) return '';
+  if (cell.f) return String(cell.f).trim();
+  if (typeof cell.v === 'string' && cell.v.startsWith('Date(')) {
+    const m = cell.v.match(/Date\((\d+),\s*(\d+),\s*(\d+)/);
+    if (m) {
+      const y = m[1];
+      const month = String(Number(m[2]) + 1).padStart(2, '0');
+      const d = String(Number(m[3])).padStart(2, '0');
+      return `${d}-${month}-${y}`;
+    }
+  }
+  return cell.v !== undefined && cell.v !== null ? String(cell.v).trim() : '';
+}
+
 async function readPublicSheet(source) {
   const sheetId = extractSpreadsheetId(source.spreadsheetId);
   const gid = source.gid === undefined || source.gid === null || source.gid === '' ? '' : `&gid=${encodeURIComponent(source.gid)}`;
@@ -387,7 +402,7 @@ async function readPublicSheet(source) {
   const content = await response.text(); const match = content.match(/setResponse\((.*)\);\s*$/s);
   if (!match) throw new Error('The public Google Sheet response could not be read.');
   const table = JSON.parse(match[1]).table || { cols: [], rows: [] };
-  return { headers: table.cols.map(column => clean(column.label)), rows: table.rows.map(row => (row.c || []).map(cell => cell?.v ?? cell?.f ?? '')) };
+  return { headers: table.cols.map(column => clean(column.label)), rows: table.rows.map(row => (row.c || []).map(formatCellVal)) };
 }
 async function writeBackToSheet(source, meta, value) {
   if (!source || source.direction !== 'TWO WAY') throw new Error('No two-way source mapping is configured for this field.');
@@ -412,6 +427,44 @@ function applySourceTransforms(incoming, transforms = {}) {
   });
   return incoming;
 }
+
+const KNOWN_VILLAGE_ALIASES = {
+  'bnr peta': 'bakaranarasingarayanipeta',
+  'b.n.r. peta': 'bakaranarasingarayanipeta',
+  'g.d.nellore': 'gangadhara nellore',
+  'gd nellore': 'gangadhara nellore',
+  'uk.marripalli': 'marripalleuttarapu khandrika',
+  'u.k. marripalli': 'marripalleuttarapu khandrika',
+  'o.n.kottoor': 'onnapanayanikothur',
+  'on kottoor': 'onnapanayanikothur',
+  'v. kota': 'venkatagirikota',
+  'v.kota': 'venkatagirikota',
+  'tarlabelu': 'tarlabylu',
+  'jawni palle': 'jounipalle',
+  'chinnathayuur': 'china thayyur',
+  'nelavai': 'nelavoy',
+  'kanampachcharlapalle': 'kanamapacharlapalle',
+  'ganginayanipalli': 'ganginayanapalli',
+  'tugundram': 'thugundram',
+  'kamachinniahpalli': 'kama chennaiah palli'
+};
+
+function teluguSkeleton(str) {
+  return String(str || '').toLowerCase()
+    .replace(/^\d+[\s.-]*/, '')
+    .replace(/[^a-z]/g, '')
+    .replace(/palli|palle|pally/g, 'palli')
+    .replace(/puram|pura/g, 'puram')
+    .replace(/khandriga|khandri|khandrika/g, 'khandriga')
+    .replace(/kota|kote/g, 'kota')
+    .replace(/bylu|belu/g, 'belu')
+    .replace(/[aeiou]/g, '')
+    .replace(/th/g, 't')
+    .replace(/dh/g, 'd')
+    .replace(/kh/g, 'k')
+    .replace(/w/g, 'v');
+}
+
 function findVillageMatch(incoming, villages, store) {
   const code = clean(incoming.village_code);
   if (code) {
@@ -419,7 +472,11 @@ function findVillageMatch(incoming, villages, store) {
     if (byCode) return byCode;
   }
   const incMandal = normalizeMandal(incoming.mandal, store);
-  const incName = normalKey(incoming.village_name);
+  const rawName = String(incoming.village_name || '').toLowerCase().trim();
+  const aliasTarget = KNOWN_VILLAGE_ALIASES[rawName];
+  const lookupName = aliasTarget || rawName;
+
+  const incName = normalKey(lookupName);
   if (!incName) return null;
   const incNorm = incName.replace(/palli\b/g, 'palle').replace(/[^a-z0-9]/g, '');
   const incNoNum = incNorm.replace(/^\d+/, '');
@@ -438,7 +495,24 @@ function findVillageMatch(incoming, villages, store) {
       const vNoNum = vNorm.replace(/^\d+/, '');
       return vNorm === incNorm || vNoNum === incNoNum;
     });
+    if (hit) return hit;
   }
+
+  // Fallback: Telugu skeleton matching within mandal
+  const incSkel = teluguSkeleton(lookupName);
+  if (incSkel.length >= 3) {
+    hit = villages.find(v => {
+      if (incMandal && normalizeMandal(v.mandal, store) !== incMandal) return false;
+      const vSkel = teluguSkeleton(v.village_name);
+      return vSkel === incSkel || vSkel.includes(incSkel) || incSkel.includes(vSkel);
+    });
+    if (hit) return hit;
+
+    // Global fallback by skeleton
+    hit = villages.find(v => teluguSkeleton(v.village_name) === incSkel);
+    if (hit) return hit;
+  }
+
   return hit;
 }
 async function syncSource(store, source) {
@@ -460,6 +534,11 @@ async function syncSource(store, source) {
     if (source.recordType === 'summary') {
       store.sourceSummaries ||= {}; store.sourceSummaries[sourceId] = { source: source.name, records: rows.length, syncedAt: now(), headers };
     }
+    let carryDivision = '';
+    let carryMandal = '';
+    const phaseMatch = (source.name || '').match(/Phase\s*([0-9IVX]+)/i);
+    const inferredPhase = phaseMatch ? normalizePhase(phaseMatch[1]) : '';
+
     rows.forEach((row, index) => {
       if (source.recordType === 'summary') return;
       let incoming;
@@ -503,6 +582,70 @@ async function syncSource(store, source) {
           total_khatas: parseInt(clean(row[9]), 10) || 0,
           online_khatas: parseInt(clean(row[10]), 10) || 0
         };
+      } else if (source.recordType === 'phase_targets' || headers.some(h => /targets.*timelines/i.test(h) || /present\s*stage/i.test(h) || /jc\s*login/i.test(h))) {
+        const divIdx = headers.findIndex(h => /division/i.test(h));
+        const manIdx = headers.findIndex(h => /mandal/i.test(h));
+        const vilIdx = headers.findIndex(h => /village/i.test(h));
+        const extIdx = headers.findIndex(h => /extent/i.test(h));
+        const stgIdx = headers.findIndex(h => /present\s*stage/i.test(h) || /^stage$/i.test(h.trim()));
+        const remIdx = headers.findIndex(h => /remark/i.test(h));
+
+        const gtIdx = headers.findIndex(h => /^gt/i.test(h.trim()) || /ground\s*truth/i.test(h));
+        const vecIdx = headers.findIndex(h => /vectoriz/i.test(h));
+        const dlrIdx = headers.findIndex(h => /dlr/i.test(h));
+        const vroIdx = headers.findIndex(h => /vro/i.test(h));
+        const tahIdx = headers.findIndex(h => /tah/i.test(h));
+        const rdoIdx = headers.findIndex(h => /rdo/i.test(h));
+        const jcIdx = headers.findIndex(h => /jc/i.test(h));
+
+        const divVal = divIdx >= 0 ? clean(row[divIdx]) : '';
+        const manVal = manIdx >= 0 ? clean(row[manIdx]) : '';
+        if (divVal) carryDivision = divVal;
+        if (manVal) carryMandal = manVal;
+
+        const vilVal = vilIdx >= 0 ? clean(row[vilIdx]) : '';
+        if (!vilVal) return;
+
+        const dates = [];
+        const stageTargets = {};
+        [
+          { key: 'gt', idx: gtIdx },
+          { key: 'vectorization', idx: vecIdx },
+          { key: 'dlr', idx: dlrIdx },
+          { key: 'vro', idx: vroIdx },
+          { key: 'tahsildar', idx: tahIdx },
+          { key: 'rdo', idx: rdoIdx },
+          { key: 'jc', idx: jcIdx }
+        ].forEach(sc => {
+          if (sc.idx >= 0 && row[sc.idx]) {
+            const val = clean(row[sc.idx]);
+            if (val) {
+              dates.push(val);
+              stageTargets[sc.key] = val;
+            }
+          }
+        });
+
+        const jcVal = jcIdx >= 0 && row[jcIdx] ? clean(row[jcIdx]) : '';
+        const targetDate = jcVal && !jcVal.toLowerCase().includes('stop') ? jcVal : (dates.length ? dates[dates.length - 1] : '');
+        const presentStageRaw = stgIdx >= 0 && row[stgIdx] ? clean(row[stgIdx]) : '';
+
+        incoming = {
+          division: carryDivision,
+          mandal: carryMandal,
+          village_name: vilVal,
+          phase: inferredPhase || 'Yet to be Scheduled',
+          extent: extIdx >= 0 && row[extIdx] ? clean(row[extIdx]) : '',
+          current_stage: presentStageRaw || (inferredPhase === 'Phase VII' ? 'GT' : ''),
+          target_date: targetDate,
+          stage_targets: {
+            phase: inferredPhase,
+            dates,
+            ...stageTargets,
+            source: source.name
+          },
+          remarks: remIdx >= 0 && row[remIdx] ? clean(row[remIdx]) : ''
+        };
       } else {
         incoming = applySourceTransforms(rowObject(headers, row, source.mappings || DEFAULT_MAPPINGS), source.statusTransforms);
         Object.assign(incoming, source.fixedFields || {});
@@ -517,14 +660,26 @@ async function syncSource(store, source) {
         store.villages.push(existing);
         added++;
       } else {
-        Object.entries(incoming).forEach(([field, value]) => {
-          if (value === undefined || value === null || value === '') return;
-          if (existing.pending_write?.[field] && clean(existing[field]) !== String(value)) {
-            store.conflicts.unshift({ id: id(), villageId: existing.id, village: existing.village_name, field, websiteValue: existing[field], sheetValue: value, source: source.name, status: 'Open', detectedAt: now() }); conflicts++; return;
+        if (source.recordType === 'phase_targets') {
+          if (incoming.phase && existing.phase !== incoming.phase) { existing.phase = incoming.phase; changed++; }
+          if (incoming.target_date && existing.target_date !== incoming.target_date) { existing.target_date = incoming.target_date; changed++; }
+          if (incoming.extent && !existing.extent) { existing.extent = incoming.extent; changed++; }
+          if (incoming.current_stage && existing.current_stage !== incoming.current_stage) { existing.current_stage = incoming.current_stage; changed++; }
+          if (incoming.stage_targets) { existing.stage_targets = incoming.stage_targets; }
+          if (incoming.remarks) { existing.remarks = incoming.remarks; }
+          if (existing.status === 'Not Updated' || !existing.status) {
+            existing.status = incoming.current_stage && incoming.current_stage !== 'GT' ? 'In Progress' : 'Pending';
           }
-          if (String(existing[field] ?? '') !== String(value)) { existing[field] = value; changed++; }
-        });
-        if (incoming.total_khatas) existing.khatas = incoming.total_khatas;
+        } else {
+          Object.entries(incoming).forEach(([field, value]) => {
+            if (value === undefined || value === null || value === '') return;
+            if (existing.pending_write?.[field] && clean(existing[field]) !== String(value)) {
+              store.conflicts.unshift({ id: id(), villageId: existing.id, village: existing.village_name, field, websiteValue: existing[field], sheetValue: value, source: source.name, status: 'Open', detectedAt: now() }); conflicts++; return;
+            }
+            if (String(existing[field] ?? '') !== String(value)) { existing[field] = value; changed++; }
+          });
+          if (incoming.total_khatas) existing.khatas = incoming.total_khatas;
+        }
         existing.last_synced = now(); updated++;
       }
       existing.source_meta ||= {};
