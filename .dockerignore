@@ -1,0 +1,9 @@
+node_modules
+.git
+.agents
+npm-debug.log
+*.xlsx
+*.xls
+data/action_plan.json
+data/master_villages.json
+scratch/

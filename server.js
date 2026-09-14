@@ -1,0 +1,726 @@
+/*
+ * Chittoor Resurvey Monitoring API
+ *
+ * This dependency-free server keeps Google credentials strictly on the server.
+ * It is deliberately seeded with no operational records: the monitoring universe
+ * begins only after the administrator connects the real Village Master source.
+ */
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
+const crypto = require('crypto');
+
+const PORT = Number(process.env.PORT || 4173);
+const ROOT = __dirname;
+const PUBLIC = path.join(ROOT, 'public');
+const DATA_DIR = path.join(ROOT, 'data');
+const STORE_FILE = path.join(DATA_DIR, 'store.json');
+const STAGES = [
+  ['gt_status', 'GT'], ['vectorization_status', 'Vectorization'], ['vs_status', 'VS Login'],
+  ['vro_status', 'VRO Login'], ['tahsildar_status', 'Tahsildar Login'], ['rdo_status', 'RDO Login'],
+  ['jc_status', 'JC Login'], ['section13_status', 'Section 13'], ['draft_ror_status', 'Draft RoR'],
+  ['final_ror_status', 'Final RoR']
+];
+const DEFAULT_MAPPINGS = {
+  village_code: 'Village Code', village_name: 'Village Name', mandal: 'Mandal', division: 'Division',
+  phase: 'Phase', extent: 'Extent', target_date: 'Target Date', gt_status: 'GT',
+  vectorization_status: 'Vectorization', vs_status: 'VS', vro_status: 'VRO',
+  tahsildar_status: 'Tahsildar', rdo_status: 'RDO', jc_status: 'JC', section13_status: 'Section 13',
+  draft_ror_status: 'Draft RoR', final_ror_status: 'Final RoR', ppb_status: 'PPB'
+};
+const MANDAL_ALIASES = {
+  gudupalle: 'Gudipalle', gudipalle: 'Gudipalle', palamaneru: 'Palamaner', palamaner: 'Palamaner',
+  palmaner: 'Palamaner', bangarupalyam: 'Bangarupalem', bangarupalem: 'Bangarupalem',
+  'v kota': 'Venkatagirikota', 'v.kota': 'Venkatagirikota', venkatagirikota: 'Venkatagirikota',
+  penumur: 'Penumuru', penumuru: 'Penumuru', puthalapatu: 'Puthalapattu', puthalapattu: 'Puthalapattu',
+  thavanampalle: 'Thavanampalli', thavanampalli: 'Thavanampalli', 'g.d.nellore': 'G.D.Nellore',
+  'g d nellore': 'G.D.Nellore', 'gd nellore': 'G.D.Nellore', 's.r.puram': 'S.R.Puram',
+  's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
+};
+
+let bundledStore = null;
+try {
+  bundledStore = require('./data/store.json');
+} catch (e) {
+  bundledStore = null;
+}
+
+let inMemoryStore = null;
+
+function blankStore() {
+  return { sources: [], villages: [], syncLogs: [], auditLog: [], conflicts: [], changeFeed: [],
+    sourceSummaries: {}, settings: { noProgressDays: 5, timezone: 'Asia/Kolkata' }, customMandalAliases: {} };
+}
+function ensureStore() {
+  if (inMemoryStore) return;
+  if (!fs.existsSync(DATA_DIR)) {
+    try { fs.mkdirSync(DATA_DIR, { recursive: true }); } catch (e) {}
+  }
+  if (!fs.existsSync(STORE_FILE) && bundledStore) {
+    try { fs.writeFileSync(STORE_FILE, JSON.stringify(bundledStore, null, 2)); } catch (e) {}
+  }
+}
+function load() {
+  if (inMemoryStore) return inMemoryStore;
+  try {
+    ensureStore();
+    if (fs.existsSync(STORE_FILE)) {
+      inMemoryStore = JSON.parse(fs.readFileSync(STORE_FILE, 'utf8'));
+      return inMemoryStore;
+    }
+  } catch (e) {
+    console.warn('Store file read notice:', e.message);
+  }
+  const tmpStore = path.join('/tmp', 'store.json');
+  try {
+    if (fs.existsSync(tmpStore)) {
+      inMemoryStore = JSON.parse(fs.readFileSync(tmpStore, 'utf8'));
+      return inMemoryStore;
+    }
+  } catch (e) {}
+  if (bundledStore) {
+    inMemoryStore = JSON.parse(JSON.stringify(bundledStore));
+    return inMemoryStore;
+  }
+  inMemoryStore = blankStore();
+  return inMemoryStore;
+}
+function save(store) {
+  inMemoryStore = store;
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(STORE_FILE, JSON.stringify(store, null, 2));
+    return;
+  } catch (e) {
+    // Expected on read-only serverless filesystems like Vercel Lambda
+  }
+  try {
+    fs.writeFileSync(path.join('/tmp', 'store.json'), JSON.stringify(store, null, 2));
+  } catch (e) {}
+}
+function now() { return new Date().toISOString(); }
+function id() { return crypto.randomUUID(); }
+function frequencyMs(value) { return ({ '5 minutes': 5 * 60e3, '15 minutes': 15 * 60e3, '30 minutes': 30 * 60e3, '1 hour': 60 * 60e3 })[value] || 15 * 60e3; }
+function clean(v) { return String(v ?? '').trim(); }
+function normalKey(v) { return clean(v).toLowerCase().replace(/\s+/g, ' '); }
+function normalizeMandal(value, store) { const key = normalKey(value); return (store.customMandalAliases || {})[key] || MANDAL_ALIASES[key] || clean(value); }
+function isComplete(value) { return /^(completed|complete|done|yes|y)$/i.test(clean(value)); }
+function normalStatus(value) {
+  const s = normalKey(value);
+  if (!s) return 'Not Updated';
+  if (isComplete(s)) return 'Completed';
+  if (/delay|overdue/.test(s)) return 'Delayed';
+  if (/not started/.test(s)) return 'Not Started';
+  if (/progress|ongoing|started/.test(s)) return 'In Progress';
+  return 'Pending';
+}
+const DIVISION_ALIASES = { palmaner: 'Palamaner', palamaneru: 'Palamaner' };
+function normalizeDivision(div, mandal) {
+  const norm = clean(div).toLowerCase();
+  if (DIVISION_ALIASES[norm]) return DIVISION_ALIASES[norm];
+  if (div && clean(div) !== 'Not Available') return clean(div);
+  const m = clean(mandal).toLowerCase();
+  if (['penumuru','puthalapattu','thavanampalli','thavanampalle','gudipala','chittoor','g.d.nellore','irala','vedurukuppam','yadamari','s.r.puram','pulicherla','rompicherla','bangarupalem','palasamudram'].includes(m)) return 'Chittoor';
+  if (['karvetinagar','nagari','nindra','vijayapuram'].includes(m)) return 'Nagari';
+  if (['peddapanjani','gangavaram','palamaner','baireddipalle','venkatagirikota'].includes(m)) return 'Palamaner';
+  if (['kuppam','santhipuram','gudipalle','gudupalle','ramakuppam'].includes(m)) return 'Kuppam';
+  return 'Chittoor';
+}
+function villageKey(v) { return clean(v.village_code) || [normalKey(v.division), normalKey(v.mandal), normalKey(v.village_name)].join('|'); }
+function parseDate(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  const m = s.match(/Date\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (m) return new Date(Number(m[1]), Number(m[2]), Number(m[3]));
+  const d = new Date(s);
+  return Number.isNaN(+d) ? null : d;
+}
+function allComplete(v) { return isComplete(v.final_ror_status); }
+function currentStage(v) { const next = STAGES.find(([key]) => !isComplete(v[key])); return next ? next[1] : 'Completed'; }
+function villageStatus(v, store) {
+  if (!v.last_synced && !STAGES.some(([key]) => clean(v[key]))) return 'Not Updated';
+  if (allComplete(v)) return 'Completed';
+  if (isDelayed(v, store)) return 'Delayed';
+  if (STAGES.some(([key]) => normalStatus(v[key]) === 'In Progress')) return 'In Progress';
+  return STAGES.some(([key]) => clean(v[key])) ? 'Pending' : 'Not Updated';
+}
+function isDelayed(v, store) {
+  if (allComplete(v)) return false;
+  const target = parseDate(v.target_date);
+  if (target && target < new Date()) return true;
+  const lastChange = parseDate(v.last_modified || v.last_synced);
+  return Boolean(lastChange && (Date.now() - +lastChange) / 86400000 > Number(store.settings.noProgressDays || 5) && STAGES.some(([key]) => clean(v[key])));
+}
+function daysDelayed(v) { const d = parseDate(v.target_date); return d && d < new Date() ? Math.ceil((Date.now() - +d) / 86400000) : (Number(v.days_delayed) || 0); }
+function recordView(v, store) {
+  const conflict = (store.conflicts || []).some(c => c.villageId === v.id && c.status === 'Open');
+  const mandal = normalizeMandal(v.mandal, store);
+  const division = normalizeDivision(v.division, mandal);
+  return { ...v, mandal, division, current_stage: currentStage(v),
+    status: villageStatus(v, store), days_delayed: daysDelayed(v), has_conflict: conflict,
+    workflow_conflict: isComplete(v.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(v[key]) && !isComplete(v[key])) };
+}
+function grouped(items, key) { return items.reduce((map, item) => { const k = item[key] || 'Not Available'; (map[k] ||= []).push(item); return map; }, {}); }
+function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
+function rollup(items, name) {
+  const total = items.length;
+  const finalReported = items.filter(v => clean(v.final_ror_status)).length;
+  const completed = items.filter(allComplete).length;
+  const delayed = items.filter(v => v.status === 'Delayed').length;
+  const row = { name, total, completed: completed, pending: Math.max(0, total - completed), delayed, overall: percent(completed, total) };
+  STAGES.forEach(([key]) => {
+    const stageCompleted = items.filter(v => isComplete(v[key])).length;
+    row[key] = percent(stageCompleted, total);
+    row[`${key}_pending`] = Math.max(0, total - stageCompleted);
+  });
+  const ppbReported = items.filter(v => isComplete(v.ppb_status)).length;
+  row.ppb = percent(ppbReported, total);
+  return row;
+}
+function dataQuality(items) {
+  const codes = {}; items.forEach(v => { if (clean(v.village_code)) (codes[clean(v.village_code)] ||= []).push(v); });
+  return {
+    duplicateVillageCodes: Object.values(codes).filter(x => x.length > 1).flat().length,
+    missingVillageCodes: items.filter(v => !clean(v.village_code)).length,
+    missingMandal: items.filter(v => !clean(v.mandal)).length,
+    missingDivision: items.filter(v => !clean(v.division)).length,
+    missingPhase: items.filter(v => !clean(v.phase)).length,
+    missingTargetDates: items.filter(v => !clean(v.target_date)).length,
+    workflowConflicts: items.filter(v => v.workflow_conflict).length
+  };
+}
+function dashboard(store) {
+  const villages = store.villages.map(v => recordView(v, store));
+  const total = villages.length;
+  const masterConnected = store.sources.some(source => source.recordType === 'village_master' && source.status === 'Connected');
+  const stageProgress = STAGES.map(([key, label]) => {
+    const reported = villages.filter(v => clean(v[key])).length;
+    const completed = villages.filter(v => isComplete(v[key])).length;
+    return {
+      key, label,
+      available: Boolean(reported),
+      reported,
+      completed: completed,
+      pending: Math.max(0, total - completed),
+      percent: percent(completed, total)
+    };
+  });
+  const bottleneck = stageProgress.some(stage => stage.available) ? [...stageProgress.filter(stage => stage.available)].sort((a, b) => b.pending - a.pending)[0] : null;
+  const divisions = Object.entries(grouped(villages, 'division')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (b.overall ?? 0) - (a.overall ?? 0));
+  const mandals = Object.entries(grouped(villages, 'mandal')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (a.overall ?? 0) - (b.overall ?? 0));
+  const phases = Object.entries(grouped(villages, 'phase')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => String(a.name).localeCompare(String(b.name)));
+  const delayed = villages.filter(v => v.status === 'Delayed').sort((a,b) => b.days_delayed - a.days_delayed);
+  const conflicts = store.conflicts.filter(c => c.status === 'Open');
+  const quality = dataQuality(villages);
+  const observations = [];
+  if (!total) observations.push('No village data is available. Connect the Village Master source to begin monitoring.');
+  if (total && !masterConnected) observations.push(`${total} village-level workflow records are synchronized, but the complete district Village Master source is not yet connected.`);
+  if (total && masterConnected) observations.push(`Every village, every stage: active monitoring across all ${total} villages in Chittoor District.`);
+  if (delayed.length) observations.push(`${delayed.length} village${delayed.length === 1 ? ' is' : 's are'} overdue and require review.`);
+  if (bottleneck?.pending) observations.push(`${bottleneck.label} is the largest pending workflow stage (${bottleneck.pending} pending villages).`);
+  const worstPhase = phases.filter(p => p.total).sort((a,b) => b.pending - a.pending)[0]; if (worstPhase?.pending) observations.push(`${worstPhase.name} has the highest pending workload.`);
+  if (conflicts.length) observations.push(`${conflicts.length} data ${conflicts.length === 1 ? 'conflict requires' : 'conflicts require'} verification.`);
+  const sourceSummary = { configured: store.sources.length, connected: store.sources.filter(s => s.status === 'Connected').length, failed: store.sources.filter(s => s.status === 'Connection Error').length };
+  
+  const totalKhatas = villages.reduce((sum, v) => sum + (Number(v.total_khatas) || Number(v.khatas) || 0), 0);
+  const pattaKhatas = villages.reduce((sum, v) => sum + (Number(v.patta_khatas) || 0), 0);
+  const govtKhatas = villages.reduce((sum, v) => sum + (Number(v.govt_khatas) || 0), 0);
+  const totalExtent = Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.extent) || 0), 0) * 100) / 100;
+
+  return {
+    generatedAt: now(), hasData: Boolean(total), hasMasterData: masterConnected, villageRecordCount: total, sources: store.sources, sourceSummary,
+    kpis: {
+      total: total,
+      totalVillages: total,
+      completed: villages.filter(allComplete).length,
+      pending: villages.filter(v => !allComplete(v)).length,
+      delayed: delayed.length,
+      ppbCompleted: villages.filter(v => isComplete(v.ppb_status)).length,
+      // 12 Primary Officer Milestones
+      gtCompleted: villages.filter(v => isComplete(v.gt_status)).length,
+      gtPending: villages.filter(v => !isComplete(v.gt_status)).length,
+      vectorizationCompleted: villages.filter(v => isComplete(v.vectorization_status)).length,
+      vsCompleted: villages.filter(v => isComplete(v.vs_status)).length,
+      vroCompleted: villages.filter(v => isComplete(v.vro_status)).length,
+      tahsildarCompleted: villages.filter(v => isComplete(v.tahsildar_status)).length,
+      rdoCompleted: villages.filter(v => isComplete(v.rdo_status)).length,
+      jcCompleted: villages.filter(v => isComplete(v.jc_status)).length,
+      section13Completed: villages.filter(v => isComplete(v.section13_status)).length,
+      draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
+      finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
+      // Khata & Extent Statistics
+      totalKhatas, pattaKhatas, govtKhatas, totalExtent,
+      inProgress: villages.filter(v => v.status === 'In Progress').length,
+      notUpdated: villages.filter(v => v.status === 'Not Updated').length
+    },
+    stageProgress, bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
+    quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null
+  };
+}
+function getToken() { return process.env.GOOGLE_SHEETS_ACCESS_TOKEN || ''; }
+function sheetRange(tab) { return encodeURIComponent(`'${tab}'`); }
+function extractSpreadsheetId(value) { const s = clean(value); const m = s.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/); return m ? m[1] : s; }
+function columnLetter(index) { let out = ''; for (let n = index + 1; n; n = Math.floor((n - 1) / 26)) out = String.fromCharCode(65 + ((n - 1) % 26)) + out; return out; }
+async function googleRequest(url, options = {}) {
+  const token = getToken();
+  if (!token) throw new Error('Google Sheets access token is not configured on the server.');
+  const response = await fetch(url, { ...options, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...(options.headers || {}) } });
+  if (!response.ok) { const body = await response.text(); throw new Error(`Google Sheets API ${response.status}: ${body.slice(0, 180)}`); }
+  return response.status === 204 ? {} : response.json();
+}
+async function readPublicSheet(source) {
+  const sheetId = extractSpreadsheetId(source.spreadsheetId);
+  const gid = source.gid === undefined || source.gid === null || source.gid === '' ? '' : `&gid=${encodeURIComponent(source.gid)}`;
+  const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json${gid}`);
+  if (!response.ok) throw new Error(`Public Google Sheet returned ${response.status}. Check sharing access.`);
+  const content = await response.text(); const match = content.match(/setResponse\((.*)\);\s*$/s);
+  if (!match) throw new Error('The public Google Sheet response could not be read.');
+  const table = JSON.parse(match[1]).table || { cols: [], rows: [] };
+  return { headers: table.cols.map(column => clean(column.label)), rows: table.rows.map(row => (row.c || []).map(cell => cell?.v ?? cell?.f ?? '')) };
+}
+async function writeBackToSheet(source, meta, value) {
+  if (!source || source.direction !== 'TWO WAY') throw new Error('No two-way source mapping is configured for this field.');
+  if (!meta?.row || !meta?.column) throw new Error('The source row or column for this field is unavailable.');
+  const sheetId = extractSpreadsheetId(source.spreadsheetId);
+  const range = encodeURIComponent(`'${source.tab}'!${meta.column}${meta.row}`);
+  return googleRequest(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?valueInputOption=USER_ENTERED`, { method: 'PUT', body: JSON.stringify({ values: [[value]] }) });
+}
+function rowObject(headers, values, mappings) {
+  const result = {};
+  Object.entries(mappings || DEFAULT_MAPPINGS).forEach(([appField, sheetColumn]) => {
+    const index = Number.isInteger(sheetColumn) ? sheetColumn : headers.findIndex(h => normalKey(h) === normalKey(sheetColumn));
+    result[appField] = index >= 0 ? clean(values[index]) : '';
+  });
+  return result;
+}
+function applySourceTransforms(incoming, transforms = {}) {
+  Object.entries(transforms).forEach(([field, transform]) => {
+    if (transform === 'notblank-completed' && clean(incoming[field])) incoming[field] = 'Completed';
+    if (transform === 'positive-completed' && Number(incoming[field]) > 0) incoming[field] = 'Completed';
+    if (transform === 'positive-completed' && !(Number(incoming[field]) > 0)) incoming[field] = '';
+  });
+  return incoming;
+}
+function findVillageMatch(incoming, villages, store) {
+  const code = clean(incoming.village_code);
+  if (code) {
+    const byCode = villages.find(v => clean(v.village_code) === code);
+    if (byCode) return byCode;
+  }
+  const incMandal = normalizeMandal(incoming.mandal, store);
+  const incName = normalKey(incoming.village_name);
+  if (!incName) return null;
+  const incNorm = incName.replace(/palli\b/g, 'palle').replace(/[^a-z0-9]/g, '');
+  const incNoNum = incNorm.replace(/^\d+/, '');
+
+  let hit = villages.find(v => {
+    if (incMandal && normalizeMandal(v.mandal, store) !== incMandal) return false;
+    const vNorm = normalKey(v.village_name).replace(/palli\b/g, 'palle').replace(/[^a-z0-9]/g, '');
+    const vNoNum = vNorm.replace(/^\d+/, '');
+    return vNorm === incNorm || vNoNum === incNoNum || vNorm.includes(incNoNum) || incNorm.includes(vNoNum);
+  });
+  if (hit) return hit;
+
+  if (incNoNum.length > 5) {
+    hit = villages.find(v => {
+      const vNorm = normalKey(v.village_name).replace(/palli\b/g, 'palle').replace(/[^a-z0-9]/g, '');
+      const vNoNum = vNorm.replace(/^\d+/, '');
+      return vNorm === incNorm || vNoNum === incNoNum;
+    });
+  }
+  return hit;
+}
+async function syncSource(store, source) {
+  const started = now(); const sourceId = source.id;
+  try {
+    if (!source.spreadsheetId || !source.tab) throw new Error('Spreadsheet ID and tab are required.');
+    if (source.accessMode === 'LOCAL' || String(source.spreadsheetId).startsWith('LOCAL_')) {
+      source.status = 'Connected';
+      source.lastSync = now();
+      source.nextSync = new Date(Date.now() + frequencyMs(source.refreshFrequency)).toISOString();
+      return { id: id(), dateTime: started, source: source.name, recordsRead: store.villages.length, recordsAdded: 0, recordsUpdated: 0, recordsChanged: 0, errors: 0, status: 'Success' };
+    }
+    const table = source.accessMode === 'PUBLIC' ? await readPublicSheet(source) : (() => null);
+    let headers, rows;
+    if (table) { headers = table.headers; rows = table.rows; }
+    else { const sheetId = extractSpreadsheetId(source.spreadsheetId); const result = await googleRequest(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange(source.tab)}`); const values = result.values || []; if (!values.length) throw new Error('The configured tab has no rows.'); [headers, ...rows] = values; }
+    const skipRows = Number(source.skipRows || 0); if (skipRows) rows = rows.slice(skipRows);
+    let added = 0, updated = 0, changed = 0, conflicts = 0;
+    if (source.recordType === 'summary') {
+      store.sourceSummaries ||= {}; store.sourceSummaries[sourceId] = { source: source.name, records: rows.length, syncedAt: now(), headers };
+    }
+    rows.forEach((row, index) => {
+      if (source.recordType === 'summary') return;
+      let incoming;
+      if (source.recordType === 'action_plan' || (headers.some(h => /target\s*month/i.test(h)) && headers.some(h => /extent/i.test(h)))) {
+        const tmIdx = headers.findIndex(h => /target\s*month/i.test(h));
+        const mIdx = headers.findIndex(h => /^mandal$/i.test(h.trim()));
+        const vIdx = headers.findIndex(h => /^village$/i.test(h.trim()) || /village\s*name/i.test(h));
+        const vcIdx = headers.findIndex(h => /village\s*code/i.test(h));
+        const geIdx = headers.findIndex(h => /govt.*extent/i.test(h));
+        const peIdx = headers.findIndex(h => /patta.*extent/i.test(h));
+        const teIdx = headers.findIndex(h => /total.*extent/i.test(h) || /^extent$/i.test(h.trim()));
+        const khIdx = headers.findIndex(h => /khata/i.test(h));
+        const phIdx = headers.findIndex(h => /^phase$/i.test(h.trim()));
+        const csIdx = headers.findIndex(h => /current\s*stage/i.test(h));
+        const ddIdx = headers.findIndex(h => /delay/i.test(h));
+
+        incoming = {
+          target_month: tmIdx >= 0 ? clean(row[tmIdx]) : '',
+          mandal: mIdx >= 0 ? clean(row[mIdx]) : '',
+          village_name: vIdx >= 0 ? clean(row[vIdx]) : '',
+          village_code: vcIdx >= 0 ? clean(row[vcIdx]) : '',
+          govt_extent: geIdx >= 0 ? (parseFloat(clean(row[geIdx])) || null) : null,
+          patta_extent: peIdx >= 0 ? (parseFloat(clean(row[peIdx])) || null) : null,
+          extent: teIdx >= 0 ? clean(row[teIdx]) : '',
+          total_khatas: khIdx >= 0 ? (parseInt(clean(row[khIdx]), 10) || null) : null,
+          khatas: khIdx >= 0 ? (parseInt(clean(row[khIdx]), 10) || null) : null,
+          phase: phIdx >= 0 ? clean(row[phIdx]) : '',
+          current_stage: csIdx >= 0 ? clean(row[csIdx]) : '',
+          days_delayed: ddIdx >= 0 ? (parseInt(clean(row[ddIdx]), 10) || 0) : 0
+        };
+      } else if (source.recordType === 'khata_monitoring' || (headers.some(h => /khatas/i.test(h)) && headers.some(h => /patta/i.test(h)))) {
+        incoming = {
+          division: clean(row[1]),
+          mandal: clean(row[2]),
+          village_name: clean(row[3]),
+          extent: clean(row[4]),
+          patta_khatas: parseInt(clean(row[5]), 10) || 0,
+          govt_khatas: parseInt(clean(row[6]), 10) || 0,
+          both_khatas: parseInt(clean(row[7]), 10) || 0,
+          deletions: parseInt(clean(row[8]), 10) || 0,
+          total_khatas: parseInt(clean(row[9]), 10) || 0,
+          online_khatas: parseInt(clean(row[10]), 10) || 0
+        };
+      } else {
+        incoming = applySourceTransforms(rowObject(headers, row, source.mappings || DEFAULT_MAPPINGS), source.statusTransforms);
+        Object.assign(incoming, source.fixedFields || {});
+      }
+      incoming.mandal = normalizeMandal(incoming.mandal, store);
+      if (!clean(incoming.village_code) && !clean(incoming.village_name)) return;
+      let existing = findVillageMatch(incoming, store.villages, store);
+      if (!existing) {
+        if (store.villages.length >= 774 && !clean(incoming.village_code)) return;
+        existing = { id: id(), ...incoming, last_synced: now(), last_modified: now(), source_meta: {} };
+        store.villages.push(existing);
+        added++;
+      } else {
+        Object.entries(incoming).forEach(([field, value]) => {
+          if (value === undefined || value === null || value === '') return;
+          if (existing.pending_write?.[field] && clean(existing[field]) !== String(value)) {
+            store.conflicts.unshift({ id: id(), villageId: existing.id, village: existing.village_name, field, websiteValue: existing[field], sheetValue: value, source: source.name, status: 'Open', detectedAt: now() }); conflicts++; return;
+          }
+          if (String(existing[field] ?? '') !== String(value)) { existing[field] = value; changed++; }
+        });
+        if (incoming.total_khatas) existing.khatas = incoming.total_khatas;
+        existing.last_synced = now(); updated++;
+      }
+      existing.source_meta ||= {};
+      Object.keys(incoming).forEach(field => {
+        const mappedHeader = (source.mappings || DEFAULT_MAPPINGS)[field] || DEFAULT_MAPPINGS[field];
+        const sheetColumn = Number.isInteger(mappedHeader) ? mappedHeader : headers.findIndex(header => normalKey(header) === normalKey(mappedHeader));
+        existing.source_meta[field] = { sourceId, source: source.name, tab: source.tab, row: index + 2, column: sheetColumn >= 0 ? columnLetter(sheetColumn) : '', lastSynced: now() };
+      });
+    });
+    source.status = 'Connected'; source.lastSync = now(); source.nextSync = new Date(Date.now() + frequencyMs(source.refreshFrequency)).toISOString(); source.lastError = ''; source.lastRecords = rows.length;
+    const log = { id: id(), dateTime: started, source: source.name, recordsRead: rows.length, recordsAdded: added, recordsUpdated: updated, recordsChanged: changed, errors: 0, status: 'Success' };
+    store.syncLogs.unshift(log); store.changeFeed.unshift({ id: id(), dateTime: now(), source: source.name, description: `${added} added, ${changed} changed, ${conflicts} conflicts identified` });
+    store.syncLogs = store.syncLogs.slice(0, 200); store.changeFeed = store.changeFeed.slice(0, 100);
+    return log;
+  } catch (error) {
+    source.status = 'Connection Error'; source.lastError = error.message; source.lastFailedSync = now(); source.nextSync = new Date(Date.now() + frequencyMs(source.refreshFrequency)).toISOString();
+    const log = { id: id(), dateTime: started, source: source.name, recordsRead: 0, recordsAdded: 0, recordsUpdated: 0, recordsChanged: 0, errors: 1, status: 'Failed', error: error.message };
+    store.syncLogs.unshift(log); return log;
+  }
+}
+function setSecurityHeaders(res) {
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  }
+}
+
+function json(res, status, body) {
+  res.statusCode = status;
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+    setSecurityHeaders(res);
+  }
+  if (typeof res.writeHead === 'function' && !res.headersSent) {
+    try {
+      res.writeHead(status, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-store, no-cache, must-revalidate',
+        'X-Frame-Options': 'DENY',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+      });
+    } catch (e) {}
+  }
+  res.end(JSON.stringify(body));
+}
+
+function text(res, status, body, type = 'text/plain; charset=utf-8') {
+  res.statusCode = status;
+  if (typeof res.setHeader === 'function') {
+    res.setHeader('Content-Type', type);
+    setSecurityHeaders(res);
+  }
+  if (typeof res.writeHead === 'function' && !res.headersSent) {
+    try {
+      res.writeHead(status, {
+        'Content-Type': type,
+        'X-Frame-Options': 'DENY',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'strict-origin-when-cross-origin'
+      });
+    } catch (e) {}
+  }
+  res.end(body);
+}
+
+const OFFICER_PIN = process.env.OFFICER_PIN || 'APCTR2026';
+const AUTH_SECRET = process.env.AUTH_SECRET || 'chittoor-sslr-resurvey-auth-key-2026';
+const loginAttempts = new Map();
+
+function checkRateLimit(ip) {
+  const nowTime = Date.now();
+  const record = loginAttempts.get(ip);
+  if (!record) return true;
+  if (record.lockedUntil && nowTime < record.lockedUntil) return false;
+  if (record.lockedUntil && nowTime >= record.lockedUntil) {
+    loginAttempts.delete(ip);
+    return true;
+  }
+  return true;
+}
+function recordFailedLogin(ip) {
+  const nowTime = Date.now();
+  const record = loginAttempts.get(ip) || { count: 0, firstAttempt: nowTime };
+  record.count += 1;
+  if (record.count >= 5) {
+    record.lockedUntil = nowTime + 10 * 60 * 1000;
+  }
+  loginAttempts.set(ip, record);
+}
+function clearLoginAttempts(ip) {
+  loginAttempts.delete(ip);
+}
+function generateToken(role = 'DISTRICT OFFICER') {
+  const expiry = Date.now() + 12 * 60 * 60 * 1000;
+  const salt = crypto.randomBytes(8).toString('hex');
+  const payload = `${role}:${expiry}:${salt}`;
+  const hmac = crypto.createHmac('sha256', AUTH_SECRET).update(payload).digest('hex');
+  return Buffer.from(`${payload}:${hmac}`).toString('base64url');
+}
+function verifyToken(token) {
+  if (!token) return null;
+  try {
+    const raw = Buffer.from(token, 'base64url').toString('utf8');
+    const parts = raw.split(':');
+    if (parts.length !== 4) return null;
+    const [role, expiryStr, salt, hmac] = parts;
+    const payload = `${role}:${expiryStr}:${salt}`;
+    const expectedHmac = crypto.createHmac('sha256', AUTH_SECRET).update(payload).digest('hex');
+    if (!crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expectedHmac))) return null;
+    if (Date.now() > Number(expiryStr)) return null;
+    return { role, valid: true };
+  } catch {
+    return null;
+  }
+}
+
+function readBody(req) {
+  if (req.body !== undefined && req.body !== null) {
+    if (typeof req.body === 'object') return Promise.resolve(req.body);
+    if (typeof req.body === 'string') {
+      try { return Promise.resolve(JSON.parse(req.body)); }
+      catch { return Promise.resolve({}); }
+    }
+  }
+  return new Promise((resolve, reject) => {
+    let raw = '';
+    req.on('data', c => {
+      raw += c;
+      if (raw.length > 1e6) req.destroy();
+    });
+    req.on('end', () => {
+      try { resolve(raw ? JSON.parse(raw) : {}); }
+      catch { reject(new Error('Invalid JSON request body.')); }
+    });
+    req.on('error', reject);
+  });
+}
+function requireAuthorized(req, res) { const role = req.headers['x-user-role'] || 'ADMIN'; if (!['ADMIN', 'DISTRICT OFFICER', 'DIVISION OFFICER', 'MANDAL OFFICER'].includes(role)) { json(res, 403, { error: 'This role is not authorized to make changes.' }); return null; } return role; }
+function filterVillages(items, query) {
+  return items.filter(v => {
+    const search = normalKey(query.search); const normalizedSearch = MANDAL_ALIASES[search] ? normalKey(MANDAL_ALIASES[search]) : search;
+    const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, v.target_month].map(normalKey).join(' ');
+    return (!search || searchable.includes(search) || normalKey(v.mandal) === normalizedSearch) &&
+      (!query.phase || v.phase === query.phase) &&
+      (!query.division || v.division === query.division) &&
+      (!query.mandal || v.mandal === query.mandal) &&
+      (!query.status || v.status === query.status) &&
+      (!query.stage || v.current_stage === query.stage) &&
+      (!query.stageField || isComplete(v[query.stageField]));
+  });
+}
+async function handleApi(req, res, url) {
+  const pathname = url.pathname;
+  const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
+
+  // Public authentication endpoints
+  if (req.method === 'POST' && pathname === '/api/auth/login') {
+    if (!checkRateLimit(clientIp)) {
+      return json(res, 429, { error: 'Too many failed login attempts. Portal access temporarily locked for 10 minutes.' });
+    }
+    const b = await readBody(req);
+    const submittedPin = clean(b.pin);
+    const configuredPin = clean(process.env.OFFICER_PIN || OFFICER_PIN);
+    if (submittedPin && submittedPin === configuredPin) {
+      clearLoginAttempts(clientIp);
+      const token = generateToken('DISTRICT OFFICER');
+      return json(res, 200, { success: true, token, role: 'DISTRICT OFFICER' });
+    } else {
+      recordFailedLogin(clientIp);
+      return json(res, 401, { error: 'Invalid Officer PIN. Unauthorized access attempts are monitored and recorded.' });
+    }
+  }
+
+  if (req.method === 'GET' && pathname === '/api/auth/check') {
+    const authHeader = req.headers['authorization'] || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : req.headers['x-officer-token'];
+    const officer = verifyToken(token);
+    return json(res, 200, { authenticated: Boolean(officer), role: officer?.role || null });
+  }
+
+  // Strict Officer Authentication Gate for all government data
+  const authHeader = req.headers['authorization'] || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : req.headers['x-officer-token'];
+  const officer = verifyToken(token);
+  if (!officer) {
+    return json(res, 401, { error: 'Restricted Government Portal. Authorized Officer Authentication Required.' });
+  }
+
+  const store = load();
+  if (req.method === 'GET' && pathname === '/api/dashboard') return json(res, 200, dashboard(store));
+  if (req.method === 'GET' && pathname === '/api/health') return json(res, 200, { status: 'ok', tokenConfigured: Boolean(getToken()), dashboard: dashboard(store).sourceSummary });
+  if (req.method === 'GET' && pathname === '/api/sources') return json(res, 200, { sources: store.sources, defaultMappings: DEFAULT_MAPPINGS });
+  if (req.method === 'GET' && pathname === '/api/mandal-aliases') return json(res, 200, { aliases: { ...MANDAL_ALIASES, ...(store.customMandalAliases || {}) } });
+  if (req.method === 'GET' && pathname === '/api/sync-history') return json(res, 200, { logs: store.syncLogs });
+  if (req.method === 'GET' && pathname === '/api/audit') return json(res, 200, { entries: store.auditLog });
+  if (req.method === 'GET' && pathname === '/api/conflicts') return json(res, 200, { conflicts: store.conflicts });
+  if (req.method === 'GET' && pathname === '/api/villages') {
+    const villages = filterVillages(store.villages.map(v => recordView(v, store)), Object.fromEntries(url.searchParams));
+    return json(res, 200, { villages, filters: { phases: [...new Set(store.villages.map(v => v.phase).filter(Boolean))], divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))], mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort() } });
+  }
+  const villageMatch = pathname.match(/^\/api\/villages\/([^/]+)$/);
+  if (req.method === 'GET' && villageMatch) { const v = store.villages.find(x => x.id === villageMatch[1]); return v ? json(res, 200, recordView(v, store)) : json(res, 404, { error: 'Village not found.' }); }
+  if (req.method === 'POST' && pathname === '/api/sources') {
+    if (!requireAuthorized(req, res)) return; const b = await readBody(req); const source = { id: id(), name: clean(b.name), spreadsheetId: extractSpreadsheetId(b.spreadsheetId || b.googleSheet), googleSheet: clean(b.googleSheet), tab: clean(b.tab), purpose: clean(b.purpose), direction: ['READ ONLY', 'WRITE ONLY', 'TWO WAY'].includes(b.direction) ? b.direction : 'READ ONLY', accessMode: b.accessMode === 'PUBLIC' ? 'PUBLIC' : 'API', gid: b.gid ?? '', recordType: b.recordType || 'village_progress', skipRows: Number(b.skipRows || 0), fixedFields: b.fixedFields || {}, statusTransforms: b.statusTransforms || {}, refreshFrequency: b.refreshFrequency || '15 minutes', status: 'Not Connected', lastSync: null, mappings: b.mappings || DEFAULT_MAPPINGS, createdAt: now() };
+    if (!source.name || !source.spreadsheetId || !source.tab) return json(res, 400, { error: 'Source name, spreadsheet ID/URL and tab are required.' });
+    store.sources.push(source); save(store); return json(res, 201, source);
+  }
+  const sourceMatch = pathname.match(/^\/api\/sources\/([^/]+)(?:\/(test|sync|disable))?$/);
+  if (sourceMatch) {
+    const source = store.sources.find(s => s.id === sourceMatch[1]); if (!source) return json(res, 404, { error: 'Data source not found.' });
+    if (req.method === 'PATCH' && !sourceMatch[2]) { if (!requireAuthorized(req,res)) return; const b = await readBody(req); Object.assign(source, { ...b, spreadsheetId: extractSpreadsheetId(b.spreadsheetId || source.spreadsheetId), updatedAt: now() }); save(store); return json(res, 200, source); }
+    if (req.method === 'POST' && sourceMatch[2] === 'test') { if (!requireAuthorized(req,res)) return; const log = await syncSource(store, source); save(store); return json(res, log.status === 'Success' ? 200 : 422, { result: log, source }); }
+    if (req.method === 'POST' && sourceMatch[2] === 'sync') { if (!requireAuthorized(req,res)) return; const log = await syncSource(store, source); save(store); return json(res, 200, { result: log }); }
+    if (req.method === 'POST' && sourceMatch[2] === 'disable') { if (!requireAuthorized(req,res)) return; source.status = 'Disabled'; save(store); return json(res, 200, source); }
+  }
+  if (req.method === 'POST' && pathname === '/api/sync') {
+    if (!requireAuthorized(req,res)) return; const logs = []; for (const source of store.sources.filter(s => s.status !== 'Disabled' && s.direction !== 'WRITE ONLY')) logs.push(await syncSource(store, source)); save(store); return json(res, 200, { logs });
+  }
+  if (req.method === 'POST' && pathname === '/api/mandal-aliases') {
+    if (!requireAuthorized(req, res)) return; const b = await readBody(req); const alias = normalKey(b.alias); const standard = clean(b.standard);
+    if (!alias || !standard) return json(res, 400, { error: 'Both the alias and standardized Mandal name are required.' });
+    store.customMandalAliases[alias] = standard;
+    store.villages.forEach(village => { village.mandal = normalizeMandal(village.mandal, store); });
+    store.auditLog.unshift({ id: id(), dateTime: now(), user: req.headers['x-user-role'] || 'ADMIN', village: 'Master data', field: 'Mandal alias', oldValue: alias, newValue: standard, source: 'Website', syncStatus: 'Applied' });
+    save(store); return json(res, 201, { alias, standard });
+  }
+  if (req.method === 'PATCH' && villageMatch) {
+    const role = requireAuthorized(req, res); if (!role) return; const v = store.villages.find(x => x.id === villageMatch[1]); if (!v) return json(res, 404, { error: 'Village not found.' });
+    const b = await readBody(req); const allowed = new Set([...STAGES.map(s => s[0]), 'ppb_status', 'target_date', 'remarks']); const updates = Object.fromEntries(Object.entries(b.updates || {}).filter(([key]) => allowed.has(key)));
+    if (!Object.keys(updates).length) return json(res, 400, { error: 'No permitted fields supplied.' });
+    const changes = [];
+    for (const [field, value] of Object.entries(updates)) { if (clean(v[field]) !== clean(value)) { changes.push({ field, oldValue: v[field] || '', newValue: clean(value) }); v[field] = clean(value); } }
+    if (!changes.length) return json(res, 200, recordView(v, store));
+    v.last_modified = now(); v.pending_write = { ...(v.pending_write || {}), ...updates };
+    const auditEntries = changes.map(change => ({ id: id(), dateTime: now(), user: role, village: v.village_name, villageId: v.id, field: change.field, oldValue: change.oldValue, newValue: change.newValue, source: 'Website', syncStatus: 'Pending' }));
+    auditEntries.forEach(entry => store.auditLog.unshift(entry));
+    for (const entry of auditEntries) {
+      const meta = v.source_meta?.[entry.field]; const source = store.sources.find(s => s.id === meta?.sourceId);
+      if (!source || source.direction !== 'TWO WAY') continue;
+      try { await writeBackToSheet(source, meta, entry.newValue); entry.syncStatus = 'Synced'; delete v.pending_write[entry.field]; }
+      catch (error) { entry.syncStatus = 'Pending'; entry.syncError = error.message; }
+    }
+    save(store); return json(res, 200, recordView(v, store));
+  }
+  if (req.method === 'POST' && pathname === '/api/conflicts/resolve') {
+    if (!requireAuthorized(req,res)) return; const b = await readBody(req); const conflict = store.conflicts.find(c => c.id === b.id); if (!conflict || conflict.status !== 'Open') return json(res, 404, { error: 'Open conflict not found.' });
+    const village = store.villages.find(v => v.id === conflict.villageId); if (b.resolution === 'Keep Google Sheet Value' && village) village[conflict.field] = conflict.sheetValue;
+    conflict.status = b.resolution || 'Review Manually'; conflict.resolvedAt = now(); save(store); return json(res, 200, conflict);
+  }
+  return json(res, 404, { error: 'Endpoint not found.' });
+}
+function serveStatic(req, res, url) {
+  return new Promise((resolve) => {
+    let file = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
+    if (file.startsWith('public/')) file = file.slice(7);
+    const full = path.resolve(PUBLIC, file);
+    if (!full.startsWith(PUBLIC)) {
+      text(res, 403, 'Forbidden');
+      return resolve();
+    }
+    fs.readFile(full, (error, data) => {
+      if (error) {
+        text(res, 404, 'Not found');
+        return resolve();
+      }
+      const ext = path.extname(full);
+      const types = {
+        '.html': 'text/html; charset=utf-8',
+        '.css': 'text/css; charset=utf-8',
+        '.js': 'application/javascript; charset=utf-8',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json; charset=utf-8',
+        '.png': 'image/png',
+        '.ico': 'image/x-icon'
+      };
+      text(res, 200, data, types[ext] || 'application/octet-stream');
+      resolve();
+    });
+  });
+}
+let schedulerRunning = false;
+async function runScheduledSync() {
+  if (schedulerRunning) return; schedulerRunning = true;
+  try {
+    const store = load(); const due = store.sources.filter(source => source.status !== 'Disabled' && source.direction !== 'WRITE ONLY' && source.accessMode !== 'LOCAL' && (!source.nextSync || new Date(source.nextSync) <= new Date()));
+    for (const source of due) await syncSource(store, source);
+    if (due.length) save(store);
+  } catch (error) { console.error('Scheduled synchronization failed:', error.message); }
+  finally { schedulerRunning = false; }
+}
+
+if (require.main === module) {
+  http.createServer(async (req, res) => {
+    const url = new URL(req.url, `http://${req.headers.host}`);
+    try {
+      if (url.pathname.startsWith('/api/')) await handleApi(req, res, url);
+      else serveStatic(req, res, url);
+    } catch (error) {
+      console.error(error);
+      json(res, 500, { error: error.message || 'Unexpected server error.' });
+    }
+  }).listen(PORT, () => {
+    console.log(`Chittoor Monitoring running at http://localhost:${PORT}`);
+    setInterval(runScheduledSync, 60 * 1000).unref();
+  });
+}
+
+module.exports = { handleApi, serveStatic, load, save, dashboard, STAGES, DEFAULT_MAPPINGS, MANDAL_ALIASES };

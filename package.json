@@ -1,0 +1,10 @@
+{
+  "name": "chittoor-resurvey-monitoring",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chittoor District AP Resurvey Monitoring & Analytics",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  }
+}

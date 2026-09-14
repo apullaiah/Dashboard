@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment secrets
+.env
+.env.*
+
+# Raw spreadsheets and intermediate extraction files
+*.xlsx
+*.xls
+data/action_plan.json
+data/master_villages.json
+scratch/
+dashboard/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
