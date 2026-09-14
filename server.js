@@ -192,17 +192,39 @@ function grouped(items, key) { return items.reduce((map, item) => { const k = it
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function rollup(items, name) {
   const total = items.length;
-  const finalReported = items.filter(v => clean(v.final_ror_status)).length;
   const completed = items.filter(allComplete).length;
   const delayed = items.filter(v => v.status === 'Delayed').length;
-  const row = { name, total, completed: completed, pending: Math.max(0, total - completed), delayed, overall: percent(completed, total) };
+  const extent = Math.round(items.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100;
+  const khatas = items.reduce((s, v) => s + (Number(v.total_khatas) || Number(v.khatas) || 0), 0);
+  const patta_khatas = items.reduce((s, v) => s + (Number(v.patta_khatas) || 0), 0);
+  const govt_khatas = items.reduce((s, v) => s + (Number(v.govt_khatas) || 0), 0);
+  const both_khatas = items.reduce((s, v) => s + (Number(v.both_khatas) || 0), 0);
+  const deletions = items.reduce((s, v) => s + (Number(v.deletions) || 0), 0);
+  const online_khatas = items.reduce((s, v) => s + (Number(v.online_khatas) || 0), 0);
+  const mandals = [...new Set(items.map(v => v.mandal).filter(Boolean))].sort();
+  const in_progress = items.filter(v => v.status === 'In Progress').length;
+  const not_updated = items.filter(v => v.status === 'Not Updated').length;
+
+  const stageCounts = STAGES.map(([k, lbl]) => {
+    const c = items.filter(v => isComplete(v[k])).length;
+    return { key: k, label: lbl, count: c, percent: percent(c, total) };
+  });
+
+  const row = {
+    name, total, completed, pending: Math.max(0, total - completed), delayed,
+    overall: percent(completed, total), extent, khatas, patta_khatas, govt_khatas,
+    both_khatas, deletions, online_khatas, mandals_count: mandals.length, mandals,
+    in_progress, not_updated, stageCounts
+  };
   STAGES.forEach(([key]) => {
     const stageCompleted = items.filter(v => isComplete(v[key])).length;
     row[key] = percent(stageCompleted, total);
+    row[`${key}_count`] = stageCompleted;
     row[`${key}_pending`] = Math.max(0, total - stageCompleted);
   });
   const ppbReported = items.filter(v => isComplete(v.ppb_status)).length;
   row.ppb = percent(ppbReported, total);
+  row.ppb_count = ppbReported;
   return row;
 }
 function dataQuality(items) {
@@ -291,7 +313,58 @@ function dashboard(store) {
       inProgress: villages.filter(v => v.status === 'In Progress').length,
       notUpdated: villages.filter(v => v.status === 'Not Updated').length
     },
-    stageProgress, bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
+    stageProgress,
+    stageDetails: STAGES.map(([key, label], idx) => {
+      const citizenDescriptions = [
+        'DGPS ground truthing & preliminary perimeter survey',
+        'High-resolution digital boundary mapping & vectorization',
+        'Village Secretariat record linking & ground verification',
+        'Village Revenue Officer (VRO) door-to-door khata verification',
+        'Tahsildar statutory inspection, error rectification & sign-off',
+        'Revenue Divisional Officer (RDO) appellate review & vetting',
+        'Joint Collector final administrative sanction & clearance',
+        'Section 13 statutory public notice inviting landowner claims',
+        'Draft Record of Rights (1B) published for public claims & objections',
+        'Final Record of Rights confirmed and Pattadar Passbooks issued'
+      ];
+      const tierAccountability = [
+        'Survey Field Team (RSDT / MLSO)',
+        'GIS & Vectorization Team',
+        'Village Secretariat Staff',
+        'Village Revenue Officer (VRO)',
+        'Tahsildar Office',
+        'Revenue Divisional Officer (RDO)',
+        'Joint Collectorate',
+        'Revenue Notification Cell',
+        'Tahsildar & VRO Field Unit',
+        'Collectorate SSLR Wing'
+      ];
+      const cleared = villages.filter(v => isComplete(v[key])).length;
+      const currentAtStage = villages.filter(v => v.current_stage === label).length;
+      const delayedAtStage = villages.filter(v => v.current_stage === label && (v.status === 'Delayed' || v.days_delayed > 0)).length;
+      const divisionBacklog = {};
+      divisions.forEach(d => {
+        divisionBacklog[d.name] = villages.filter(v => v.division === d.name && v.current_stage === label).length;
+      });
+      const phaseBacklog = {};
+      phases.forEach(p => {
+        phaseBacklog[p.name] = villages.filter(v => v.phase === p.name && v.current_stage === label).length;
+      });
+      return {
+        stageNumber: idx + 1,
+        key,
+        label,
+        description: citizenDescriptions[idx] || label,
+        responsibleTier: tierAccountability[idx] || 'Revenue Department',
+        cleared,
+        clearedPercent: percent(cleared, total),
+        activeAtStage: currentAtStage,
+        delayedAtStage,
+        divisionBacklog,
+        phaseBacklog
+      };
+    }),
+    bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
     quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null
   };
 }
@@ -593,17 +666,78 @@ function readBody(req) {
   });
 }
 function requireAuthorized(req, res) { const role = req.headers['x-user-role'] || 'ADMIN'; if (!['ADMIN', 'DISTRICT OFFICER', 'DIVISION OFFICER', 'MANDAL OFFICER'].includes(role)) { json(res, 403, { error: 'This role is not authorized to make changes.' }); return null; } return role; }
+const STAGE_KEYS = [
+  'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
+  'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
+  'draft_ror_status', 'final_ror_status', 'ppb_status'
+];
+
 function filterVillages(items, query) {
   return items.filter(v => {
-    const search = normalKey(query.search); const normalizedSearch = MANDAL_ALIASES[search] ? normalKey(MANDAL_ALIASES[search]) : search;
+    const search = normalKey(query.search);
+    const normalizedSearch = MANDAL_ALIASES[search] ? normalKey(MANDAL_ALIASES[search]) : search;
     const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, normalizePhase(v.phase), v.target_month].map(normalKey).join(' ');
-    return (!search || searchable.includes(search) || normalKey(v.mandal) === normalizedSearch) &&
-      (!query.phase || normalizePhase(v.phase) === normalizePhase(query.phase)) &&
-      (!query.division || v.division === query.division) &&
-      (!query.mandal || v.mandal === query.mandal) &&
-      (!query.status || v.status === query.status) &&
-      (!query.stage || v.current_stage === query.stage) &&
-      (!query.stageField || isComplete(v[query.stageField]));
+
+    if (search && !searchable.includes(search) && normalKey(v.mandal) !== normalizedSearch) {
+      return false;
+    }
+    if (query.phase && normalizePhase(v.phase) !== normalizePhase(query.phase)) {
+      return false;
+    }
+    if (query.division && v.division !== query.division) {
+      return false;
+    }
+    if (query.mandal && v.mandal !== query.mandal) {
+      return false;
+    }
+    if (query.status) {
+      const s = normalKey(query.status);
+      if (s === 'delayed') {
+        if (v.status !== 'Delayed' && !(Number(v.days_delayed) > 0)) return false;
+      } else if (normalKey(v.status) !== s) {
+        return false;
+      }
+    }
+    if (query.delayed === 'true' || query.delayed === '1' || query.overdue === 'true') {
+      if (v.status !== 'Delayed' && !(Number(v.days_delayed) > 0)) return false;
+    }
+
+    // Filter by Current Bottleneck Stage
+    if (query.current_stage || query.stage) {
+      const reqStage = normalKey(query.current_stage || query.stage);
+      const vStage = normalKey(v.current_stage);
+      if (reqStage !== 'all' && reqStage !== 'any') {
+        if (vStage !== reqStage && !vStage.includes(reqStage) && !reqStage.includes(vStage)) {
+          return false;
+        }
+      }
+    }
+
+    // Filter by stageField completion (e.g. stageField=gt_status)
+    if (query.stageField && !isComplete(v[query.stageField])) {
+      return false;
+    }
+
+    // Filter by individual stage statuses
+    for (const key of STAGE_KEYS) {
+      if (query[key]) {
+        const expected = normalKey(query[key]);
+        if (expected === 'all' || expected === 'any') continue;
+        if (expected === 'completed') {
+          if (!isComplete(v[key])) return false;
+        } else if (expected === 'pending') {
+          if (isComplete(v[key]) || !clean(v[key])) return false;
+        } else if (expected === 'in progress') {
+          if (normalStatus(v[key]) !== 'In Progress') return false;
+        } else if (expected === 'not updated') {
+          if (clean(v[key])) return false;
+        } else if (normalKey(v[key]) !== expected) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   });
 }
 async function handleApi(req, res, url) {
@@ -661,7 +795,32 @@ async function handleApi(req, res, url) {
       if (ib !== -1) return 1;
       return a.localeCompare(b);
     });
-    return json(res, 200, { villages, filters: { phases: uniquePhases, divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))], mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort() } });
+    const stageDefinitions = [
+      { key: 'gt_status', label: 'Ground Truthing (GT)', short: 'GT', stageNumber: 1 },
+      { key: 'vectorization_status', label: 'Vectorization (Digital Maps)', short: 'Vectorization', stageNumber: 2 },
+      { key: 'vs_status', label: 'Village Secretariat (VS)', short: 'VS Login', stageNumber: 3 },
+      { key: 'vro_status', label: 'VRO Verification', short: 'VRO Login', stageNumber: 4 },
+      { key: 'tahsildar_status', label: 'Tahsildar Approval', short: 'Tahsildar Login', stageNumber: 5 },
+      { key: 'rdo_status', label: 'RDO Review', short: 'RDO Login', stageNumber: 6 },
+      { key: 'jc_status', label: 'Joint Collector Sanction', short: 'JC Login', stageNumber: 7 },
+      { key: 'section13_status', label: 'Section 13 Notice', short: 'Section 13', stageNumber: 8 },
+      { key: 'draft_ror_status', label: 'Draft RoR 1(B)', short: 'Draft RoR', stageNumber: 9 },
+      { key: 'final_ror_status', label: 'Final RoR Finalized', short: 'Final RoR', stageNumber: 10 },
+      { key: 'ppb_status', label: 'Passbooks Issued', short: 'PPB Issued', stageNumber: 11 }
+    ];
+    const stageNames = ['GT', 'Vectorization', 'VS Login', 'VRO Login', 'Tahsildar Login', 'RDO Login', 'JC Login', 'Section 13', 'Draft RoR', 'Final RoR', 'Completed'];
+    return json(res, 200, {
+      villages,
+      totalCount: villages.length,
+      filters: {
+        phases: uniquePhases,
+        divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))].sort(),
+        mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort(),
+        stages: stageNames,
+        stageDefinitions,
+        statuses: ['Completed', 'In Progress', 'Pending', 'Delayed', 'Not Started', 'Not Updated']
+      }
+    });
   }
   const villageMatch = pathname.match(/^\/api\/villages\/([^/]+)$/);
   if (req.method === 'GET' && villageMatch) { const v = store.villages.find(x => x.id === villageMatch[1]); return v ? json(res, 200, recordView(v, store)) : json(res, 404, { error: 'Village not found.' }); }
