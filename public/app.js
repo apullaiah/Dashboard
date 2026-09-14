@@ -59,7 +59,7 @@ function setTopbar(data) {
   else { label.textContent = 'Awaiting first sync'; dot.className = 'status-dot neutral'; }
   document.title = has ? 'Chittoor District | Live Monitoring' : 'Chittoor District | AP Resurvey Monitoring';
 }
-function updateNav() { document.querySelectorAll('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.view)); const names = { dashboard: ['MONITORING CENTRE', 'District overview'], villages: ['MONITORING', 'Village monitoring'], performance: ['ANALYTICS', 'Performance monitoring'], quality: ['DATA ASSURANCE', 'Data quality'], reports: ['REPORTING', 'Reports'], sources: ['ADMINISTRATION', 'Data sources'], audit: ['GOVERNANCE', 'Audit history'] }; $('#breadcrumb').textContent = names[state.view][0]; $('#page-title').textContent = names[state.view][1]; }
+function updateNav() { document.querySelectorAll('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.view)); const names = { dashboard: ['MONITORING CENTRE', 'District overview'], villages: ['MONITORING', 'Village monitoring'], performance: ['ANALYTICS', 'Multi-Page Analytics Hub'], quality: ['DATA ASSURANCE', 'Data quality'], reports: ['REPORTING', 'Reports'], sources: ['ADMINISTRATION', 'Data sources'], audit: ['GOVERNANCE', 'Audit history'] }; $('#breadcrumb').textContent = names[state.view][0]; $('#page-title').textContent = names[state.view][1]; }
 async function reloadDashboard() { state.dashboard = await api('/api/dashboard'); setTopbar(state.dashboard); }
 function renderAuthGate(errorMsg = '') {
   document.body.classList.add('auth-locked');
@@ -432,13 +432,6 @@ function renderPerformance() {
   const has = d && d.hasData;
 
   root.innerHTML = `
-    <div class="content-heading">
-      <div>
-        <h3>Multi-Page District Analytics Hub</h3>
-        <p>Comprehensive, citizen-convenient analysis of Chittoor District resurvey across Phases, Divisions, and Workflow Stages.</p>
-      </div>
-    </div>
-
     <div class="analysis-tabs-nav">
       <button class="analysis-tab-btn ${state.analysisTab === 'phases' ? 'active' : ''}" data-analysis-tab="phases">
         ${icon('map')} Phase-Wise Progress
