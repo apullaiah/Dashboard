@@ -165,24 +165,34 @@ function renderDashboard() {
       </div>
       <div class="khata-metrics-grid">
         <div class="khata-metric-box">
-          <span class="khata-metric-label">Total Khatas Tracked</span>
-          <b class="khata-metric-val">${Number(d.kpis.totalKhatas || 0).toLocaleString()}</b>
-          <small>Across surveyed villages</small>
-        </div>
-        <div class="khata-metric-box">
           <span class="khata-metric-label">Patta Land Khatas</span>
           <b class="khata-metric-val">${Number(d.kpis.pattaKhatas || 0).toLocaleString()}</b>
-          <small>Private holdings verified</small>
+          <small>Private holdings reported</small>
         </div>
         <div class="khata-metric-box">
-          <span class="khata-metric-label">Government Land Khatas</span>
+          <span class="khata-metric-label">Government Khatas</span>
           <b class="khata-metric-val">${Number(d.kpis.govtKhatas || 0).toLocaleString()}</b>
           <small>Poramboke / Govt lands</small>
         </div>
         <div class="khata-metric-box">
-          <span class="khata-metric-label">Total Resurvey Extent</span>
-          <b class="khata-metric-val">${Number(d.kpis.totalExtent || 0).toLocaleString()} Ac</b>
-          <small>Acreage under programme</small>
+          <span class="khata-metric-label">Both Patta & Dkt</span>
+          <b class="khata-metric-val">${Number(d.kpis.bothKhatas || 0).toLocaleString()}</b>
+          <small>Joint / Notional Khatas</small>
+        </div>
+        <div class="khata-metric-box">
+          <span class="khata-metric-label">Proposed Deletions</span>
+          <b class="khata-metric-val">${Number(d.kpis.deletions || 0).toLocaleString()}</b>
+          <small>Flagged for removal</small>
+        </div>
+        <div class="khata-metric-box">
+          <span class="khata-metric-label">Reconciled Khatas</span>
+          <b class="khata-metric-val">${Number(d.kpis.totalKhatas || 0).toLocaleString()}</b>
+          <small>Total Proforma Khatas</small>
+        </div>
+        <div class="khata-metric-box">
+          <span class="khata-metric-label">Khatas as per Online</span>
+          <b class="khata-metric-val">${Number(d.kpis.onlineKhatas || 0).toLocaleString()}</b>
+          <small>Webland portal records</small>
         </div>
       </div>
     </section>
@@ -290,7 +300,7 @@ async function syncAll() { const b = $('#refresh-button'); b.classList.add('load
 async function sourceAction(id, kind) { try { if (kind === 'edit') return sourceModal(state.sources.find(s => s.id === id)); const endpoint = kind === 'test' ? 'test' : 'sync'; const result = await api(`/api/sources/${id}/${endpoint}`, { method: 'POST' }); await reloadDashboard(); await loadSources(); renderSources(); toast(result.result.status === 'Success' ? 'Source synchronized successfully.' : 'The source could not be connected. Details are in sync history.', result.result.status === 'Success' ? '' : 'error'); } catch (e) { toast(e.message, 'error'); } }
 async function saveVillage(id) { const updates = {}; document.querySelectorAll('[data-stage-update]').forEach(el => updates[el.dataset.stageUpdate] = el.value); try { await api(`/api/villages/${id}`, { method: 'PATCH', body: JSON.stringify({ updates }) }); closeModal(); await reloadDashboard(); if (state.view === 'villages') await loadVillages(); render(); toast('Village update recorded. Write-back is queued for the authorized source.'); } catch (e) { toast(e.message, 'error'); } }
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
-function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
+function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'extent', 'patta_khatas', 'govt_khatas', 'both_khatas', 'deletions', 'total_khatas', 'online_khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
   const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict]');
   if (!el) return;

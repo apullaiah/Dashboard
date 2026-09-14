@@ -225,6 +225,9 @@ function dashboard(store) {
   const totalKhatas = villages.reduce((sum, v) => sum + (Number(v.total_khatas) || Number(v.khatas) || 0), 0);
   const pattaKhatas = villages.reduce((sum, v) => sum + (Number(v.patta_khatas) || 0), 0);
   const govtKhatas = villages.reduce((sum, v) => sum + (Number(v.govt_khatas) || 0), 0);
+  const bothKhatas = villages.reduce((sum, v) => sum + (Number(v.both_khatas) || 0), 0);
+  const deletions = villages.reduce((sum, v) => sum + (Number(v.deletions) || 0), 0);
+  const onlineKhatas = villages.reduce((sum, v) => sum + (Number(v.online_khatas) || 0), 0);
   const totalExtent = Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.extent) || 0), 0) * 100) / 100;
 
   return {
@@ -248,8 +251,8 @@ function dashboard(store) {
       section13Completed: villages.filter(v => isComplete(v.section13_status)).length,
       draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
       finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
-      // Khata & Extent Statistics
-      totalKhatas, pattaKhatas, govtKhatas, totalExtent,
+      // Khata & Extent Statistics (Joint Collector Directive)
+      totalKhatas, pattaKhatas, govtKhatas, bothKhatas, deletions, onlineKhatas, totalExtent,
       inProgress: villages.filter(v => v.status === 'In Progress').length,
       notUpdated: villages.filter(v => v.status === 'Not Updated').length
     },
