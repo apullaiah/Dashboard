@@ -707,20 +707,45 @@ async function runScheduledSync() {
   finally { schedulerRunning = false; }
 }
 
-if (require.main === module) {
-  http.createServer(async (req, res) => {
-    const url = new URL(req.url, `http://${req.headers.host}`);
-    try {
-      if (url.pathname.startsWith('/api/')) await handleApi(req, res, url);
-      else serveStatic(req, res, url);
-    } catch (error) {
-      console.error(error);
-      json(res, 500, { error: error.message || 'Unexpected server error.' });
+async function requestHandler(req, res) {
+  const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost';
+  const proto = req.headers['x-forwarded-proto'] || 'https';
+  const url = new URL(req.url, `${proto}://${host}`);
+
+  const route = url.searchParams.get('route');
+  if (route) {
+    url.pathname = '/api/' + route.replace(/^\/+/, '');
+  }
+
+  try {
+    if (url.pathname.startsWith('/api/') || url.pathname === '/api') {
+      await handleApi(req, res, url);
+    } else {
+      await serveStatic(req, res, url);
     }
-  }).listen(PORT, () => {
+  } catch (error) {
+    console.error('Request Handler Error:', error);
+    if (!res.headersSent) {
+      json(res, 500, { error: error.message || 'Server error' });
+    }
+  }
+}
+
+if (require.main === module && !process.env.VERCEL) {
+  http.createServer(requestHandler).listen(PORT, () => {
     console.log(`Chittoor Monitoring running at http://localhost:${PORT}`);
     setInterval(runScheduledSync, 60 * 1000).unref();
   });
 }
 
-module.exports = { handleApi, serveStatic, load, save, dashboard, STAGES, DEFAULT_MAPPINGS, MANDAL_ALIASES };
+module.exports = requestHandler;
+module.exports.requestHandler = requestHandler;
+module.exports.handleApi = handleApi;
+module.exports.serveStatic = serveStatic;
+module.exports.load = load;
+module.exports.save = save;
+module.exports.dashboard = dashboard;
+module.exports.STAGES = STAGES;
+module.exports.DEFAULT_MAPPINGS = DEFAULT_MAPPINGS;
+module.exports.MANDAL_ALIASES = MANDAL_ALIASES;
+
