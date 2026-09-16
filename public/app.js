@@ -30,6 +30,32 @@ const formatPct = value => value !== null && value !== undefined && !Number.isNa
 const formatDate = value => { if (!value) return 'Not synchronized'; const d = new Date(value); return Number.isNaN(+d) ? h(value) : new Intl.DateTimeFormat('en-IN', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Kolkata' }).format(d); };
 const statusClass = value => String(value || 'not-updated').toLowerCase().replace(/\s+/g, '-');
 const stageStatus = value => value || 'Not Updated';
+
+function normalizePhase(val) {
+  if (!val) return '';
+  const str = String(val).trim();
+  const m = str.match(/^(?:Phase[\s\-_]*)?(1|2|3|4|5|6|7|I|II|III|IV|V|VI|VII)$/i);
+  if (m) {
+    const p = m[1].toUpperCase();
+    if (p === '1' || p === 'I') return 'Phase I';
+    if (p === '2' || p === 'II') return 'Phase II';
+    if (p === '3' || p === 'III') return 'Phase III';
+    if (p === '4' || p === 'IV') return 'Phase IV';
+    if (p === '5' || p === 'V') return 'Phase V';
+    if (p === '6' || p === 'VI') return 'Phase VI';
+    if (p === '7' || p === 'VII') return 'Phase VII';
+  }
+  const m2 = str.match(/^P[-_ ]?([1-7])$/i);
+  if (m2) {
+    const map = { '1': 'Phase I', '2': 'Phase II', '3': 'Phase III', '4': 'Phase IV', '5': 'Phase V', '6': 'Phase VI', '7': 'Phase VII' };
+    return map[m2[1]];
+  }
+  if (/^yet\s*to\s*be\s*scheduled$/i.test(str) || /^unscheduled$/i.test(str)) {
+    return 'Yet to be Scheduled';
+  }
+  return str;
+}
+
 const api = async (endpoint, options = {}) => {
   const token = sessionStorage.getItem('ctr_officer_token');
   let response;
@@ -1479,7 +1505,7 @@ function renderVillageMonitoring() {
     const [k, v] = pId.split(':');
     if (k === 'ported') return active.ported === 'true';
     if (k === 'cycle') return active.ppb_cycle === v;
-    if (k === 'phase') return active.phase === v || normalizePhase(active.phase) === normalizePhase(v);
+    if (k === 'phase') return active.phase === v || (Boolean(active.phase) && normalizePhase(active.phase) === normalizePhase(v));
     if (k === 'delayed') return active.delayed === 'true' || active.status === 'Delayed';
     if (k === 'stage') return active.stage === v || active.current_stage === v;
     return false;
