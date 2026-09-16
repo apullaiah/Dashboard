@@ -67,7 +67,26 @@ function setTopbar(data) {
   else { label.textContent = 'Awaiting first sync'; dot.className = 'status-dot neutral'; }
   document.title = has ? 'Chittoor District | Live Monitoring' : 'Chittoor District | AP Resurvey Monitoring';
 }
-function updateNav() { document.querySelectorAll('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.view)); const names = { dashboard: ['MONITORING CENTRE', 'District overview'], villages: ['MONITORING', 'Village monitoring'], performance: ['ANALYTICS', 'Multi-Page Analytics Hub'], quality: ['DATA ASSURANCE', 'Data quality'], reports: ['REPORTING', 'Reports'], sources: ['ADMINISTRATION', 'Data sources'], audit: ['GOVERNANCE', 'Audit history'] }; $('#breadcrumb').textContent = names[state.view][0]; $('#page-title').textContent = names[state.view][1]; }
+function updateNav() {
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.view));
+  const names = {
+    dashboard: ['MONITORING CENTRE', 'DISTRICT SURVEY AND LAND RECORDS OFFICE, CHITTOOR DISTRICT'],
+    villages: ['MONITORING', 'Village monitoring'],
+    performance: ['ANALYTICS', 'Multi-Page Analytics Hub'],
+    quality: ['DATA ASSURANCE', 'Data quality'],
+    reports: ['REPORTING', 'Reports'],
+    sources: ['ADMINISTRATION', 'Data sources'],
+    audit: ['GOVERNANCE', 'Audit history']
+  };
+  $('#breadcrumb').textContent = names[state.view][0];
+  const titleEl = $('#page-title');
+  titleEl.textContent = names[state.view][1];
+  if (state.view === 'dashboard') {
+    titleEl.classList.add('page-title-red-bold');
+  } else {
+    titleEl.classList.remove('page-title-red-bold');
+  }
+}
 async function reloadDashboard() { state.dashboard = await api('/api/dashboard'); setTopbar(state.dashboard); }
 function renderAuthGate(errorMsg = '') {
   document.body.classList.add('auth-locked');
@@ -646,7 +665,7 @@ function renderDashboard() {
   const d = state.dashboard; const has = d.hasData; const sourceReady = d.sourceSummary.configured > 0;
   const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || (has ? 774 : 0);
   root.innerHTML = `
-    <div class="dashboard-intro"><div><h3>District monitoring at a glance</h3><p>Village-wise status of the AP Resurvey workflow, PPBs and related activities across all 774 villages.</p></div><span class="timezone">IST · ${d.generatedAt ? formatDate(d.generatedAt) : 'Not available'}</span></div>
+    <div class="dashboard-intro"><div><h3 class="dashboard-intro-title-blue">CHITTOOR DISTRICT RESURVEY PROGRESS AT GLANCE</h3><p>Village-wise status of the AP Resurvey workflow, PPBs and related activities across all 774 villages.</p></div><span class="timezone">IST · ${d.generatedAt ? formatDate(d.generatedAt) : 'Not available'}</span></div>
     ${!sourceReady ? `<section class="setup-banner">${icon('link')}<div><strong>Connect the district data sources to begin monitoring.</strong><p>No operational values are shown until data sources are synchronized.</p></div><button data-action="open-source-modal">Connect source</button></section>` : !d.hasMasterData ? `<section class="setup-banner">${icon('warning')}<div><strong>Partial source coverage: ${progressCount} real village-progress records are synchronized.</strong><p>The complete Village Master source is not connected.</p></div><button data-view-link="sources">Add Village Master</button></section>` : ''}
     <section class="kpi-grid" aria-label="Primary monitoring indicators">
       ${kpiCard('Total villages', d.kpis.totalVillages || d.kpis.total, 'Master universe (27 Mandals)', 'primary', 'all', has)}

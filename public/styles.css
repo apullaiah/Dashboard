@@ -1509,10 +1509,20 @@ body.auth-locked .primary-nav, body.auth-locked .top-actions { display: none; }
   }
 }
 
+/* ==========================================================================
+   Custom Header Typography for Overview Section
+   ========================================================================== */
+.page-title-red-bold {
+  color: #dc2626 !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.3px !important;
+  text-transform: uppercase !important;
+}
 
-
-
-
-
-
-
+.dashboard-intro-title-blue {
+  color: #1d4ed8 !important;
+  font-weight: 800 !important;
+  font-size: 22px !important;
+  letter-spacing: -0.4px !important;
+  text-transform: uppercase !important;
+}
