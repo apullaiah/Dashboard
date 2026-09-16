@@ -699,7 +699,13 @@ function getFilteredHomeVillages() {
       if ((v.division || '').toLowerCase() !== f.division.toLowerCase()) return false;
     }
     if (f.mandal && f.mandal !== 'All mandals') {
-      if ((v.mandal || '').toLowerCase() !== f.mandal.toLowerCase()) return false;
+      const vMan = (v.mandal || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      const qMan = f.mandal.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const isMandalMatch = vMan === qMan ||
+        vMan.includes(qMan) || qMan.includes(vMan) ||
+        (qMan.includes('srpuram') && (vMan.includes('srirangarajapuram') || vMan.includes('srpuram'))) ||
+        (qMan.includes('gangadhara') && (vMan.includes('gdnellore') || vMan.includes('gangadhara')));
+      if (!isMandalMatch) return false;
     }
     if (f.month && f.month !== 'All months') {
       const cyc = (v.ppb_cycle || v.target_month || '').toLowerCase();
@@ -709,14 +715,22 @@ function getFilteredHomeVillages() {
       const curStage = (v.current_stage || '').toLowerCase();
       const stQuery = f.stage.toLowerCase();
       if (stQuery === 'completed') {
-        if (v.status !== 'Completed' && !v.ported_to_webland) return false;
+        if (v.status !== 'Completed' && !v.ported_to_webland && !curStage.includes('completed')) return false;
+      } else if (stQuery.includes('correlation') || stQuery.includes('area analysis')) {
+        if (!curStage.includes('vector') && !curStage.includes('corr') && !curStage.includes('area')) return false;
       } else if (stQuery === 'gt') {
         if (!curStage.includes('gt')) return false;
+      } else if (stQuery.includes('not yet started')) {
+        if (!curStage.includes('not started') && !curStage.includes('not yet') && v.gt_status !== 'Not Started') return false;
+      } else if (stQuery.includes('september')) {
+        if (!curStage.includes('sep') && !curStage.includes('ppb') && v.ppb_cycle !== 'Sep-26') return false;
+      } else if (stQuery.includes('draft ppb')) {
+        if (!curStage.includes('draft') && !curStage.includes('ekyc')) return false;
       } else if (stQuery === 'vectorization') {
         if (!curStage.includes('vectorization')) return false;
-      } else if (stQuery.includes('vs login')) {
+      } else if (stQuery.includes('vs login') || stQuery === 'vs login') {
         if (!curStage.includes('vs')) return false;
-      } else if (stQuery.includes('vro login')) {
+      } else if (stQuery.includes('vro login') || stQuery === 'vro login') {
         if (!curStage.includes('vro')) return false;
       } else if (stQuery.includes('tah login')) {
         if (!curStage.includes('tahsildar') && !curStage.includes('tah')) return false;
@@ -766,9 +780,39 @@ function renderGovHeader(d) {
   return `
     <section class="gov-dashboard-header">
       <div class="gov-header-brand">
-        <div class="gov-emblem-circle" title="Government of Andhra Pradesh">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M3 21h18M4 18h16M5 18V9l7-5 7 5v9M9 18v-5h6v5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        <div class="gov-emblem-circle" title="Chittoor District Resurvey Portal">
+          <svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Chittoor District Map">
+            <defs>
+              <radialGradient id="govCircleGrad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#0e2a58" />
+                <stop offset="100%" stop-color="#040e20" />
+              </radialGradient>
+              <linearGradient id="distMapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fde047" />
+                <stop offset="50%" stop-color="#eab308" />
+                <stop offset="100%" stop-color="#ca8a04" />
+              </linearGradient>
+              <filter id="mapShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.6"/>
+              </filter>
+            </defs>
+            <!-- Background circle & gold border rings -->
+            <circle cx="50" cy="50" r="48" fill="url(#govCircleGrad)" stroke="#f59e0b" stroke-width="2.5" />
+            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(253, 224, 71, 0.45)" stroke-width="0.8" stroke-dasharray="2 1" />
+
+            <!-- Chittoor District Map Silhouette -->
+            <path d="M48 17 L58 19 L68 22 L77 27 L85 33 L88 42 L84 50 L77 55 L68 58 L59 63 L51 68 L43 72 L34 76 L25 84 L18 88 L13 82 L16 74 L22 66 L28 56 L32 46 L36 36 L42 26 Z"
+                  fill="url(#distMapGrad)" stroke="#78350f" stroke-width="0.9" filter="url(#mapShadow)" />
+
+            <!-- Revenue Division Boundary Contours -->
+            <path d="M51 68 L48 48 L68 58 M48 48 L42 26 M32 46 L48 48 M34 76 L28 56" fill="none" stroke="#78350f" stroke-width="0.6" stroke-dasharray="1 1" opacity="0.65" />
+
+            <!-- District Headquarters Locator Marker (Chittoor town) -->
+            <circle cx="55" cy="54" r="2.8" fill="#dc2626" stroke="#ffffff" stroke-width="0.9" />
+            <circle cx="55" cy="54" r="1" fill="#ffffff" />
+
+            <!-- Text Label -->
+            <text x="50" y="94" text-anchor="middle" fill="#fde047" font-size="6.5" font-weight="800" letter-spacing="1" font-family="system-ui, -apple-system, sans-serif">CHITTOOR</text>
           </svg>
         </div>
         <div class="gov-header-text">
@@ -804,8 +848,9 @@ function renderFilterChipPanel(d) {
   const mandalsList = [
     'Baireddipalle', 'Bangarupalem', 'Chittoor', 'Chowdepalle', 'Gangadhara Nellore', 'Gangavaram',
     'Gudipala', 'Gudipalle', 'Irala', 'Karvetinagar', 'Kuppam', 'Nagari', 'Nindra', 'Palamaner',
-    'Peddapanjani', 'Penumuru', 'Pulicherla', 'Punganur', 'Ramakuppam', 'Rompicherla', 'Santhipuram',
-    'Somala', 'SR Puram', 'Thavanampalle', 'Vedurukuppam', 'Venkatagirikota', 'Vijayapuram', 'Yadamari'
+    'Palasamudram', 'Peddapanjani', 'Penumuru', 'Pulicherla', 'Punganur', 'Puthalapattu',
+    'Ramakuppam', 'Rompicherla', 'Santhipuram', 'SR Puram', 'Thavanampalle', 'Vedurukuppam',
+    'Venkatagirikota', 'Vijayapuram', 'Yadamari'
   ];
   const monthsList = ['Aug-26', 'Sep-26', 'Oct-26', 'Nov-26', 'Dec-26', 'Jan-27', 'Feb-27', 'Mar-27'];
   const stagesList = [
@@ -1083,6 +1128,174 @@ function updateHomeFilterUI() {
   const behindSub = document.getElementById('ref-kpi-behind-sub');
   if (behindVal) behindVal.textContent = `${delayedPct}%`;
   if (behindSub) behindSub.textContent = `${delayed} villages behind by 2+ stages`;
+
+  // Update Village Details table in Overview
+  const villagesTbody = document.getElementById('home-villages-tbody');
+  if (villagesTbody) {
+    villagesTbody.innerHTML = renderHomeVillageRows(filtered);
+  }
+  const f = state.homeFilters || {};
+  const activeLabels = [];
+  if (f.mandal && f.mandal !== 'All mandals') activeLabels.push(`Mandal: ${f.mandal}`);
+  if (f.month && f.month !== 'All months') activeLabels.push(`Month: ${f.month}`);
+  if (f.stage && f.stage !== 'All stages') activeLabels.push(`Stage: ${f.stage}`);
+  if (f.division && f.division !== 'All') activeLabels.push(`Division: ${f.division}`);
+  if (f.zone && f.zone !== 'All') activeLabels.push(`Zone: ${f.zone}`);
+  if (f.search && f.search.trim()) activeLabels.push(`Search: "${f.search.trim()}"`);
+
+  const villagesTitle = document.getElementById('home-villages-title');
+  if (villagesTitle) {
+    villagesTitle.textContent = activeLabels.length > 0
+      ? `Village Details · ${activeLabels.join(' | ')}`
+      : 'All Chittoor District Villages';
+  }
+  const villagesSub = document.getElementById('home-villages-subtitle');
+  if (villagesSub) {
+    const summaryText = activeLabels.length > 0 ? activeLabels.join(' · ') : 'All 736 Villages in Chittoor District Universe';
+    villagesSub.innerHTML = `Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village or "Track Details →" to inspect full 11-stage progress.`;
+  }
+  const exportBtn = document.getElementById('home-villages-export-btn');
+  if (exportBtn) {
+    exportBtn.innerHTML = `${icon('download')} Export CSV (${filtered.length})`;
+  }
+  const resetBtnWrap = document.getElementById('home-reset-btn-wrap');
+  if (resetBtnWrap) {
+    resetBtnWrap.innerHTML = activeLabels.length > 0
+      ? `<button type="button" class="home-reset-filter-btn" data-action="reset-home-filters">Reset Filters ✕</button>`
+      : '';
+  }
+}
+
+function renderHomeFilteredVillagesSection() {
+  const filtered = getFilteredHomeVillages();
+  const f = state.homeFilters || {};
+  const activeLabels = [];
+  if (f.mandal && f.mandal !== 'All mandals') activeLabels.push(`Mandal: ${f.mandal}`);
+  if (f.month && f.month !== 'All months') activeLabels.push(`Month: ${f.month}`);
+  if (f.stage && f.stage !== 'All stages') activeLabels.push(`Stage: ${f.stage}`);
+  if (f.division && f.division !== 'All') activeLabels.push(`Division: ${f.division}`);
+  if (f.zone && f.zone !== 'All') activeLabels.push(`Zone: ${f.zone}`);
+  if (f.search && f.search.trim()) activeLabels.push(`Search: "${f.search.trim()}"`);
+
+  const summaryText = activeLabels.length > 0
+    ? activeLabels.join(' · ')
+    : 'All 736 Villages in Chittoor District Universe';
+
+  return `
+    <section class="section-card home-villages-card" id="home-filtered-villages-section">
+      <div class="home-villages-header">
+        <div class="home-villages-title-wrap">
+          <div class="home-villages-badge-row">
+            <span class="home-villages-kicker">VILLAGE-WISE OPERATIONAL DETAILS</span>
+            <span id="home-reset-btn-wrap">
+              ${activeLabels.length > 0 ? `<button type="button" class="home-reset-filter-btn" data-action="reset-home-filters">Reset Filters ✕</button>` : ''}
+            </span>
+          </div>
+          <h3 class="home-villages-title" id="home-villages-title">
+            ${activeLabels.length > 0 ? `Village Details · ${h(activeLabels.join(' | '))}` : 'All Chittoor District Villages'}
+          </h3>
+          <p class="home-villages-subtitle" id="home-villages-subtitle">
+            Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village or "Track Details →" to inspect full 11-stage progress.
+          </p>
+        </div>
+        <div class="home-villages-actions">
+          <button type="button" class="outline-button" id="home-villages-export-btn" data-action="export-filtered-home-csv" title="Export currently filtered villages as CSV">
+            ${icon('download')} Export CSV (${filtered.length})
+          </button>
+          <button type="button" class="primary-button" data-action="view-filtered-villages-full" title="Open in Full Village Monitoring Centre">
+            Open Full Monitoring Centre →
+          </button>
+        </div>
+      </div>
+
+      <div class="home-table-wrap">
+        <table class="data-table home-village-table">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>CODE</th>
+              <th>VILLAGE NAME</th>
+              <th>MANDAL</th>
+              <th>DIVISION</th>
+              <th>TARGET MONTH</th>
+              <th>PHASE</th>
+              <th class="mono">EXTENT (AC)</th>
+              <th class="mono">TARGET PPBS</th>
+              <th>CURRENT RESURVEY STAGE</th>
+              <th>OVERALL STATUS</th>
+              <th style="text-align:center;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody id="home-villages-tbody">
+            ${renderHomeVillageRows(filtered)}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function renderHomeVillageRows(filtered) {
+  if (!filtered || !filtered.length) {
+    return `
+      <tr>
+        <td colspan="12" style="text-align:center;padding:36px 16px;color:var(--muted);">
+          <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;">No villages match the active selection</div>
+          <p style="font-size:12px;margin:0;">Try selecting a different Mandal, Target Month, or Present Stage from the filter panel above.</p>
+        </td>
+      </tr>
+    `;
+  }
+
+  const displayRows = filtered.slice(0, 150);
+  const rowsHtml = displayRows.map((v, idx) => {
+    const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+    const isCurrentCycle = (v.ppb_cycle === 'Sep-26' || v.target_month === 'Sep-26');
+    const isPriorCompleted = (v.ppb_cycle && v.ppb_cycle.includes('Prior'));
+
+    return `
+      <tr class="clickable" data-village="${v.id}">
+        <td style="color:var(--muted);font-weight:600;font-size:11px;">${idx + 1}</td>
+        <td class="mono" style="font-weight:700;color:var(--navy);">${h(v.village_code || '—')}</td>
+        <td class="village-name" style="font-weight:800;color:var(--navy);">
+          ${h(v.village_name || 'Village name unavailable')}
+          ${isPorted ? `<span class="webland-ported-badge" title="Ported to Webland 2.0 - All 11 Resurvey Activities Completed">${icon('shield')} WEBLAND 2.0</span>` : ''}
+        </td>
+        <td><strong>${h(v.mandal || '—')}</strong></td>
+        <td>${h(v.division || '—')}</td>
+        <td>
+          <span class="ppb-cycle-pill ${isCurrentCycle ? 'active-cycle' : isPriorCompleted ? 'completed-cycle' : ''}">
+            ${h(v.ppb_cycle || v.target_month || '—')}
+          </span>
+        </td>
+        <td><span class="phase-card-badge" style="font-size:9.5px;padding:2px 8px;">${h(v.phase || '—')}</span></td>
+        <td class="mono">${v.extent ? `${Number(v.extent).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2})}` : '—'}</td>
+        <td class="mono"><b style="color:var(--navy);">${v.ppb_target ? Number(v.ppb_target).toLocaleString() : (v.khatas ? Number(v.khatas).toLocaleString() : '—')}</b></td>
+        <td>
+          <span class="stage-label" style="font-weight:700;color:var(--ink);background:#f1f5f9;padding:3px 8px;border-radius:4px;border:1px solid #e2e8f0;display:inline-block;font-size:11.5px;">
+            ${h(v.current_stage || 'Not Started')}
+          </span>
+        </td>
+        <td><span class="status-pill ${statusClass(isPorted ? 'Completed' : v.status)}">${h(isPorted ? 'Completed' : v.status)}</span></td>
+        <td style="text-align:center;">
+          <button type="button" class="inline-link" data-village="${v.id}" style="font-weight:800;cursor:pointer;">
+            Track Details →
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  if (filtered.length > 150) {
+    return rowsHtml + `
+      <tr>
+        <td colspan="12" style="text-align:center;padding:14px;background:#f8fafc;font-size:12px;font-weight:700;color:var(--navy);">
+          Showing first 150 of ${filtered.length} matching villages. Use the Search bar above to narrow down, or click "Open Full Monitoring Centre" to view all.
+        </td>
+      </tr>
+    `;
+  }
+  return rowsHtml;
 }
 
 function renderDashboard() {
@@ -1098,7 +1311,10 @@ function renderDashboard() {
     <!-- 3. The 6 Color-Coded Executive KPI Cards (Reference Design) -->
     ${has ? renderReferenceKpiCards(d) : ''}
 
-    <!-- 4. Floating Local Time Widget (Reference Design) -->
+    <!-- 4. Village Details on Clicking Mandal, Target Month, or Present Stage -->
+    ${has ? renderHomeFilteredVillagesSection() : ''}
+
+    <!-- 5. Floating Local Time Widget (Reference Design) -->
     ${renderFloatingTimeWidget()}
 
     ${!sourceReady ? `<section class="setup-banner">${icon('link')}<div><strong>Connect the district data sources to begin monitoring.</strong><p>No operational values are shown until data sources are synchronized.</p></div><button data-action="open-source-modal">Connect source</button></section>` : !d.hasMasterData ? `<section class="setup-banner">${icon('warning')}<div><strong>Partial source coverage: ${progressCount} real village-progress records are synchronized.</strong><p>The complete Village Master source is not connected.</p></div><button data-view-link="sources">Add Village Master</button></section>` : ''}
@@ -2501,7 +2717,45 @@ document.addEventListener('click', async event => {
       el.classList.add('active');
     }
     updateHomeFilterUI();
+    if (group === 'mandal' || group === 'month' || group === 'stage') {
+      const sec = document.getElementById('home-filtered-villages-section');
+      if (sec) {
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
     return;
+  }
+  if (el.dataset.action === 'reset-home-filters') {
+    state.homeFilters = { division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' };
+    document.querySelectorAll('.ref-filter-pill').forEach(p => {
+      const val = p.dataset.filterVal;
+      p.classList.toggle('active', val === 'All' || val === 'All mandals' || val === 'All months' || val === 'All stages');
+    });
+    const searchInp = document.getElementById('ref-home-search');
+    if (searchInp) searchInp.value = '';
+    updateHomeFilterUI();
+    return;
+  }
+  if (el.dataset.action === 'export-filtered-home-csv') {
+    const rows = getFilteredHomeVillages();
+    if (!rows.length) { toast('No village records to export.', 'error'); return; }
+    const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'current_stage', 'status'];
+    const out = [columns.join(','), ...rows.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n');
+    const blob = new Blob([out], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `chittoor-filtered-villages-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    return;
+  }
+  if (el.dataset.action === 'view-filtered-villages-full') {
+    const vf = {};
+    if (state.homeFilters.mandal && state.homeFilters.mandal !== 'All mandals') vf.mandal = state.homeFilters.mandal;
+    if (state.homeFilters.month && state.homeFilters.month !== 'All months') vf.ppb_cycle = state.homeFilters.month;
+    if (state.homeFilters.division && state.homeFilters.division !== 'All') vf.division = state.homeFilters.division;
+    if (state.homeFilters.search) vf.search = state.homeFilters.search;
+    return navigate('villages', { filters: vf });
   }
   if (el.dataset.kpiDrill) {
     const drill = el.dataset.kpiDrill;
