@@ -16,17 +16,25 @@ const PUBLIC = path.join(ROOT, 'public');
 const DATA_DIR = path.join(ROOT, 'data');
 const STORE_FILE = path.join(DATA_DIR, 'store.json');
 const STAGES = [
-  ['gt_status', 'GT'], ['vectorization_status', 'Vectorization'], ['vs_status', 'VS Login'],
-  ['vro_status', 'VRO Login'], ['tahsildar_status', 'Tahsildar Login'], ['rdo_status', 'RDO Login'],
-  ['jc_status', 'JC Login'], ['section13_status', 'Section 13'], ['draft_ror_status', 'Draft RoR'],
-  ['final_ror_status', 'Final RoR']
+  ['gt_status', 'GT'],
+  ['vectorization_status', 'Vectorization/Correlation'],
+  ['vs_status', 'DLR@VS Login'],
+  ['vro_status', 'DLR@VRO Login'],
+  ['tahsildar_status', 'DLR@Tahsildar Login'],
+  ['rdo_status', 'DLR@RDO Login'],
+  ['jc_status', 'DLR@JC Login'],
+  ['section13_status', '13 Notification'],
+  ['draft_ror_status', 'Draft RoR'],
+  ['final_ror_status', 'Final RoR'],
+  ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 const DEFAULT_MAPPINGS = {
   village_code: 'Village Code', village_name: 'Village Name', mandal: 'Mandal', division: 'Division',
   phase: 'Phase', extent: 'Extent', target_date: 'Target Date', gt_status: 'GT',
-  vectorization_status: 'Vectorization', vs_status: 'VS', vro_status: 'VRO',
-  tahsildar_status: 'Tahsildar', rdo_status: 'RDO', jc_status: 'JC', section13_status: 'Section 13',
-  draft_ror_status: 'Draft RoR', final_ror_status: 'Final RoR', ppb_status: 'PPB'
+  vectorization_status: 'Vectorization/Correlation', vs_status: 'DLR@VS Login', vro_status: 'DLR@VRO Login',
+  tahsildar_status: 'DLR@Tahsildar Login', rdo_status: 'DLR@RDO Login', jc_status: 'DLR@JC Login',
+  section13_status: '13 Notification', draft_ror_status: 'Draft RoR', final_ror_status: 'Final RoR',
+  webland_2_status: 'Porting DLR to Webland-2.0', ppb_status: 'PPB'
 };
 const MANDAL_ALIASES = {
   gudupalle: 'Gudipalle', gudipalle: 'Gudipalle', palamaneru: 'Palamaner', palamaner: 'Palamaner',
@@ -150,7 +158,7 @@ function frequencyMs(value) { return ({ '5 minutes': 5 * 60e3, '15 minutes': 15 
 function clean(v) { return String(v ?? '').trim(); }
 function normalKey(v) { return clean(v).toLowerCase().replace(/\s+/g, ' '); }
 function normalizeMandal(value, store) { const key = normalKey(value); return (store.customMandalAliases || {})[key] || MANDAL_ALIASES[key] || clean(value); }
-function isComplete(value) { return /^(completed|complete|done|yes|y)$/i.test(clean(value)); }
+function isComplete(value) { return /^(completed|complete|done|yes|y|ported|true|1)$/i.test(clean(value)); }
 function normalStatus(value) {
   const s = normalKey(value);
   if (!s) return 'Not Updated';
@@ -185,8 +193,12 @@ function parseDate(v) {
   const d = new Date(s);
   return Number.isNaN(+d) ? null : d;
 }
-function allComplete(v) { return Boolean(v.ported_to_webland || v.webland_2_status === 'Ported' || isComplete(v.final_ror_status)); }
-function currentStage(v) { const next = STAGES.find(([key]) => !isComplete(v[key])); return next ? next[1] : 'Completed'; }
+function allComplete(v) { return Boolean(v.ported_to_webland || isComplete(v.webland_2_status) || (isComplete(v.final_ror_status) && isComplete(v.draft_ror_status))); }
+function currentStage(v) {
+  if (v.ported_to_webland || isComplete(v.webland_2_status)) return 'Completed';
+  const next = STAGES.find(([key]) => !isComplete(v[key]));
+  return next ? next[1] : 'Completed';
+}
 function villageStatus(v, store) {
   if (allComplete(v)) return 'Completed';
   if (!v.last_synced && !STAGES.some(([key]) => clean(v[key]))) return 'Not Updated';
@@ -208,7 +220,7 @@ function daysDelayed(v) {
 }
 const VS_AND_ABOVE_STAGES = [
   'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status',
-  'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status'
+  'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'webland_2_status'
 ];
 
 function isVsOrAbove(v) {
@@ -238,7 +250,7 @@ function recordView(v, store) {
   const mandal = normalizeMandal(v.mandal, store);
   const division = normalizeDivision(v.division, mandal);
   const phase = normalizePhase(v.phase);
-  const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+  const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported' || phase === 'Before 2024');
 
   if (isPorted) {
     return {
@@ -429,6 +441,7 @@ function dashboard(store) {
       section13Completed: villages.filter(v => isComplete(v.section13_status)).length,
       draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
       finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
+      webland2Completed: villages.filter(v => isComplete(v.webland_2_status) || v.ported_to_webland).length,
       totalKhatas,
       totalExtent,
       inProgress: villages.filter(v => v.status === 'In Progress').length,
@@ -451,7 +464,8 @@ function dashboard(store) {
         'Joint Collector final administrative sanction & clearance',
         'Section 13 statutory public notice inviting landowner claims',
         'Draft Record of Rights (1B) published for public claims & objections',
-        'Final Record of Rights confirmed and Pattadar Passbooks issued'
+        'Final Record of Rights confirmed and Pattadar Passbooks issued',
+        'Porting digital land records to Webland-2.0 portal for official mutation & registry'
       ];
       const tierAccountability = [
         'Survey Field Team (RSDT / MLSO)',
@@ -463,7 +477,8 @@ function dashboard(store) {
         'Joint Collectorate',
         'Revenue Notification Cell',
         'Tahsildar & VRO Field Unit',
-        'Collectorate SSLR Wing'
+        'Collectorate SSLR Wing',
+        'District SSLR & Webland-2.0 Portal Wing'
       ];
       const cleared = villages.filter(v => isComplete(v[key])).length;
       const currentAtStage = villages.filter(v => v.current_stage === label).length;
@@ -1029,7 +1044,7 @@ function requireAuthorized(req, res) { const role = req.headers['x-user-role'] |
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
-  'draft_ror_status', 'final_ror_status', 'ppb_status'
+  'draft_ror_status', 'final_ror_status', 'webland_2_status'
 ];
 
 function filterVillages(items, query) {
@@ -1166,19 +1181,19 @@ async function handleApi(req, res, url) {
       return a.localeCompare(b);
     });
     const stageDefinitions = [
-      { key: 'gt_status', label: 'Ground Truthing (GT)', short: 'GT', stageNumber: 1 },
-      { key: 'vectorization_status', label: 'Vectorization (Digital Maps)', short: 'Vectorization', stageNumber: 2 },
-      { key: 'vs_status', label: 'Village Secretariat (VS)', short: 'VS Login', stageNumber: 3 },
-      { key: 'vro_status', label: 'VRO Verification', short: 'VRO Login', stageNumber: 4 },
-      { key: 'tahsildar_status', label: 'Tahsildar Approval', short: 'Tahsildar Login', stageNumber: 5 },
-      { key: 'rdo_status', label: 'RDO Review', short: 'RDO Login', stageNumber: 6 },
-      { key: 'jc_status', label: 'Joint Collector Sanction', short: 'JC Login', stageNumber: 7 },
-      { key: 'section13_status', label: 'Section 13 Notice', short: 'Section 13', stageNumber: 8 },
-      { key: 'draft_ror_status', label: 'Draft RoR 1(B)', short: 'Draft RoR', stageNumber: 9 },
-      { key: 'final_ror_status', label: 'Final RoR Finalized', short: 'Final RoR', stageNumber: 10 },
-      { key: 'ppb_status', label: 'Passbooks Issued', short: 'PPB Issued', stageNumber: 11 }
+      { key: 'gt_status', label: 'GT (Ground Truthing)', short: 'GT', stageNumber: 1 },
+      { key: 'vectorization_status', label: 'Vectorization/Correlation', short: 'Vectorization/Correlation', stageNumber: 2 },
+      { key: 'vs_status', label: 'DLR@VS Login', short: 'DLR@VS Login', stageNumber: 3 },
+      { key: 'vro_status', label: 'DLR@VRO Login', short: 'DLR@VRO Login', stageNumber: 4 },
+      { key: 'tahsildar_status', label: 'DLR@Tahsildar Login', short: 'DLR@Tahsildar Login', stageNumber: 5 },
+      { key: 'rdo_status', label: 'DLR@RDO Login', short: 'DLR@RDO Login', stageNumber: 6 },
+      { key: 'jc_status', label: 'DLR@JC Login', short: 'DLR@JC Login', stageNumber: 7 },
+      { key: 'section13_status', label: '13 Notification', short: '13 Notification', stageNumber: 8 },
+      { key: 'draft_ror_status', label: 'Draft RoR', short: 'Draft RoR', stageNumber: 9 },
+      { key: 'final_ror_status', label: 'Final RoR', short: 'Final RoR', stageNumber: 10 },
+      { key: 'webland_2_status', label: 'Porting DLR to Webland-2.0', short: 'Porting DLR to Webland-2.0', stageNumber: 11 }
     ];
-    const stageNames = ['GT', 'Vectorization', 'VS Login', 'VRO Login', 'Tahsildar Login', 'RDO Login', 'JC Login', 'Section 13', 'Draft RoR', 'Final RoR', 'Completed'];
+    const stageNames = ['GT', 'Vectorization/Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed'];
     return json(res, 200, {
       villages,
       totalCount: villages.length,

@@ -1,14 +1,22 @@
 const STAGES = [
-  ['gt_status', 'GT'], ['vectorization_status', 'Vectorization'], ['vs_status', 'VS Login'],
-  ['vro_status', 'VRO Login'], ['tahsildar_status', 'Tahsildar Login'], ['rdo_status', 'RDO Login'],
-  ['jc_status', 'JC Login'], ['section13_status', 'Section 13'], ['draft_ror_status', 'Draft RoR'], ['final_ror_status', 'Final RoR']
+  ['gt_status', 'GT'],
+  ['vectorization_status', 'Vectorization/Correlation'],
+  ['vs_status', 'DLR@VS Login'],
+  ['vro_status', 'DLR@VRO Login'],
+  ['tahsildar_status', 'DLR@Tahsildar Login'],
+  ['rdo_status', 'DLR@RDO Login'],
+  ['jc_status', 'DLR@JC Login'],
+  ['section13_status', '13 Notification'],
+  ['draft_ror_status', 'Draft RoR'],
+  ['final_ror_status', 'Final RoR'],
+  ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'cycles', mandalSearch: '', overviewMode: 'ppb_cycles', villageFilterMode: 'cycle' };
+const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', overviewMode: 'both', villageFilterMode: 'cycle' };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
-  'draft_ror_status', 'final_ror_status', 'ppb_status'
+  'draft_ror_status', 'final_ror_status', 'webland_2_status'
 ];
 const root = document.getElementById('view-root');
 const modalRoot = document.getElementById('modal-root');
@@ -288,7 +296,7 @@ function renderDashboard() {
 
     ${has && d.dailyProgress ? renderTodayProgressSection(d) : ''}
 
-    <section class="section-card workflow-card"><div class="section-header"><div><h3>Sequential Workflow Progress</h3><p>Completion is calculated from actual stage statuses across all 10 stages.</p></div><span class="section-meta">774 VILLAGES</span></div>
+    <section class="section-card workflow-card"><div class="section-header"><div><h3>Sequential Workflow Progress</h3><p>Completion is calculated from actual stage statuses across all 11 statutory resurvey activities.</p></div><span class="section-meta">736 VILLAGES</span></div>
       <div class="workflow-steps">${d.stageProgress.map(s => { const isAvail = s.available !== undefined ? s.available : (s.completed !== null && s.completed !== undefined); return `<div class="step ${has && isAvail ? (s.completed ? 'completed' : s.reported ? 'pending' : '') : 'no-data'}"><span class="step-dot"></span><div class="step-name" title="${h(s.label)}">${h(s.label)}</div><div class="step-count">${has && s.completed !== null && s.completed !== undefined ? `${s.completed} complete` : 'Not available'}</div><div class="step-percent">${has && s.percent !== null && s.percent !== undefined ? `${s.percent}%` : '—'}</div></div>`; }).join('')}</div>
     </section>
     <div class="body-grid">
@@ -300,32 +308,176 @@ function renderDashboard() {
       ${performanceCard('Mandals requiring attention', 'Lowest Final RoR completion, based on all villages in each Mandal.', d.mandals, has, 'mandal')}
       ${performanceCard('Division performance', 'Ranked by Final RoR completion. Click a division for its villages.', d.divisions, has, 'division')}
     </div>
-    <div class="overview-mode-bar">
-      <div class="overview-mode-title">
-        ${icon('grid')}
-        <div>
-          <span>MONITORING FRAMEWORK: <strong>${state.overviewMode === 'ppb_cycles' ? 'Month-Wise PPBs Distribution Cycle View' : 'Sequential Phase Progress View'}</strong></span>
-          <small>${state.overviewMode === 'ppb_cycles' ? 'Joint Collectorate Plan of Action · 8 Monthly Delivery Cycles (Aug 2026 – Mar 2027)' : 'Sequential 7-Phase Revenue Tracking'}</small>
-        </div>
-      </div>
-      <div class="view-mode-toggle">
-        <button class="view-mode-btn ${state.overviewMode === 'ppb_cycles' ? 'active' : ''}" data-toggle-overview-mode="ppb_cycles">
-          ${icon('chart')} Month-wise PPBs Cycle
-        </button>
-        <button class="view-mode-btn ${state.overviewMode === 'phases' ? 'active' : ''}" data-toggle-overview-mode="phases">
-          ${icon('map')} Phase Progress View
-        </button>
-      </div>
-    </div>
 
-    ${state.overviewMode === 'ppb_cycles' ? renderDashboardPpbCycleSection(d, has) : `
-      <section class="section-card"><div class="section-header"><div><h3>Phase progress</h3><p>Phase-wise village completion and pending workload.</p></div>${has ? `<button class="inline-link" data-view-link="performance">View performance</button>` : ''}</div>${phaseCells(d.phases, has)}</section>
-    `}
+    <!-- 1. Dedicated Phase-wise Resurvey Progress Section -->
+    ${renderPhaseProgressSection(d, has)}
+
+    <!-- 2. Separately: Month-Wise PPBs Distribution Cycle Section -->
+    ${renderDashboardPpbCycleSection(d, has)}
 
     <div class="performance-grid" style="margin-top:20px">
       <section class="section-card"><div class="section-header"><div><h3>Current bottleneck</h3><p>Stage with the largest pending workload.</p></div></div>${d.bottleneck && has ? `<div class="bottleneck-body"><div class="bottleneck-header-row"><div class="bottleneck-stage-name">${h(d.bottleneck.label)}</div><span class="bottleneck-pending-badge">${d.bottleneck.pending} pending villages</span></div><div class="bottleneck-bar" title="${100 - (d.bottleneck.percent || 0)}% pendency"><i style="width:${Math.max(4, 100 - (d.bottleneck.percent || 0))}%"></i></div><div class="bottleneck-footer-row"><span>Stage completion rate</span><strong>${d.bottleneck.percent ?? 0}% completed</strong></div></div>` : emptyBlock('Workflow data not available', 'The bottleneck will appear after stage progress is synchronized.', 'chart')}</section>
       <section class="section-card"><div class="section-header"><div><h3>Data quality</h3><p>Records requiring verification.</p></div>${has ? `<button class="inline-link" data-view-link="quality">Review issues</button>` : ''}</div><div class="data-grid">${qualityCells(d.quality, has)}</div></section>
     </div>`;
+}
+
+function renderPhaseProgressSection(d, has) {
+  const phases = d.phases || [];
+  if (!has || !phases.length) {
+    return emptyBlock('Phase data not available', 'Phase records will appear once synchronized.', 'map');
+  }
+
+  return `
+    <section class="section-card phase-progress-dashboard-card">
+      <div class="section-header">
+        <div>
+          <h3>Phase-Wise Resurvey Progress</h3>
+          <p>Village progress and statutory activity completion across all phases (Phase I through Phase VII, Before 2024, and Yet to be Scheduled).</p>
+        </div>
+        <div class="ppb-cycle-header-meta">
+          <div class="cycle-stat-badge">
+            <span>TOTAL PHASES</span>
+            <strong>${phases.length} <small>Classifications</small></strong>
+          </div>
+          <div class="cycle-stat-badge current-active">
+            <span>ACTIVE RESURVEY PHASES</span>
+            <strong>PHASE IV, V, VI, VII</strong>
+          </div>
+          <div class="cycle-stat-badge">
+            <span>WEBLAND-2 PORTED</span>
+            <strong>${d.kpis?.webland2Completed || d.kpis?.portedToWeblandVillages || 72} <small>Villages</small></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase-progress-grid">
+        ${phases.map(p => {
+          const isCompletePhase = p.pending === 0;
+          return `
+            <div class="phase-progress-card ${isCompletePhase ? 'is-complete' : ''}">
+              <div class="phase-card-header">
+                <div>
+                  <h4 class="phase-title">${h(p.name)}</h4>
+                  <div class="phase-meta-line">
+                    <span>${p.mandals_count || (p.mandals && p.mandals.length) || 0} Mandals</span>
+                    ${p.extent ? ` · <span>${p.extent} Ac</span>` : ''}
+                  </div>
+                </div>
+                <span class="phase-badge ${isCompletePhase ? 'completed' : 'active'}">
+                  ${isCompletePhase ? 'COMPLETED' : `${p.completed}/${p.total} DONE`}
+                </span>
+              </div>
+
+              <div class="phase-kpi-row">
+                <div class="phase-kpi-item">
+                  <span>VILLAGES</span>
+                  <b>${p.total}</b>
+                </div>
+                <div class="phase-kpi-item">
+                  <span>FINAL ROR</span>
+                  <b style="color:var(--teal);">${p.completed}</b>
+                </div>
+                <div class="phase-kpi-item">
+                  <span>PENDING</span>
+                  <b style="color:var(--orange);">${p.pending}</b>
+                </div>
+                <div class="phase-kpi-item">
+                  <span>DELAYED</span>
+                  <b style="${p.delayed > 0 ? 'color:var(--red);' : ''}">${p.delayed}</b>
+                </div>
+              </div>
+
+              <div class="phase-activities-strip">
+                <span class="activity-pill ${p.gt_status === 100 ? 'done' : ''}" title="GT: ${formatPct(p.gt_status)}">GT: ${formatPct(p.gt_status)}</span>
+                <span class="activity-pill ${p.vectorization_status === 100 ? 'done' : ''}" title="Vectorization/Correlation: ${formatPct(p.vectorization_status)}">Vec: ${formatPct(p.vectorization_status)}</span>
+                <span class="activity-pill ${p.vs_status === 100 ? 'done' : ''}" title="DLR@VS Login: ${formatPct(p.vs_status)}">VS: ${formatPct(p.vs_status)}</span>
+                <span class="activity-pill ${p.vro_status === 100 ? 'done' : ''}" title="DLR@VRO Login: ${formatPct(p.vro_status)}">VRO: ${formatPct(p.vro_status)}</span>
+                <span class="activity-pill ${p.final_ror_status === 100 ? 'done' : ''}" title="Final RoR: ${formatPct(p.final_ror_status)}">Final RoR: ${formatPct(p.final_ror_status)}</span>
+                <span class="activity-pill ${p.webland_2_status === 100 ? 'done' : ''}" title="Porting DLR to Webland-2.0: ${formatPct(p.webland_2_status)}">Webland 2: ${formatPct(p.webland_2_status)}</span>
+              </div>
+
+              <div class="phase-progress-bar-wrap">
+                <div class="phase-bar-label">
+                  <span>Resurvey Completion</span>
+                  <b>${formatPct(p.final_ror_status || p.overall)}</b>
+                </div>
+                <div class="progress-bar" style="height:6px;">
+                  <i style="width:${p.final_ror_status || p.overall || 0}%;"></i>
+                </div>
+              </div>
+
+              <button class="phase-drilldown-btn" data-filter-phase="${h(p.name)}">
+                ${icon('search')} View ${h(p.name)} Villages (${p.total}) →
+              </button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="section-card phase-table-card" style="margin-bottom:0;box-shadow:none;border:1px solid #e2e8f0;margin-top:16px;">
+        <div class="section-header">
+          <div>
+            <h4 style="font-size:13px;font-weight:800;color:var(--ink);margin:0 0 2px;">Phase-Wise Resurvey Milestone Matrix</h4>
+            <p style="font-size:11px;color:var(--muted);margin:0;">Activity clearance across all 11 resurvey stages by Phase.</p>
+          </div>
+          <button class="inline-link" data-view-link="villages">View all villages ${icon('arrow')}</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="performance-table phase-progress-table">
+            <thead>
+              <tr>
+                <th>PHASE</th>
+                <th class="mono">VILLAGES</th>
+                <th class="mono">EXTENT (AC)</th>
+                <th class="mono">GT</th>
+                <th class="mono">VEC/CORR</th>
+                <th class="mono">DLR@VS</th>
+                <th class="mono">DLR@VRO</th>
+                <th class="mono">DLR@TAH</th>
+                <th class="mono">DLR@RDO</th>
+                <th class="mono">DLR@JC</th>
+                <th class="mono">13 NOTIF</th>
+                <th class="mono">DRAFT ROR</th>
+                <th class="mono">FINAL ROR</th>
+                <th class="mono">WEBLAND 2.0</th>
+                <th>PROGRESS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${phases.map(p => `
+                <tr class="clickable" data-filter-phase="${h(p.name)}">
+                  <td><b style="color:var(--navy);font-weight:800;">${h(p.name)}</b></td>
+                  <td class="mono"><b>${p.total}</b></td>
+                  <td class="mono">${p.extent ? `${p.extent}` : '—'}</td>
+                  <td class="mono">${formatPct(p.gt_status)}</td>
+                  <td class="mono">${formatPct(p.vectorization_status)}</td>
+                  <td class="mono">${formatPct(p.vs_status)}</td>
+                  <td class="mono">${formatPct(p.vro_status)}</td>
+                  <td class="mono">${formatPct(p.tahsildar_status)}</td>
+                  <td class="mono">${formatPct(p.rdo_status)}</td>
+                  <td class="mono">${formatPct(p.jc_status)}</td>
+                  <td class="mono">${formatPct(p.section13_status)}</td>
+                  <td class="mono">${formatPct(p.draft_ror_status)}</td>
+                  <td class="mono"><b style="color:var(--teal);">${formatPct(p.final_ror_status)}</b></td>
+                  <td class="mono"><b style="color:var(--blue);">${formatPct(p.webland_2_status)}</b></td>
+                  <td>
+                    <div class="progress-cell">
+                      <span class="progress-bar"><i style="width:${p.final_ror_status || p.overall || 0}%;"></i></span>
+                      <b>${formatPct(p.final_ror_status || p.overall)}</b>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="inline-link" data-filter-phase="${h(p.name)}">Filter →</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  `;
 }
 
 function renderDashboardPpbCycleSection(d, has) {
@@ -596,39 +748,51 @@ function renderVillageMonitoring() {
         <div class="adv-filter-grid">
           <div class="filter-field-box">
             <label>Current Resurvey Stage</label>
-            ${selectFilter('current_stage', 'All Current Stages', (f.stages || ['GT', 'Vectorization', 'VS Login', 'VRO Login', 'Tahsildar Login', 'RDO Login', 'JC Login', 'Section 13', 'Draft RoR', 'Final RoR', 'Completed']), active.current_stage)}
+            ${selectFilter('current_stage', 'All Current Stages', (f.stages || ['GT', 'Vectorization/Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed']), active.current_stage)}
           </div>
           <div class="filter-field-box">
-            <label>1. Ground Truthing (GT)</label>
+            <label>1. GT (Ground Truthing)</label>
             ${selectFilter('gt_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.gt_status)}
           </div>
           <div class="filter-field-box">
-            <label>2. Digital Vectorization</label>
+            <label>2. Vectorization/Correlation</label>
             ${selectFilter('vectorization_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.vectorization_status)}
           </div>
           <div class="filter-field-box">
-            <label>3. Secretariat (VS)</label>
+            <label>3. DLR@VS Login</label>
             ${selectFilter('vs_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.vs_status)}
           </div>
           <div class="filter-field-box">
-            <label>4. VRO Verification</label>
+            <label>4. DLR@VRO Login</label>
             ${selectFilter('vro_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.vro_status)}
           </div>
           <div class="filter-field-box">
-            <label>5. Tahsildar Approval</label>
+            <label>5. DLR@Tahsildar Login</label>
             ${selectFilter('tahsildar_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.tahsildar_status)}
           </div>
           <div class="filter-field-box">
-            <label>6. RDO Review</label>
+            <label>6. DLR@RDO Login</label>
             ${selectFilter('rdo_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.rdo_status)}
           </div>
           <div class="filter-field-box">
-            <label>7. Final RoR 1(B)</label>
+            <label>7. DLR@JC Login</label>
+            ${selectFilter('jc_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.jc_status)}
+          </div>
+          <div class="filter-field-box">
+            <label>8. 13 Notification</label>
+            ${selectFilter('section13_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.section13_status)}
+          </div>
+          <div class="filter-field-box">
+            <label>9. Draft RoR</label>
+            ${selectFilter('draft_ror_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.draft_ror_status)}
+          </div>
+          <div class="filter-field-box">
+            <label>10. Final RoR</label>
             ${selectFilter('final_ror_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.final_ror_status)}
           </div>
           <div class="filter-field-box">
-            <label>8. Passbooks (PPB)</label>
-            ${selectFilter('ppb_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.ppb_status)}
+            <label>11. Porting DLR to Webland-2.0</label>
+            ${selectFilter('webland_2_status', 'Any Status', ['Ported', 'Completed', 'In Progress', 'Pending', 'Not Started'], active.webland_2_status)}
           </div>
         </div>
         <div class="adv-filter-foot">
@@ -687,7 +851,7 @@ function villageTable(rows) {
           <th>PPBS CYCLE</th>
           <th>PHASE</th>
           <th>EXTENT (AC)</th>
-          <th>KHATAS</th>
+          <th>PPBs TARGET</th>
           <th>CURRENT RESURVEY STAGE</th>
           <th>OVERALL STATUS</th>
           <th>ACTION</th>
@@ -710,7 +874,7 @@ function villageTable(rows) {
             </td>
             <td><span class="phase-card-badge" style="font-size:9px;padding:2px 7px;">${h(v.phase || '—')}</span></td>
             <td class="mono">${v.extent ? `${h(v.extent)}` : '—'}</td>
-            <td class="mono">${v.total_khatas ?? v.khatas ?? '—'}</td>
+            <td class="mono"><b>${v.ppb_target ? Number(v.ppb_target).toLocaleString() : '—'}</b></td>
             <td>
               <span class="stage-label" style="font-weight:700;color:var(--ink);background:#f1f5f9;padding:3px 8px;border-radius:4px;border:1px solid #e2e8f0;display:inline-block;">
                 ${h(v.current_stage || 'Not Started')}
@@ -964,16 +1128,20 @@ function renderPhaseAnalysis(d) {
         <thead>
           <tr>
             <th>PHASE</th>
-            <th>VILLAGES</th>
-            <th>EXTENT (AC)</th>
-            <th>KHATAS</th>
-            <th>GT %</th>
-            <th>VECTORIZATION %</th>
-            <th>VRO %</th>
-            <th>RDO %</th>
-            <th>FINAL ROR %</th>
-            <th>PPB %</th>
-            <th>DELAYED</th>
+            <th class="mono">VILLAGES</th>
+            <th class="mono">EXTENT (AC)</th>
+            <th class="mono">GT</th>
+            <th class="mono">VEC/CORR</th>
+            <th class="mono">DLR@VS</th>
+            <th class="mono">DLR@VRO</th>
+            <th class="mono">DLR@TAH</th>
+            <th class="mono">DLR@RDO</th>
+            <th class="mono">DLR@JC</th>
+            <th class="mono">13 NOTIF</th>
+            <th class="mono">DRAFT ROR</th>
+            <th class="mono">FINAL ROR</th>
+            <th class="mono">WEBLAND 2.0</th>
+            <th class="mono">DELAYED</th>
             <th>ACTION</th>
           </tr>
         </thead>
@@ -983,13 +1151,17 @@ function renderPhaseAnalysis(d) {
               <td style="font-weight:800;color:var(--navy);">${h(p.name)}</td>
               <td class="mono"><b>${p.total}</b></td>
               <td class="mono">${p.extent ? `${p.extent}` : '—'}</td>
-              <td class="mono">${p.khatas ?? '—'}</td>
               <td class="mono">${formatPct(p.gt_status)}</td>
               <td class="mono">${formatPct(p.vectorization_status)}</td>
+              <td class="mono">${formatPct(p.vs_status)}</td>
               <td class="mono">${formatPct(p.vro_status)}</td>
+              <td class="mono">${formatPct(p.tahsildar_status)}</td>
               <td class="mono">${formatPct(p.rdo_status)}</td>
+              <td class="mono">${formatPct(p.jc_status)}</td>
+              <td class="mono">${formatPct(p.section13_status)}</td>
+              <td class="mono">${formatPct(p.draft_ror_status)}</td>
               <td class="mono"><b style="color:var(--teal);">${formatPct(p.final_ror_status)}</b></td>
-              <td class="mono">${formatPct(p.ppb)}</td>
+              <td class="mono"><b style="color:var(--blue);">${formatPct(p.webland_2_status)}</b></td>
               <td class="mono" style="${p.delayed > 0 ? 'color:var(--red);font-weight:800;' : ''}">${p.delayed}</td>
               <td>
                 <button class="inline-link" data-filter-phase="${h(p.name)}">
@@ -1321,16 +1493,17 @@ async function openVillage(id) {
     const statusOptions = ['Completed', 'In Progress', 'Pending', 'Delayed', 'Not Started', 'Not Updated'];
 
     const citizenSteps = [
-      { key: 'gt_status', num: 1, title: 'Ground Truthing (GT)', desc: 'Drone aerial boundary survey and physical ground verification by survey field team.', tier: 'Survey Field Team (RSDT / MLSO)' },
-      { key: 'vectorization_status', num: 2, title: 'Digital Vectorization', desc: 'Computerized boundary digitization, GIS shapefile plotting, and parcel map generation.', tier: 'GIS Vectorization Team' },
-      { key: 'vs_status', num: 3, title: 'Village Secretariat (VS)', desc: 'Secretariat data synchronization, Grama Sabha review, and landholder record verification.', tier: 'Village Secretariat' },
-      { key: 'vro_status', num: 4, title: 'VRO Verification', desc: 'Village Revenue Officer field inspection, ownership cross-check with 1B Webland register.', tier: 'Village Revenue Officer (VRO)' },
-      { key: 'tahsildar_status', num: 5, title: 'Tahsildar Approval', desc: 'Mandal Revenue Officer statutory scrutiny, discrepancy resolution, and approval.', tier: 'Tahsildar Office' },
-      { key: 'rdo_status', num: 6, title: 'RDO Review', desc: 'Sub-divisional revenue officer validation of survey boundaries and khatas.', tier: 'Revenue Divisional Officer (RDO)' },
-      { key: 'jc_status', num: 7, title: 'Joint Collector Sanction', desc: 'District Collectorate resurvey validation and administrative approval.', tier: 'Joint Collectorate' },
-      { key: 'section13_status', num: 8, title: 'Section 13 Gazette Notice', desc: 'Statutory district gazette notification published for public claims & objections.', tier: 'Revenue Notification Cell' },
-      { key: 'draft_ror_status', num: 9, title: 'Draft RoR 1(B)', desc: 'Draft Record of Rights published for public scrutiny and objection hearing.', tier: 'Tahsildar & VRO Field Unit' },
-      { key: 'final_ror_status', num: 10, title: 'Final RoR & Passbooks', desc: 'Final Record of Rights confirmed, permanent land title validated, and Pattadar Passbooks issued.', tier: 'SSLR & Collectorate' }
+      { key: 'gt_status', num: 1, title: 'GT', desc: 'DGPS ground truthing & preliminary perimeter survey by survey team.', tier: 'Survey Field Team (RSDT / MLSO)' },
+      { key: 'vectorization_status', num: 2, title: 'Vectorization/Correlation', desc: 'Computerized boundary digitization, GIS shapefile correlation, and parcel map generation.', tier: 'GIS Vectorization Team' },
+      { key: 'vs_status', num: 3, title: 'DLR@VS Login', desc: 'Secretariat data synchronization, Grama Sabha review, and landholder record linking.', tier: 'Village Secretariat Staff' },
+      { key: 'vro_status', num: 4, title: 'DLR@VRO Login', desc: 'Village Revenue Officer field inspection, ownership cross-check with 1B Webland register.', tier: 'Village Revenue Officer (VRO)' },
+      { key: 'tahsildar_status', num: 5, title: 'DLR@Tahsildar Login', desc: 'Mandal Revenue Officer statutory scrutiny, discrepancy resolution, and sign-off.', tier: 'Tahsildar Office' },
+      { key: 'rdo_status', num: 6, title: 'DLR@RDO Login', desc: 'Sub-divisional revenue officer validation of survey boundaries and records.', tier: 'Revenue Divisional Officer (RDO)' },
+      { key: 'jc_status', num: 7, title: 'DLR@JC Login', desc: 'District Joint Collectorate final administrative sanction and clearance.', tier: 'Joint Collectorate' },
+      { key: 'section13_status', num: 8, title: '13 Notification', desc: 'Statutory district gazette notification published for public claims & objections.', tier: 'Revenue Notification Cell' },
+      { key: 'draft_ror_status', num: 9, title: 'Draft RoR', desc: 'Draft Record of Rights (1B) published for public scrutiny and objection hearing.', tier: 'Tahsildar & VRO Field Unit' },
+      { key: 'final_ror_status', num: 10, title: 'Final RoR', desc: 'Final Record of Rights confirmed and permanent land title validated.', tier: 'Collectorate SSLR Wing' },
+      { key: 'webland_2_status', num: 11, title: 'Porting DLR to Webland-2.0', desc: 'Porting digital land records to Webland-2.0 portal for official mutation & registry.', tier: 'District SSLR & Webland Portal Wing' }
     ];
 
     const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
@@ -1360,7 +1533,6 @@ async function openVillage(id) {
             <span>TARGET PPBS<b>${v.ppb_target ? Number(v.ppb_target).toLocaleString() : (v.target_ppbs ? Number(v.target_ppbs).toLocaleString() : '—')}</b></span>
             <span>PHASE<b>${h(v.phase || '—')}</b></span>
             <span>EXTENT<b>${v.extent ? `${h(v.extent)} Ac` : '—'}</b></span>
-            <span>KHATAS<b>${v.khatas ? Number(v.khatas).toLocaleString() : '—'}</b></span>
             <span>STATUS<b><span class="status-pill ${statusClass(isPorted ? 'Completed' : v.status)}">${h(isPorted ? 'Completed' : v.status)}</span></b></span>
           </div>
         </div>
@@ -1369,16 +1541,16 @@ async function openVillage(id) {
           <div class="ported-webland-alert">
             <span class="ported-icon">${icon('shield')}</span>
             <div>
-              <strong>Ported to Webland 2.0 · All Resurvey Activities Completed</strong>
-              <p>This village has successfully completed all 10 statutory resurvey stages and its final record of rights and land parcels are officially ported to Webland 2.0.</p>
+              <strong>Ported to Webland 2.0 · All 11 Resurvey Activities Completed</strong>
+              <p>This village has successfully completed all 11 statutory resurvey stages and its final record of rights and digital land records are officially ported to Webland 2.0.</p>
             </div>
           </div>
         ` : ''}
 
         <div class="citizen-stage-banner" style="${isPorted ? 'border-color:#bbf7d0;background:#f0fdf4;' : ''}">
           <span style="${isPorted ? 'color:#16a34a;' : ''}">${isPorted ? 'RESURVEY STATUS' : 'CURRENT WORKFLOW MILESTONE'}</span>
-          <h3 style="${isPorted ? 'color:#15803d;' : ''}">${isPorted ? 'All 10 Resurvey Activities Completed' : `Step ${activeStep.num} of 10: ${h(v.current_stage || 'Not Started')}`}</h3>
-          <p style="${isPorted ? 'color:#166534;' : ''}">${isPorted ? 'DGPS GT, Vectorization, VS/VRO verification, Tahsildar, RDO, JC sanctions, Section 13, Draft RoR, and Final RoR are verified and completed.' : h(activeStep.desc)}</p>
+          <h3 style="${isPorted ? 'color:#15803d;' : ''}">${isPorted ? 'All 11 Resurvey Activities Completed' : `Step ${activeStep.num} of 11: ${h(activeStep.title)}`}</h3>
+          <p style="${isPorted ? 'color:#166534;' : ''}">${isPorted ? 'GT, Vectorization/Correlation, DLR@VS, DLR@VRO, DLR@Tahsildar, DLR@RDO, DLR@JC, 13 Notification, Draft RoR, Final RoR and Porting DLR to Webland-2.0 are verified and completed.' : h(activeStep.desc)}</p>
         </div>
 
         <div class="citizen-stepper">
