@@ -491,7 +491,7 @@ function dashboard(store) {
       };
     }),
     ppbCycles,
-    ppbKpis: {
+    ppbKpis: total ? {
       totalPlanVillages: 434,
       totalPlanPPBs: 332013,
       priorCompletedVillages: 239,
@@ -505,8 +505,22 @@ function dashboard(store) {
       peakPPBs: 90789,
       totalUniverseVillages: total,
       totalUniversePPBs: 391546
+    } : {
+      totalPlanVillages: 0,
+      totalPlanPPBs: 0,
+      priorCompletedVillages: 0,
+      priorCompletedPPBs: 0,
+      activeCycleName: 'None',
+      activeCycleKey: '',
+      activeVillages: 0,
+      activePPBs: 0,
+      peakMonthName: 'None',
+      peakVillages: 0,
+      peakPPBs: 0,
+      totalUniverseVillages: 0,
+      totalUniversePPBs: 0
     },
-    dailyProgress: {
+    dailyProgress: total ? {
       asOnDate: '14-09-2026',
       combined: {
         todayGtExtent: 1440.82,
@@ -561,7 +575,7 @@ function dashboard(store) {
         phase3: 11,
         allActivitiesCompleted: true
       }
-    },
+    } : null,
     bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
     quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null
   };

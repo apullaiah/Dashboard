@@ -152,62 +152,8 @@ function kpiCard(label, value, description, variant, filter = null, hasData, fil
 function emptyBlock(title, note, iconName = 'database') { return `<div class="empty-block"><div>${icon(iconName)}<strong>${h(title)}</strong><p>${h(note)}</p></div></div>`; }
 
 function renderTodayProgressSection(d) {
-  const p = d.dailyProgress || {
-    asOnDate: '14-09-2026',
-    combined: {
-      todayGtExtent: 1440.82,
-      cumulativeGtExtent: 103870.09,
-      totalTargetExtent: 277122.94,
-      gtCompletedVillages: 58,
-      totalVillages: 152,
-      vsLoginToday: 20,
-      vroLoginToday: 12,
-      tahLoginToday: 9,
-      rdoLoginToday: 3,
-      portedVillages: 72
-    },
-    phase5: {
-      phase: 'Phase V',
-      date: '14-09-2026',
-      totalVillages: 60,
-      totalExtent: 116517.27,
-      todayGtExtent: 351.25,
-      cumulativeGtExtent: 81438.16,
-      gtCompletedVillages: 49,
-      gtStartedVillages: 60,
-      gtNotStartedVillages: 0,
-      vsLoginToday: 16,
-      vroLoginToday: 12,
-      tahLoginToday: 9,
-      rdoLoginToday: 3,
-      vectorizationVillages: 5,
-      correlationAreaVillages: 4
-    },
-    phase6: {
-      phase: 'Phase VI',
-      date: '11-09-2026',
-      totalVillages: 92,
-      totalExtent: 160605.67,
-      todayGtExtent: 1089.57,
-      cumulativeGtExtent: 22431.93,
-      gtStartedVillages: 54,
-      gtNotStartedVillages: 38,
-      gtCompletedVillages: 9,
-      vsLoginToday: 4,
-      vroLoginToday: 0,
-      tahLoginToday: 0,
-      rdoLoginToday: 0,
-      vectorizationVillages: 5,
-      correlationAreaVillages: 0
-    },
-    portedToWebland: {
-      totalPorted: 72,
-      phase1: 27,
-      phase2: 34,
-      phase3: 11,
-      allActivitiesCompleted: true
-    }
-  };
+  if (!d.dailyProgress || !d.dailyProgress.combined) return '';
+  const p = d.dailyProgress;
 
   return `
     <section class="section-card today-progress-card">
@@ -327,7 +273,7 @@ function renderTodayProgressSection(d) {
 
 function renderDashboard() {
   const d = state.dashboard; const has = d.hasData; const sourceReady = d.sourceSummary.configured > 0;
-  const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || 774;
+  const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || (has ? 774 : 0);
   root.innerHTML = `
     <div class="dashboard-intro"><div><h3>District monitoring at a glance</h3><p>Village-wise status of the AP Resurvey workflow, PPBs and related activities across all 774 villages.</p></div><span class="timezone">IST · ${d.generatedAt ? formatDate(d.generatedAt) : 'Not available'}</span></div>
     ${!sourceReady ? `<section class="setup-banner">${icon('link')}<div><strong>Connect the district data sources to begin monitoring.</strong><p>No operational values are shown until data sources are synchronized.</p></div><button data-action="open-source-modal">Connect source</button></section>` : !d.hasMasterData ? `<section class="setup-banner">${icon('warning')}<div><strong>Partial source coverage: ${progressCount} real village-progress records are synchronized.</strong><p>The complete Village Master source is not connected.</p></div><button data-view-link="sources">Add Village Master</button></section>` : ''}
@@ -340,7 +286,7 @@ function renderDashboard() {
       ${kpiCard('PPBs completed', d.kpis.ppbCompleted, 'Pattadar passbooks issued', 'completed', 'ppb_status', has, 'stageField')}
     </section>
 
-    ${renderTodayProgressSection(d)}
+    ${has && d.dailyProgress ? renderTodayProgressSection(d) : ''}
 
     <section class="section-card workflow-card"><div class="section-header"><div><h3>Sequential Workflow Progress</h3><p>Completion is calculated from actual stage statuses across all 10 stages.</p></div><span class="section-meta">774 VILLAGES</span></div>
       <div class="workflow-steps">${d.stageProgress.map(s => { const isAvail = s.available !== undefined ? s.available : (s.completed !== null && s.completed !== undefined); return `<div class="step ${has && isAvail ? (s.completed ? 'completed' : s.reported ? 'pending' : '') : 'no-data'}"><span class="step-dot"></span><div class="step-name" title="${h(s.label)}">${h(s.label)}</div><div class="step-count">${has && s.completed !== null && s.completed !== undefined ? `${s.completed} complete` : 'Not available'}</div><div class="step-percent">${has && s.percent !== null && s.percent !== undefined ? `${s.percent}%` : '—'}</div></div>`; }).join('')}</div>
@@ -544,15 +490,17 @@ function renderVillageMonitoring() {
     const p = phasesList.find(x => x.name === pName);
     return p ? p.total : fallback;
   }
+  const hasData = Boolean(state.dashboard?.hasData);
   const cycleList = state.dashboard?.ppbCycles || [];
   function getCycleTotal(cKey, fallback) {
+    if (!hasData) return 0;
     const c = cycleList.find(x => x.key === cKey);
     return c ? c.totalVillages : fallback;
   }
 
   const cycleQuickPills = [
-    { id: 'all', label: 'All Villages', count: state.dashboard?.kpis?.total ?? 774 },
-    { id: 'ported:true', label: 'Webland-2 Ported', count: state.dashboard?.dailyProgress?.combined?.portedVillages || 72, isPorted: true },
+    { id: 'all', label: 'All Villages', count: hasData ? (state.dashboard?.kpis?.total ?? 0) : 0 },
+    { id: 'ported:true', label: 'Webland-2 Ported', count: hasData ? (state.dashboard?.dailyProgress?.combined?.portedVillages || 0) : 0, isPorted: true },
     { id: 'cycle:Sep-26', label: 'Sep-26 (Active)', count: getCycleTotal('Sep-26', 37), isCurrent: true },
     { id: 'cycle:Aug-26', label: 'Aug-26', count: getCycleTotal('Aug-26', 20) },
     { id: 'cycle:Oct-26', label: 'Oct-26', count: getCycleTotal('Oct-26', 44) },
@@ -562,12 +510,12 @@ function renderVillageMonitoring() {
     { id: 'cycle:Feb-27', label: 'Feb-27', count: getCycleTotal('Feb-27', 63) },
     { id: 'cycle:Mar-27', label: 'Mar-27 (Peak)', count: getCycleTotal('Mar-27', 123) },
     { id: 'cycle:Prior Completed (Jan–Jul 2026)', label: 'Prior Completed', count: getCycleTotal('Prior Completed (Jan–Jul 2026)', 239) },
-    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 31, alert: true }
+    { id: 'delayed:true', label: 'Overdue Villages', count: hasData ? (state.dashboard?.kpis?.delayed ?? 0) : 0, alert: true }
   ];
 
   const phaseQuickPills = [
-    { id: 'all', label: 'All Villages', count: state.dashboard?.kpis?.total ?? 774 },
-    { id: 'ported:true', label: 'Webland-2 Ported', count: state.dashboard?.dailyProgress?.combined?.portedVillages || 72, isPorted: true },
+    { id: 'all', label: 'All Villages', count: hasData ? (state.dashboard?.kpis?.total ?? 0) : 0 },
+    { id: 'ported:true', label: 'Webland-2 Ported', count: hasData ? (state.dashboard?.dailyProgress?.combined?.portedVillages || 0) : 0, isPorted: true },
     { id: 'phase:Phase I', label: 'Phase 1', count: getPhaseTotal('Phase I', 27) },
     { id: 'phase:Phase II', label: 'Phase 2', count: getPhaseTotal('Phase II', 34) },
     { id: 'phase:Phase III', label: 'Phase 3', count: getPhaseTotal('Phase III', 14) },
@@ -575,7 +523,7 @@ function renderVillageMonitoring() {
     { id: 'phase:Phase V', label: 'Phase 5', count: getPhaseTotal('Phase V', 60) },
     { id: 'phase:Phase VI', label: 'Phase 6', count: getPhaseTotal('Phase VI', 92) },
     { id: 'phase:Phase VII', label: 'Phase 7', count: getPhaseTotal('Phase VII', 91) },
-    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 31, alert: true }
+    { id: 'delayed:true', label: 'Overdue Villages', count: hasData ? (state.dashboard?.kpis?.delayed ?? 0) : 0, alert: true }
   ];
 
   const pillsToShow = (state.villageFilterMode === 'phase') ? phaseQuickPills : cycleQuickPills;
