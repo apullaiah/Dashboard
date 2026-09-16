@@ -12,7 +12,7 @@ const STAGES = [
   ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', overviewMode: 'both', villageFilterMode: 'cycle' };
+const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', villageFilterMode: 'cycle' };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -279,6 +279,369 @@ function renderTodayProgressSection(d) {
   `;
 }
 
+function renderTodayHeroSection(d) {
+  if (!d.dailyProgress || !d.dailyProgress.combined) return '';
+  const p = d.dailyProgress;
+  const c = p.combined;
+  const p5 = p.phase5 || {};
+  const p6 = p.phase6 || {};
+  const totalLogins = (c.vsLoginToday || 0) + (c.vroLoginToday || 0) + (c.tahLoginToday || 0) + (c.rdoLoginToday || 0) + (c.jcLoginToday || 0);
+
+  return `
+    <section class="today-hero-grid" aria-label="Today's live resurvey out-turn and revenue officer logins">
+      <!-- 1. Today's GT Progress Card -->
+      <div class="today-hero-card gt-hero-card">
+        <div>
+          <div class="hero-top-badge-row">
+            <span class="hero-badge-pill">
+              <span class="pulse-ring"></span> TODAY'S GT OUT-TURN EXTENT
+            </span>
+            <span class="hero-date-tag">LIVE REVIEW: ${p.asOnDate || '16-09-2026'}</span>
+          </div>
+          <div class="hero-primary-val">
+            ${Number(c.todayGtExtent).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}
+            <small>Acres Today</small>
+          </div>
+          <div class="hero-sub-text">
+            Cumulative Ground Truthing: <strong>${Number(c.cumulativeGtExtent).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} Acres</strong> across Phase 5 &amp; 6 (Target: 2,77,090 Ac · 60 Villages 100% Done).
+          </div>
+        </div>
+        <div class="hero-stats-row">
+          <div class="hero-stat-col">
+            <span>PHASE 5 GT TODAY</span>
+            <strong>${Number(p5.todayGtExtent || 0).toFixed(2)} Ac</strong>
+            <small>Cum: ${Number(p5.cumulativeGtExtent || 0).toLocaleString()} Ac (${p5.gtCompletedVillages || 49}/${p5.totalVillages || 60} Vlgs Done)</small>
+          </div>
+          <div class="hero-stat-col">
+            <span>PHASE 6 GT TODAY</span>
+            <strong>${Number(p6.todayGtExtent || 0).toFixed(2)} Ac</strong>
+            <small>Cum: ${Number(p6.cumulativeGtExtent || 0).toLocaleString()} Ac (${p6.gtCompletedVillages || 11}/${p6.totalVillages || 92} Vlgs Done)</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Today's Revenue Officer DLR Logins Progress Card -->
+      <div class="today-hero-card dlr-hero-card">
+        <div>
+          <div class="hero-top-badge-row">
+            <span class="hero-badge-pill">
+              <span class="pulse-ring" style="background:#34d399;"></span> TODAY'S REVENUE OFFICER DLR LOGINS
+            </span>
+            <span class="hero-date-tag">ACTIVE REVENUE DISPOSAL</span>
+          </div>
+          <div class="hero-primary-val">
+            ${totalLogins}
+            <small>Active Logins Today</small>
+          </div>
+          <div class="hero-sub-text">
+            Real-time workflow disposal across Village Secretariats, VROs, Tahsildars, RDOs, and Joint Collectorate.
+          </div>
+        </div>
+        <div class="hero-stats-row dlr-stats-row">
+          <div class="hero-stat-col">
+            <span>DLR@VS</span>
+            <strong>${c.vsLoginToday || 0}</strong>
+            <small>Secretariats</small>
+          </div>
+          <div class="hero-stat-col">
+            <span>DLR@VRO</span>
+            <strong>${c.vroLoginToday || 0}</strong>
+            <small>VROs Active</small>
+          </div>
+          <div class="hero-stat-col">
+            <span>TAHSILDAR</span>
+            <strong>${c.tahLoginToday || 9}</strong>
+            <small>Sign-offs</small>
+          </div>
+          <div class="hero-stat-col">
+            <span>RDO</span>
+            <strong>${c.rdoLoginToday || 3}</strong>
+            <small>Appellate</small>
+          </div>
+          <div class="hero-stat-col">
+            <span>JC</span>
+            <strong>${c.jcLoginToday || 2}</strong>
+            <small>Clearances</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderPhaseStagePendencySection(d, has) {
+  const stages = d.stagePendency || [];
+  const matrix = d.phaseStagePendencyMatrix || [];
+  if (!has || !stages.length) return '';
+
+  const totalVillages = d.kpis?.totalVillages || d.kpis?.total || 774;
+  const completedFinal = d.kpis?.finalRorCompleted || d.kpis?.completed || 72;
+  const totalPending = totalVillages - completedFinal;
+
+  const shortHeaders = [
+    ['gt_status', '1. GT'],
+    ['vectorization_status', '2. Vect'],
+    ['vs_status', '3. VS'],
+    ['vro_status', '4. VRO'],
+    ['tahsildar_status', '5. Tah'],
+    ['rdo_status', '6. RDO'],
+    ['jc_status', '7. JC'],
+    ['section13_status', '8. Sec13'],
+    ['draft_ror_status', '9. Draft'],
+    ['final_ror_status', '10. Final'],
+    ['webland_2_status', '11. W2.0']
+  ];
+
+  return `
+    <section class="section-card overview-pendency-container">
+      <div class="section-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span class="live-pulse-badge" style="background:#fee2e2;color:#b91c1c;border-color:#fca5a5;">
+              <span class="pulse-ring" style="background:#ef4444;"></span> DISTRICT STATUTORY PENDENCY ANALYSIS
+            </span>
+          </div>
+          <h3>Phase-Wise & Stage-Wise Resurvey Pendency</h3>
+          <p>Real-time backlog analysis across all 11 statutory resurvey milestones and 8 phase categories (774 villages universe).</p>
+        </div>
+        <div class="pendency-header-meta">
+          <div class="pendency-stat-badge alert">
+            <span>ACTIVE RESURVEY WORKLOAD</span>
+            <strong>${totalPending} <small>Villages Pending</small></strong>
+          </div>
+          <div class="pendency-stat-badge">
+            <span>FINAL CLEARANCE (WEBLAND-2)</span>
+            <strong style="color:var(--teal);">${completedFinal} <small>Villages Ported</small></strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stage-Wise Pendency Across 11 Statutory Milestones -->
+      <div style="padding:14px 20px 6px;font-size:12.5px;font-weight:800;color:var(--navy);letter-spacing:0.5px;text-transform:uppercase;display:flex;align-items:center;gap:8px;">
+        ${icon('chart')} <span>Stage-Wise Pendency Across 11 Statutory Milestones</span>
+      </div>
+      <div class="stage-pendency-grid">
+        ${stages.map(s => {
+          const badgeCls = s.pending === 0 ? 'zero' : s.pending < 200 ? 'low' : s.pending < 340 ? 'high' : 'critical';
+          return `
+            <div class="stage-pendency-card">
+              <div class="stage-pendency-head">
+                <span class="stage-pendency-num">Stage ${s.stageNumber}</span>
+                <span class="matrix-pend-badge ${badgeCls}">${s.pending} Pending</span>
+              </div>
+              <div class="stage-pendency-name" title="${h(s.label)}">${h(s.label)}</div>
+              <div class="stage-pendency-counts">
+                <span class="done-tag">${s.completed} Cleared</span>
+                <span class="pend-tag">${s.percent}% Done</span>
+              </div>
+              <div class="bottleneck-bar" style="margin-top:4px;" title="${s.percent}% completed">
+                <i style="width:${Math.max(3, s.percent)}%;background:${s.percent > 70 ? 'var(--teal)' : s.percent > 40 ? 'var(--blue)' : 'var(--orange)'};"></i>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <!-- Phase-Wise & Stage-Wise Pendency Matrix -->
+      <div style="padding:16px 20px 8px;font-size:12.5px;font-weight:800;color:var(--navy);letter-spacing:0.5px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          ${icon('map')} <span>Phase × Stage Pendency Matrix (Pending Villages Per Stage)</span>
+        </div>
+        <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:none;">
+          Click badge to view phase villages · Figures represent pending villages
+        </span>
+      </div>
+      <div class="phase-stage-matrix-wrap">
+        <table class="phase-stage-matrix-table">
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Universe</th>
+              <th>Final Cleared</th>
+              <th>Overall Pending</th>
+              ${shortHeaders.map(([k, lbl]) => `<th title="${lbl}">${lbl}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+            ${matrix.map(row => {
+              return `
+                <tr>
+                  <td><strong>${h(row.phase)}</strong></td>
+                  <td style="font-family:'DM Mono',monospace;font-weight:700;">${row.total}</td>
+                  <td style="font-family:'DM Mono',monospace;color:var(--teal);font-weight:700;">${row.completed}</td>
+                  <td>
+                    <span class="matrix-pend-badge ${row.pending === 0 ? 'zero' : row.pending < 10 ? 'low' : row.pending < 60 ? 'high' : 'critical'}" data-phase="${h(row.phase)}" title="Click to view ${row.pending} pending villages in ${h(row.phase)}">
+                      ${row.pending}
+                    </span>
+                  </td>
+                  ${shortHeaders.map(([k, lbl]) => {
+                    const st = row.stages[k] || { pending: 0, completed: 0 };
+                    const badgeCls = st.pending === 0 ? 'zero' : st.pending < 6 ? 'low' : st.pending < 30 ? 'high' : 'critical';
+                    return `
+                      <td>
+                        <span class="matrix-pend-badge ${badgeCls}" title="${h(row.phase)} - ${lbl}: ${st.pending} Pending / ${st.completed} Cleared" data-phase="${h(row.phase)}">
+                          ${st.pending}
+                        </span>
+                      </td>
+                    `;
+                  }).join('')}
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+          <tfoot>
+            <tr style="background:#f1f5f9;font-weight:800;border-top:2px solid #cbd5e1;">
+              <td>District Total</td>
+              <td style="font-family:'DM Mono',monospace;">${totalVillages}</td>
+              <td style="font-family:'DM Mono',monospace;color:var(--teal);">${completedFinal}</td>
+              <td><span class="matrix-pend-badge critical">${totalPending}</span></td>
+              ${shortHeaders.map(([k, lbl]) => {
+                const sObj = stages.find(s => s.key === k) || { pending: 0 };
+                const badgeCls = sObj.pending === 0 ? 'zero' : sObj.pending < 200 ? 'low' : sObj.pending < 340 ? 'high' : 'critical';
+                return `<td><span class="matrix-pend-badge ${badgeCls}">${sObj.pending}</span></td>`;
+              }).join('')}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function renderCurrentMonthPpbSection(d, has) {
+  const cur = d.currentMonthPpb;
+  if (!has || !cur || !cur.villages) return '';
+
+  const q = (state.currentMonthSearch || '').toLowerCase().trim();
+  const allVlgs = cur.villages;
+  const filtered = q ? allVlgs.filter(v => 
+    (v.village_name || '').toLowerCase().includes(q) ||
+    (v.village_code || '').toLowerCase().includes(q) ||
+    (v.mandal || '').toLowerCase().includes(q) ||
+    (v.division || '').toLowerCase().includes(q)
+  ) : allVlgs;
+
+  return `
+    <section class="section-card current-month-ppb-section" id="current-month-ppb-card">
+      <div class="current-month-header">
+        <div class="current-month-title">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+            <span class="hero-badge-pill" style="background:rgba(255,255,255,0.2);color:#ffffff;">
+              <span class="pulse-ring"></span> CURRENT MONTH PPB DISTRIBUTION CYCLE
+            </span>
+            <span class="hero-date-tag">SEPTEMBER 2026</span>
+          </div>
+          <h3>September 2026 Cycle — Pattadar Passbooks (PPBs) Pending Villages &amp; Status</h3>
+          <p>Active ryot passbook distribution drive across <strong>37 cleared villages</strong> in 10 Mandals (Target: 22,375 Passbooks).</p>
+        </div>
+        <div class="current-month-kpi-strip">
+          <div class="cur-month-pill">
+            <span>TARGET VILLAGES</span>
+            <strong>${cur.totalVillages}</strong>
+          </div>
+          <div class="cur-month-pill">
+            <span>TARGET PASSBOOKS</span>
+            <strong>${cur.targetPPBs.toLocaleString()}</strong>
+          </div>
+          <div class="cur-month-pill">
+            <span>MANDALS COVERED</span>
+            <strong>${cur.mandalsCount}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="current-month-controls">
+        <div class="cur-search-box">
+          ${icon('search')}
+          <input type="text" id="current-month-search" placeholder="Search village, mandal, or code..." value="${h(state.currentMonthSearch || '')}" />
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+          <span id="current-month-filtered-count" style="font-size:12.5px;font-weight:700;color:var(--navy);">
+            Showing ${filtered.length} of ${allVlgs.length} villages
+          </span>
+          <span style="background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46;padding:5px 12px;border-radius:6px;font-size:11.5px;font-weight:800;">
+            100% Resurvey Cleared · In Passbook Handover
+          </span>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table class="cur-month-table" style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Village Code</th>
+              <th>Village Name</th>
+              <th>Mandal</th>
+              <th>Division</th>
+              <th>Phase</th>
+              <th>Extent</th>
+              <th>Target PPBs</th>
+              <th>Resurvey Stage</th>
+              <th>PPB Distribution Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="current-month-table-body">
+            ${filtered.length ? filtered.map((v, i) => `
+              <tr>
+                <td style="font-weight:700;color:var(--muted);">${i + 1}</td>
+                <td><code>${h(v.village_code)}</code></td>
+                <td><strong>${h(v.village_name)}</strong></td>
+                <td>${h(v.mandal)}</td>
+                <td>${h(v.division)}</td>
+                <td><span class="phase-pill">${h(v.phase)}</span></td>
+                <td>${v.extent ? Number(v.extent).toLocaleString() + ' Ac' : '—'}</td>
+                <td><strong style="font-family:'DM Mono',monospace;color:var(--blue);font-size:14px;">${v.ppb_target ? Number(v.ppb_target).toLocaleString() : '—'}</strong></td>
+                <td><span class="badge-pill-green">${icon('shield')} Final RoR Ported</span></td>
+                <td><span style="background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:4px;font-weight:700;font-size:11.5px;">Distribution Active</span></td>
+                <td><button class="inline-link" data-village="${v.id}" title="Drill down to village details">Track →</button></td>
+              </tr>
+            `).join('') : `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted);">No September 2026 villages match "${h(q)}"</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function updateCurrentMonthTable() {
+  const tbody = document.getElementById('current-month-table-body');
+  const countEl = document.getElementById('current-month-filtered-count');
+  if (!tbody || !state.dashboard?.currentMonthPpb?.villages) return;
+  const q = (state.currentMonthSearch || '').toLowerCase().trim();
+  const allVlgs = state.dashboard.currentMonthPpb.villages;
+  const filtered = q ? allVlgs.filter(v => 
+    (v.village_name || '').toLowerCase().includes(q) ||
+    (v.village_code || '').toLowerCase().includes(q) ||
+    (v.mandal || '').toLowerCase().includes(q) ||
+    (v.division || '').toLowerCase().includes(q)
+  ) : allVlgs;
+
+  if (countEl) countEl.textContent = `Showing ${filtered.length} of ${allVlgs.length} villages`;
+
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted);">No September 2026 villages match "${h(q)}"</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((v, i) => `
+    <tr>
+      <td style="font-weight:700;color:var(--muted);">${i + 1}</td>
+      <td><code>${h(v.village_code)}</code></td>
+      <td><strong>${h(v.village_name)}</strong></td>
+      <td>${h(v.mandal)}</td>
+      <td>${h(v.division)}</td>
+      <td><span class="phase-pill">${h(v.phase)}</span></td>
+      <td>${v.extent ? Number(v.extent).toLocaleString() + ' Ac' : '—'}</td>
+      <td><strong style="font-family:'DM Mono',monospace;color:var(--blue);font-size:14px;">${v.ppb_target ? Number(v.ppb_target).toLocaleString() : '—'}</strong></td>
+      <td><span class="badge-pill-green">${icon('shield')} Final RoR Ported</span></td>
+      <td><span style="background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:4px;font-weight:700;font-size:11.5px;">Distribution Active</span></td>
+      <td><button class="inline-link" data-village="${v.id}" title="Drill down to village details">Track →</button></td>
+    </tr>
+  `).join('');
+}
+
 function renderDashboard() {
   const d = state.dashboard; const has = d.hasData; const sourceReady = d.sourceSummary.configured > 0;
   const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || (has ? 774 : 0);
@@ -294,7 +657,14 @@ function renderDashboard() {
       ${kpiCard('PPBs completed', d.kpis.ppbCompleted, 'Pattadar passbooks issued', 'completed', 'ppb_status', has, 'stageField')}
     </section>
 
-    ${has && d.dailyProgress ? renderTodayProgressSection(d) : ''}
+    <!-- 1. Executive Hero: Today's GT Progress & DLR Revenue Officer Logins -->
+    ${has && d.dailyProgress ? renderTodayHeroSection(d) : ''}
+
+    <!-- 2. Phase-Wise & Stage-Wise Pendency Analysis (All 11 Stages & Matrix) -->
+    ${has ? renderPhaseStagePendencySection(d, has) : ''}
+
+    <!-- 3. Dedicated Section: PPB Current Month (September 2026) Pending Villages & Status -->
+    ${has ? renderCurrentMonthPpbSection(d, has) : ''}
 
     <section class="section-card workflow-card"><div class="section-header"><div><h3>Sequential Workflow Progress</h3><p>Completion is calculated from actual stage statuses across all 11 statutory resurvey activities.</p></div><span class="section-meta">736 VILLAGES</span></div>
       <div class="workflow-steps">${d.stageProgress.map(s => { const isAvail = s.available !== undefined ? s.available : (s.completed !== null && s.completed !== undefined); return `<div class="step ${has && isAvail ? (s.completed ? 'completed' : s.reported ? 'pending' : '') : 'no-data'}"><span class="step-dot"></span><div class="step-name" title="${h(s.label)}">${h(s.label)}</div><div class="step-count">${has && s.completed !== null && s.completed !== undefined ? `${s.completed} complete` : 'Not available'}</div><div class="step-percent">${has && s.percent !== null && s.percent !== undefined ? `${s.percent}%` : '—'}</div></div>`; }).join('')}</div>
@@ -1838,6 +2208,9 @@ document.addEventListener('input', event => {
   } else if (event.target.id === 'mandal-search-input') {
     state.mandalSearch = event.target.value;
     renderPerformance();
+  } else if (event.target.id === 'current-month-search') {
+    state.currentMonthSearch = event.target.value;
+    updateCurrentMonthTable();
   }
 });
 

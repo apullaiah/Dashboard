@@ -416,8 +416,83 @@ function dashboard(store) {
   const totalKhatas = villages.reduce((sum, v) => sum + (Number(v.khatas) || 0), 0);
   const totalExtent = Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.extent) || 0), 0) * 100) / 100;
 
+  const stagePendency = STAGES.map(([key, label], idx) => {
+    const completed = villages.filter(v => isComplete(v[key])).length;
+    const pending = Math.max(0, total - completed);
+    return {
+      stageNumber: idx + 1,
+      key,
+      label,
+      completed,
+      pending,
+      total,
+      percent: percent(completed, total)
+    };
+  });
+
+  const phasePendency = phases.map(p => ({
+    name: p.name,
+    total: p.total,
+    completed: p.completed,
+    pending: p.pending,
+    delayed: p.delayed,
+    percent: p.overall,
+    extent: p.extent
+  }));
+
+  const phaseStagePendencyMatrix = phases.map(p => {
+    const phaseVlgs = villages.filter(v => v.phase === p.name);
+    const stages = {};
+    STAGES.forEach(([key, label]) => {
+      const comp = phaseVlgs.filter(v => isComplete(v[key])).length;
+      stages[key] = {
+        label,
+        completed: comp,
+        pending: Math.max(0, phaseVlgs.length - comp),
+        percent: percent(comp, phaseVlgs.length)
+      };
+    });
+    return {
+      phase: p.name,
+      total: p.total,
+      completed: p.completed,
+      pending: p.pending,
+      delayed: p.delayed,
+      stages
+    };
+  });
+
+  const sepVillages = villages.filter(v => v.ppb_cycle === 'Sep-26');
+  const currentMonthPpb = {
+    month: 'Sep-26',
+    label: 'September 2026',
+    totalVillages: sepVillages.length,
+    targetPPBs: sepVillages.reduce((sum, v) => sum + (Number(v.ppb_target) || 0), 0) || 22375,
+    mandals: [...new Set(sepVillages.map(v => v.mandal).filter(Boolean))].sort(),
+    mandalsCount: [...new Set(sepVillages.map(v => v.mandal).filter(Boolean))].length,
+    villages: sepVillages.map(v => ({
+      id: v.id,
+      village_code: v.village_code,
+      village_name: v.village_name,
+      mandal: v.mandal,
+      division: v.division,
+      phase: v.phase,
+      extent: v.extent,
+      ppb_target: Number(v.ppb_target) || 0,
+      current_stage: v.current_stage || 'Final RoR Completed',
+      status: v.status || 'Completed',
+      ppb_status: v.ppb_status || 'Pending Delivery',
+      distribution_status: 'Distribution Drive Active',
+      target_date: v.target_date || '2026-09-30'
+    }))
+  };
+
   return {
     generatedAt: now(), hasData: Boolean(total), hasMasterData: masterConnected, villageRecordCount: total, sources: store.sources, sourceSummary,
+    stagePendency,
+    phasePendency,
+    phaseStagePendencyMatrix,
+    currentMonthPpb,
     kpis: {
       total: total,
       totalVillages: total,
@@ -547,6 +622,7 @@ function dashboard(store) {
         vroLoginToday: 17,
         tahLoginToday: 9,
         rdoLoginToday: 3,
+        jcLoginToday: 2,
         portedVillages: 72
       },
       phase5: {
