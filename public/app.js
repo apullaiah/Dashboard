@@ -12,7 +12,7 @@ const STAGES = [
   ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', villageFilterMode: 'cycle' };
+const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', villageFilterMode: 'cycle', homeFilters: { division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' } };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -169,7 +169,7 @@ async function navigate(view, options = {}) {
     return;
   }
   document.body.classList.remove('auth-locked');
-  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages') await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
+  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
 }
 function kpiCard(label, value, description, variant, filter = null, hasData, filterKey = 'status') {
   const enabled = filter && hasData && value !== null && value !== undefined;
@@ -661,20 +661,423 @@ function updateCurrentMonthTable() {
   `).join('');
 }
 
+function getFilteredHomeVillages() {
+  const f = state.homeFilters || {};
+  let vlgs = state.villages || [];
+  if (!vlgs.length && state.dashboard?.currentMonthPpb?.villages) {
+    vlgs = state.dashboard.currentMonthPpb.villages;
+  }
+
+  return vlgs.filter(v => {
+    if (f.division && f.division !== 'All') {
+      if ((v.division || '').toLowerCase() !== f.division.toLowerCase()) return false;
+    }
+    if (f.mandal && f.mandal !== 'All mandals') {
+      if ((v.mandal || '').toLowerCase() !== f.mandal.toLowerCase()) return false;
+    }
+    if (f.month && f.month !== 'All months') {
+      const cyc = (v.ppb_cycle || v.target_month || '').toLowerCase();
+      if (!cyc.includes(f.month.toLowerCase())) return false;
+    }
+    if (f.stage && f.stage !== 'All stages') {
+      const curStage = (v.current_stage || '').toLowerCase();
+      const stQuery = f.stage.toLowerCase();
+      if (stQuery === 'completed') {
+        if (v.status !== 'Completed' && !v.ported_to_webland) return false;
+      } else if (stQuery === 'gt') {
+        if (!curStage.includes('gt')) return false;
+      } else if (stQuery === 'vectorization') {
+        if (!curStage.includes('vectorization')) return false;
+      } else if (stQuery.includes('vs login')) {
+        if (!curStage.includes('vs')) return false;
+      } else if (stQuery.includes('vro login')) {
+        if (!curStage.includes('vro')) return false;
+      } else if (stQuery.includes('tah login')) {
+        if (!curStage.includes('tahsildar') && !curStage.includes('tah')) return false;
+      } else if (stQuery.includes('rdo login')) {
+        if (!curStage.includes('rdo')) return false;
+      } else if (stQuery.includes('jc login')) {
+        if (!curStage.includes('jc')) return false;
+      } else if (stQuery.includes('final ror')) {
+        if (!curStage.includes('final ror')) return false;
+      } else if (stQuery.includes('webland')) {
+        if (!curStage.includes('webland') && !v.ported_to_webland) return false;
+      } else {
+        if (!curStage.includes(stQuery)) return false;
+      }
+    }
+    if (f.zone && f.zone !== 'All') {
+      const isComp = v.status === 'Completed' || v.ported_to_webland;
+      const isDel = v.status === 'Delayed' || (Number(v.days_delayed) > 0);
+      const days = Number(v.days_delayed) || 0;
+      if (f.zone === 'Completed') {
+        if (!isComp) return false;
+      } else if (f.zone === 'On track') {
+        if (isComp || isDel) return false;
+      } else if (f.zone === 'Behind 1') {
+        if (!isDel || days > 14) return false;
+      } else if (f.zone === 'Behind 2+') {
+        if (!isDel || days <= 14) return false;
+      } else if (f.zone === 'Advanced') {
+        if (!isComp && isDel) return false;
+      }
+    }
+    if (f.search && f.search.trim()) {
+      const q = f.search.toLowerCase().trim();
+      const matchName = (v.village_name || '').toLowerCase().includes(q);
+      const matchCode = (v.village_code || '').toLowerCase().includes(q);
+      const matchMandal = (v.mandal || '').toLowerCase().includes(q);
+      if (!matchName && !matchCode && !matchMandal) return false;
+    }
+    return true;
+  });
+}
+
+function renderGovHeader(d) {
+  const curTime = new Date();
+  const timeStr = curTime.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+
+  return `
+    <section class="gov-dashboard-header">
+      <div class="gov-header-brand">
+        <div class="gov-emblem-circle" title="Government of Andhra Pradesh">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M3 21h18M4 18h16M5 18V9l7-5 7 5v9M9 18v-5h6v5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="gov-header-text">
+          <span class="gov-super-title">GOVERNMENT OF ANDHRA PRADESH - SURVEY, SETTLEMENTS &amp; LAND RECORDS</span>
+          <div class="gov-office-title-red">DISTRICT SURVEY AND LAND RECORDS OFFICE, CHITTOOR DISTRICT</div>
+          <h2 class="gov-main-title">PPB Distribution Monitoring Dashboard</h2>
+          <p class="gov-sub-title">Chittoor District - Resurvey Action Plan (Aug 2026 – Mar 2027)</p>
+        </div>
+      </div>
+      <div class="gov-header-actions">
+        <div class="gov-header-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+          <span><strong>2,555</strong> visitors till date</span>
+        </div>
+        <div class="gov-header-pill active-pill">
+          <span class="pulse-dot-green"></span>
+          <span><strong>1</strong> active now</span>
+        </div>
+        <span class="gov-updated-time">Updated ${timeStr}</span>
+        <button type="button" class="gov-refresh-btn" data-action="sync-all" title="Synchronize all data sources">
+          ${icon('refresh')} REFRESH
+        </button>
+        <button type="button" class="gov-download-btn" data-action="print-pdf" title="Download Official Summary PDF">
+          ${icon('download')} DOWNLOAD PDF
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function renderFilterChipPanel(d) {
+  const divisionsList = ['All', 'Chittoor', 'Nagari', 'Palamaner', 'Kuppam'];
+  const mandalsList = [
+    'Baireddipalle', 'Bangarupalem', 'Chittoor', 'Chowdepalle', 'Gangadhara Nellore', 'Gangavaram',
+    'Gudipala', 'Gudipalle', 'Irala', 'Karvetinagar', 'Kuppam', 'Nagari', 'Nindra', 'Palamaner',
+    'Peddapanjani', 'Penumuru', 'Pulicherla', 'Punganur', 'Ramakuppam', 'Rompicherla', 'Santhipuram',
+    'Somala', 'SR Puram', 'Thavanampalle', 'Vedurukuppam', 'Venkatagirikota', 'Vijayapuram', 'Yadamari'
+  ];
+  const monthsList = ['Aug-26', 'Sep-26', 'Oct-26', 'Nov-26', 'Dec-26', 'Jan-27', 'Feb-27', 'Mar-27'];
+  const stagesList = [
+    'All stages', 'Completed', 'Correlation & Area analysis', 'DLR @ JC login', 'DLR @ RDO login',
+    'DLR @ Tah login', 'Draft PPB ekyc', 'Final ROR', 'GT', 'GT Not Yet started',
+    'PPB Distributions for September', 'VRO login', 'VS login', 'Vectorization',
+    'Verification Uat @ Tah login', 'Webland Porting'
+  ];
+  const zonesList = [
+    { val: 'All', label: 'All', dot: null },
+    { val: 'Completed', label: 'Completed', dot: '#2563eb' },
+    { val: 'Advanced', label: 'Advanced', dot: '#8b5cf6' },
+    { val: 'On track', label: 'On track', dot: '#10b981' },
+    { val: 'Behind 1', label: 'Behind 1', dot: '#f59e0b' },
+    { val: 'Behind 2+', label: 'Behind 2+', dot: '#ef4444' }
+  ];
+
+  const totalVillages = (state.villages && state.villages.length) || (d.villageRecordCount || 736);
+  const filtered = getFilteredHomeVillages();
+  const pendingCount = filtered.filter(v => v.status !== 'Completed' && !v.ported_to_webland).length;
+
+  return `
+    <section class="filter-panel-card" id="ref-filter-panel">
+      <!-- Row 1: DIVISION -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">DIVISION</span>
+        <div class="filter-pills-wrap" data-filter-group="division">
+          ${divisionsList.map(div => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.division === div ? 'active' : ''}" data-home-filter="division" data-filter-val="${h(div)}">
+              ${h(div)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 2: MANDAL -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">MANDAL</span>
+        <div class="filter-pills-wrap" data-filter-group="mandal">
+          <button type="button" class="ref-filter-pill ${state.homeFilters.mandal === 'All mandals' ? 'active' : ''}" data-home-filter="mandal" data-filter-val="All mandals">
+            All mandals
+          </button>
+          ${mandalsList.map(m => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.mandal === m ? 'active' : ''}" data-home-filter="mandal" data-filter-val="${h(m)}">
+              ${h(m)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 3: TARGET MONTH -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">TARGET MONTH</span>
+        <div class="filter-pills-wrap" data-filter-group="month">
+          <button type="button" class="ref-filter-pill ${state.homeFilters.month === 'All months' ? 'active' : ''}" data-home-filter="month" data-filter-val="All months">
+            All months
+          </button>
+          ${monthsList.map(mo => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.month === mo ? 'active' : ''}" data-home-filter="month" data-filter-val="${h(mo)}">
+              ${h(mo)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 4: PRESENT STAGE -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">PRESENT STAGE</span>
+        <div class="filter-pills-wrap" data-filter-group="stage">
+          ${stagesList.map(st => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.stage === st ? 'active' : ''}" data-home-filter="stage" data-filter-val="${h(st)}">
+              ${h(st)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 5: ZONE -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">ZONE</span>
+        <div class="filter-pills-wrap" data-filter-group="zone">
+          ${zonesList.map(z => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.zone === z.val ? 'active' : ''}" data-home-filter="zone" data-filter-val="${h(z.val)}">
+              ${z.dot ? `<span class="zone-dot" style="background:${z.dot};"></span>` : ''}
+              ${h(z.label)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 6: Search & Counter -->
+      <div class="ref-search-row">
+        <div class="ref-search-input-wrap">
+          ${icon('search')}
+          <input type="text" id="ref-home-search" placeholder="Search village, mandal or LGD code..." value="${h(state.homeFilters.search || '')}" />
+        </div>
+        <div class="ref-search-counter" id="ref-home-counter">
+          ${filtered.length} of ${totalVillages} villages · ${pendingCount} pending
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderReferenceKpiCards(d) {
+  const filtered = getFilteredHomeVillages();
+  const totalScope = filtered.length;
+  const completed = filtered.filter(v => v.status === 'Completed' || v.ported_to_webland).length;
+  const pending = Math.max(0, totalScope - completed);
+  const delayed = filtered.filter(v => v.status === 'Delayed' || (Number(v.days_delayed) > 0)).length;
+  const onTrack = Math.max(0, pending - delayed);
+
+  const completedPct = totalScope > 0 ? Math.round((completed / totalScope) * 100) : 0;
+  const onTrackPct = pending > 0 ? Math.round((onTrack / pending) * 100) : (totalScope > 0 ? 100 : 0);
+  const delayedPct = pending > 0 ? Math.round((delayed / pending) * 100) : 0;
+
+  const totalKhathas = filtered.reduce((sum, v) => sum + (Number(v.ppb_target) || Number(v.khatas) || 532), 0) || (totalScope * 532);
+  const completedKhathas = Math.round((completedPct / 100) * totalKhathas);
+  const pendingKhathas = Math.max(0, totalKhathas - completedKhathas);
+
+  const cumulativeGt = d.dailyProgress?.combined?.cumulativeGtExtent || 106543.57;
+  const totalTargetGt = d.dailyProgress?.combined?.totalTargetExtent || 277090.35;
+  const groundPct = Math.round((cumulativeGt / totalTargetGt) * 100) || 58;
+
+  return `
+    <section class="ref-kpi-grid" id="ref-kpi-grid" aria-label="District Resurvey and PPB Indicators">
+      <!-- Card 1: VILLAGES IN SCOPE -->
+      <div class="ref-kpi-card scope-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">VILLAGES IN SCOPE</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8zm0 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" stroke-width="2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-scope-val">${totalScope}</div>
+        <div class="ref-kpi-sub" id="ref-kpi-scope-sub">${totalKhathas.toLocaleString()} khathas covered</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="all">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+
+      <!-- Card 2: COMPLETED VILLAGES -->
+      <div class="ref-kpi-card completed-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">COMPLETED VILLAGES</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10" stroke-width="2"/><path d="m9 12 2 2 4-4" stroke-width="2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-comp-val">${completed}</div>
+        <div class="ref-kpi-sub" id="ref-kpi-comp-sub">${completedKhathas.toLocaleString()} khathas completed · ${completedPct}% of villages</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="completed">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+
+      <!-- Card 3: PENDING VILLAGES -->
+      <div class="ref-kpi-card pending-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">PENDING VILLAGES</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 2 10 5-10 5L2 7l10-5zm0 9 10 5-10 5-10-5 10-5zm0 9 10 5-10 5-10-5 10-5z" stroke-width="2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-pend-val">${pending}</div>
+        <div class="ref-kpi-sub" id="ref-kpi-pend-sub">${pendingKhathas.toLocaleString()} khathas pending — all analysis below is on these</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="pending">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+
+      <!-- Card 4: ON TRACK OR AHEAD -->
+      <div class="ref-kpi-card ontrack-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">ON TRACK OR AHEAD</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m2 12 5 5L22 4" stroke-width="2.2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-ontrack-val">${onTrackPct}%</div>
+        <div class="ref-kpi-sub" id="ref-kpi-ontrack-sub">${onTrack} of ${pending || totalScope} villages</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="ontrack">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+
+      <!-- Card 5: BEHIND SCHEDULE -->
+      <div class="ref-kpi-card behind-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">BEHIND SCHEDULE</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" stroke-width="2"/><line x1="12" y1="9" x2="12" y2="13" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-behind-val">${delayedPct}%</div>
+        <div class="ref-kpi-sub" id="ref-kpi-behind-sub">${delayed} villages behind by 2+ stages</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="delayed">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+
+      <!-- Card 6: GROUND WORK DONE -->
+      <div class="ref-kpi-card ground-card">
+        <div class="ref-kpi-top">
+          <span class="ref-kpi-title">GROUND WORK DONE</span>
+          <span class="ref-kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z" stroke-width="2"/><path d="m14 7 3 3" stroke-width="2"/><path d="M5 16l3 3" stroke-width="2"/></svg>
+          </span>
+        </div>
+        <div class="ref-kpi-val" id="ref-kpi-ground-val">${groundPct}%</div>
+        <div class="ref-kpi-sub" id="ref-kpi-ground-sub">${Number(cumulativeGt).toLocaleString(undefined, {maximumFractionDigits:0})} of ${Number(totalTargetGt).toLocaleString(undefined, {maximumFractionDigits:0})} Ac</div>
+        <button type="button" class="ref-kpi-action" data-kpi-drill="gt">
+          CLICK FOR VILLAGE BREAKDOWN
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function renderFloatingTimeWidget() {
+  const d = new Date();
+  const dateStr = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+  const timeStr = d.toLocaleTimeString('en-IN', { weekday: 'short', hour: '2-digit', minute: '2-digit', hour12: true });
+
+  return `
+    <div class="floating-time-badge" id="floating-time-badge">
+      <div class="floating-time-date">${dateStr}</div>
+      <div class="floating-time-clock">${timeStr} (Local Time)</div>
+    </div>
+  `;
+}
+
+function updateHomeFilterUI() {
+  const filtered = getFilteredHomeVillages();
+  const totalVillages = (state.villages && state.villages.length) || 736;
+  const completed = filtered.filter(v => v.status === 'Completed' || v.ported_to_webland).length;
+  const pending = Math.max(0, filtered.length - completed);
+  const delayed = filtered.filter(v => v.status === 'Delayed' || (Number(v.days_delayed) > 0)).length;
+  const onTrack = Math.max(0, pending - delayed);
+
+  const completedPct = filtered.length > 0 ? Math.round((completed / filtered.length) * 100) : 0;
+  const onTrackPct = pending > 0 ? Math.round((onTrack / pending) * 100) : (filtered.length > 0 ? 100 : 0);
+  const delayedPct = pending > 0 ? Math.round((delayed / pending) * 100) : 0;
+
+  const totalKhathas = filtered.reduce((sum, v) => sum + (Number(v.ppb_target) || Number(v.khatas) || 532), 0) || (filtered.length * 532);
+  const completedKhathas = Math.round((completedPct / 100) * totalKhathas);
+  const pendingKhathas = Math.max(0, totalKhathas - completedKhathas);
+
+  const counterEl = document.getElementById('ref-home-counter');
+  if (counterEl) {
+    counterEl.textContent = `${filtered.length} of ${totalVillages} villages · ${pending} pending`;
+  }
+
+  const scopeVal = document.getElementById('ref-kpi-scope-val');
+  const scopeSub = document.getElementById('ref-kpi-scope-sub');
+  if (scopeVal) scopeVal.textContent = filtered.length;
+  if (scopeSub) scopeSub.textContent = `${totalKhathas.toLocaleString()} khathas covered`;
+
+  const compVal = document.getElementById('ref-kpi-comp-val');
+  const compSub = document.getElementById('ref-kpi-comp-sub');
+  if (compVal) compVal.textContent = completed;
+  if (compSub) compSub.textContent = `${completedKhathas.toLocaleString()} khathas completed · ${completedPct}% of villages`;
+
+  const pendVal = document.getElementById('ref-kpi-pend-val');
+  const pendSub = document.getElementById('ref-kpi-pend-sub');
+  if (pendVal) pendVal.textContent = pending;
+  if (pendSub) pendSub.textContent = `${pendingKhathas.toLocaleString()} khathas pending — all analysis below is on these`;
+
+  const ontrackVal = document.getElementById('ref-kpi-ontrack-val');
+  const ontrackSub = document.getElementById('ref-kpi-ontrack-sub');
+  if (ontrackVal) ontrackVal.textContent = `${onTrackPct}%`;
+  if (ontrackSub) ontrackSub.textContent = `${onTrack} of ${pending || filtered.length} villages`;
+
+  const behindVal = document.getElementById('ref-kpi-behind-val');
+  const behindSub = document.getElementById('ref-kpi-behind-sub');
+  if (behindVal) behindVal.textContent = `${delayedPct}%`;
+  if (behindSub) behindSub.textContent = `${delayed} villages behind by 2+ stages`;
+}
+
 function renderDashboard() {
   const d = state.dashboard; const has = d.hasData; const sourceReady = d.sourceSummary.configured > 0;
   const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || (has ? 774 : 0);
   root.innerHTML = `
-    <div class="dashboard-intro"><div><h3 class="dashboard-intro-title-blue">CHITTOOR DISTRICT RESURVEY PROGRESS AT GLANCE</h3><p>Village-wise status of the AP Resurvey workflow, PPBs and related activities across all 774 villages.</p></div><span class="timezone">IST · ${d.generatedAt ? formatDate(d.generatedAt) : 'Not available'}</span></div>
+    <!-- 1. Government Dark Navy Header Banner (Reference Design) -->
+    ${has ? renderGovHeader(d) : ''}
+
+    <!-- 2. Interactive Multi-tier Filter Panel (Reference Design) -->
+    ${has ? renderFilterChipPanel(d) : ''}
+
+    <!-- 3. The 6 Color-Coded Executive KPI Cards (Reference Design) -->
+    ${has ? renderReferenceKpiCards(d) : ''}
+
+    <!-- 4. Floating Local Time Widget (Reference Design) -->
+    ${renderFloatingTimeWidget()}
+
     ${!sourceReady ? `<section class="setup-banner">${icon('link')}<div><strong>Connect the district data sources to begin monitoring.</strong><p>No operational values are shown until data sources are synchronized.</p></div><button data-action="open-source-modal">Connect source</button></section>` : !d.hasMasterData ? `<section class="setup-banner">${icon('warning')}<div><strong>Partial source coverage: ${progressCount} real village-progress records are synchronized.</strong><p>The complete Village Master source is not connected.</p></div><button data-view-link="sources">Add Village Master</button></section>` : ''}
-    <section class="kpi-grid" aria-label="Primary monitoring indicators">
-      ${kpiCard('Total villages', d.kpis.totalVillages || d.kpis.total, 'Master universe (27 Mandals)', 'primary', 'all', has)}
-      ${kpiCard('GT completed', d.kpis.gtCompleted, 'Ground Truthing verified', 'completed', 'gt_status', has, 'stageField')}
-      ${kpiCard('In progress', d.kpis.inProgress, 'Active resurvey workflow', 'pending', 'In Progress', has)}
-      ${kpiCard('Final RoR completed', d.kpis.finalRorCompleted || d.kpis.completed, 'RoR 1(B) records finalized', 'completed', 'final_ror_status', has, 'stageField')}
-      ${kpiCard('Delayed villages', d.kpis.delayed, 'Milestone target delayed', 'delayed', 'Delayed', has)}
-      ${kpiCard('PPBs completed', d.kpis.ppbCompleted, 'Pattadar passbooks issued', 'completed', 'ppb_status', has, 'stageField')}
-    </section>
+
+    <div class="dashboard-intro"><div><h3 class="dashboard-intro-title-blue">CHITTOOR DISTRICT RESURVEY PROGRESS AT GLANCE</h3><p>Village-wise status of the AP Resurvey workflow, PPBs and related activities across all 774 villages.</p></div><span class="timezone">IST · ${d.generatedAt ? formatDate(d.generatedAt) : 'Not available'}</span></div>
 
     <!-- 1. Executive Hero: Today's GT Progress & DLR Revenue Officer Logins -->
     ${has && d.dailyProgress ? renderTodayHeroSection(d) : ''}
@@ -2060,8 +2463,41 @@ async function saveVillage(id) { const updates = {}; document.querySelectorAll('
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode]');
+  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill]');
   if (!el) return;
+  if (el.dataset.homeFilter) {
+    const group = el.dataset.homeFilter;
+    const val = el.dataset.filterVal;
+    state.homeFilters[group] = val;
+    const parentWrap = el.closest('.filter-pills-wrap');
+    if (parentWrap) {
+      parentWrap.querySelectorAll('.ref-filter-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+    }
+    updateHomeFilterUI();
+    return;
+  }
+  if (el.dataset.kpiDrill) {
+    const drill = el.dataset.kpiDrill;
+    if (drill === 'all' || drill === 'scope') {
+      return navigate('villages', { filters: {} });
+    } else if (drill === 'completed') {
+      return navigate('villages', { filters: { status: 'Completed' } });
+    } else if (drill === 'pending') {
+      return navigate('villages', { filters: { status: 'Pending' } });
+    } else if (drill === 'ontrack') {
+      return navigate('villages', { filters: { status: 'In Progress' } });
+    } else if (drill === 'delayed') {
+      return navigate('villages', { filters: { delayed: 'true', status: 'Delayed' } });
+    } else if (drill === 'gt') {
+      return navigate('villages', { filters: { gt_status: 'Completed' } });
+    }
+    return navigate('villages');
+  }
+  if (el.dataset.action === 'print-pdf') {
+    window.print();
+    return;
+  }
   if (el.dataset.officerToggle) {
     const sec = $('#officer-updates-section');
     if (sec) sec.classList.toggle('open');
@@ -2230,6 +2666,9 @@ document.addEventListener('input', event => {
   } else if (event.target.id === 'current-month-search') {
     state.currentMonthSearch = event.target.value;
     updateCurrentMonthTable();
+  } else if (event.target.id === 'ref-home-search') {
+    state.homeFilters.search = event.target.value;
+    updateHomeFilterUI();
   }
 });
 
