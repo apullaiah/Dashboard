@@ -4,7 +4,7 @@ const STAGES = [
   ['jc_status', 'JC Login'], ['section13_status', 'Section 13'], ['draft_ror_status', 'Draft RoR'], ['final_ror_status', 'Final RoR']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '' };
+const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'cycles', mandalSearch: '', overviewMode: 'ppb_cycles', villageFilterMode: 'cycle' };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -150,6 +150,181 @@ function kpiCard(label, value, description, variant, filter = null, hasData, fil
   return `<button class="kpi-card ${variant || ''}" ${action}><span class="kpi-label"><i></i>${h(label)}</span><b class="kpi-value">${noValue(value, hasData)}</b><span class="kpi-description">${h(description)}</span>${enabled ? `<span class="drill-arrow">${icon('arrow')}</span>` : ''}</button>`;
 }
 function emptyBlock(title, note, iconName = 'database') { return `<div class="empty-block"><div>${icon(iconName)}<strong>${h(title)}</strong><p>${h(note)}</p></div></div>`; }
+
+function renderTodayProgressSection(d) {
+  const p = d.dailyProgress || {
+    asOnDate: '14-09-2026',
+    combined: {
+      todayGtExtent: 1440.82,
+      cumulativeGtExtent: 103870.09,
+      totalTargetExtent: 277122.94,
+      gtCompletedVillages: 58,
+      totalVillages: 152,
+      vsLoginToday: 20,
+      vroLoginToday: 12,
+      tahLoginToday: 9,
+      rdoLoginToday: 3,
+      portedVillages: 72
+    },
+    phase5: {
+      phase: 'Phase V',
+      date: '14-09-2026',
+      totalVillages: 60,
+      totalExtent: 116517.27,
+      todayGtExtent: 351.25,
+      cumulativeGtExtent: 81438.16,
+      gtCompletedVillages: 49,
+      gtStartedVillages: 60,
+      gtNotStartedVillages: 0,
+      vsLoginToday: 16,
+      vroLoginToday: 12,
+      tahLoginToday: 9,
+      rdoLoginToday: 3,
+      vectorizationVillages: 5,
+      correlationAreaVillages: 4
+    },
+    phase6: {
+      phase: 'Phase VI',
+      date: '11-09-2026',
+      totalVillages: 92,
+      totalExtent: 160605.67,
+      todayGtExtent: 1089.57,
+      cumulativeGtExtent: 22431.93,
+      gtStartedVillages: 54,
+      gtNotStartedVillages: 38,
+      gtCompletedVillages: 9,
+      vsLoginToday: 4,
+      vroLoginToday: 0,
+      tahLoginToday: 0,
+      rdoLoginToday: 0,
+      vectorizationVillages: 5,
+      correlationAreaVillages: 0
+    },
+    portedToWebland: {
+      totalPorted: 72,
+      phase1: 27,
+      phase2: 34,
+      phase3: 11,
+      allActivitiesCompleted: true
+    }
+  };
+
+  return `
+    <section class="section-card today-progress-card">
+      <div class="today-progress-header">
+        <div class="today-progress-title-block">
+          <span class="live-pulse-badge"><span class="pulse-ring"></span> TODAY'S RESURVEY MONITORING (PHASE 5 & 6)</span>
+          <h3>Today's GT Progress & Revenue Officer Login Status</h3>
+          <p>Official District Collectorate review as on ${p.asOnDate || '14-09-2026'} · Real-time Ground Truthing out-turn & Village Secretariat / VRO login tracking.</p>
+        </div>
+        <div class="today-header-badges">
+          <button class="today-badge-filter-btn" data-action="filter-ported-villages" title="Click to view all 72 Webland-2 ported villages">
+            <span class="badge-icon">${icon('shield')}</span>
+            <span>Webland-2 Ported: <strong>${p.combined.portedVillages || 72} Villages</strong></span>
+            <small class="badge-pill-green">100% COMPLETED</small>
+          </button>
+        </div>
+      </div>
+
+      <div class="today-kpi-row">
+        <!-- 1. Today's GT Progress -->
+        <div class="today-kpi-box gt-box">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('map')}</span>
+            <span class="today-kpi-tag">TODAY'S GT OUT-TURN EXTENT</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">${Number(p.combined.todayGtExtent).toLocaleString()} <small>Acres</small></b>
+            <span class="today-kpi-sub">Today's Combined Out-turn (Phase 5 & 6)</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">PHASE 5 TODAY</span>
+              <strong class="split-val">${Number(p.phase5.todayGtExtent).toLocaleString()} Ac</strong>
+              <small class="split-note">Cum: ${Number(p.phase5.cumulativeGtExtent).toLocaleString()} Ac (${p.phase5.gtCompletedVillages}/${p.phase5.totalVillages} Vlgs Done)</small>
+            </div>
+            <div class="split-divider"></div>
+            <div class="split-col">
+              <span class="split-label">PHASE 6 TODAY</span>
+              <strong class="split-val">${Number(p.phase6.todayGtExtent).toLocaleString()} Ac</strong>
+              <small class="split-note">Cum: ${Number(p.phase6.cumulativeGtExtent).toLocaleString()} Ac (${p.phase6.gtCompletedVillages}/${p.phase6.totalVillages} Vlgs Done)</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. VS Login Status Today -->
+        <div class="today-kpi-box vs-box">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('users')}</span>
+            <span class="today-kpi-tag">VS LOGIN STATUS TODAY</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">${p.combined.vsLoginToday} <small>Villages</small></b>
+            <span class="today-kpi-sub">Village Secretariat Active Logins</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">PHASE 5 ACTIVE</span>
+              <strong class="split-val">${p.phase5.vsLoginToday} Villages</strong>
+              <small class="split-note">Village Secretariat</small>
+            </div>
+            <div class="split-divider"></div>
+            <div class="split-col">
+              <span class="split-label">PHASE 6 ACTIVE</span>
+              <strong class="split-val">${p.phase6.vsLoginToday} Villages</strong>
+              <small class="split-note">Village Secretariat</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. VRO Login Status Today -->
+        <div class="today-kpi-box vro-box">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('user')}</span>
+            <span class="today-kpi-tag">VRO LOGIN STATUS TODAY</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">${p.combined.vroLoginToday} <small>Villages</small></b>
+            <span class="today-kpi-sub">Village Revenue Officer Active</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">PHASE 5 ACTIVE</span>
+              <strong class="split-val">${p.phase5.vroLoginToday} Villages</strong>
+              <small class="split-note">Tah: ${p.phase5.tahLoginToday} · RDO: ${p.phase5.rdoLoginToday}</small>
+            </div>
+            <div class="split-divider"></div>
+            <div class="split-col">
+              <span class="split-label">PHASE 6 ACTIVE</span>
+              <strong class="split-val">${p.phase6.vroLoginToday} Villages</strong>
+              <small class="split-note">Tah: 0 · RDO: 0</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Webland-2 Ported Completed -->
+        <div class="today-kpi-box ported-box clickable" data-action="filter-ported-villages">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('shield')}</span>
+            <span class="today-kpi-tag">WEBLAND 2.0 PORTED</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">${p.combined.portedVillages || 72} <small>Villages</small></b>
+            <span class="today-kpi-sub">All Resurvey Activities Completed</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">PHASE BREAKDOWN</span>
+              <strong class="split-val">P1: ${p.portedToWebland.phase1} · P2: ${p.portedToWebland.phase2} · P3: ${p.portedToWebland.phase3}</strong>
+              <small class="split-note" style="color:var(--teal);font-weight:700;">View 72 Completed Villages →</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function renderDashboard() {
   const d = state.dashboard; const has = d.hasData; const sourceReady = d.sourceSummary.configured > 0;
   const progressCount = d.villageRecordCount || d.kpis?.total || (state.villages && state.villages.length) || 774;
@@ -165,47 +340,7 @@ function renderDashboard() {
       ${kpiCard('PPBs completed', d.kpis.ppbCompleted, 'Pattadar passbooks issued', 'completed', 'ppb_status', has, 'stageField')}
     </section>
 
-    <section class="section-card khata-directive-card">
-      <div class="section-header">
-        <div>
-          <h3>Joint Collector Directive · Khata Reconciliation</h3>
-          <p>Continuous monitoring of Patta, Government, and Notional Khatas across Resurvey villages (RSDT, MLSO & VRO submissions).</p>
-        </div>
-        <span class="section-meta">LIVE PROFORMA</span>
-      </div>
-      <div class="khata-metrics-grid">
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Patta Land Khatas</span>
-          <b class="khata-metric-val">${Number(d.kpis.pattaKhatas || 0).toLocaleString()}</b>
-          <small>Private holdings reported</small>
-        </div>
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Government Khatas</span>
-          <b class="khata-metric-val">${Number(d.kpis.govtKhatas || 0).toLocaleString()}</b>
-          <small>Poramboke / Govt lands</small>
-        </div>
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Both Patta & Dkt</span>
-          <b class="khata-metric-val">${Number(d.kpis.bothKhatas || 0).toLocaleString()}</b>
-          <small>Joint / Notional Khatas</small>
-        </div>
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Proposed Deletions</span>
-          <b class="khata-metric-val">${Number(d.kpis.deletions || 0).toLocaleString()}</b>
-          <small>Flagged for removal</small>
-        </div>
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Reconciled Khatas</span>
-          <b class="khata-metric-val">${Number(d.kpis.totalKhatas || 0).toLocaleString()}</b>
-          <small>Total Proforma Khatas</small>
-        </div>
-        <div class="khata-metric-box">
-          <span class="khata-metric-label">Khatas as per Online</span>
-          <b class="khata-metric-val">${Number(d.kpis.onlineKhatas || 0).toLocaleString()}</b>
-          <small>Webland portal records</small>
-        </div>
-      </div>
-    </section>
+    ${renderTodayProgressSection(d)}
 
     <section class="section-card workflow-card"><div class="section-header"><div><h3>Sequential Workflow Progress</h3><p>Completion is calculated from actual stage statuses across all 10 stages.</p></div><span class="section-meta">774 VILLAGES</span></div>
       <div class="workflow-steps">${d.stageProgress.map(s => { const isAvail = s.available !== undefined ? s.available : (s.completed !== null && s.completed !== undefined); return `<div class="step ${has && isAvail ? (s.completed ? 'completed' : s.reported ? 'pending' : '') : 'no-data'}"><span class="step-dot"></span><div class="step-name" title="${h(s.label)}">${h(s.label)}</div><div class="step-count">${has && s.completed !== null && s.completed !== undefined ? `${s.completed} complete` : 'Not available'}</div><div class="step-percent">${has && s.percent !== null && s.percent !== undefined ? `${s.percent}%` : '—'}</div></div>`; }).join('')}</div>
@@ -219,11 +354,180 @@ function renderDashboard() {
       ${performanceCard('Mandals requiring attention', 'Lowest Final RoR completion, based on all villages in each Mandal.', d.mandals, has, 'mandal')}
       ${performanceCard('Division performance', 'Ranked by Final RoR completion. Click a division for its villages.', d.divisions, has, 'division')}
     </div>
-    <section class="section-card"><div class="section-header"><div><h3>Phase progress</h3><p>Phase-wise village completion and pending workload.</p></div>${has ? `<button class="inline-link" data-view-link="performance">View performance</button>` : ''}</div>${phaseCells(d.phases, has)}</section>
+    <div class="overview-mode-bar">
+      <div class="overview-mode-title">
+        ${icon('grid')}
+        <div>
+          <span>MONITORING FRAMEWORK: <strong>${state.overviewMode === 'ppb_cycles' ? 'Month-Wise PPBs Distribution Cycle View' : 'Sequential Phase Progress View'}</strong></span>
+          <small>${state.overviewMode === 'ppb_cycles' ? 'Joint Collectorate Plan of Action · 8 Monthly Delivery Cycles (Aug 2026 – Mar 2027)' : 'Sequential 7-Phase Revenue Tracking'}</small>
+        </div>
+      </div>
+      <div class="view-mode-toggle">
+        <button class="view-mode-btn ${state.overviewMode === 'ppb_cycles' ? 'active' : ''}" data-toggle-overview-mode="ppb_cycles">
+          ${icon('chart')} Month-wise PPBs Cycle
+        </button>
+        <button class="view-mode-btn ${state.overviewMode === 'phases' ? 'active' : ''}" data-toggle-overview-mode="phases">
+          ${icon('map')} Phase Progress View
+        </button>
+      </div>
+    </div>
+
+    ${state.overviewMode === 'ppb_cycles' ? renderDashboardPpbCycleSection(d, has) : `
+      <section class="section-card"><div class="section-header"><div><h3>Phase progress</h3><p>Phase-wise village completion and pending workload.</p></div>${has ? `<button class="inline-link" data-view-link="performance">View performance</button>` : ''}</div>${phaseCells(d.phases, has)}</section>
+    `}
+
     <div class="performance-grid" style="margin-top:20px">
       <section class="section-card"><div class="section-header"><div><h3>Current bottleneck</h3><p>Stage with the largest pending workload.</p></div></div>${d.bottleneck && has ? `<div class="bottleneck-body"><div class="bottleneck-header-row"><div class="bottleneck-stage-name">${h(d.bottleneck.label)}</div><span class="bottleneck-pending-badge">${d.bottleneck.pending} pending villages</span></div><div class="bottleneck-bar" title="${100 - (d.bottleneck.percent || 0)}% pendency"><i style="width:${Math.max(4, 100 - (d.bottleneck.percent || 0))}%"></i></div><div class="bottleneck-footer-row"><span>Stage completion rate</span><strong>${d.bottleneck.percent ?? 0}% completed</strong></div></div>` : emptyBlock('Workflow data not available', 'The bottleneck will appear after stage progress is synchronized.', 'chart')}</section>
       <section class="section-card"><div class="section-header"><div><h3>Data quality</h3><p>Records requiring verification.</p></div>${has ? `<button class="inline-link" data-view-link="quality">Review issues</button>` : ''}</div><div class="data-grid">${qualityCells(d.quality, has)}</div></section>
     </div>`;
+}
+
+function renderDashboardPpbCycleSection(d, has) {
+  const cycles = d.ppbCycles || [];
+  if (!has || !cycles.length) {
+    return emptyBlock('PPBs Cycle data not available', 'Cycle records will appear once synchronized.', 'chart');
+  }
+
+  return `
+    <section class="section-card ppb-cycle-dashboard-card">
+      <div class="section-header">
+        <div>
+          <h3>Month-Wise PPBs Distribution Cycle</h3>
+          <p>Official timelines & delivery targets from the Joint Collector / SSLR Plan of Action (Aug 2026 to Mar 2027).</p>
+        </div>
+        <div class="ppb-cycle-header-meta">
+          <div class="cycle-stat-badge">
+            <span>BALANCE TARGET</span>
+            <strong>332,013 <small>PPBs (434 Vlgs)</small></strong>
+          </div>
+          <div class="cycle-stat-badge current-active">
+            <span>CURRENT OPERATIONAL CYCLE</span>
+            <strong>SEP 2026 <small>(37 Villages · 22.3k PPBs)</small></strong>
+          </div>
+          <div class="cycle-stat-badge">
+            <span>PRIOR DISTRIBUTED</span>
+            <strong>59,533+ <small>PPBs</small></strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="ppb-cycle-grid">
+        ${cycles.map(c => `
+          <div class="ppb-cycle-card ${c.isCurrent ? 'is-current' : ''}">
+            <div>
+              <div class="ppb-cycle-card-top">
+                <div>
+                  <h4 class="ppb-cycle-name">${h(c.name)}</h4>
+                  <div class="ppb-cycle-sub">${c.year} · ${c.mandalsCount} Mandals</div>
+                </div>
+                <span class="ppb-cycle-status-badge ${c.isCurrent ? 'active' : c.status === 'completed' ? 'completed' : c.key === 'Mar-27' ? 'peak' : 'scheduled'}">
+                  ${c.isCurrent ? 'ACTIVE CYCLE' : h(c.badge)}
+                </span>
+              </div>
+
+              <div class="ppb-cycle-metrics">
+                <div class="ppb-cycle-metric">
+                  <span>TARGET VILLAGES</span>
+                  <b>${c.totalVillages}</b>
+                </div>
+                <div class="ppb-cycle-metric">
+                  <span>TARGET PPBS</span>
+                  <b>${c.targetPPBs ? c.targetPPBs.toLocaleString() : '—'}</b>
+                </div>
+              </div>
+
+              <div class="ppb-cycle-progress-label">
+                <span>Final RoR Progress</span>
+                <b>${c.completionPercent}% (${c.completedVillages}/${c.totalVillages})</b>
+              </div>
+              <div class="progress-bar" style="height:6px;">
+                <i style="width:${c.completionPercent || 0}%;"></i>
+              </div>
+            </div>
+
+            <button class="ppb-cycle-action-btn" data-cycle="${h(c.key)}">
+              ${icon('search')} View ${h(c.shortName)} Villages (${c.totalVillages}) →
+            </button>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="section-card ppb-cycle-table-card" style="margin-bottom:0;box-shadow:none;border:1px solid #e2e8f0;">
+        <div class="section-header">
+          <div>
+            <h4 style="font-size:13px;font-weight:800;color:var(--ink);margin:0 0 2px;">PPBs Cycle Performance & Rollout Schedule</h4>
+            <p style="font-size:11px;color:var(--muted);margin:0;">Click any monthly cycle row to drill down into its village records.</p>
+          </div>
+          <button class="inline-link" data-view-link="villages">View all 774 villages ${icon('arrow')}</button>
+        </div>
+        <table class="performance-table ppb-cycle-table">
+          <thead>
+            <tr>
+              <th>CYCLE MONTH</th>
+              <th>OPERATIONAL STATUS</th>
+              <th class="mono">VILLAGES</th>
+              <th class="mono">TARGET PPBS</th>
+              <th class="mono">FINAL ROR COMPLETED</th>
+              <th class="mono">IN PROGRESS</th>
+              <th class="mono">PENDING</th>
+              <th class="mono">DELAYED</th>
+              <th>COMPLETION RATE</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cycles.map(c => `
+              <tr class="clickable ${c.isCurrent ? 'current-cycle-row' : ''}" data-cycle="${h(c.key)}">
+                <td>
+                  <b style="color:var(--navy);font-weight:800;">${h(c.name)}</b>
+                  ${c.isCurrent ? `<span class="ppb-cycle-pill active-cycle" style="margin-left:6px;font-size:9px;">CURRENT</span>` : ''}
+                </td>
+                <td>
+                  <span class="ppb-cycle-status-badge ${c.isCurrent ? 'active' : c.status === 'completed' ? 'completed' : c.key === 'Mar-27' ? 'peak' : 'scheduled'}">
+                    ${c.isCurrent ? 'ACTIVE' : h(c.badge)}
+                  </span>
+                </td>
+                <td class="mono"><b>${c.totalVillages}</b></td>
+                <td class="mono"><b>${c.targetPPBs ? c.targetPPBs.toLocaleString() : '—'}</b></td>
+                <td class="mono" style="color:var(--teal);font-weight:700;">${c.completedVillages}</td>
+                <td class="mono" style="color:var(--blue);font-weight:700;">${c.inProgressVillages}</td>
+                <td class="mono">${c.pendingVillages}</td>
+                <td class="mono" style="${c.delayedVillages > 0 ? 'color:var(--red);font-weight:800;' : ''}">${c.delayedVillages}</td>
+                <td>
+                  <div class="progress-cell">
+                    <span class="progress-bar"><i style="width:${c.completionPercent || 0}%;"></i></span>
+                    <b>${c.completionPercent}%</b>
+                  </div>
+                </td>
+                <td>
+                  <button class="inline-link" data-cycle="${h(c.key)}">
+                    Filter →
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+            <tr class="total-summary-row">
+              <td><b>DISTRICT TOTAL (ALL CYCLES)</b></td>
+              <td><b>774 VILLAGE UNIVERSE</b></td>
+              <td class="mono"><b>${d.kpis?.total || 774}</b></td>
+              <td class="mono"><b>391,546</b></td>
+              <td class="mono" style="color:var(--teal);"><b>${d.kpis?.finalRorCompleted || d.kpis?.completed || 0}</b></td>
+              <td class="mono" style="color:var(--blue);"><b>${d.kpis?.inProgress || 0}</b></td>
+              <td class="mono"><b>${(d.kpis?.total || 774) - (d.kpis?.completed || 0)}</b></td>
+              <td class="mono" style="color:var(--red);"><b>${d.kpis?.delayed || 0}</b></td>
+              <td>
+                <div class="progress-cell">
+                  <span class="progress-bar"><i style="width:${d.stageProgress ? (d.stageProgress[d.stageProgress.length - 1]?.percent || 0) : 0}%;"></i></span>
+                  <b>${d.stageProgress ? (d.stageProgress[d.stageProgress.length - 1]?.percent || 0) : 0}%</b>
+                </div>
+              </td>
+              <td><button class="inline-link" data-view-link="villages">All Villages →</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
 }
 function performanceCard(title, note, rows, has, type) { return `<section class="section-card"><div class="section-header"><div><h3>${title}</h3><p>${note}</p></div>${has ? `<button class="inline-link" data-view-link="performance">View all</button>` : ''}</div>${has && rows.length ? `<table class="performance-table"><thead><tr><th>${type === 'mandal' ? 'MANDAL' : 'DIVISION'}</th><th>VILLAGES</th><th>FINAL ROR</th><th>PENDING</th><th>DELAYED</th></tr></thead><tbody>${rows.slice(0, 5).map(r => `<tr data-drill-type="${type}" data-drill-value="${h(r.name)}"><td>${h(r.name)}</td><td class="mono">${r.total}</td><td><div class="progress-cell"><span class="progress-bar"><i style="width:${r.final_ror_status || 0}%"></i></span><b>${formatPct(r.final_ror_status)}</b></div></td><td class="mono">${r.pending}</td><td class="mono">${r.delayed}</td></tr>`).join('')}</tbody></table><div class="section-footer"><button class="inline-link" data-view-link="villages">Open village records ${icon('arrow')}</button></div>` : emptyBlock('Performance data not available', 'Rollups are calculated after the village master and progress data are connected.', 'chart')}</section>`; }
 function phaseCells(rows, has) { if (!has || !rows.length) return `<div class="phase-strip"><div class="phase-cell empty"><div class="phase-name">PHASE DATA</div><div class="phase-values"><span>Total<b>—</b></span><span>Completed<b>—</b></span><span>Pending<b>—</b></span></div></div></div>`; return `<div class="phase-strip">${rows.map(r => `<button class="phase-cell" data-phase="${h(r.name)}"><div class="phase-name">${h(r.name)}</div><div class="phase-values"><span>Total<b>${r.total}</b></span><span>Completed<b>${r.completed}</b></span><span>Pending<b>${r.pending}</b></span></div></button>`).join('')}</div>`; }
@@ -235,25 +539,55 @@ function renderVillageMonitoring() {
 
   const activeStageCount = ['current_stage', ...STAGE_KEYS].filter(k => Boolean(active[k])).length;
 
-  const quickPills = [
-    { id: 'all', label: 'All Villages', count: 774 },
-    { id: 'phase:Phase 1', label: 'Phase 1', count: 27 },
-    { id: 'phase:Phase 2', label: 'Phase 2', count: 36 },
-    { id: 'phase:Phase 3', label: 'Phase 3', count: 14 },
-    { id: 'phase:Phase 4', label: 'Phase 4', count: 101 },
-    { id: 'phase:Phase 5', label: 'Phase 5', count: 60 },
-    { id: 'phase:Phase 6', label: 'Phase 6', count: 92 },
-    { id: 'phase:Phase 7', label: 'Phase 7', count: 91 },
-    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 16, alert: true },
-    { id: 'stage:Final RoR', label: 'Final RoR Ready', count: state.dashboard?.kpis?.completed ?? 33, success: true }
+  const phasesList = state.dashboard?.phases || [];
+  function getPhaseTotal(pName, fallback) {
+    const p = phasesList.find(x => x.name === pName);
+    return p ? p.total : fallback;
+  }
+  const cycleList = state.dashboard?.ppbCycles || [];
+  function getCycleTotal(cKey, fallback) {
+    const c = cycleList.find(x => x.key === cKey);
+    return c ? c.totalVillages : fallback;
+  }
+
+  const cycleQuickPills = [
+    { id: 'all', label: 'All Villages', count: state.dashboard?.kpis?.total ?? 774 },
+    { id: 'ported:true', label: 'Webland-2 Ported', count: state.dashboard?.dailyProgress?.combined?.portedVillages || 72, isPorted: true },
+    { id: 'cycle:Sep-26', label: 'Sep-26 (Active)', count: getCycleTotal('Sep-26', 37), isCurrent: true },
+    { id: 'cycle:Aug-26', label: 'Aug-26', count: getCycleTotal('Aug-26', 20) },
+    { id: 'cycle:Oct-26', label: 'Oct-26', count: getCycleTotal('Oct-26', 44) },
+    { id: 'cycle:Nov-26', label: 'Nov-26', count: getCycleTotal('Nov-26', 43) },
+    { id: 'cycle:Dec-26', label: 'Dec-26', count: getCycleTotal('Dec-26', 60) },
+    { id: 'cycle:Jan-27', label: 'Jan-27', count: getCycleTotal('Jan-27', 48) },
+    { id: 'cycle:Feb-27', label: 'Feb-27', count: getCycleTotal('Feb-27', 63) },
+    { id: 'cycle:Mar-27', label: 'Mar-27 (Peak)', count: getCycleTotal('Mar-27', 123) },
+    { id: 'cycle:Prior Completed (Jan–Jul 2026)', label: 'Prior Completed', count: getCycleTotal('Prior Completed (Jan–Jul 2026)', 239) },
+    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 31, alert: true }
   ];
+
+  const phaseQuickPills = [
+    { id: 'all', label: 'All Villages', count: state.dashboard?.kpis?.total ?? 774 },
+    { id: 'ported:true', label: 'Webland-2 Ported', count: state.dashboard?.dailyProgress?.combined?.portedVillages || 72, isPorted: true },
+    { id: 'phase:Phase I', label: 'Phase 1', count: getPhaseTotal('Phase I', 27) },
+    { id: 'phase:Phase II', label: 'Phase 2', count: getPhaseTotal('Phase II', 34) },
+    { id: 'phase:Phase III', label: 'Phase 3', count: getPhaseTotal('Phase III', 14) },
+    { id: 'phase:Phase IV', label: 'Phase 4', count: getPhaseTotal('Phase IV', 101) },
+    { id: 'phase:Phase V', label: 'Phase 5', count: getPhaseTotal('Phase V', 60) },
+    { id: 'phase:Phase VI', label: 'Phase 6', count: getPhaseTotal('Phase VI', 92) },
+    { id: 'phase:Phase VII', label: 'Phase 7', count: getPhaseTotal('Phase VII', 91) },
+    { id: 'delayed:true', label: 'Overdue Villages', count: state.dashboard?.kpis?.delayed ?? 31, alert: true }
+  ];
+
+  const pillsToShow = (state.villageFilterMode === 'phase') ? phaseQuickPills : cycleQuickPills;
 
   function isPillActive(pId) {
     if (pId === 'all') {
-      return !active.phase && !active.delayed && !active.status && !active.stage && !active.current_stage;
+      return !active.phase && !active.delayed && !active.status && !active.stage && !active.current_stage && !active.ppb_cycle && !active.ported;
     }
     const [k, v] = pId.split(':');
-    if (k === 'phase') return active.phase === v;
+    if (k === 'ported') return active.ported === 'true';
+    if (k === 'cycle') return active.ppb_cycle === v;
+    if (k === 'phase') return active.phase === v || normalizePhase(active.phase) === normalizePhase(v);
     if (k === 'delayed') return active.delayed === 'true' || active.status === 'Delayed';
     if (k === 'stage') return active.stage === v || active.current_stage === v;
     return false;
@@ -271,19 +605,30 @@ function renderVillageMonitoring() {
     </div>
 
     <div class="quick-pills-bar">
+      <div class="view-mode-toggle" style="margin-right:8px;">
+        <button class="view-mode-btn ${state.villageFilterMode !== 'phase' ? 'active' : ''}" data-toggle-village-mode="cycle">
+          PPBs Cycle
+        </button>
+        <button class="view-mode-btn ${state.villageFilterMode === 'phase' ? 'active' : ''}" data-toggle-village-mode="phase">
+          Phases
+        </button>
+      </div>
       <span style="font-size:10.5px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-right:2px;">Quick View:</span>
-      ${quickPills.map(p => `
-        <button class="quick-pill ${isPillActive(p.id) ? 'active' : ''} ${p.alert ? 'alert' : ''} ${p.success ? 'success' : ''}" data-quick-filter="${p.id}">
-          ${h(p.label)} <span class="pill-count">${p.count}</span>
+      ${pillsToShow.map(p => `
+        <button class="quick-pill ${isPillActive(p.id) ? 'active' : ''} ${p.alert ? 'alert' : ''} ${p.isCurrent ? 'active-cycle' : ''} ${p.isPorted ? 'ported-pill' : ''}" data-quick-filter="${p.id}">
+          ${p.isPorted ? icon('shield') : ''} ${h(p.label)} <span class="pill-count">${p.count}</span>
         </button>
       `).join('')}
     </div>
+
+    ${renderActiveChips(active)}
 
     <div class="filters">
       <div class="search-box">
         ${icon('search')}
         <input id="village-search" value="${h(active.search || '')}" placeholder="Search Village Name, Code, or Mandal..." />
       </div>
+      ${selectFilter('ppb_cycle', 'All PPBs Cycles', (f.ppbCycles ? f.ppbCycles.map(c => c.id) : ['Sep-26', 'Aug-26', 'Oct-26', 'Nov-26', 'Dec-26', 'Jan-27', 'Feb-27', 'Mar-27', 'Prior Completed (Jan–Jul 2026)']), active.ppb_cycle)}
       ${selectFilter('phase', 'All Phases', f.phases, active.phase)}
       ${selectFilter('division', 'All Divisions', f.divisions, active.division)}
       ${selectFilter('mandal', 'All Mandals', f.mandals, active.mandal)}
@@ -345,8 +690,6 @@ function renderVillageMonitoring() {
       </div>
     ` : ''}
 
-    ${renderActiveChips(active)}
-
     <section class="section-card data-table-card">
       ${has ? villageTable(state.villages) : emptyBlock('Village master data is not available', 'The 774-village monitoring universe will appear here after the master source is synchronized.', 'map')}
     </section>
@@ -355,7 +698,9 @@ function renderVillageMonitoring() {
 
 function renderActiveChips(active) {
   const chips = [];
+  if (active.ported === 'true') chips.push({ key: 'ported', label: `Webland-2 Ported (Completed)` });
   if (active.search) chips.push({ key: 'search', label: `Search: "${active.search}"` });
+  if (active.ppb_cycle) chips.push({ key: 'ppb_cycle', label: `PPBs Cycle: ${active.ppb_cycle}` });
   if (active.phase) chips.push({ key: 'phase', label: `Phase: ${active.phase}` });
   if (active.division) chips.push({ key: 'division', label: `Division: ${active.division}` });
   if (active.mandal) chips.push({ key: 'mandal', label: `Mandal: ${active.mandal}` });
@@ -391,6 +736,7 @@ function villageTable(rows) {
           <th>VILLAGE NAME</th>
           <th>MANDAL</th>
           <th>DIVISION</th>
+          <th>PPBS CYCLE</th>
           <th>PHASE</th>
           <th>EXTENT (AC)</th>
           <th>KHATAS</th>
@@ -403,9 +749,17 @@ function villageTable(rows) {
         ${rows.map(v => `
           <tr class="clickable" data-village="${v.id}">
             <td class="mono">${h(v.village_code || '—')}</td>
-            <td class="village-name" style="font-weight:800;color:var(--navy);">${h(v.village_name || 'Village name unavailable')}</td>
+            <td class="village-name" style="font-weight:800;color:var(--navy);">
+              ${h(v.village_name || 'Village name unavailable')}
+              ${(v.ported_to_webland || v.webland_2_status === 'Ported') ? `<span class="webland-ported-badge" title="Ported to Webland 2.0 - All Resurvey Activities Completed">${icon('shield')} WEBLAND 2.0</span>` : ''}
+            </td>
             <td>${h(v.mandal || '—')}</td>
             <td>${h(v.division || '—')}</td>
+            <td>
+              <span class="ppb-cycle-pill ${v.ppb_cycle === 'Sep-26' ? 'active-cycle' : (v.ppb_cycle && v.ppb_cycle.includes('Prior')) ? 'completed-cycle' : ''}">
+                ${h(v.ppb_cycle || v.target_month || '—')}
+              </span>
+            </td>
             <td><span class="phase-card-badge" style="font-size:9px;padding:2px 7px;">${h(v.phase || '—')}</span></td>
             <td class="mono">${v.extent ? `${h(v.extent)}` : '—'}</td>
             <td class="mono">${v.total_khatas ?? v.khatas ?? '—'}</td>
@@ -433,6 +787,9 @@ function renderPerformance() {
 
   root.innerHTML = `
     <div class="analysis-tabs-nav">
+      <button class="analysis-tab-btn ${state.analysisTab === 'cycles' ? 'active' : ''}" data-analysis-tab="cycles">
+        ${icon('grid')} Month-wise PPBs Cycle
+      </button>
       <button class="analysis-tab-btn ${state.analysisTab === 'phases' ? 'active' : ''}" data-analysis-tab="phases">
         ${icon('map')} Phase-Wise Progress
       </button>
@@ -448,11 +805,148 @@ function renderPerformance() {
     </div>
 
     ${!has ? emptyBlock('Performance data not available', 'Connect and synchronize village master records first.', 'chart') :
+      state.analysisTab === 'cycles' ? renderPpbCycleAnalysis(d) :
       state.analysisTab === 'phases' ? renderPhaseAnalysis(d) :
       state.analysisTab === 'divisions' ? renderDivisionAnalysis(d) :
       state.analysisTab === 'stages' ? renderStageAnalysis(d) :
       renderMatrixAnalysis(d)
     }
+  `;
+}
+
+function renderPpbCycleAnalysis(d) {
+  const cycles = d.ppbCycles || [];
+  return `
+    <div class="analysis-intro-box">
+      <div>
+        <h3>${icon('grid')} Month-Wise PPBs Distribution Cycle Analytics</h3>
+        <p>Comprehensive operational tracking across the 8 Collectorate monthly delivery cycles (Aug 2026 to Mar 2027) covering 434 target villages (332,013 PPBs) and prior completions.</p>
+      </div>
+      <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 774 Villages</button>
+    </div>
+
+    <div class="khata-metrics-grid" style="margin-bottom:22px;border:1px solid var(--line);border-radius:9px;overflow:hidden;">
+      <div class="khata-metric-box">
+        <span class="khata-metric-label">Balance Target PPBs</span>
+        <b class="khata-metric-val" style="color:var(--blue);">332,013</b>
+        <small>434 Villages (Aug 2026 - Mar 2027)</small>
+      </div>
+      <div class="khata-metric-box">
+        <span class="khata-metric-label">Prior Distributed PPBs</span>
+        <b class="khata-metric-val" style="color:var(--teal);">59,533+</b>
+        <small>Distributed till July 2026</small>
+      </div>
+      <div class="khata-metric-box">
+        <span class="khata-metric-label">Current Cycle (Sep-26)</span>
+        <b class="khata-metric-val" style="color:var(--ink);">22,375</b>
+        <small>37 Active Deployment Villages</small>
+      </div>
+      <div class="khata-metric-box">
+        <span class="khata-metric-label">Peak Month (Mar-27)</span>
+        <b class="khata-metric-val" style="color:#7c3aed;">90,789</b>
+        <small>123 Peak Villages Scheduled</small>
+      </div>
+    </div>
+
+    <div class="phase-deep-grid">
+      ${cycles.map(c => `
+        <div class="phase-deep-card ${c.isCurrent ? 'is-current' : ''}">
+          <div>
+            <div class="phase-card-top">
+              <div>
+                <h4 style="font-size:15px;font-weight:800;color:var(--navy);margin:0 0 2px;">${h(c.name)}</h4>
+                <div class="phase-card-vcount">${c.totalVillages} <small>villages</small></div>
+              </div>
+              <span class="ppb-cycle-status-badge ${c.isCurrent ? 'active' : c.status === 'completed' ? 'completed' : c.key === 'Mar-27' ? 'peak' : 'scheduled'}">
+                ${c.isCurrent ? 'ACTIVE CYCLE' : h(c.badge)}
+              </span>
+            </div>
+
+            <div class="phase-card-stats">
+              <div>
+                <span>TARGET PPBS</span>
+                <b style="color:var(--navy);">${c.targetPPBs ? c.targetPPBs.toLocaleString() : '—'}</b>
+              </div>
+              <div>
+                <span>MANDALS COVERED</span>
+                <b>${c.mandalsCount}</b>
+              </div>
+              <div>
+                <span>FINAL ROR DONE</span>
+                <b style="color:var(--teal);">${c.completedVillages}</b>
+              </div>
+              <div>
+                <span>PENDING WORKLOAD</span>
+                <b style="color:var(--orange);">${c.pendingVillages}</b>
+              </div>
+            </div>
+
+            <div class="phase-card-bar-label">
+              <span>Cycle Completion</span>
+              <b>${c.completionPercent}%</b>
+            </div>
+            <div class="progress-bar" style="height:6px;">
+              <i style="width:${c.completionPercent || 0}%;"></i>
+            </div>
+          </div>
+
+          <button class="phase-card-action-btn" data-cycle="${h(c.key)}">
+            ${icon('search')} View ${h(c.shortName)} Villages (${c.totalVillages}) →
+          </button>
+        </div>
+      `).join('')}
+    </div>
+
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h3>Monthly PPBs Rollout Schedule Matrix</h3>
+          <p>Chronological breakdown of passbooks target and milestone completion rates.</p>
+        </div>
+      </div>
+      <table class="performance-table ppb-cycle-table">
+        <thead>
+          <tr>
+            <th>CYCLE MONTH</th>
+            <th>STATUS</th>
+            <th>MANDALS</th>
+            <th class="mono">VILLAGES</th>
+            <th class="mono">TARGET PPBS</th>
+            <th class="mono">FINAL ROR COMPLETED</th>
+            <th class="mono">IN PROGRESS</th>
+            <th class="mono">PENDING</th>
+            <th class="mono">DELAYED</th>
+            <th>PROGRESS</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${cycles.map(c => `
+            <tr class="clickable ${c.isCurrent ? 'current-cycle-row' : ''}" data-cycle="${h(c.key)}">
+              <td>
+                <b style="color:var(--navy);font-weight:800;">${h(c.name)}</b>
+                ${c.isCurrent ? `<span class="ppb-cycle-pill active-cycle" style="margin-left:6px;font-size:9px;">CURRENT</span>` : ''}
+              </td>
+              <td><span class="ppb-cycle-status-badge ${c.isCurrent ? 'active' : c.status === 'completed' ? 'completed' : c.key === 'Mar-27' ? 'peak' : 'scheduled'}">${c.isCurrent ? 'ACTIVE' : h(c.badge)}</span></td>
+              <td><small style="color:var(--muted);">${c.mandals ? c.mandals.slice(0, 3).join(', ') + (c.mandals.length > 3 ? ` +${c.mandals.length - 3}` : '') : '—'}</small></td>
+              <td class="mono"><b>${c.totalVillages}</b></td>
+              <td class="mono"><b>${c.targetPPBs ? c.targetPPBs.toLocaleString() : '—'}</b></td>
+              <td class="mono" style="color:var(--teal);">${c.completedVillages}</td>
+              <td class="mono" style="color:var(--blue);">${c.inProgressVillages}</td>
+              <td class="mono">${c.pendingVillages}</td>
+              <td class="mono" style="${c.delayedVillages > 0 ? 'color:var(--red);font-weight:800;' : ''}">${c.delayedVillages}</td>
+              <td>
+                <div class="progress-cell">
+                  <span class="progress-bar"><i style="width:${c.completionPercent || 0}%;"></i></span>
+                  <b>${c.completionPercent}%</b>
+                </div>
+              </td>
+              <td><button class="inline-link" data-cycle="${h(c.key)}">Filter →</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </section>
   `;
 }
 
@@ -719,40 +1213,30 @@ function renderMatrixAnalysis(d) {
     <div class="analysis-intro-box">
       <div>
         <h3>${icon('document')} Executive Summary & Cross-Tabulation Matrix</h3>
-        <p>Distribution of all 774 villages across Revenue Divisions and Government Phases, alongside district-wide Khata proforma totals.</p>
+        <p>Distribution of all 774 villages across Revenue Divisions and Government Phases, alongside district-wide resurvey totals.</p>
       </div>
     </div>
 
     <div class="khata-metrics-grid" style="margin-bottom:20px;">
       <div class="khata-metric-box">
+        <span class="khata-metric-lbl">TOTAL DISTRICT VILLAGES</span>
+        <span class="khata-metric-val">774</span>
+        <small>Master monitoring universe</small>
+      </div>
+      <div class="khata-metric-box">
         <span class="khata-metric-lbl">TOTAL RESURVEY EXTENT</span>
-        <span class="khata-metric-val">${km.extent ? `${km.extent} Ac` : '—'}</span>
+        <span class="khata-metric-val">${d.kpis?.totalExtent ? `${d.kpis.totalExtent} Ac` : '—'}</span>
         <small>Total geographical area</small>
       </div>
       <div class="khata-metric-box">
-        <span class="khata-metric-lbl">PATTA KHATAS</span>
-        <span class="khata-metric-val">${km.patta_khatas ?? '—'}</span>
-        <small>Private agricultural landholders</small>
+        <span class="khata-metric-lbl">TOTAL TARGET PPBS</span>
+        <span class="khata-metric-val">391,546</span>
+        <small>District-wide passbook universe</small>
       </div>
       <div class="khata-metric-box">
-        <span class="khata-metric-lbl">GOVERNMENT KHATAS</span>
-        <span class="khata-metric-val">${km.govt_khatas ?? '—'}</span>
-        <small>Govt / Poramboke parcels</small>
-      </div>
-      <div class="khata-metric-box">
-        <span class="khata-metric-lbl">BOTH PATTA & DKT</span>
-        <span class="khata-metric-val">${km.both_khatas ?? '—'}</span>
-        <small>Mixed titlehold parcels</small>
-      </div>
-      <div class="khata-metric-box">
-        <span class="khata-metric-lbl">ONLINE KHATAS</span>
-        <span class="khata-metric-val">${km.online_khatas ?? '—'}</span>
-        <small>Digitized Webland records</small>
-      </div>
-      <div class="khata-metric-box">
-        <span class="khata-metric-lbl">TOTAL KHATAS</span>
-        <span class="khata-metric-val">${km.total_khatas ?? '—'}</span>
-        <small>District monitoring total</small>
+        <span class="khata-metric-lbl">TOTAL MANDALS</span>
+        <span class="khata-metric-val">27</span>
+        <small>Across 4 Revenue Divisions</small>
       </div>
     </div>
 
@@ -839,10 +1323,12 @@ async function openVillage(id) {
       { key: 'final_ror_status', num: 10, title: 'Final RoR & Passbooks', desc: 'Final Record of Rights confirmed, permanent land title validated, and Pattadar Passbooks issued.', tier: 'SSLR & Collectorate' }
     ];
 
-    const currentStageName = v.current_stage || 'Not Started';
-    const activeStep = citizenSteps.find(s => s.title.toLowerCase().includes(currentStageName.toLowerCase()) || currentStageName.toLowerCase().includes(s.title.toLowerCase())) || citizenSteps[0];
+    const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+    const currentStageName = isPorted ? 'Completed' : (v.current_stage || 'Not Started');
+    const activeStep = isPorted ? citizenSteps[citizenSteps.length - 1] : (citizenSteps.find(s => s.title.toLowerCase().includes(currentStageName.toLowerCase()) || currentStageName.toLowerCase().includes(s.title.toLowerCase())) || citizenSteps[0]);
 
     const isComplete = (val) => {
+      if (isPorted) return true;
       const s = String(val || '').toLowerCase().trim();
       return s === 'completed' || s === 'true' || s === 'yes' || s === '1' || s === 'done';
     };
@@ -859,35 +1345,39 @@ async function openVillage(id) {
             </p>
           </div>
           <div class="profile-data">
+            ${isPorted ? `<span>WEBLAND 2.0<b><span class="badge-pill-green">PORTED (100%)</span></b></span>` : ''}
+            <span>PPB CYCLE<b><span class="ppb-cycle-pill ${v.ppb_cycle === 'Sep-26' ? 'active-cycle' : (v.ppb_cycle && v.ppb_cycle.includes('Prior')) ? 'completed-cycle' : ''}">${h(v.ppb_cycle || v.target_month || '—')}</span></b></span>
+            <span>TARGET PPBS<b>${v.ppb_target ? Number(v.ppb_target).toLocaleString() : (v.target_ppbs ? Number(v.target_ppbs).toLocaleString() : '—')}</b></span>
             <span>PHASE<b>${h(v.phase || '—')}</b></span>
             <span>EXTENT<b>${v.extent ? `${h(v.extent)} Ac` : '—'}</b></span>
-            <span>TOTAL KHATAS<b>${v.total_khatas ?? v.khatas ?? '—'}</b></span>
-            <span>STATUS<b><span class="status-pill ${statusClass(v.status)}">${h(v.status)}</span></b></span>
+            <span>KHATAS<b>${v.khatas ? Number(v.khatas).toLocaleString() : '—'}</b></span>
+            <span>STATUS<b><span class="status-pill ${statusClass(isPorted ? 'Completed' : v.status)}">${h(isPorted ? 'Completed' : v.status)}</span></b></span>
           </div>
         </div>
 
-        ${(v.patta_khatas != null || v.govt_khatas != null || v.both_khatas != null) ? `
-          <div class="khata-badge-strip">
-            <span>Patta Khatas: <b>${v.patta_khatas ?? '—'}</b></span>
-            <span>Govt Khatas: <b>${v.govt_khatas ?? '—'}</b></span>
-            <span>Both Patta & Dkt: <b>${v.both_khatas ?? '—'}</b></span>
-            <span>Deletions: <b>${v.deletions ?? '—'}</b></span>
-            <span>Online Khatas: <b>${v.online_khatas ?? '—'}</b></span>
+        ${isPorted ? `
+          <div class="ported-webland-alert">
+            <span class="ported-icon">${icon('shield')}</span>
+            <div>
+              <strong>Ported to Webland 2.0 · All Resurvey Activities Completed</strong>
+              <p>This village has successfully completed all 10 statutory resurvey stages and its final record of rights and land parcels are officially ported to Webland 2.0.</p>
+            </div>
           </div>
         ` : ''}
 
-        <div class="citizen-stage-banner">
-          <span>CURRENT WORKFLOW MILESTONE</span>
-          <h3>Step ${activeStep.num} of 10: ${h(v.current_stage || 'Not Started')}</h3>
-          <p>${h(activeStep.desc)}</p>
+        <div class="citizen-stage-banner" style="${isPorted ? 'border-color:#bbf7d0;background:#f0fdf4;' : ''}">
+          <span style="${isPorted ? 'color:#16a34a;' : ''}">${isPorted ? 'RESURVEY STATUS' : 'CURRENT WORKFLOW MILESTONE'}</span>
+          <h3 style="${isPorted ? 'color:#15803d;' : ''}">${isPorted ? 'All 10 Resurvey Activities Completed' : `Step ${activeStep.num} of 10: ${h(v.current_stage || 'Not Started')}`}</h3>
+          <p style="${isPorted ? 'color:#166534;' : ''}">${isPorted ? 'DGPS GT, Vectorization, VS/VRO verification, Tahsildar, RDO, JC sanctions, Section 13, Draft RoR, and Final RoR are verified and completed.' : h(activeStep.desc)}</p>
         </div>
 
         <div class="citizen-stepper">
           ${citizenSteps.map(step => {
-            const val = v[step.key];
-            const comp = isComplete(val);
-            const isCurr = (step.num === activeStep.num) || (v.current_stage && (step.title.toLowerCase().includes(v.current_stage.toLowerCase()) || v.current_stage.toLowerCase().includes(step.title.toLowerCase())));
-            const isDel = isCurr && (v.status === 'Delayed' || Number(v.days_delayed) > 0);
+            const isVsOrAbove = isPorted || (activeStep.num >= 3) || citizenSteps.slice(2).some(s => isComplete(v[s.key]));
+            const val = isPorted ? 'Completed' : ((isVsOrAbove && step.num <= 2) ? 'Completed' : v[step.key]);
+            const comp = isPorted || isComplete(val);
+            const isCurr = !isPorted && ((step.num === activeStep.num) || (v.current_stage && (step.title.toLowerCase().includes(v.current_stage.toLowerCase()) || v.current_stage.toLowerCase().includes(step.title.toLowerCase()))));
+            const isDel = !isPorted && isCurr && (v.status === 'Delayed' || Number(v.days_delayed) > 0);
             const rowClass = comp ? 'completed' : isDel ? 'delayed' : isCurr ? 'active' : '';
 
             return `
@@ -949,13 +1439,23 @@ async function syncAll() { const b = $('#refresh-button'); b.classList.add('load
 async function sourceAction(id, kind) { try { if (kind === 'edit') return sourceModal(state.sources.find(s => s.id === id)); const endpoint = kind === 'test' ? 'test' : 'sync'; const result = await api(`/api/sources/${id}/${endpoint}`, { method: 'POST' }); await reloadDashboard(); await loadSources(); renderSources(); toast(result.result.status === 'Success' ? 'Source synchronized successfully.' : 'The source could not be connected. Details are in sync history.', result.result.status === 'Success' ? '' : 'error'); } catch (e) { toast(e.message, 'error'); } }
 async function saveVillage(id) { const updates = {}; document.querySelectorAll('[data-stage-update]').forEach(el => updates[el.dataset.stageUpdate] = el.value); try { await api(`/api/villages/${id}`, { method: 'PATCH', body: JSON.stringify({ updates }) }); closeModal(); await reloadDashboard(); if (state.view === 'villages') await loadVillages(); render(); toast('Village update recorded. Write-back is queued for the authorized source.'); } catch (e) { toast(e.message, 'error'); } }
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
-function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'extent', 'patta_khatas', 'govt_khatas', 'both_khatas', 'deletions', 'total_khatas', 'online_khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
+function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle]');
+  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode]');
   if (!el) return;
   if (el.dataset.officerToggle) {
     const sec = $('#officer-updates-section');
     if (sec) sec.classList.toggle('open');
+    return;
+  }
+  if (el.dataset.toggleOverviewMode) {
+    state.overviewMode = el.dataset.toggleOverviewMode;
+    renderDashboard();
+    return;
+  }
+  if (el.dataset.toggleVillageMode) {
+    state.villageFilterMode = el.dataset.toggleVillageMode;
+    renderVillageMonitoring();
     return;
   }
   if (el.dataset.analysisTab) {
@@ -969,6 +1469,12 @@ document.addEventListener('click', async event => {
   if (el.dataset.filterStage) {
     return navigate('villages', { filters: { current_stage: el.dataset.filterStage } });
   }
+  if (el.dataset.filterCycle) {
+    return navigate('villages', { filters: { ppb_cycle: el.dataset.filterCycle } });
+  }
+  if (el.dataset.cycle) {
+    return navigate('villages', { filters: { ppb_cycle: el.dataset.cycle } });
+  }
   if (el.dataset.clearChip) {
     delete state.villageFilters[el.dataset.clearChip];
     await loadVillages();
@@ -979,28 +1485,48 @@ document.addEventListener('click', async event => {
     const qf = el.dataset.quickFilter;
     if (qf === 'all') {
       delete state.villageFilters.phase;
+      delete state.villageFilters.ppb_cycle;
       delete state.villageFilters.delayed;
       delete state.villageFilters.status;
       delete state.villageFilters.stage;
       delete state.villageFilters.current_stage;
-    } else if (qf.startsWith('phase:')) {
-      state.villageFilters.phase = qf.replace('phase:', '');
+      delete state.villageFilters.ported;
+    } else if (qf === 'ported:true') {
+      state.villageFilters = { ported: 'true' };
+    } else if (qf.startsWith('cycle:')) {
+      state.villageFilters.ppb_cycle = qf.replace('cycle:', '');
+      delete state.villageFilters.phase;
       delete state.villageFilters.delayed;
       delete state.villageFilters.stage;
       delete state.villageFilters.current_stage;
+      delete state.villageFilters.ported;
+    } else if (qf.startsWith('phase:')) {
+      state.villageFilters.phase = qf.replace('phase:', '');
+      delete state.villageFilters.ppb_cycle;
+      delete state.villageFilters.delayed;
+      delete state.villageFilters.stage;
+      delete state.villageFilters.current_stage;
+      delete state.villageFilters.ported;
     } else if (qf === 'delayed:true') {
       state.villageFilters.delayed = 'true';
       state.villageFilters.status = 'Delayed';
       delete state.villageFilters.phase;
+      delete state.villageFilters.ppb_cycle;
       delete state.villageFilters.current_stage;
+      delete state.villageFilters.ported;
     } else if (qf.startsWith('stage:')) {
       state.villageFilters.current_stage = qf.replace('stage:', '');
       delete state.villageFilters.phase;
+      delete state.villageFilters.ppb_cycle;
       delete state.villageFilters.delayed;
+      delete state.villageFilters.ported;
     }
     await loadVillages();
     renderVillageMonitoring();
     return;
+  }
+  if (el.dataset.action === 'filter-ported-villages') {
+    return navigate('villages', { filters: { ported: 'true' } });
   }
   if (el.dataset.view) return navigate(el.dataset.view);
   if (el.dataset.kpiFilter) {

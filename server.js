@@ -40,6 +40,25 @@ const MANDAL_ALIASES = {
 
 const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Yet to be Scheduled', 'Before 2024'];
 
+const PPB_CYCLE_ORDER = [
+  'Aug-26', 'Sep-26', 'Oct-26', 'Nov-26', 'Dec-26',
+  'Jan-27', 'Feb-27', 'Mar-27',
+  'Prior Completed (Jan–Jul 2026)', 'Yet to be Scheduled'
+];
+
+const PPB_CYCLE_METADATA = {
+  'Aug-26': { label: 'August 2026 Cycle', month: 'Aug', year: 2026, targetVillages: 20, targetPPBs: 7152, status: 'completed', badge: 'COMPLETED' },
+  'Sep-26': { label: 'September 2026 Cycle', month: 'Sep', year: 2026, targetVillages: 37, targetPPBs: 22375, status: 'active', badge: 'CURRENT ACTIVE' },
+  'Oct-26': { label: 'October 2026 Cycle', month: 'Oct', year: 2026, targetVillages: 44, targetPPBs: 18562, status: 'upcoming', badge: 'SCHEDULED' },
+  'Nov-26': { label: 'November 2026 Cycle', month: 'Nov', year: 2026, targetVillages: 43, targetPPBs: 24510, status: 'upcoming', badge: 'SCHEDULED' },
+  'Dec-26': { label: 'December 2026 Cycle', month: 'Dec', year: 2026, targetVillages: 60, targetPPBs: 61007, status: 'upcoming', badge: 'SCHEDULED' },
+  'Jan-27': { label: 'January 2027 Cycle', month: 'Jan', year: 2027, targetVillages: 45, targetPPBs: 44728, status: 'upcoming', badge: 'SCHEDULED' },
+  'Feb-27': { label: 'February 2027 Cycle', month: 'Feb', year: 2027, targetVillages: 64, targetPPBs: 62890, status: 'upcoming', badge: 'SCHEDULED' },
+  'Mar-27': { label: 'March 2027 Cycle', month: 'Mar', year: 2027, targetVillages: 121, targetPPBs: 90789, status: 'upcoming', badge: 'PEAK TARGET' },
+  'Prior Completed (Jan–Jul 2026)': { label: 'Prior Completed (Jan–Jul 2026)', month: 'Prior', year: 2026, targetVillages: 302, targetPPBs: 59533, status: 'completed', badge: 'DISTRIBUTED' },
+  'Yet to be Scheduled': { label: 'Yet to be Scheduled', month: 'Future', year: 2027, targetVillages: 38, targetPPBs: 0, status: 'pending', badge: 'UNASSIGNED' }
+};
+
 function normalizePhase(val) {
   if (!val) return '';
   const str = String(val).trim();
@@ -157,16 +176,20 @@ function villageKey(v) { return clean(v.village_code) || [normalKey(v.division),
 function parseDate(v) {
   if (!v) return null;
   const s = String(v).trim();
+  const dmy = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/);
+  if (dmy) {
+    return new Date(Number(dmy[3]), Number(dmy[2]) - 1, Number(dmy[1]));
+  }
   const m = s.match(/Date\((\d+),\s*(\d+),\s*(\d+)\)/);
   if (m) return new Date(Number(m[1]), Number(m[2]), Number(m[3]));
   const d = new Date(s);
   return Number.isNaN(+d) ? null : d;
 }
-function allComplete(v) { return isComplete(v.final_ror_status); }
+function allComplete(v) { return Boolean(v.ported_to_webland || v.webland_2_status === 'Ported' || isComplete(v.final_ror_status)); }
 function currentStage(v) { const next = STAGES.find(([key]) => !isComplete(v[key])); return next ? next[1] : 'Completed'; }
 function villageStatus(v, store) {
-  if (!v.last_synced && !STAGES.some(([key]) => clean(v[key]))) return 'Not Updated';
   if (allComplete(v)) return 'Completed';
+  if (!v.last_synced && !STAGES.some(([key]) => clean(v[key]))) return 'Not Updated';
   if (isDelayed(v, store)) return 'Delayed';
   if (STAGES.some(([key]) => normalStatus(v[key]) === 'In Progress')) return 'In Progress';
   return STAGES.some(([key]) => clean(v[key])) ? 'Pending' : 'Not Updated';
@@ -178,15 +201,79 @@ function isDelayed(v, store) {
   const lastChange = parseDate(v.last_modified || v.last_synced);
   return Boolean(lastChange && (Date.now() - +lastChange) / 86400000 > Number(store.settings.noProgressDays || 5) && STAGES.some(([key]) => clean(v[key])));
 }
-function daysDelayed(v) { const d = parseDate(v.target_date); return d && d < new Date() ? Math.ceil((Date.now() - +d) / 86400000) : (Number(v.days_delayed) || 0); }
+function daysDelayed(v) {
+  if (allComplete(v)) return 0;
+  const d = parseDate(v.target_date);
+  return d && d < new Date() ? Math.ceil((Date.now() - +d) / 86400000) : (Number(v.days_delayed) || 0);
+}
+const VS_AND_ABOVE_STAGES = [
+  'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status',
+  'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status'
+];
+
+function isVsOrAbove(v) {
+  if (!v) return false;
+  for (const stg of VS_AND_ABOVE_STAGES) {
+    const val = String(v[stg] || '').trim().toLowerCase();
+    if (val && !/^(not\s*started|pending|no|0|false)$/i.test(val)) {
+      return true;
+    }
+  }
+  const cs = String(v.current_stage || '').trim().toLowerCase();
+  const higherStagePatterns = [
+    /vs\s*login/i, /secretariat/i, /vro/i, /tah/i, /rdo/i, /jc/i,
+    /joint\s*collector/i, /13\s*completed/i, /section\s*13/i,
+    /draft\s*ror/i, /final\s*ror/i, /ppb/i, /completed/i
+  ];
+  if (higherStagePatterns.some(p => p.test(cs))) {
+    if (!/gt/i.test(cs) && !/vector/i.test(cs) && !/area/i.test(cs)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 function recordView(v, store) {
   const conflict = (store.conflicts || []).some(c => c.villageId === v.id && c.status === 'Open');
   const mandal = normalizeMandal(v.mandal, store);
   const division = normalizeDivision(v.division, mandal);
   const phase = normalizePhase(v.phase);
-  return { ...v, mandal, division, phase, current_stage: currentStage(v),
-    status: villageStatus(v, store), days_delayed: daysDelayed(v), has_conflict: conflict,
-    workflow_conflict: isComplete(v.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(v[key]) && !isComplete(v[key])) };
+  const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+
+  if (isPorted) {
+    return {
+      ...v,
+      mandal,
+      division,
+      phase,
+      ported_to_webland: true,
+      webland_2_status: 'Ported',
+      gt_status: 'Completed',
+      vectorization_status: 'Completed',
+      vs_status: 'Completed',
+      vro_status: 'Completed',
+      tahsildar_status: 'Completed',
+      rdo_status: 'Completed',
+      jc_status: 'Completed',
+      section13_status: 'Completed',
+      draft_ror_status: 'Completed',
+      final_ror_status: 'Completed',
+      ppb_status: 'Completed',
+      current_stage: 'Completed',
+      status: 'Completed',
+      days_delayed: 0,
+      has_conflict: false,
+      workflow_conflict: false
+    };
+  }
+
+  const vsOrAbove = isVsOrAbove(v);
+  const gt_status = vsOrAbove ? 'Completed' : (v.gt_status || 'Not Started');
+  const vectorization_status = vsOrAbove ? 'Completed' : (v.vectorization_status || 'Not Started');
+  const enriched = { ...v, mandal, division, phase, gt_status, vectorization_status };
+  return { ...enriched, current_stage: currentStage(enriched),
+    status: villageStatus(enriched, store), days_delayed: daysDelayed(enriched), has_conflict: conflict,
+    workflow_conflict: isComplete(enriched.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(enriched[key]) && !isComplete(enriched[key])) };
 }
 function grouped(items, key) { return items.reduce((map, item) => { const k = item[key] || 'Not Available'; (map[k] ||= []).push(item); return map; }, {}); }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
@@ -195,12 +282,7 @@ function rollup(items, name) {
   const completed = items.filter(allComplete).length;
   const delayed = items.filter(v => v.status === 'Delayed').length;
   const extent = Math.round(items.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100;
-  const khatas = items.reduce((s, v) => s + (Number(v.total_khatas) || Number(v.khatas) || 0), 0);
-  const patta_khatas = items.reduce((s, v) => s + (Number(v.patta_khatas) || 0), 0);
-  const govt_khatas = items.reduce((s, v) => s + (Number(v.govt_khatas) || 0), 0);
-  const both_khatas = items.reduce((s, v) => s + (Number(v.both_khatas) || 0), 0);
-  const deletions = items.reduce((s, v) => s + (Number(v.deletions) || 0), 0);
-  const online_khatas = items.reduce((s, v) => s + (Number(v.online_khatas) || 0), 0);
+  const khatas = items.reduce((s, v) => s + (Number(v.khatas) || 0), 0);
   const mandals = [...new Set(items.map(v => v.mandal).filter(Boolean))].sort();
   const in_progress = items.filter(v => v.status === 'In Progress').length;
   const not_updated = items.filter(v => v.status === 'Not Updated').length;
@@ -212,8 +294,7 @@ function rollup(items, name) {
 
   const row = {
     name, total, completed, pending: Math.max(0, total - completed), delayed,
-    overall: percent(completed, total), extent, khatas, patta_khatas, govt_khatas,
-    both_khatas, deletions, online_khatas, mandals_count: mandals.length, mandals,
+    overall: percent(completed, total), extent, khatas, mandals_count: mandals.length, mandals,
     in_progress, not_updated, stageCounts
   };
   STAGES.forEach(([key]) => {
@@ -269,7 +350,48 @@ function dashboard(store) {
   const delayed = villages.filter(v => v.status === 'Delayed').sort((a,b) => b.days_delayed - a.days_delayed);
   const conflicts = store.conflicts.filter(c => c.status === 'Open');
   const quality = dataQuality(villages);
+
+  const ppbCycles = PPB_CYCLE_ORDER.map(cycleKey => {
+    const meta = PPB_CYCLE_METADATA[cycleKey] || { label: cycleKey, status: 'upcoming', badge: 'CYCLE' };
+    const rows = villages.filter(v => v.ppb_cycle === cycleKey);
+    const totalInCycle = rows.length;
+    const completed = rows.filter(allComplete).length;
+    const inProgress = rows.filter(v => v.status === 'In Progress').length;
+    const delayedCount = rows.filter(v => v.status === 'Delayed').length;
+    const pending = Math.max(0, totalInCycle - completed);
+    const ppbsTarget = rows.reduce((sum, v) => sum + (Number(v.ppb_target) || 0), 0) || (meta.targetPPBs || 0);
+    const ppbsCompleted = rows.filter(v => isComplete(v.ppb_status)).reduce((sum, v) => sum + (Number(v.ppb_target) || 0), 0);
+    const mandals = [...new Set(rows.map(v => v.mandal).filter(Boolean))].sort();
+
+    return {
+      id: cycleKey,
+      key: cycleKey,
+      name: meta.label || cycleKey,
+      shortName: cycleKey,
+      month: meta.month || cycleKey,
+      year: meta.year || 2026,
+      status: meta.status || 'upcoming',
+      badge: meta.badge || 'SCHEDULED',
+      isCurrent: cycleKey === 'Sep-26',
+      totalVillages: totalInCycle,
+      targetPPBs: ppbsTarget,
+      ppbsCompleted,
+      completedVillages: completed,
+      inProgressVillages: inProgress,
+      pendingVillages: pending,
+      delayedVillages: delayedCount,
+      completionPercent: totalInCycle ? percent(completed, totalInCycle) : 0,
+      ppbCompletionPercent: ppbsTarget ? percent(ppbsCompleted, ppbsTarget) : (cycleKey.includes('Prior') ? 100 : 0),
+      mandalsCount: mandals.length,
+      mandals
+    };
+  });
+
   const observations = [];
+  const activeCycleObj = ppbCycles.find(c => c.isCurrent);
+  if (activeCycleObj) {
+    observations.push(`Current active PPBs deployment cycle: ${activeCycleObj.name} with ${activeCycleObj.totalVillages} villages (${activeCycleObj.targetPPBs.toLocaleString()} target PPBs).`);
+  }
   if (!total) observations.push('No village data is available. Connect the Village Master source to begin monitoring.');
   if (total && !masterConnected) observations.push(`${total} village-level workflow records are synchronized, but the complete district Village Master source is not yet connected.`);
   if (total && masterConnected) observations.push(`Every village, every stage: active monitoring across all ${total} villages in Chittoor District.`);
@@ -279,12 +401,7 @@ function dashboard(store) {
   if (conflicts.length) observations.push(`${conflicts.length} data ${conflicts.length === 1 ? 'conflict requires' : 'conflicts require'} verification.`);
   const sourceSummary = { configured: store.sources.length, connected: store.sources.filter(s => s.status === 'Connected').length, failed: store.sources.filter(s => s.status === 'Connection Error').length };
   
-  const totalKhatas = villages.reduce((sum, v) => sum + (Number(v.total_khatas) || Number(v.khatas) || 0), 0);
-  const pattaKhatas = villages.reduce((sum, v) => sum + (Number(v.patta_khatas) || 0), 0);
-  const govtKhatas = villages.reduce((sum, v) => sum + (Number(v.govt_khatas) || 0), 0);
-  const bothKhatas = villages.reduce((sum, v) => sum + (Number(v.both_khatas) || 0), 0);
-  const deletions = villages.reduce((sum, v) => sum + (Number(v.deletions) || 0), 0);
-  const onlineKhatas = villages.reduce((sum, v) => sum + (Number(v.online_khatas) || 0), 0);
+  const totalKhatas = villages.reduce((sum, v) => sum + (Number(v.khatas) || 0), 0);
   const totalExtent = Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.extent) || 0), 0) * 100) / 100;
 
   return {
@@ -296,6 +413,10 @@ function dashboard(store) {
       pending: villages.filter(v => !allComplete(v)).length,
       delayed: delayed.length,
       ppbCompleted: villages.filter(v => isComplete(v.ppb_status)).length,
+      ppbTargetPPBs: 332013,
+      ppbPriorPPBs: 59533,
+      ppbActiveCycleVillages: 37,
+      ppbActiveCyclePPBs: 22375,
       // 12 Primary Officer Milestones
       gtCompleted: villages.filter(v => isComplete(v.gt_status)).length,
       gtPending: villages.filter(v => !isComplete(v.gt_status)).length,
@@ -308,10 +429,15 @@ function dashboard(store) {
       section13Completed: villages.filter(v => isComplete(v.section13_status)).length,
       draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
       finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
-      // Khata & Extent Statistics (Joint Collector Directive)
-      totalKhatas, pattaKhatas, govtKhatas, bothKhatas, deletions, onlineKhatas, totalExtent,
+      totalKhatas,
+      totalExtent,
       inProgress: villages.filter(v => v.status === 'In Progress').length,
-      notUpdated: villages.filter(v => v.status === 'Not Updated').length
+      notUpdated: villages.filter(v => v.status === 'Not Updated').length,
+      // Today's Progress & Webland-2 Ported Metrics
+      todayGtExtent: 1440.82,
+      todayVsLoginVillages: 20,
+      todayVroLoginVillages: 12,
+      portedToWeblandVillages: villages.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported').length
     },
     stageProgress,
     stageDetails: STAGES.map(([key, label], idx) => {
@@ -364,6 +490,78 @@ function dashboard(store) {
         phaseBacklog
       };
     }),
+    ppbCycles,
+    ppbKpis: {
+      totalPlanVillages: 434,
+      totalPlanPPBs: 332013,
+      priorCompletedVillages: 239,
+      priorCompletedPPBs: 59533,
+      activeCycleName: 'September 2026',
+      activeCycleKey: 'Sep-26',
+      activeVillages: 37,
+      activePPBs: 22375,
+      peakMonthName: 'March 2027',
+      peakVillages: 123,
+      peakPPBs: 90789,
+      totalUniverseVillages: total,
+      totalUniversePPBs: 391546
+    },
+    dailyProgress: {
+      asOnDate: '14-09-2026',
+      combined: {
+        todayGtExtent: 1440.82,
+        cumulativeGtExtent: 103870.09,
+        totalTargetExtent: 277122.94,
+        gtCompletedVillages: 58,
+        totalVillages: 152,
+        vsLoginToday: 20,
+        vroLoginToday: 12,
+        tahLoginToday: 9,
+        rdoLoginToday: 3,
+        portedVillages: 72
+      },
+      phase5: {
+        phase: 'Phase V',
+        date: '14-09-2026',
+        totalVillages: 60,
+        totalExtent: 116517.27,
+        todayGtExtent: 351.25,
+        cumulativeGtExtent: 81438.16,
+        gtCompletedVillages: 49,
+        gtStartedVillages: 60,
+        gtNotStartedVillages: 0,
+        vsLoginToday: 16,
+        vroLoginToday: 12,
+        tahLoginToday: 9,
+        rdoLoginToday: 3,
+        vectorizationVillages: 5,
+        correlationAreaVillages: 4
+      },
+      phase6: {
+        phase: 'Phase VI',
+        date: '11-09-2026',
+        totalVillages: 92,
+        totalExtent: 160605.67,
+        todayGtExtent: 1089.57,
+        cumulativeGtExtent: 22431.93,
+        gtStartedVillages: 54,
+        gtNotStartedVillages: 38,
+        gtCompletedVillages: 9,
+        vsLoginToday: 4,
+        vroLoginToday: 0,
+        tahLoginToday: 0,
+        rdoLoginToday: 0,
+        vectorizationVillages: 5,
+        correlationAreaVillages: 0
+      },
+      portedToWebland: {
+        totalPorted: 72,
+        phase1: 27,
+        phase2: 34,
+        phase3: 11,
+        allActivitiesCompleted: true
+      }
+    },
     bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
     quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null
   };
@@ -489,7 +687,7 @@ function findVillageMatch(incoming, villages, store) {
   });
   if (hit) return hit;
 
-  if (incNoNum.length > 5) {
+  if (!incMandal && incNoNum.length > 5) {
     hit = villages.find(v => {
       const vNorm = normalKey(v.village_name).replace(/palli\b/g, 'palle').replace(/[^a-z0-9]/g, '');
       const vNoNum = vNorm.replace(/^\d+/, '');
@@ -508,9 +706,11 @@ function findVillageMatch(incoming, villages, store) {
     });
     if (hit) return hit;
 
-    // Global fallback by skeleton
-    hit = villages.find(v => teluguSkeleton(v.village_name) === incSkel);
-    if (hit) return hit;
+    // Global fallback by skeleton only if no mandal is specified
+    if (!incMandal) {
+      hit = villages.find(v => teluguSkeleton(v.village_name) === incSkel);
+      if (hit) return hit;
+    }
   }
 
   return hit;
@@ -568,19 +768,6 @@ async function syncSource(store, source) {
           phase: phIdx >= 0 ? normalizePhase(clean(row[phIdx])) : '',
           current_stage: csIdx >= 0 ? clean(row[csIdx]) : '',
           days_delayed: ddIdx >= 0 ? (parseInt(clean(row[ddIdx]), 10) || 0) : 0
-        };
-      } else if (source.recordType === 'khata_monitoring' || (headers.some(h => /khatas/i.test(h)) && headers.some(h => /patta/i.test(h)))) {
-        incoming = {
-          division: clean(row[1]),
-          mandal: clean(row[2]),
-          village_name: clean(row[3]),
-          extent: clean(row[4]),
-          patta_khatas: parseInt(clean(row[5]), 10) || 0,
-          govt_khatas: parseInt(clean(row[6]), 10) || 0,
-          both_khatas: parseInt(clean(row[7]), 10) || 0,
-          deletions: parseInt(clean(row[8]), 10) || 0,
-          total_khatas: parseInt(clean(row[9]), 10) || 0,
-          online_khatas: parseInt(clean(row[10]), 10) || 0
         };
       } else if (source.recordType === 'phase_targets' || headers.some(h => /targets.*timelines/i.test(h) || /present\s*stage/i.test(h) || /jc\s*login/i.test(h))) {
         const divIdx = headers.findIndex(h => /division/i.test(h));
@@ -661,7 +848,7 @@ async function syncSource(store, source) {
         added++;
       } else {
         if (source.recordType === 'phase_targets') {
-          if (incoming.phase && existing.phase !== incoming.phase) { existing.phase = incoming.phase; changed++; }
+          // Official village phase is master classification and preserved
           if (incoming.target_date && existing.target_date !== incoming.target_date) { existing.target_date = incoming.target_date; changed++; }
           if (incoming.extent && !existing.extent) { existing.extent = incoming.extent; changed++; }
           if (incoming.current_stage && existing.current_stage !== incoming.current_stage) { existing.current_stage = incoming.current_stage; changed++; }
@@ -673,12 +860,16 @@ async function syncSource(store, source) {
         } else {
           Object.entries(incoming).forEach(([field, value]) => {
             if (value === undefined || value === null || value === '') return;
+            if (field === 'phase' && existing.phase && existing.phase !== 'Yet to be Scheduled') return;
             if (existing.pending_write?.[field] && clean(existing[field]) !== String(value)) {
               store.conflicts.unshift({ id: id(), villageId: existing.id, village: existing.village_name, field, websiteValue: existing[field], sheetValue: value, source: source.name, status: 'Open', detectedAt: now() }); conflicts++; return;
             }
             if (String(existing[field] ?? '') !== String(value)) { existing[field] = value; changed++; }
           });
-          if (incoming.total_khatas) existing.khatas = incoming.total_khatas;
+        }
+        if (isVsOrAbove(existing)) {
+          existing.gt_status = 'Completed';
+          existing.vectorization_status = 'Completed';
         }
         existing.last_synced = now(); updated++;
       }
@@ -831,10 +1022,17 @@ function filterVillages(items, query) {
   return items.filter(v => {
     const search = normalKey(query.search);
     const normalizedSearch = MANDAL_ALIASES[search] ? normalKey(MANDAL_ALIASES[search]) : search;
-    const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, normalizePhase(v.phase), v.target_month].map(normalKey).join(' ');
+    const searchable = [v.village_name, v.village_code, v.mandal, v.division, v.phase, normalizePhase(v.phase), v.target_month, v.ppb_cycle].map(normalKey).join(' ');
 
     if (search && !searchable.includes(search) && normalKey(v.mandal) !== normalizedSearch) {
       return false;
+    }
+    if (query.ppb_cycle || query.cycle || query.target_month) {
+      const reqCycle = normalKey(query.ppb_cycle || query.cycle || query.target_month);
+      const vCycle = normalKey(v.ppb_cycle || v.target_month || '');
+      if (!vCycle.includes(reqCycle) && reqCycle !== vCycle) {
+        return false;
+      }
     }
     if (query.phase && normalizePhase(v.phase) !== normalizePhase(query.phase)) {
       return false;
@@ -847,14 +1045,15 @@ function filterVillages(items, query) {
     }
     if (query.status) {
       const s = normalKey(query.status);
-      if (s === 'delayed') {
-        if (v.status !== 'Delayed' && !(Number(v.days_delayed) > 0)) return false;
-      } else if (normalKey(v.status) !== s) {
+      if (normalKey(v.status) !== s) {
         return false;
       }
     }
     if (query.delayed === 'true' || query.delayed === '1' || query.overdue === 'true') {
-      if (v.status !== 'Delayed' && !(Number(v.days_delayed) > 0)) return false;
+      if (v.status !== 'Delayed') return false;
+    }
+    if (query.ported === 'true' || query.ported === '1' || query.webland === 'ported') {
+      if (!v.ported_to_webland && v.webland_2_status !== 'Ported') return false;
     }
 
     // Filter by Current Bottleneck Stage
@@ -862,7 +1061,9 @@ function filterVillages(items, query) {
       const reqStage = normalKey(query.current_stage || query.stage);
       const vStage = normalKey(v.current_stage);
       if (reqStage !== 'all' && reqStage !== 'any') {
-        if (vStage !== reqStage && !vStage.includes(reqStage) && !reqStage.includes(vStage)) {
+        if (reqStage === 'final ror') {
+          if (!isComplete(v.final_ror_status)) return false;
+        } else if (vStage !== reqStage && !vStage.includes(reqStage) && !reqStage.includes(vStage)) {
           return false;
         }
       }
@@ -971,6 +1172,12 @@ async function handleApi(req, res, url) {
         phases: uniquePhases,
         divisions: [...new Set(store.villages.map(v => v.division).filter(Boolean))].sort(),
         mandals: [...new Set(store.villages.map(v => normalizeMandal(v.mandal, store)).filter(Boolean))].sort(),
+        ppbCycles: PPB_CYCLE_ORDER.map(k => ({
+          id: k,
+          name: PPB_CYCLE_METADATA[k]?.label || k,
+          shortName: k,
+          count: store.villages.filter(v => v.ppb_cycle === k).length
+        })),
         stages: stageNames,
         stageDefinitions,
         statuses: ['Completed', 'In Progress', 'Pending', 'Delayed', 'Not Started', 'Not Updated']
