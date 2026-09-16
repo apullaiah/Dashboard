@@ -1,18 +1,18 @@
 const STAGES = [
   ['gt_status', 'GT'],
   ['vectorization_status', 'Vectorization/Correlation'],
-  ['vs_status', 'DLR@VS Login'],
+  ['vs_status', 'Village Surveyor Login'],
   ['vro_status', 'DLR@VRO Login'],
   ['tahsildar_status', 'DLR@Tahsildar Login'],
   ['rdo_status', 'DLR@RDO Login'],
   ['jc_status', 'DLR@JC Login'],
-  ['section13_status', '13 Notification'],
+  ['section13_status', '13 Completed'],
   ['draft_ror_status', 'Draft RoR'],
   ['final_ror_status', 'Final RoR'],
   ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', villageFilterMode: 'cycle', homeFilters: { division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' } };
+const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', villageFilterMode: 'cycle', selectedHomeVillage: null, homeFilters: { phase: 'All phases', division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' } };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -695,6 +695,11 @@ function getFilteredHomeVillages() {
   }
 
   return vlgs.filter(v => {
+    if (f.phase && f.phase !== 'All phases' && f.phase !== 'All') {
+      const vPh = normalizePhase(v.phase);
+      const qPh = normalizePhase(f.phase);
+      if (vPh !== qPh) return false;
+    }
     if (f.division && f.division !== 'All') {
       if ((v.division || '').toLowerCase() !== f.division.toLowerCase()) return false;
     }
@@ -716,6 +721,8 @@ function getFilteredHomeVillages() {
       const stQuery = f.stage.toLowerCase();
       if (stQuery === 'completed') {
         if (v.status !== 'Completed' && !v.ported_to_webland && !curStage.includes('completed')) return false;
+      } else if (stQuery.includes('13')) {
+        if (!curStage.includes('13')) return false;
       } else if (stQuery.includes('correlation') || stQuery.includes('area analysis')) {
         if (!curStage.includes('vector') && !curStage.includes('corr') && !curStage.includes('area')) return false;
       } else if (stQuery === 'gt') {
@@ -728,8 +735,8 @@ function getFilteredHomeVillages() {
         if (!curStage.includes('draft') && !curStage.includes('ekyc')) return false;
       } else if (stQuery === 'vectorization') {
         if (!curStage.includes('vectorization')) return false;
-      } else if (stQuery.includes('vs login') || stQuery === 'vs login') {
-        if (!curStage.includes('vs')) return false;
+      } else if (stQuery.includes('surveyor') || stQuery.includes('vs login') || stQuery === 'vs login') {
+        if (!curStage.includes('surveyor') && !curStage.includes('vs')) return false;
       } else if (stQuery.includes('vro login') || stQuery === 'vro login') {
         if (!curStage.includes('vro')) return false;
       } else if (stQuery.includes('tah login')) {
@@ -780,39 +787,76 @@ function renderGovHeader(d) {
   return `
     <section class="gov-dashboard-header">
       <div class="gov-header-brand">
-        <div class="gov-emblem-circle" title="Chittoor District Resurvey Portal">
-          <svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Chittoor District Map">
+        <div class="gov-emblem-circle" title="District Survey and Land Records Office, Chittoor District">
+          <svg viewBox="0 0 100 100" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-label="Chittoor District Resurvey Emblem">
             <defs>
-              <radialGradient id="govCircleGrad" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#0e2a58" />
-                <stop offset="100%" stop-color="#040e20" />
+              <radialGradient id="govCircleGrad" cx="50%" cy="45%" r="60%">
+                <stop offset="0%" stop-color="#1e3a8a" />
+                <stop offset="65%" stop-color="#0f172a" />
+                <stop offset="100%" stop-color="#020617" />
               </radialGradient>
-              <linearGradient id="distMapGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fef08a" />
+                <stop offset="35%" stop-color="#facc15" />
+                <stop offset="70%" stop-color="#ca8a04" />
+                <stop offset="100%" stop-color="#854d0e" />
+              </linearGradient>
+              <linearGradient id="gopuramGrad" x1="0%" y1="0%" x2="0%" y2="100%">
                 <stop offset="0%" stop-color="#fde047" />
                 <stop offset="50%" stop-color="#eab308" />
-                <stop offset="100%" stop-color="#ca8a04" />
+                <stop offset="100%" stop-color="#a16207" />
               </linearGradient>
-              <filter id="mapShadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.6"/>
+              <filter id="emblemGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="1" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.7"/>
               </filter>
+              <path id="chittoorArcTop" d="M 14,50 A 36,36 0 1,1 86,50" fill="none"/>
+              <path id="chittoorArcBottom" d="M 86,50 A 36,36 0 0,1 14,50" fill="none"/>
             </defs>
-            <!-- Background circle & gold border rings -->
-            <circle cx="50" cy="50" r="48" fill="url(#govCircleGrad)" stroke="#f59e0b" stroke-width="2.5" />
-            <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(253, 224, 71, 0.45)" stroke-width="0.8" stroke-dasharray="2 1" />
 
-            <!-- Chittoor District Map Silhouette -->
-            <path d="M48 17 L58 19 L68 22 L77 27 L85 33 L88 42 L84 50 L77 55 L68 58 L59 63 L51 68 L43 72 L34 76 L25 84 L18 88 L13 82 L16 74 L22 66 L28 56 L32 46 L36 36 L42 26 Z"
-                  fill="url(#distMapGrad)" stroke="#78350f" stroke-width="0.9" filter="url(#mapShadow)" />
+            <!-- Outer Ring with Gold Border -->
+            <circle cx="50" cy="50" r="48" fill="url(#govCircleGrad)" stroke="url(#goldGrad)" stroke-width="2.6" />
+            <circle cx="50" cy="50" r="43.5" fill="none" stroke="rgba(250, 204, 21, 0.5)" stroke-width="0.7" stroke-dasharray="1.5 1" />
 
-            <!-- Revenue Division Boundary Contours -->
-            <path d="M51 68 L48 48 L68 58 M48 48 L42 26 M32 46 L48 48 M34 76 L28 56" fill="none" stroke="#78350f" stroke-width="0.6" stroke-dasharray="1 1" opacity="0.65" />
+            <!-- Inner Seal Circle -->
+            <circle cx="50" cy="50" r="28" fill="#091428" stroke="url(#goldGrad)" stroke-width="1.2" />
 
-            <!-- District Headquarters Locator Marker (Chittoor town) -->
-            <circle cx="55" cy="54" r="2.8" fill="#dc2626" stroke="#ffffff" stroke-width="0.9" />
-            <circle cx="55" cy="54" r="1" fill="#ffffff" />
+            <!-- Circular Arched Text: CHITTOOR DISTRICT -->
+            <text fill="#fef08a" font-weight="900" font-size="7.8" letter-spacing="1.2" filter="url(#emblemGlow)">
+              <textPath href="#chittoorArcTop" startOffset="50%" text-anchor="middle">CHITTOOR DISTRICT</textPath>
+            </text>
+            <!-- Circular Arched Text: RESURVEY PROJECT -->
+            <text fill="#facc15" font-weight="800" font-size="6.2" letter-spacing="1.1" filter="url(#emblemGlow)">
+              <textPath href="#chittoorArcBottom" startOffset="50%" text-anchor="middle">RESURVEY PROJECT</textPath>
+            </text>
 
-            <!-- Text Label -->
-            <text x="50" y="94" text-anchor="middle" fill="#fde047" font-size="6.5" font-weight="800" letter-spacing="1" font-family="system-ui, -apple-system, sans-serif">CHITTOOR</text>
+            <!-- Decorative Stars -->
+            <text x="12.5" y="52.5" fill="#facc15" font-size="5" text-anchor="middle">★</text>
+            <text x="87.5" y="52.5" fill="#facc15" font-size="5" text-anchor="middle">★</text>
+
+            <!-- Chittoor District Map Silhouette (Subtle Relief in Background of Inner Ring) -->
+            <path d="M48 27 L55 29 L62 31 L68 35 L71 42 L67 47 L62 52 L56 57 L49 61 L42 66 L35 71 L30 68 L32 60 L36 52 L39 44 L43 35 Z"
+                  fill="rgba(202, 138, 4, 0.22)" stroke="rgba(250, 204, 21, 0.45)" stroke-width="0.7" />
+
+            <!-- Famous Kanipakam Temple Gopuram Icon in Center -->
+            <!-- Base & Entrance -->
+            <rect x="42" y="58" width="16" height="12" rx="1" fill="url(#gopuramGrad)" stroke="#78350f" stroke-width="0.6" filter="url(#emblemGlow)" />
+            <path d="M47 70 L47 63 A 3 3 0 0 1 53 63 L53 70 Z" fill="#0f172a" />
+            <!-- Tier 1 -->
+            <rect x="40" y="52" width="20" height="6.5" rx="0.8" fill="url(#gopuramGrad)" stroke="#78350f" stroke-width="0.6" />
+            <line x1="42" y1="55" x2="58" y2="55" stroke="#78350f" stroke-width="0.5" />
+            <!-- Tier 2 -->
+            <polygon points="41,52 43,44 57,44 59,52" fill="url(#gopuramGrad)" stroke="#78350f" stroke-width="0.6" />
+            <line x1="44" y1="48" x2="56" y2="48" stroke="#78350f" stroke-width="0.5" />
+            <!-- Tier 3 (Upper Vimana) -->
+            <polygon points="44,44 46,37 54,37 56,44" fill="url(#gopuramGrad)" stroke="#78350f" stroke-width="0.6" />
+            <!-- Gopuram Kalasams (Sacred Temple Spires) -->
+            <path d="M47 37 L47 33 M50 37 L50 31.5 M53 37 L53 33" stroke="#fef08a" stroke-width="1.1" stroke-linecap="round" />
+            <circle cx="47" cy="32.5" r="0.9" fill="#fef08a" />
+            <circle cx="50" cy="31" r="1.1" fill="#fef08a" />
+            <circle cx="53" cy="32.5" r="0.9" fill="#fef08a" />
+
+            <!-- Sacred Tilak / District Dot -->
+            <circle cx="50" cy="62" r="1.2" fill="#ef4444" stroke="#ffffff" stroke-width="0.4" />
           </svg>
         </div>
         <div class="gov-header-text">
@@ -844,6 +888,9 @@ function renderGovHeader(d) {
 }
 
 function renderFilterChipPanel(d) {
+  const phasesList = [
+    'All phases', 'Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Before 2024', 'Yet to be Scheduled'
+  ];
   const divisionsList = ['All', 'Chittoor', 'Nagari', 'Palamaner', 'Kuppam'];
   const mandalsList = [
     'Baireddipalle', 'Bangarupalem', 'Chittoor', 'Chowdepalle', 'Gangadhara Nellore', 'Gangavaram',
@@ -854,10 +901,8 @@ function renderFilterChipPanel(d) {
   ];
   const monthsList = ['Aug-26', 'Sep-26', 'Oct-26', 'Nov-26', 'Dec-26', 'Jan-27', 'Feb-27', 'Mar-27'];
   const stagesList = [
-    'All stages', 'Completed', 'Correlation & Area analysis', 'DLR @ JC login', 'DLR @ RDO login',
-    'DLR @ Tah login', 'Draft PPB ekyc', 'Final ROR', 'GT', 'GT Not Yet started',
-    'PPB Distributions for September', 'VRO login', 'VS login', 'Vectorization',
-    'Verification Uat @ Tah login', 'Webland Porting'
+    'All stages', 'Final ROR Completed', '13 Completed', 'JC Login', 'RDO Login',
+    'Tah Login', 'VRO Login', 'Village Surveyor Login', 'Vectorization', 'GT Ongoing', 'GT Not Started', 'Completed'
   ];
   const zonesList = [
     { val: 'All', label: 'All', dot: null },
@@ -874,7 +919,22 @@ function renderFilterChipPanel(d) {
 
   return `
     <section class="filter-panel-card" id="ref-filter-panel">
-      <!-- Row 1: DIVISION -->
+      <!-- Row 1: PHASE -->
+      <div class="filter-panel-row">
+        <span class="filter-row-label">PHASE</span>
+        <div class="filter-pills-wrap" data-filter-group="phase">
+          <button type="button" class="ref-filter-pill ${(!state.homeFilters.phase || state.homeFilters.phase === 'All phases') ? 'active' : ''}" data-home-filter="phase" data-filter-val="All phases">
+            All phases
+          </button>
+          ${phasesList.filter(p => p !== 'All phases').map(ph => `
+            <button type="button" class="ref-filter-pill ${state.homeFilters.phase === ph ? 'active' : ''}" data-home-filter="phase" data-filter-val="${h(ph)}">
+              ${h(ph)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Row 2: DIVISION -->
       <div class="filter-panel-row">
         <span class="filter-row-label">DIVISION</span>
         <div class="filter-pills-wrap" data-filter-group="division">
@@ -886,7 +946,7 @@ function renderFilterChipPanel(d) {
         </div>
       </div>
 
-      <!-- Row 2: MANDAL -->
+      <!-- Row 3: MANDAL -->
       <div class="filter-panel-row">
         <span class="filter-row-label">MANDAL</span>
         <div class="filter-pills-wrap" data-filter-group="mandal">
@@ -901,7 +961,7 @@ function renderFilterChipPanel(d) {
         </div>
       </div>
 
-      <!-- Row 3: TARGET MONTH -->
+      <!-- Row 4: TARGET MONTH -->
       <div class="filter-panel-row">
         <span class="filter-row-label">TARGET MONTH</span>
         <div class="filter-pills-wrap" data-filter-group="month">
@@ -916,7 +976,7 @@ function renderFilterChipPanel(d) {
         </div>
       </div>
 
-      <!-- Row 4: PRESENT STAGE -->
+      <!-- Row 5: PRESENT STAGE -->
       <div class="filter-panel-row">
         <span class="filter-row-label">PRESENT STAGE</span>
         <div class="filter-pills-wrap" data-filter-group="stage">
@@ -928,7 +988,7 @@ function renderFilterChipPanel(d) {
         </div>
       </div>
 
-      <!-- Row 5: ZONE -->
+      <!-- Row 6: ZONE -->
       <div class="filter-panel-row">
         <span class="filter-row-label">ZONE</span>
         <div class="filter-pills-wrap" data-filter-group="zone">
@@ -1083,6 +1143,215 @@ function renderFloatingTimeWidget() {
   `;
 }
 
+function renderHomeExecutiveAbstract(filtered) {
+  const f = state.homeFilters || {};
+  const selectedVillageId = state.selectedHomeVillage;
+  const selVillage = selectedVillageId ? (state.villages || []).find(v => v.id === selectedVillageId) : null;
+
+  if (selVillage) {
+    const isPorted = Boolean(selVillage.ported_to_webland || selVillage.webland_2_status === 'Ported');
+    const totExt = selVillage.extent ? Number(selVillage.extent).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2}) : '—';
+    const govtExt = selVillage.govt_extent ? Number(selVillage.govt_extent).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2}) : '0.00';
+    const pattaExt = selVillage.patta_extent ? Number(selVillage.patta_extent).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2}) : '0.00';
+    const ppbs = selVillage.ppb_target ? Number(selVillage.ppb_target).toLocaleString() : (selVillage.khatas ? Number(selVillage.khatas).toLocaleString() : '—');
+    const stage = selVillage.current_stage || 'Not Started';
+
+    return `
+      <div class="executive-abstract-card village-selected-abstract" id="home-executive-abstract">
+        <div class="abstract-header-bar">
+          <div class="abstract-badge-title">
+            <span class="abstract-pill-tag">VILLAGE EXECUTIVE ABSTRACT</span>
+            <h4 class="abstract-heading">
+              ${h(selVillage.village_name)}
+              <span class="abstract-lgd-code">(LGD: ${h(selVillage.village_code || '—')})</span>
+            </h4>
+            <span class="abstract-meta-line">
+              Mandal: <strong>${h(selVillage.mandal || '—')}</strong> · Division: <strong>${h(selVillage.division || '—')}</strong> · ${h(selVillage.phase || '—')} · Target Month: <strong>${h(selVillage.ppb_cycle || selVillage.target_month || '—')}</strong>
+            </span>
+          </div>
+          <div class="abstract-header-actions">
+            <button type="button" class="abstract-close-btn" data-action="clear-selected-village" title="Return to scope abstract">
+              ✕ Clear Village Selection
+            </button>
+            <button type="button" class="abstract-track-btn" data-action="track-village-modal" data-village-id="${selVillage.id}">
+              Full 11-Stage Citizen Tracker →
+            </button>
+          </div>
+        </div>
+
+        <div class="abstract-numbers-grid">
+          <div class="abstract-metric-box">
+            <span class="abstract-num-label">TOTAL EXTENT</span>
+            <div class="abstract-num-val">${totExt} <small>Ac</small></div>
+            <span class="abstract-num-sub">Govt: ${govtExt} Ac · Patta: ${pattaExt} Ac</span>
+          </div>
+          <div class="abstract-metric-box">
+            <span class="abstract-num-label">TARGET PPBs / KHATHAS</span>
+            <div class="abstract-num-val" style="color:#2563eb;">${ppbs}</div>
+            <span class="abstract-num-sub">Pattadar Passbooks Target</span>
+          </div>
+          <div class="abstract-metric-box">
+            <span class="abstract-num-label">RESURVEY CURRENT STAGE</span>
+            <div class="abstract-num-val" style="font-size:19px;color:#0f172a;">${h(stage)}</div>
+            <span class="abstract-num-sub">Active Departmental Step</span>
+          </div>
+          <div class="abstract-metric-box">
+            <span class="abstract-num-label">OVERALL STATUS</span>
+            <div class="abstract-num-val" style="font-size:18px;">
+              <span class="status-pill ${statusClass(isPorted ? 'Completed' : selVillage.status)}">${h(isPorted ? 'Completed' : selVillage.status)}</span>
+            </div>
+            <span class="abstract-num-sub">${isPorted ? 'Ported to Webland 2.0' : 'Monitoring Active'}</span>
+          </div>
+        </div>
+
+        <div class="abstract-stepper-wrap">
+          <div class="abstract-stepper-title">RESURVEY 11-STAGE PROGRESSION TRAJECTORY:</div>
+          <div class="abstract-stepper-bar">
+            ${[
+              ['1. Ground Truthing (GT)', selVillage.gt_status],
+              ['2. Vectorization', selVillage.vectorization_status],
+              ['3. VS Login (Village Surveyor)', selVillage.vs_status],
+              ['4. VRO Login', selVillage.vro_status],
+              ['5. Tahsildar Login', selVillage.tahsildar_status],
+              ['6. RDO Login', selVillage.rdo_status],
+              ['7. JC Login', selVillage.jc_status],
+              ['8. 13 Notification', selVillage.section13_status],
+              ['9. Draft RoR', selVillage.draft_ror_status],
+              ['10. Final RoR', selVillage.final_ror_status],
+              ['11. Webland 2.0 Porting', selVillage.webland_2_status]
+            ].map(([lbl, st]) => {
+              const comp = isComplete(st);
+              const prog = normalStatus(st) === 'In Progress';
+              return `
+                <div class="abstract-step-chip ${comp ? 'step-done' : prog ? 'step-active' : 'step-pending'}">
+                  <span class="step-chip-dot"></span>
+                  <span class="step-chip-name">${lbl}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Scope Abstract
+  const totalCount = filtered.length;
+  const completed = filtered.filter(v => v.status === 'Completed' || v.ported_to_webland).length;
+  const pending = Math.max(0, totalCount - completed);
+  const compPct = totalCount > 0 ? Math.round((completed / totalCount) * 100) : 0;
+  const totalExtent = filtered.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
+  const totalKhathas = filtered.reduce((s, v) => s + (Number(v.ppb_target) || Number(v.khatas) || 0), 0);
+
+  // Stage breakdown
+  const stageBreakdown = {
+    'Final ROR Completed': filtered.filter(v => (v.current_stage || '').includes('Final ROR') || v.ported_to_webland).length,
+    '13 Completed': filtered.filter(v => (v.current_stage || '').includes('13 Completed')).length,
+    'JC Login': filtered.filter(v => (v.current_stage || '').includes('JC')).length,
+    'RDO Login': filtered.filter(v => (v.current_stage || '').includes('RDO')).length,
+    'Tah Login': filtered.filter(v => (v.current_stage || '').includes('Tah')).length,
+    'VRO Login': filtered.filter(v => (v.current_stage || '').includes('VRO')).length,
+    'Village Surveyor Login': filtered.filter(v => (v.current_stage || '').includes('Village Surveyor') || (v.current_stage || '') === 'VS Login').length,
+    'Vectorization': filtered.filter(v => (v.current_stage || '').includes('Vector') || (v.current_stage || '').includes('Correlation')).length,
+    'GT Ongoing': filtered.filter(v => (v.current_stage || '').includes('GT Ongoing') || (v.current_stage || '') === 'GT').length,
+    'GT Not Started': filtered.filter(v => (v.current_stage || '').includes('Not Started')).length
+  };
+
+  const activeLabels = [];
+  if (f.phase && f.phase !== 'All phases') activeLabels.push(`Phase: ${f.phase}`);
+  if (f.mandal && f.mandal !== 'All mandals') activeLabels.push(`Mandal: ${f.mandal}`);
+  if (f.month && f.month !== 'All months') activeLabels.push(`Month: ${f.month}`);
+  if (f.stage && f.stage !== 'All stages') activeLabels.push(`Stage: ${f.stage}`);
+  if (f.division && f.division !== 'All') activeLabels.push(`Division: ${f.division}`);
+
+  const scopeTitle = activeLabels.length > 0 ? activeLabels.join(' · ') : 'All Chittoor District Resurvey Villages (736 Total)';
+
+  return `
+    <div class="executive-abstract-card" id="home-executive-abstract">
+      <div class="abstract-header-bar">
+        <div>
+          <span class="abstract-pill-tag">EXECUTIVE ABSTRACT SUMMARY / గోష్వారా</span>
+          <h4 class="abstract-heading">
+            ${h(scopeTitle)}
+          </h4>
+        </div>
+        <div class="abstract-badge-stats">
+          <span class="abstract-count-pill">${totalCount} Villages in Scope</span>
+        </div>
+      </div>
+
+      <div class="abstract-numbers-grid">
+        <div class="abstract-metric-box">
+          <span class="abstract-num-label">TOTAL VILLAGES</span>
+          <div class="abstract-num-val" style="color:#0f172a;">${totalCount}</div>
+          <span class="abstract-num-sub">Villages Selected</span>
+        </div>
+        <div class="abstract-metric-box">
+          <span class="abstract-num-label">TOTAL LAND EXTENT</span>
+          <div class="abstract-num-val" style="color:#0f172a;">${totalExtent.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2})} <small>Ac</small></div>
+          <span class="abstract-num-sub">Total Geographical Acres</span>
+        </div>
+        <div class="abstract-metric-box">
+          <span class="abstract-num-label">TARGET PPBs / KHATHAS</span>
+          <div class="abstract-num-val" style="color:#2563eb;">${totalKhathas.toLocaleString()}</div>
+          <span class="abstract-num-sub">Pattadar Passbooks Target</span>
+        </div>
+        <div class="abstract-metric-box">
+          <span class="abstract-num-label">COMPLETED / PORTED</span>
+          <div class="abstract-num-val" style="color:#10b981;">${completed} <small>(${compPct}%)</small></div>
+          <span class="abstract-num-sub">${pending} Villages Pending</span>
+        </div>
+      </div>
+
+      <div class="abstract-stage-distribution">
+        <div class="abstract-dist-title">STAGE-WISE VILLAGE BREAKDOWN (EXACT ABSTRACT COUNTS):</div>
+        <div class="abstract-stage-pills">
+          <div class="stage-abs-pill pill-ror">
+            <span class="stage-abs-name">Final RoR / Ported</span>
+            <span class="stage-abs-count">${stageBreakdown['Final ROR Completed']}</span>
+          </div>
+          <div class="stage-abs-pill pill-13">
+            <span class="stage-abs-name">13 Completed</span>
+            <span class="stage-abs-count">${stageBreakdown['13 Completed']}</span>
+          </div>
+          <div class="stage-abs-pill pill-jc">
+            <span class="stage-abs-name">JC Login</span>
+            <span class="stage-abs-count">${stageBreakdown['JC Login']}</span>
+          </div>
+          <div class="stage-abs-pill pill-rdo">
+            <span class="stage-abs-name">RDO Login</span>
+            <span class="stage-abs-count">${stageBreakdown['RDO Login']}</span>
+          </div>
+          <div class="stage-abs-pill pill-tah">
+            <span class="stage-abs-name">Tahsildar Login</span>
+            <span class="stage-abs-count">${stageBreakdown['Tah Login']}</span>
+          </div>
+          <div class="stage-abs-pill pill-vro">
+            <span class="stage-abs-name">VRO Login</span>
+            <span class="stage-abs-count">${stageBreakdown['VRO Login']}</span>
+          </div>
+          <div class="stage-abs-pill pill-vs">
+            <span class="stage-abs-name" title="Village Surveyor Login">VS Login (Village Surveyor)</span>
+            <span class="stage-abs-count">${stageBreakdown['Village Surveyor Login']}</span>
+          </div>
+          <div class="stage-abs-pill pill-vec">
+            <span class="stage-abs-name">Vectorization</span>
+            <span class="stage-abs-count">${stageBreakdown['Vectorization']}</span>
+          </div>
+          <div class="stage-abs-pill pill-gt">
+            <span class="stage-abs-name">GT Ongoing</span>
+            <span class="stage-abs-count">${stageBreakdown['GT Ongoing']}</span>
+          </div>
+          <div class="stage-abs-pill pill-notstarted">
+            <span class="stage-abs-name">GT Not Started</span>
+            <span class="stage-abs-count">${stageBreakdown['GT Not Started']}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function updateHomeFilterUI() {
   const filtered = getFilteredHomeVillages();
   const totalVillages = (state.villages && state.villages.length) || 736;
@@ -1129,6 +1398,12 @@ function updateHomeFilterUI() {
   if (behindVal) behindVal.textContent = `${delayedPct}%`;
   if (behindSub) behindSub.textContent = `${delayed} villages behind by 2+ stages`;
 
+  // Update Executive Abstract Box
+  const absContainer = document.getElementById('home-abstract-container');
+  if (absContainer) {
+    absContainer.innerHTML = renderHomeExecutiveAbstract(filtered);
+  }
+
   // Update Village Details table in Overview
   const villagesTbody = document.getElementById('home-villages-tbody');
   if (villagesTbody) {
@@ -1136,6 +1411,7 @@ function updateHomeFilterUI() {
   }
   const f = state.homeFilters || {};
   const activeLabels = [];
+  if (f.phase && f.phase !== 'All phases') activeLabels.push(`Phase: ${f.phase}`);
   if (f.mandal && f.mandal !== 'All mandals') activeLabels.push(`Mandal: ${f.mandal}`);
   if (f.month && f.month !== 'All months') activeLabels.push(`Month: ${f.month}`);
   if (f.stage && f.stage !== 'All stages') activeLabels.push(`Stage: ${f.stage}`);
@@ -1152,7 +1428,7 @@ function updateHomeFilterUI() {
   const villagesSub = document.getElementById('home-villages-subtitle');
   if (villagesSub) {
     const summaryText = activeLabels.length > 0 ? activeLabels.join(' · ') : 'All 736 Villages in Chittoor District Universe';
-    villagesSub.innerHTML = `Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village or "Track Details →" to inspect full 11-stage progress.`;
+    villagesSub.innerHTML = `Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village row to display its Abstract numbers and 11-stage progress, or "Track Details →" for citizen tracking.`;
   }
   const exportBtn = document.getElementById('home-villages-export-btn');
   if (exportBtn) {
@@ -1170,6 +1446,7 @@ function renderHomeFilteredVillagesSection() {
   const filtered = getFilteredHomeVillages();
   const f = state.homeFilters || {};
   const activeLabels = [];
+  if (f.phase && f.phase !== 'All phases') activeLabels.push(`Phase: ${f.phase}`);
   if (f.mandal && f.mandal !== 'All mandals') activeLabels.push(`Mandal: ${f.mandal}`);
   if (f.month && f.month !== 'All months') activeLabels.push(`Month: ${f.month}`);
   if (f.stage && f.stage !== 'All stages') activeLabels.push(`Stage: ${f.stage}`);
@@ -1195,7 +1472,7 @@ function renderHomeFilteredVillagesSection() {
             ${activeLabels.length > 0 ? `Village Details · ${h(activeLabels.join(' | '))}` : 'All Chittoor District Villages'}
           </h3>
           <p class="home-villages-subtitle" id="home-villages-subtitle">
-            Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village or "Track Details →" to inspect full 11-stage progress.
+            Showing <strong>${filtered.length}</strong> village record${filtered.length === 1 ? '' : 's'} (${summaryText}). Click any village row to display its Abstract numbers and 11-stage progress, or "Track Details →" for citizen tracking.
           </p>
         </div>
         <div class="home-villages-actions">
@@ -1206,6 +1483,11 @@ function renderHomeFilteredVillagesSection() {
             Open Full Monitoring Centre →
           </button>
         </div>
+      </div>
+
+      <!-- Executive Abstract Summary Box (Quantitative Overview & Stage Breakdown) -->
+      <div id="home-abstract-container">
+        ${renderHomeExecutiveAbstract(filtered)}
       </div>
 
       <div class="home-table-wrap">
@@ -1241,7 +1523,7 @@ function renderHomeVillageRows(filtered) {
       <tr>
         <td colspan="12" style="text-align:center;padding:36px 16px;color:var(--muted);">
           <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;">No villages match the active selection</div>
-          <p style="font-size:12px;margin:0;">Try selecting a different Mandal, Target Month, or Present Stage from the filter panel above.</p>
+          <p style="font-size:12px;margin:0;">Try selecting a different Phase, Mandal, Target Month, or Present Stage from the filter panel above.</p>
         </td>
       </tr>
     `;
@@ -1252,10 +1534,11 @@ function renderHomeVillageRows(filtered) {
     const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
     const isCurrentCycle = (v.ppb_cycle === 'Sep-26' || v.target_month === 'Sep-26');
     const isPriorCompleted = (v.ppb_cycle && v.ppb_cycle.includes('Prior'));
+    const isSelected = state.selectedHomeVillage === v.id;
 
     return `
-      <tr class="clickable" data-village="${v.id}">
-        <td style="color:var(--muted);font-weight:600;font-size:11px;">${idx + 1}</td>
+      <tr class="clickable ${isSelected ? 'selected-village-row' : ''}" data-home-village="${v.id}" title="Click to display Executive Abstract for ${h(v.village_name)}">
+        <td style="color:var(--muted);font-weight:600;font-size:12px;">${idx + 1}</td>
         <td class="mono" style="font-weight:700;color:var(--navy);">${h(v.village_code || '—')}</td>
         <td class="village-name" style="font-weight:800;color:var(--navy);">
           ${h(v.village_name || 'Village name unavailable')}
@@ -1268,17 +1551,17 @@ function renderHomeVillageRows(filtered) {
             ${h(v.ppb_cycle || v.target_month || '—')}
           </span>
         </td>
-        <td><span class="phase-card-badge" style="font-size:9.5px;padding:2px 8px;">${h(v.phase || '—')}</span></td>
+        <td><span class="phase-card-badge" style="font-size:10px;padding:3px 9px;">${h(v.phase || '—')}</span></td>
         <td class="mono">${v.extent ? `${Number(v.extent).toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:2})}` : '—'}</td>
         <td class="mono"><b style="color:var(--navy);">${v.ppb_target ? Number(v.ppb_target).toLocaleString() : (v.khatas ? Number(v.khatas).toLocaleString() : '—')}</b></td>
         <td>
-          <span class="stage-label" style="font-weight:700;color:var(--ink);background:#f1f5f9;padding:3px 8px;border-radius:4px;border:1px solid #e2e8f0;display:inline-block;font-size:11.5px;">
+          <span class="stage-label" style="font-weight:700;color:var(--ink);background:#f1f5f9;padding:4px 9px;border-radius:4px;border:1px solid #e2e8f0;display:inline-block;font-size:12px;">
             ${h(v.current_stage || 'Not Started')}
           </span>
         </td>
         <td><span class="status-pill ${statusClass(isPorted ? 'Completed' : v.status)}">${h(isPorted ? 'Completed' : v.status)}</span></td>
         <td style="text-align:center;">
-          <button type="button" class="inline-link" data-village="${v.id}" style="font-weight:800;cursor:pointer;">
+          <button type="button" class="inline-link" data-action="track-village-modal" data-village-id="${v.id}" style="font-weight:800;cursor:pointer;">
             Track Details →
           </button>
         </td>
@@ -1289,7 +1572,7 @@ function renderHomeVillageRows(filtered) {
   if (filtered.length > 150) {
     return rowsHtml + `
       <tr>
-        <td colspan="12" style="text-align:center;padding:14px;background:#f8fafc;font-size:12px;font-weight:700;color:var(--navy);">
+        <td colspan="12" style="text-align:center;padding:14px;background:#f8fafc;font-size:13px;font-weight:700;color:var(--navy);">
           Showing first 150 of ${filtered.length} matching villages. Use the Search bar above to narrow down, or click "Open Full Monitoring Centre" to view all.
         </td>
       </tr>
@@ -2705,31 +2988,52 @@ async function saveVillage(id) { const updates = {}; document.querySelectorAll('
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill]');
+  const el = event.target.closest('[data-view],[data-action],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill]');
   if (!el) return;
   if (el.dataset.homeFilter) {
     const group = el.dataset.homeFilter;
     const val = el.dataset.filterVal;
     state.homeFilters[group] = val;
+    state.selectedHomeVillage = null;
     const parentWrap = el.closest('.filter-pills-wrap');
     if (parentWrap) {
       parentWrap.querySelectorAll('.ref-filter-pill').forEach(p => p.classList.remove('active'));
       el.classList.add('active');
     }
     updateHomeFilterUI();
-    if (group === 'mandal' || group === 'month' || group === 'stage') {
-      const sec = document.getElementById('home-filtered-villages-section');
-      if (sec) {
-        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+    const sec = document.getElementById('home-filtered-villages-section');
+    if (sec) {
+      sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return;
+  }
+  if (el.dataset.homeVillage) {
+    state.selectedHomeVillage = (state.selectedHomeVillage === el.dataset.homeVillage) ? null : el.dataset.homeVillage;
+    updateHomeFilterUI();
+    const abs = document.getElementById('home-executive-abstract');
+    if (abs) {
+      abs.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return;
+  }
+  if (el.dataset.action === 'clear-selected-village') {
+    state.selectedHomeVillage = null;
+    updateHomeFilterUI();
+    return;
+  }
+  if (el.dataset.action === 'track-village-modal') {
+    const vid = el.dataset.villageId;
+    if (vid) {
+      openVillage(vid);
     }
     return;
   }
   if (el.dataset.action === 'reset-home-filters') {
-    state.homeFilters = { division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' };
+    state.homeFilters = { phase: 'All phases', division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' };
+    state.selectedHomeVillage = null;
     document.querySelectorAll('.ref-filter-pill').forEach(p => {
       const val = p.dataset.filterVal;
-      p.classList.toggle('active', val === 'All' || val === 'All mandals' || val === 'All months' || val === 'All stages');
+      p.classList.toggle('active', val === 'All' || val === 'All phases' || val === 'All mandals' || val === 'All months' || val === 'All stages');
     });
     const searchInp = document.getElementById('ref-home-search');
     if (searchInp) searchInp.value = '';
@@ -2751,6 +3055,7 @@ document.addEventListener('click', async event => {
   }
   if (el.dataset.action === 'view-filtered-villages-full') {
     const vf = {};
+    if (state.homeFilters.phase && state.homeFilters.phase !== 'All phases') vf.phase = state.homeFilters.phase;
     if (state.homeFilters.mandal && state.homeFilters.mandal !== 'All mandals') vf.mandal = state.homeFilters.mandal;
     if (state.homeFilters.month && state.homeFilters.month !== 'All months') vf.ppb_cycle = state.homeFilters.month;
     if (state.homeFilters.division && state.homeFilters.division !== 'All') vf.division = state.homeFilters.division;

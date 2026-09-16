@@ -60,6 +60,95 @@ const WEBLAND2_PORTED_CODES = [
   "1058002", "1060012", "1060030", "1060028", "1060024", "1062006", "1062009", "1062010"
 ];
 
+function normalizeStage(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return 'Not Started';
+  if (/13\s*completed/i.test(s) || /section\s*13/i.test(s)) return '13 Completed';
+  if (/final\s*ror/i.test(s) || /^completed$/i.test(s) || /ror\s*completed/i.test(s)) return 'Final ROR Completed';
+  if (/draft\s*ror/i.test(s)) return 'Draft RoR';
+  if (/jc\s*login/i.test(s) || /joint\s*collector/i.test(s)) return 'JC Login';
+  if (/rdo\s*login/i.test(s) || /^rdo$/i.test(s)) return 'RDO Login';
+  if (/tah(?:sildar)?\s*login/i.test(s) || /^tah(?:sildar)?$/i.test(s)) return 'Tah Login';
+  if (/vro\s*login/i.test(s) || /^vro$/i.test(s)) return 'VRO Login';
+  if (/vs\s*login/i.test(s) || /village\s*surveyor/i.test(s)) return 'Village Surveyor Login';
+  if (/vector/i.test(s) || /correlation/i.test(s)) return 'Vectorization';
+  if (/gt\s*ongoing/i.test(s) || /^gt$/i.test(s)) return 'GT Ongoing';
+  if (/gt\s*not\s*started/i.test(s)) return 'GT Not Started';
+  return s;
+}
+
+function cascadeStageFlags(rawStage, isPorted, phase) {
+  const norm = (isPorted || phase === 'Before 2024') ? 'Final ROR Completed' : normalizeStage(rawStage);
+  let gt = 'Pending';
+  let vec = 'Pending';
+  let vs = 'Pending';
+  let vro = 'Pending';
+  let tah = 'Pending';
+  let rdo = 'Pending';
+  let jc = 'Pending';
+  let sec13 = 'Pending';
+  let draftRor = 'Pending';
+  let finalRor = 'Pending';
+  let ppb = 'Pending';
+  let overall = 'In Progress';
+
+  if (norm === 'Final ROR Completed' || norm === 'Completed') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'Completed'; finalRor = 'Completed'; ppb = 'Completed';
+    overall = 'Completed';
+  } else if (norm === 'Draft RoR') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'In Progress';
+  } else if (norm === '13 Completed') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'Pending';
+  } else if (norm === 'JC Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed';
+    jc = 'In Progress';
+  } else if (norm === 'RDO Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed';
+    rdo = 'In Progress';
+  } else if (norm === 'Tah Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'In Progress';
+  } else if (norm === 'VRO Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed';
+    vro = 'In Progress';
+  } else if (norm === 'Village Surveyor Login' || norm === 'VS Login') {
+    gt = 'Completed'; vec = 'Completed';
+    vs = 'In Progress';
+  } else if (norm === 'Vectorization') {
+    gt = 'Completed';
+    vec = 'In Progress';
+  } else if (norm === 'GT Ongoing') {
+    gt = 'In Progress';
+  } else if (norm === 'GT Not Started') {
+    gt = 'Not Started';
+    overall = 'Pending';
+  }
+
+  return {
+    current_stage: norm,
+    status: overall,
+    gt_status: gt,
+    vectorization_status: vec,
+    vs_status: vs,
+    vro_status: vro,
+    tahsildar_status: tah,
+    rdo_status: rdo,
+    jc_status: jc,
+    section13_status: sec13,
+    draft_ror_status: draftRor,
+    final_ror_status: finalRor,
+    ppb_status: ppb
+  };
+}
+
 async function fetchSheet(id) {
   const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json`;
   const res = await fetch(url);
@@ -112,53 +201,10 @@ async function main() {
     const phase = normalizePhase(rawPhase);
     const cycle = parseCycle(c[9]);
     const ppbTarget = c[10] && c[10].v !== null ? parseInt(c[10].v, 10) : null;
-    const currentStage = c[11] ? String(c[11].v).trim() : '';
+    const rawStage = c[11] ? String(c[11].v).trim() : '';
 
     const isPorted = WEBLAND2_PORTED_CODES.includes(villageCode);
-
-    // Initial stage mapping based on phase and stage
-    let gt_status = 'Pending';
-    let vectorization_status = 'Pending';
-    let vs_status = 'Pending';
-    let vro_status = 'Pending';
-    let tahsildar_status = 'Pending';
-    let rdo_status = 'Pending';
-    let jc_status = 'Pending';
-    let section13_status = 'Pending';
-    let draft_ror_status = 'Pending';
-    let final_ror_status = 'Pending';
-    let ppb_status = 'Pending';
-    let overall_status = 'In Progress';
-
-    if (phase === 'Before 2024') {
-      gt_status = 'Completed';
-      vectorization_status = 'Completed';
-      vs_status = 'Completed';
-      vro_status = 'Completed';
-      tahsildar_status = 'Completed';
-      rdo_status = 'Completed';
-      jc_status = 'Completed';
-      section13_status = 'Completed';
-      draft_ror_status = 'Completed';
-      final_ror_status = 'Completed';
-      ppb_status = 'Completed';
-      overall_status = 'Completed';
-    }
-
-    if (isPorted) {
-      gt_status = 'Completed';
-      vectorization_status = 'Completed';
-      vs_status = 'Completed';
-      vro_status = 'Completed';
-      tahsildar_status = 'Completed';
-      rdo_status = 'Completed';
-      jc_status = 'Completed';
-      section13_status = 'Completed';
-      draft_ror_status = 'Completed';
-      final_ror_status = 'Completed';
-      ppb_status = 'Completed';
-      overall_status = 'Completed';
-    }
+    const stageCascade = cascadeStageFlags(rawStage, isPorted, phase);
 
     villages.push({
       id: id(),
@@ -176,21 +222,21 @@ async function main() {
       target_month: cycle,
       target_date: cycle === 'Sep-26' ? '2026-09-30' : cycle === 'Aug-26' ? '2026-08-31' : '2027-03-31',
       days_delayed: 0,
-      current_stage: isPorted ? 'Completed' : (currentStage || (phase === 'Before 2024' ? 'Completed' : 'GT Ongoing')),
-      status: isPorted ? 'Completed' : (phase === 'Before 2024' ? 'Completed' : overall_status),
+      current_stage: stageCascade.current_stage,
+      status: stageCascade.status,
       ported_to_webland: isPorted || phase === 'Before 2024',
       webland_2_status: (isPorted || phase === 'Before 2024') ? 'Ported' : 'Not Started',
-      gt_status,
-      vectorization_status,
-      vs_status,
-      vro_status,
-      tahsildar_status,
-      rdo_status,
-      jc_status,
-      section13_status,
-      draft_ror_status,
-      final_ror_status,
-      ppb_status,
+      gt_status: stageCascade.gt_status,
+      vectorization_status: stageCascade.vectorization_status,
+      vs_status: stageCascade.vs_status,
+      vro_status: stageCascade.vro_status,
+      tahsildar_status: stageCascade.tahsildar_status,
+      rdo_status: stageCascade.rdo_status,
+      jc_status: stageCascade.jc_status,
+      section13_status: stageCascade.section13_status,
+      draft_ror_status: stageCascade.draft_ror_status,
+      final_ror_status: stageCascade.final_ror_status,
+      ppb_status: stageCascade.ppb_status,
       last_synced: now(),
       last_modified: now(),
       source_meta: {}

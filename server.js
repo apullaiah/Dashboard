@@ -18,12 +18,12 @@ const STORE_FILE = path.join(DATA_DIR, 'store.json');
 const STAGES = [
   ['gt_status', 'GT'],
   ['vectorization_status', 'Vectorization/Correlation'],
-  ['vs_status', 'DLR@VS Login'],
+  ['vs_status', 'Village Surveyor Login'],
   ['vro_status', 'DLR@VRO Login'],
   ['tahsildar_status', 'DLR@Tahsildar Login'],
   ['rdo_status', 'DLR@RDO Login'],
   ['jc_status', 'DLR@JC Login'],
-  ['section13_status', '13 Notification'],
+  ['section13_status', '13 Completed'],
   ['draft_ror_status', 'Draft RoR'],
   ['final_ror_status', 'Final RoR'],
   ['webland_2_status', 'Porting DLR to Webland-2.0']
@@ -193,9 +193,99 @@ function parseDate(v) {
   const d = new Date(s);
   return Number.isNaN(+d) ? null : d;
 }
+function normalizeStage(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return 'Not Started';
+  if (/13\s*completed/i.test(s) || /section\s*13/i.test(s)) return '13 Completed';
+  if (/final\s*ror/i.test(s) || /^completed$/i.test(s) || /ror\s*completed/i.test(s)) return 'Final ROR Completed';
+  if (/draft\s*ror/i.test(s)) return 'Draft RoR';
+  if (/jc\s*login/i.test(s) || /joint\s*collector/i.test(s)) return 'JC Login';
+  if (/rdo\s*login/i.test(s) || /^rdo$/i.test(s)) return 'RDO Login';
+  if (/tah(?:sildar)?\s*login/i.test(s) || /^tah(?:sildar)?$/i.test(s)) return 'Tah Login';
+  if (/vro\s*login/i.test(s) || /^vro$/i.test(s)) return 'VRO Login';
+  if (/vs\s*login/i.test(s) || /village\s*surveyor/i.test(s)) return 'Village Surveyor Login';
+  if (/vector/i.test(s) || /correlation/i.test(s)) return 'Vectorization';
+  if (/gt\s*ongoing/i.test(s) || /^gt$/i.test(s)) return 'GT Ongoing';
+  if (/gt\s*not\s*started/i.test(s)) return 'GT Not Started';
+  return s;
+}
+
+function cascadeStageFlags(rawStage, village = {}) {
+  const norm = normalizeStage(rawStage || village.current_stage || village.stage);
+  let gt = 'Pending';
+  let vec = 'Pending';
+  let vs = 'Pending';
+  let vro = 'Pending';
+  let tah = 'Pending';
+  let rdo = 'Pending';
+  let jc = 'Pending';
+  let sec13 = 'Pending';
+  let draftRor = 'Pending';
+  let finalRor = 'Pending';
+  let ppb = 'Pending';
+  let overall = 'In Progress';
+
+  if (norm === 'Final ROR Completed' || norm === 'Completed' || village.ported_to_webland) {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'Completed'; finalRor = 'Completed'; ppb = 'Completed';
+    overall = 'Completed';
+  } else if (norm === 'Draft RoR') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'In Progress';
+  } else if (norm === '13 Completed') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
+    draftRor = 'Pending';
+  } else if (norm === 'JC Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed';
+    jc = 'In Progress';
+  } else if (norm === 'RDO Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed';
+    rdo = 'In Progress';
+  } else if (norm === 'Tah Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'In Progress';
+  } else if (norm === 'VRO Login') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed';
+    vro = 'In Progress';
+  } else if (norm === 'Village Surveyor Login' || norm === 'VS Login') {
+    gt = 'Completed'; vec = 'Completed';
+    vs = 'In Progress';
+  } else if (norm === 'Vectorization') {
+    gt = 'Completed';
+    vec = 'In Progress';
+  } else if (norm === 'GT Ongoing') {
+    gt = 'In Progress';
+  } else if (norm === 'GT Not Started') {
+    gt = 'Not Started';
+    overall = 'Pending';
+  }
+
+  return {
+    current_stage: norm,
+    status: overall,
+    gt_status: gt,
+    vectorization_status: vec,
+    vs_status: vs,
+    vro_status: vro,
+    tahsildar_status: tah,
+    rdo_status: rdo,
+    jc_status: jc,
+    section13_status: sec13,
+    draft_ror_status: draftRor,
+    final_ror_status: finalRor,
+    ppb_status: ppb
+  };
+}
+
 function allComplete(v) { return Boolean(v.ported_to_webland || isComplete(v.webland_2_status) || (isComplete(v.final_ror_status) && isComplete(v.draft_ror_status))); }
 function currentStage(v) {
   if (v.ported_to_webland || isComplete(v.webland_2_status)) return 'Completed';
+  if (v.current_stage && v.current_stage !== 'DLR@VS Login') return normalizeStage(v.current_stage);
   const next = STAGES.find(([key]) => !isComplete(v[key]));
   return next ? next[1] : 'Completed';
 }
@@ -271,7 +361,7 @@ function recordView(v, store) {
       draft_ror_status: 'Completed',
       final_ror_status: 'Completed',
       ppb_status: 'Completed',
-      current_stage: 'Completed',
+      current_stage: 'Final ROR Completed',
       status: 'Completed',
       days_delayed: 0,
       has_conflict: false,
@@ -279,13 +369,37 @@ function recordView(v, store) {
     };
   }
 
-  const vsOrAbove = isVsOrAbove(v);
-  const gt_status = vsOrAbove ? 'Completed' : (v.gt_status || 'Not Started');
-  const vectorization_status = vsOrAbove ? 'Completed' : (v.vectorization_status || 'Not Started');
-  const enriched = { ...v, mandal, division, phase, gt_status, vectorization_status };
-  return { ...enriched, current_stage: currentStage(enriched),
-    status: villageStatus(enriched, store), days_delayed: daysDelayed(enriched), has_conflict: conflict,
-    workflow_conflict: isComplete(enriched.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(enriched[key]) && !isComplete(enriched[key])) };
+  const rawStage = v.current_stage || v.stage || '';
+  const cascade = cascadeStageFlags(rawStage, v);
+
+  const enriched = {
+    ...v,
+    mandal,
+    division,
+    phase,
+    gt_status: isComplete(v.gt_status) ? 'Completed' : cascade.gt_status,
+    vectorization_status: isComplete(v.vectorization_status) ? 'Completed' : cascade.vectorization_status,
+    vs_status: isComplete(v.vs_status) ? 'Completed' : cascade.vs_status,
+    vro_status: isComplete(v.vro_status) ? 'Completed' : cascade.vro_status,
+    tahsildar_status: isComplete(v.tahsildar_status) ? 'Completed' : cascade.tahsildar_status,
+    rdo_status: isComplete(v.rdo_status) ? 'Completed' : cascade.rdo_status,
+    jc_status: isComplete(v.jc_status) ? 'Completed' : cascade.jc_status,
+    section13_status: isComplete(v.section13_status) ? 'Completed' : cascade.section13_status,
+    draft_ror_status: isComplete(v.draft_ror_status) ? 'Completed' : cascade.draft_ror_status,
+    final_ror_status: isComplete(v.final_ror_status) ? 'Completed' : cascade.final_ror_status,
+    ppb_status: isComplete(v.ppb_status) ? 'Completed' : cascade.ppb_status
+  };
+
+  const determinedStage = rawStage ? cascade.current_stage : currentStage(enriched);
+
+  return {
+    ...enriched,
+    current_stage: determinedStage,
+    status: (determinedStage === 'Final ROR Completed' || determinedStage === 'Completed') ? 'Completed' : villageStatus(enriched, store),
+    days_delayed: daysDelayed(enriched),
+    has_conflict: conflict,
+    workflow_conflict: isComplete(enriched.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(enriched[key]) && !isComplete(enriched[key]))
+  };
 }
 function grouped(items, key) { return items.reduce((map, item) => { const k = item[key] || 'Not Available'; (map[k] ||= []).push(item); return map; }, {}); }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }

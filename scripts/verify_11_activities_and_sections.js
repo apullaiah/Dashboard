@@ -84,12 +84,12 @@ async function verify() {
   const expectedActivities = [
     'GT',
     'Vectorization/Correlation',
-    'DLR@VS Login',
+    'Village Surveyor Login',
     'DLR@VRO Login',
     'DLR@Tahsildar Login',
     'DLR@RDO Login',
     'DLR@JC Login',
-    '13 Notification',
+    '13 Completed',
     'Draft RoR',
     'Final RoR',
     'Porting DLR to Webland-2.0'
