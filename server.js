@@ -1201,14 +1201,52 @@ async function handleApi(req, res, url) {
   const villageMatch = pathname.match(/^\/api\/villages\/([^/]+)$/);
   if (req.method === 'GET' && villageMatch) { const v = store.villages.find(x => x.id === villageMatch[1]); return v ? json(res, 200, recordView(v, store)) : json(res, 404, { error: 'Village not found.' }); }
   if (req.method === 'POST' && pathname === '/api/sources') {
-    if (!requireAuthorized(req, res)) return; const b = await readBody(req); const source = { id: id(), name: clean(b.name), spreadsheetId: extractSpreadsheetId(b.spreadsheetId || b.googleSheet), googleSheet: clean(b.googleSheet), tab: clean(b.tab), purpose: clean(b.purpose), direction: ['READ ONLY', 'WRITE ONLY', 'TWO WAY'].includes(b.direction) ? b.direction : 'READ ONLY', accessMode: b.accessMode === 'PUBLIC' ? 'PUBLIC' : 'API', gid: b.gid ?? '', recordType: b.recordType || 'village_progress', skipRows: Number(b.skipRows || 0), fixedFields: b.fixedFields || {}, statusTransforms: b.statusTransforms || {}, refreshFrequency: b.refreshFrequency || '15 minutes', status: 'Not Connected', lastSync: null, mappings: b.mappings || DEFAULT_MAPPINGS, createdAt: now() };
+    if (!requireAuthorized(req, res)) return;
+    const b = await readBody(req);
+    const rawSheet = clean(b.spreadsheetId || b.googleSheet);
+    const gidMatch = rawSheet.match(/[#&?]gid=([0-9]+)/);
+    const extractedGid = gidMatch ? gidMatch[1] : '';
+    const source = {
+      id: id(),
+      name: clean(b.name),
+      spreadsheetId: extractSpreadsheetId(rawSheet),
+      googleSheet: clean(b.googleSheet || b.spreadsheetId),
+      tab: clean(b.tab || 'Sheet1'),
+      purpose: clean(b.purpose),
+      direction: ['READ ONLY', 'WRITE ONLY', 'TWO WAY'].includes(b.direction) ? b.direction : 'READ ONLY',
+      accessMode: b.accessMode === 'API' ? 'API' : 'PUBLIC',
+      gid: b.gid ? clean(b.gid) : extractedGid,
+      recordType: b.recordType || 'village_progress',
+      skipRows: Number(b.skipRows || 0),
+      fixedFields: b.fixedFields || {},
+      statusTransforms: b.statusTransforms || {},
+      refreshFrequency: b.refreshFrequency || '15 minutes',
+      status: 'Not Connected',
+      lastSync: null,
+      mappings: b.mappings || DEFAULT_MAPPINGS,
+      createdAt: now()
+    };
     if (!source.name || !source.spreadsheetId || !source.tab) return json(res, 400, { error: 'Source name, spreadsheet ID/URL and tab are required.' });
     store.sources.push(source); save(store); return json(res, 201, source);
   }
   const sourceMatch = pathname.match(/^\/api\/sources\/([^/]+)(?:\/(test|sync|disable))?$/);
   if (sourceMatch) {
     const source = store.sources.find(s => s.id === sourceMatch[1]); if (!source) return json(res, 404, { error: 'Data source not found.' });
-    if (req.method === 'PATCH' && !sourceMatch[2]) { if (!requireAuthorized(req,res)) return; const b = await readBody(req); Object.assign(source, { ...b, spreadsheetId: extractSpreadsheetId(b.spreadsheetId || source.spreadsheetId), updatedAt: now() }); save(store); return json(res, 200, source); }
+    if (req.method === 'PATCH' && !sourceMatch[2]) {
+      if (!requireAuthorized(req,res)) return;
+      const b = await readBody(req);
+      const rawSheet = clean(b.spreadsheetId || b.googleSheet || source.spreadsheetId);
+      const gidMatch = rawSheet.match(/[#&?]gid=([0-9]+)/);
+      const extractedGid = gidMatch ? gidMatch[1] : (source.gid || '');
+      Object.assign(source, {
+        ...b,
+        spreadsheetId: extractSpreadsheetId(rawSheet),
+        gid: b.gid !== undefined ? clean(b.gid) : extractedGid,
+        updatedAt: now()
+      });
+      save(store);
+      return json(res, 200, source);
+    }
     if (req.method === 'POST' && sourceMatch[2] === 'test') { if (!requireAuthorized(req,res)) return; const log = await syncSource(store, source); save(store); return json(res, log.status === 'Success' ? 200 : 422, { result: log, source }); }
     if (req.method === 'POST' && sourceMatch[2] === 'sync') { if (!requireAuthorized(req,res)) return; const log = await syncSource(store, source); save(store); return json(res, 200, { result: log }); }
     if (req.method === 'POST' && sourceMatch[2] === 'disable') { if (!requireAuthorized(req,res)) return; source.status = 'Disabled'; save(store); return json(res, 200, source); }

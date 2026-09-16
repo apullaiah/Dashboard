@@ -1249,9 +1249,71 @@ async function loadSyncHistory() { try { const data = await api('/api/sync-histo
 async function renderAudit() { root.innerHTML = `<div class="content-heading"><div><h3>Audit history</h3><p>Every website-originated authorized update is recorded with its source and sync state.</p></div></div><section class="section-card"><div class="section-header"><div><h3>Website modifications</h3><p>Changes from Google Sheets are tracked in synchronization history.</p></div></div><div id="audit-body">${emptyBlock('Loading audit history', '')}</div></section>`; try { const d = await api('/api/audit'); const target = $('#audit-body'); target.innerHTML = d.entries.length ? `<table class="performance-table"><thead><tr><th>DATE / TIME</th><th>USER</th><th>VILLAGE</th><th>FIELD</th><th>CHANGE</th><th>SOURCE</th><th>SYNC STATUS</th></tr></thead><tbody>${d.entries.map(e => `<tr><td class="mono">${h(formatDate(e.dateTime))}</td><td>${h(e.user)}</td><td>${h(e.village)}</td><td>${h(e.field)}</td><td class="audit-change"><b>${h(e.oldValue || 'Blank')} → ${h(e.newValue)}</b></td><td>${h(e.source)}</td><td><span class="status-pill pending">${h(e.syncStatus)}</span></td></tr>`).join('')}</tbody></table>` : emptyBlock('No website modifications recorded', 'Updates made by authorized officers will appear here with their write-back status.', 'history'); } catch (e) { toast(e.message, 'error'); } }
 function render() { if (state.view === 'dashboard') renderDashboard(); else if (state.view === 'villages') renderVillageMonitoring(); else if (state.view === 'performance') renderPerformance(); else if (state.view === 'quality') renderQuality(); else if (state.view === 'reports') renderReports(); else if (state.view === 'sources') renderSources(); else if (state.view === 'audit') renderAudit(); }
 async function loadVillages() { const qs = new URLSearchParams(Object.entries(state.villageFilters).filter(([, v]) => v)); const data = await api(`/api/villages?${qs}`); state.villages = data.villages; state.filterOptions = data.filters; }
-function modal(title, subtitle, body, footer = '') { modalRoot.innerHTML = `<div class="modal-backdrop" data-action="close-modal"><section class="modal" role="dialog" aria-modal="true" aria-label="${h(title)}"><header class="modal-head"><div><h3>${h(title)}</h3>${subtitle ? `<p>${h(subtitle)}</p>` : ''}</div><button class="modal-close" data-action="close-modal" aria-label="Close">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer ? `<footer class="modal-footer">${footer}</footer>` : ''}</section></div>`; }
+function modal(title, subtitle, body, footer = '') {
+  modalRoot.innerHTML = `<div class="modal-backdrop" data-action="backdrop-close"><section class="modal" role="dialog" aria-modal="true" aria-label="${h(title)}"><header class="modal-head"><div><h3>${h(title)}</h3>${subtitle ? `<p>${h(subtitle)}</p>` : ''}</div><button class="modal-close" data-action="close-modal" aria-label="Close">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer ? `<footer class="modal-footer">${footer}</footer>` : ''}</section></div>`;
+}
 function closeModal() { modalRoot.innerHTML = ''; }
-function sourceModal(source = null) { const s = source || { direction: 'READ ONLY', refreshFrequency: '15 minutes', mappings: state.defaultMappings || {} }; modal(source ? 'Edit data source' : 'Connect Google Sheet source', 'Credentials are configured server-side and are never sent to this browser.', `<form id="source-form"><div class="form-grid"><label class="form-field"><span>Source name</span><input required name="name" value="${h(s.name || '')}" placeholder="e.g. Resurvey Progress" /></label><label class="form-field"><span>Purpose</span><input name="purpose" value="${h(s.purpose || '')}" placeholder="e.g. Village workflow progress" /></label><label class="form-field full"><span>Google Sheet URL or spreadsheet ID</span><input required name="spreadsheetId" value="${h(s.spreadsheetId || s.googleSheet || '')}" placeholder="https://docs.google.com/spreadsheets/d/..." /><small>Use the spreadsheet shared with the backend Google identity.</small></label><label class="form-field"><span>Sheet / tab name</span><input required name="tab" value="${h(s.tab || '')}" placeholder="Progress" /></label><label class="form-field"><span>Synchronization direction</span><select name="direction">${['READ ONLY', 'WRITE ONLY', 'TWO WAY'].map(v => `<option ${s.direction === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label><label class="form-field"><span>Refresh frequency</span><select name="refreshFrequency">${['5 minutes', '15 minutes', '30 minutes', '1 hour'].map(v => `<option ${s.refreshFrequency === v ? 'selected' : ''}>${v}</option>`).join('')}</select></label><label class="form-field"><span>Field mappings (optional JSON)</span><textarea name="mappings" rows="3" placeholder='{"village_code":"Village Code"}'>${s.mappings && source ? h(JSON.stringify(s.mappings, null, 2)) : ''}</textarea></label></div><div class="mapping-note"><b>Default mapping:</b> Village Code → village_code, Village Name → village_name, Mandal → mandal, division/phase, GT through Final RoR and PPB. Add a source-specific JSON mapping only when the sheet column names differ.</div></form>`, `<button class="soft-button" data-action="close-modal">Cancel</button><button class="primary-button" data-action="save-source" data-source-id="${s.id || ''}">${source ? 'Save changes' : 'Add source'}</button>`); }
+function sourceModal(source = null) {
+  const s = source || { direction: 'READ ONLY', refreshFrequency: '15 minutes', accessMode: 'PUBLIC', tab: 'Sheet1', mappings: state.defaultMappings || {} };
+  modal(source ? 'Edit data source' : 'Connect Google Sheet source', 'Connect a live Google Sheet. Ensure the spreadsheet is shared with "Anyone with the link can view".', `
+    <form id="source-form">
+      <div class="form-grid">
+        <label class="form-field">
+          <span>Source name *</span>
+          <input required name="name" value="${h(s.name || '')}" placeholder="e.g. Village Progress or Resurvey Targets" />
+        </label>
+        <label class="form-field">
+          <span>Data category</span>
+          <select name="recordType">
+            <option value="village_progress" ${s.recordType === 'village_progress' ? 'selected' : ''}>Village Workflow Progress</option>
+            <option value="action_plan" ${s.recordType === 'action_plan' ? 'selected' : ''}>PPBs Action Plan / Cycles</option>
+            <option value="phase_targets" ${s.recordType === 'phase_targets' ? 'selected' : ''}>Phase Targets & Timelines</option>
+            <option value="summary" ${s.recordType === 'summary' ? 'selected' : ''}>Daily Monitoring Summary</option>
+            <option value="village_master" ${s.recordType === 'village_master' ? 'selected' : ''}>Village Master (774 Universe)</option>
+          </select>
+        </label>
+        <label class="form-field full">
+          <span>Google Sheet URL or Spreadsheet ID *</span>
+          <input required name="spreadsheetId" value="${h(s.spreadsheetId || s.googleSheet || '')}" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit..." />
+          <small>Paste the full Google Sheet URL here. It will not close when you click or paste.</small>
+        </label>
+        <label class="form-field">
+          <span>Sheet / Tab name *</span>
+          <input required name="tab" value="${h(s.tab || 'Sheet1')}" placeholder="Sheet1" />
+          <small>Exact tab name at bottom of sheet.</small>
+        </label>
+        <label class="form-field">
+          <span>Access Mode</span>
+          <select name="accessMode">
+            <option value="PUBLIC" ${s.accessMode !== 'API' ? 'selected' : ''}>Public Link (No login/token required)</option>
+            <option value="API" ${s.accessMode === 'API' ? 'selected' : ''}>Private Google API (Server Token)</option>
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Sync Direction</span>
+          <select name="direction">
+            ${['READ ONLY', 'WRITE ONLY', 'TWO WAY'].map(v => `<option ${s.direction === v ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>
+        </label>
+        <label class="form-field">
+          <span>Refresh Frequency</span>
+          <select name="refreshFrequency">
+            ${['5 minutes', '15 minutes', '30 minutes', '1 hour'].map(v => `<option ${s.refreshFrequency === v ? 'selected' : ''}>${v}</option>`).join('')}
+          </select>
+        </label>
+        <label class="form-field full">
+          <span>Field mappings (optional JSON)</span>
+          <textarea name="mappings" rows="3" placeholder='{"village_code":"Village Code"}'>${s.mappings && source ? h(JSON.stringify(s.mappings, null, 2)) : ''}</textarea>
+        </label>
+      </div>
+      <div class="mapping-note">
+        <b>Standard Mappings:</b> Standard columns (Village Code, Village Name, Mandal, Division, GT, Vectorization, VS, VRO, RoR, PPB) are mapped automatically.
+      </div>
+    </form>`, `
+      <button type="button" class="soft-button" data-action="close-modal">Cancel</button>
+      <button type="button" class="primary-button" data-action="save-source" data-source-id="${s.id || ''}">${source ? 'Save changes' : 'Add source'}</button>
+    `);
+}
 function aliasModal() { modal('Add Mandal alias', 'The alias will normalize to the official Mandal name throughout the application.', `<form id="alias-form"><div class="form-grid"><label class="form-field"><span>Source spelling / alias</span><input required name="alias" placeholder="e.g. Palamaneru" /></label><label class="form-field"><span>Standardized Mandal name</span><input required name="standard" placeholder="e.g. Palamaner" /></label></div><div class="mapping-note">Only add aliases that refer to the same Mandal. Do not merge distinct Mandals based solely on similar spelling.</div></form>`, `<button class="soft-button" data-action="close-modal">Cancel</button><button class="primary-button" data-action="save-alias">Save alias</button>`); }
 async function openVillage(id) {
   try {
@@ -1381,7 +1443,55 @@ async function openVillage(id) {
     toast(e.message, 'error');
   }
 }
-async function saveSource(button) { const form = $('#source-form'); if (!form.reportValidity()) return; const raw = Object.fromEntries(new FormData(form)); if (raw.mappings.trim()) { try { raw.mappings = JSON.parse(raw.mappings); } catch { toast('Field mappings must be valid JSON.', 'error'); return; } } else delete raw.mappings; try { button.disabled = true; if (button.dataset.sourceId) await api(`/api/sources/${button.dataset.sourceId}`, { method: 'PATCH', body: JSON.stringify(raw) }); else await api('/api/sources', { method: 'POST', body: JSON.stringify(raw) }); closeModal(); await reloadDashboard(); await navigate('sources'); toast('Data source saved. Test or refresh it to synchronize.'); } catch (e) { button.disabled = false; toast(e.message, 'error'); } }
+async function saveSource(button) {
+  const form = $('#source-form');
+  if (!form.reportValidity()) return;
+  const raw = Object.fromEntries(new FormData(form));
+  if (raw.mappings && raw.mappings.trim()) {
+    try {
+      raw.mappings = JSON.parse(raw.mappings);
+    } catch {
+      toast('Field mappings must be valid JSON.', 'error');
+      return;
+    }
+  } else {
+    delete raw.mappings;
+  }
+  try {
+    button.disabled = true;
+    button.textContent = 'Saving...';
+    let saved;
+    if (button.dataset.sourceId) {
+      saved = await api(`/api/sources/${button.dataset.sourceId}`, { method: 'PATCH', body: JSON.stringify(raw) });
+    } else {
+      saved = await api('/api/sources', { method: 'POST', body: JSON.stringify(raw) });
+    }
+    closeModal();
+    await reloadDashboard();
+    await loadSources();
+    await navigate('sources');
+    toast('Data source saved. Initiating synchronization...');
+    if (saved && saved.id) {
+      try {
+        const testRes = await api(`/api/sources/${saved.id}/sync`, { method: 'POST' });
+        await reloadDashboard();
+        await loadSources();
+        renderSources();
+        if (testRes.result && testRes.result.status === 'Success') {
+          toast(`Successfully connected and synchronized ${testRes.result.recordsRead || testRes.result.recordsAdded || 0} records!`);
+        } else {
+          toast('Source registered. Click "Test" to verify spreadsheet sharing permissions.', 'error');
+        }
+      } catch (err) {
+        toast(`Source saved, but sync failed: ${err.message}`, 'error');
+      }
+    }
+  } catch (e) {
+    button.disabled = false;
+    button.textContent = button.dataset.sourceId ? 'Save changes' : 'Add source';
+    toast(e.message, 'error');
+  }
+}
 async function saveAlias() { const form = $('#alias-form'); if (!form.reportValidity()) return; try { const raw = Object.fromEntries(new FormData(form)); await api('/api/mandal-aliases', { method: 'POST', body: JSON.stringify(raw) }); closeModal(); await reloadDashboard(); render(); toast('Mandal alias standardized across the monitoring system.'); } catch (e) { toast(e.message, 'error'); } }
 async function syncAll() { const b = $('#refresh-button'); b.classList.add('loading'); b.disabled = true; try { const result = await api('/api/sync', { method: 'POST' }); await reloadDashboard(); render(); const failed = result.logs.filter(x => x.status === 'Failed').length; toast(!result.logs.length ? 'No data sources are configured yet.' : failed ? `${failed} source connection issue(s); last synchronized data was retained.` : 'All configured data sources synchronized.'); } catch (e) { toast(e.message, 'error'); } finally { b.classList.remove('loading'); b.disabled = false; } }
 async function sourceAction(id, kind) { try { if (kind === 'edit') return sourceModal(state.sources.find(s => s.id === id)); const endpoint = kind === 'test' ? 'test' : 'sync'; const result = await api(`/api/sources/${id}/${endpoint}`, { method: 'POST' }); await reloadDashboard(); await loadSources(); renderSources(); toast(result.result.status === 'Success' ? 'Source synchronized successfully.' : 'The source could not be connected. Details are in sync history.', result.result.status === 'Success' ? '' : 'error'); } catch (e) { toast(e.message, 'error'); } }
@@ -1520,6 +1630,10 @@ document.addEventListener('click', async event => {
     return;
   }
   if (el.dataset.action === 'logout') return performLogout();
+  if (el.dataset.action === 'backdrop-close') {
+    if (event.target === el) return closeModal();
+    return;
+  }
   if (el.dataset.action === 'close-modal') return closeModal();
   if (el.dataset.action === 'open-source-modal') return sourceModal();
   if (el.dataset.action === 'open-alias-modal') return aliasModal();
@@ -1570,6 +1684,7 @@ $('#source-status').addEventListener('click', () => navigate('sources'));
 $('#mobile-menu').addEventListener('click', () => document.querySelector('.sidebar').classList.toggle('open'));
 $('#lock-session-btn')?.addEventListener('click', performLogout);
 $('#topbar-logout-btn')?.addEventListener('click', performLogout);
+document.addEventListener('keydown', event => { if (event.key === 'Escape') closeModal(); });
 
 if (!sessionStorage.getItem('ctr_officer_token')) {
   renderAuthGate();
