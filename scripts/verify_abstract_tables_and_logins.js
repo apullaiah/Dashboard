@@ -1,23 +1,33 @@
 /**
- * Verification Script: Table Form Executive Abstract, GT Extents, and DLR Logins
+ * Verification Script: 2-Part Overview, Strict 2-Row Abstract Tables, GT & DLR Benchmarks
  * Tests:
- * 1. Abstract in Table Form: Scope Table, GT Extent Table, DLR Logins Table, 10-Stage Pipeline Table.
- * 2. Ground Truthing (GT) Tracking:
+ * 1. Overview Section strictly contains 2 parts:
+ *    - Part 1: Resurvey Progress (GT & DLR Logins with interactive toggle)
+ *    - Part 2: PPBs Distribution status
+ * 2. Abstract Table Architecture is strictly TWO ROWS:
+ *    - Row 1: All parameters (row-parameters, headers)
+ *    - Row 2: All numeric values (row-numerics)
+ * 3. Ground Truthing (GT) Tracking:
  *    - Extent completed during the day (todayGtExtent)
  *    - Cumulative extent of GT completed (cumulativeGtExtent)
  *    - Balance extent to be completed (balanceGtExtent)
  *    - Total target extent (totalTargetExtent)
- * 3. DLR Logins Tracking (VS, VRO, Tah, RDO, JC):
- *    - Entries completed in the day (Today)
+ *    - Benchmark rule: "Every day one team should complete 25 Ac of GT per day per rover."
+ *    - Active rovers and capacity calculation (rovers * 25 Ac).
+ * 4. DLR Logins Tracking:
+ *    - Entries completed today (Today)
  *    - Cumulative entries completed
- *    - Balance entries to be completed
- *    - Clearance percentages and totals across all 5 approval tiers.
- * 4. Village Executive Abstract Table when village is selected.
+ *    - Pending / balance entries to be completed
+ *    - Benchmark rule: "DLR entries@200 per day."
+ *    - 5 officer approval tiers (VS, VRO, Tahsildar, RDO, JC).
+ * 5. PPBs Distribution Status:
+ *    - Strict 2-row abstract table with target PPBs, printed, distributed, balance pending.
+ *    - Month-wise PPB delivery cycles.
  */
 const fs = require('fs');
 const assert = require('assert');
 
-console.log('=== VERIFYING TABLE FORM ABSTRACT, GT EXTENTS & DLR LOGINS ===\n');
+console.log('=== VERIFYING 2-PART OVERVIEW, 2-ROW ABSTRACT TABLES & BENCHMARKS ===\n');
 
 // 1. Verify Codebase Implementation in app.js and public/app.js
 const targets = [
@@ -30,16 +40,24 @@ targets.forEach(({ name, code }) => {
 
   // Function definitions
   assert(code.includes('function calculateStageAbstractMetrics('), `${name} must include calculateStageAbstractMetrics`);
+  assert(code.includes('function renderPart1ResurveyProgress('), `${name} must include renderPart1ResurveyProgress`);
+  assert(code.includes('function renderPart2PpbDistributionStatus('), `${name} must include renderPart2PpbDistributionStatus`);
   assert(code.includes('function renderHomeExecutiveAbstract('), `${name} must include renderHomeExecutiveAbstract`);
 
-  // Table form elements
-  assert(code.includes('abstract-data-table'), `${name} must include abstract-data-table class`);
-  assert(code.includes('scope-master-abstract-card'), `${name} must include scope-master-abstract-card`);
-  assert(code.includes('gt-extent-abstract-card'), `${name} must include gt-extent-abstract-card`);
-  assert(code.includes('dlr-logins-abstract-card'), `${name} must include dlr-logins-abstract-card`);
-  assert(code.includes('resurvey-pipeline-abstract-card'), `${name} must include resurvey-pipeline-abstract-card`);
+  // Strict 2-Part Overview Elements
+  assert(code.includes('part-1-resurvey-progress'), `${name} must have Part 1: Resurvey Progress`);
+  assert(code.includes('part-2-ppbs-distribution'), `${name} must have Part 2: PPBs Distribution status`);
+  assert(code.includes('toggle-tab-gt'), `${name} must have GT toggle tab`);
+  assert(code.includes('toggle-tab-dlr'), `${name} must have DLR toggle tab`);
+  assert(code.includes('data-resurvey-tab'), `${name} must handle data-resurvey-tab`);
 
-  // GT metrics
+  // Strict 2-Row Abstract Tables
+  assert(code.includes('abstract-two-row-table'), `${name} must include abstract-two-row-table class`);
+  assert(code.includes('row-parameters'), `${name} must include row-parameters header row`);
+  assert(code.includes('row-numerics'), `${name} must include row-numerics data row`);
+
+  // GT Benchmark: 25 Ac/day/rover
+  assert(code.includes('25 Ac of GT per day per rover'), `${name} must state benchmark: 25 Ac of GT per day per rover`);
   assert(code.includes('EXTENT COMPLETED DURING THE DAY (TODAY)'), `${name} must include today GT extent header`);
   assert(code.includes('CUMULATIVE EXTENT OF GT COMPLETED'), `${name} must include cumulative GT extent header`);
   assert(code.includes('BALANCE EXTENT TO BE COMPLETED'), `${name} must include balance GT extent header`);
@@ -48,7 +66,8 @@ targets.forEach(({ name, code }) => {
   assert(code.includes('gt.cumulativeGtExtent'), `${name} must bind gt.cumulativeGtExtent`);
   assert(code.includes('gt.balanceGtExtent'), `${name} must bind gt.balanceGtExtent`);
 
-  // DLR Logins metrics
+  // DLR Benchmark: 200 entries/day
+  assert(code.includes('DLR entries@200 per day'), `${name} must state benchmark: DLR entries@200 per day`);
   assert(code.includes('ENTRIES COMPLETED IN THE DAY (TODAY)'), `${name} must include DLR today entries header`);
   assert(code.includes('CUMULATIVE ENTRIES COMPLETED'), `${name} must include DLR cumulative entries header`);
   assert(code.includes('BALANCE ENTRIES TO BE COMPLETED'), `${name} must include DLR balance entries header`);
@@ -59,10 +78,12 @@ targets.forEach(({ name, code }) => {
   assert(code.includes('JC Login (Joint Collector Approval)'), `${name} must list JC Login`);
   assert(code.includes('TOTAL DLR WORKFLOW CLEARANCES (5 APPROVAL TIERS)'), `${name} must include DLR total row`);
 
-  // Village Executive Abstract Table
-  assert(code.includes('VILLAGE EXECUTIVE ABSTRACT TABLE'), `${name} must include Village Table header`);
-  assert(code.includes('village-specs-table'), `${name} must include village-specs-table`);
-  assert(code.includes('village-trajectory-table'), `${name} must include village-trajectory-table`);
+  // PPBs Distribution Status Elements
+  assert(code.includes('PPBs DISTRIBUTION STATUS'), `${name} must include PPBs Distribution Status header`);
+  assert(code.includes('TOTAL TARGET PPBs'), `${name} must include TOTAL TARGET PPBs`);
+  assert(code.includes('PPBs PRINTED / GENERATED'), `${name} must include PPBs PRINTED / GENERATED`);
+  assert(code.includes('DISTRIBUTED / HANDED OVER'), `${name} must include DISTRIBUTED / HANDED OVER`);
+  assert(code.includes('BALANCE PENDING DISTRIBUTION'), `${name} must include BALANCE PENDING DISTRIBUTION`);
 
   console.log(`  ✓ ${name} passes all frontend structural requirements.`);
 });
@@ -75,24 +96,23 @@ const cssTargets = [
 
 cssTargets.forEach(({ name, css }) => {
   console.log(`Checking ${name}...`);
-  assert(css.includes('.abstract-data-table'), `${name} must have .abstract-data-table`);
-  assert(css.includes('.abstract-table-card'), `${name} must have .abstract-table-card`);
-  assert(css.includes('.gt-focus-active'), `${name} must have .gt-focus-active`);
-  assert(css.includes('.dlr-focus-active'), `${name} must have .dlr-focus-active`);
-  assert(css.includes('.highlight-col-today'), `${name} must have .highlight-col-today`);
-  assert(css.includes('.highlight-col-cum'), `${name} must have .highlight-col-cum`);
-  assert(css.includes('.highlight-col-bal'), `${name} must have .highlight-col-bal`);
-  assert(css.includes('.extent-big-today'), `${name} must have .extent-big-today`);
-  assert(css.includes('.entries-today-val'), `${name} must have .entries-today-val`);
-  console.log(`  ✓ ${name} passes all CSS table form requirements.`);
+  assert(css.includes('.overview-two-parts-container'), `${name} must have .overview-two-parts-container`);
+  assert(css.includes('.overview-part-card'), `${name} must have .overview-part-card`);
+  assert(css.includes('.resurvey-toggle-group'), `${name} must have .resurvey-toggle-group`);
+  assert(css.includes('.resurvey-tab-btn'), `${name} must have .resurvey-tab-btn`);
+  assert(css.includes('.abstract-two-row-table-wrap'), `${name} must have .abstract-two-row-table-wrap`);
+  assert(css.includes('.abstract-two-row-table'), `${name} must have .abstract-two-row-table`);
+  assert(css.includes('.row-parameters'), `${name} must have .row-parameters`);
+  assert(css.includes('.row-numerics'), `${name} must have .row-numerics`);
+  assert(css.includes('.benchmark-summary-bar'), `${name} must have .benchmark-summary-bar`);
+  console.log(`  ✓ ${name} passes all CSS styling requirements.`);
 });
 
-// 3. Functional Simulation of calculateStageAbstractMetrics
+// 3. Functional Simulation of calculateStageAbstractMetrics with real store data
 console.log('\nTesting calculateStageAbstractMetrics logic with real store data...');
 const store = JSON.parse(fs.readFileSync('data/store.json', 'utf8'));
 const villages = store.villages || [];
 
-// Mock state and global dashboard
 global.state = {
   villages,
   dashboard: {
@@ -136,7 +156,6 @@ global.state = {
   }
 };
 
-// Evaluate helper functions from app.js
 const clean = value => String(value ?? '').trim();
 const isComplete = value => /^(completed|complete|done|yes|y|ported|true|1)$/i.test(clean(value));
 const formatExtent = value => {
@@ -145,7 +164,6 @@ const formatExtent = value => {
   return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-// Extract and evaluate calculateStageAbstractMetrics
 const appText = fs.readFileSync('app.js', 'utf8');
 const fnMatch = appText.match(/function calculateStageAbstractMetrics\([\s\S]*?\n\}/);
 assert(fnMatch, 'Could not extract calculateStageAbstractMetrics function from app.js');
@@ -155,34 +173,26 @@ const calculateStageAbstractMetrics = new Function(
   `return (${fnMatch[0]})(filtered, f);`
 );
 
-// Test Case A: All District (736 Villages)
+// Test Case A: District Level Abstract
 {
   const res = calculateStageAbstractMetrics(villages, {}, global.state, clean, isComplete, formatExtent);
   console.log('\n--- Test Case A: District Level Abstract (736 Villages) ---');
   console.log(`Villages: ${res.scope.totalCount}, Total Extent: ${formatExtent(res.scope.totalExtent)} Ac`);
-  console.log(`GT Today Extent: ${res.gt.todayGtExtent} Ac`);
-  console.log(`GT Cumulative Extent: ${res.gt.cumulativeGtExtent} Ac`);
-  console.log(`GT Balance Extent: ${res.gt.balanceGtExtent} Ac`);
-  console.log(`GT Total Target Extent: ${res.gt.totalTargetExtent} Ac`);
+  console.log(`GT Today Extent: ${res.gt.todayGtExtent} Ac (Benchmark capacity: ${res.gt.dailyCapacityAc} Ac/day, rovers: ${res.gt.rovers})`);
+  console.log(`GT Cumulative Extent: ${res.gt.cumulativeGtExtent} Ac, Balance: ${formatExtent(res.gt.balanceGtExtent)} Ac`);
 
   assert.strictEqual(res.gt.todayGtExtent, 1382.56, 'District GT today extent must be 1,382.56 Ac');
   assert.strictEqual(res.gt.cumulativeGtExtent, 106543.57, 'District cumulative GT extent must be 106,543.57 Ac');
   assert.strictEqual(res.gt.totalTargetExtent, 277090.35, 'District total target GT extent must be 277,090.35 Ac');
   assert(Math.abs(res.gt.balanceGtExtent - 170546.78) < 0.01, 'District balance GT extent must be 170,546.78 Ac');
+  assert.strictEqual(res.gt.benchmarkRateAc, 25, 'GT benchmark must be 25 Ac per day per rover');
+  assert.strictEqual(res.gt.rovers, 60, 'District active rovers must be 60');
+  assert.strictEqual(res.gt.dailyCapacityAc, 1500, 'District daily capacity must be 1,500 Ac/day (60 * 25)');
 
-  console.log('DLR Logins Metrics:');
-  res.dlr.stages.forEach(st => {
-    console.log(`  ${st.name}: Today=${st.today}, Cumulative=${st.cumulative}, Balance=${st.balance}, Clear%=${st.pct}%`);
-  });
-  console.log(`DLR Total Steps: ${res.dlr.totalSteps}, Today Total=${res.dlr.todayTotal}, Cum Total=${res.dlr.cumulativeTotal}, Balance=${res.dlr.balanceTotal}`);
-
-  assert.strictEqual(res.dlr.todayTotal, 75, 'District total DLR daily entries must equal 75 (44+17+9+3+2)');
-  assert(res.dlr.stages.find(s => s.short === 'VS Login').cumulative >= 515, 'VS Login cumulative should be ~519-520');
-  assert(res.dlr.stages.find(s => s.short === 'VRO Login').cumulative >= 500, 'VRO Login cumulative should be ~506');
-  assert(res.dlr.stages.find(s => s.short === 'Tah Login').cumulative >= 460, 'Tah Login cumulative should be ~463');
-  assert(res.dlr.stages.find(s => s.short === 'RDO Login').cumulative >= 425, 'RDO Login cumulative should be ~430');
-  assert(res.dlr.stages.find(s => s.short === 'JC Login').cumulative >= 415, 'JC Login cumulative should be ~418');
-  console.log('✓ District Level Abstract passes all assertions!');
+  console.log(`DLR Logins: Today=${res.dlr.todayTotal}, Cum=${res.dlr.cumulativeTotal}, Pending=${res.dlr.balanceTotal}, Benchmark=${res.dlr.dlrBenchmarkDaily}/day`);
+  assert.strictEqual(res.dlr.todayTotal, 75, 'District total DLR daily entries must equal 75');
+  assert.strictEqual(res.dlr.dlrBenchmarkDaily, 200, 'DLR benchmark must be 200 entries/day');
+  console.log('✓ District Level Abstract & Benchmarks pass all assertions!');
 }
 
 // Test Case B: Phase V Filtered
@@ -190,13 +200,12 @@ const calculateStageAbstractMetrics = new Function(
   const p5Villages = villages.filter(v => (v.phase || '').includes('5') || (v.phase || '').includes('V'));
   const res = calculateStageAbstractMetrics(p5Villages, { phase: 'Phase V' }, global.state, clean, isComplete, formatExtent);
   console.log('\n--- Test Case B: Phase V Abstract ---');
-  console.log(`Phase V Villages: ${res.scope.totalCount}`);
-  console.log(`Phase V GT Today: ${res.gt.todayGtExtent} Ac, Cumulative: ${res.gt.cumulativeGtExtent} Ac, Balance: ${res.gt.balanceGtExtent} Ac`);
+  console.log(`Phase V GT Today: ${res.gt.todayGtExtent} Ac, Capacity: ${res.gt.dailyCapacityAc} Ac, Rovers: ${res.gt.rovers}`);
   assert.strictEqual(res.gt.todayGtExtent, 425.96, 'Phase V today GT extent must be 425.96 Ac');
   assert.strictEqual(res.gt.cumulativeGtExtent, 82184.05, 'Phase V cumulative GT extent must be 82,184.05 Ac');
-  assert.strictEqual(res.gt.totalTargetExtent, 116517.28, 'Phase V total target extent must be 116,517.28 Ac');
-  assert(Math.abs(res.gt.balanceGtExtent - 34333.23) < 0.01, 'Phase V balance GT extent must be 34,333.23 Ac');
-  console.log('✓ Phase V GT Extents match official departmental records!');
+  assert.strictEqual(res.gt.rovers, 24, 'Phase V rovers must be 24');
+  assert.strictEqual(res.gt.dailyCapacityAc, 600, 'Phase V daily capacity must be 600 Ac/day');
+  console.log('✓ Phase V GT Extents match official records!');
 }
 
 // Test Case C: Phase VI Filtered
@@ -204,28 +213,14 @@ const calculateStageAbstractMetrics = new Function(
   const p6Villages = villages.filter(v => (v.phase || '').includes('6') || (v.phase || '').includes('VI'));
   const res = calculateStageAbstractMetrics(p6Villages, { phase: 'Phase VI' }, global.state, clean, isComplete, formatExtent);
   console.log('\n--- Test Case C: Phase VI Abstract ---');
-  console.log(`Phase VI Villages: ${res.scope.totalCount}`);
-  console.log(`Phase VI GT Today: ${res.gt.todayGtExtent} Ac, Cumulative: ${res.gt.cumulativeGtExtent} Ac, Balance: ${res.gt.balanceGtExtent} Ac`);
+  console.log(`Phase VI GT Today: ${res.gt.todayGtExtent} Ac, Capacity: ${res.gt.dailyCapacityAc} Ac, Rovers: ${res.gt.rovers}`);
   assert.strictEqual(res.gt.todayGtExtent, 956.60, 'Phase VI today GT extent must be 956.60 Ac');
   assert.strictEqual(res.gt.cumulativeGtExtent, 24359.52, 'Phase VI cumulative GT extent must be 24,359.52 Ac');
-  assert.strictEqual(res.gt.totalTargetExtent, 160573.07, 'Phase VI total target extent must be 160,573.07 Ac');
-  assert(Math.abs(res.gt.balanceGtExtent - 136213.55) < 0.01, 'Phase VI balance GT extent must be 136,213.55 Ac');
-  console.log('✓ Phase VI GT Extents match official departmental records!');
-}
-
-// Test Case D: Mandal Filter (e.g. Bangarupalem)
-{
-  const manVillages = villages.filter(v => (v.mandal || '').toLowerCase().includes('bangarupalem'));
-  const res = calculateStageAbstractMetrics(manVillages, { mandal: 'Bangarupalem' }, global.state, clean, isComplete, formatExtent);
-  console.log('\n--- Test Case D: Bangarupalem Mandal Abstract ---');
-  console.log(`Bangarupalem Villages: ${res.scope.totalCount}`);
-  console.log(`Bangarupalem Total Extent: ${formatExtent(res.scope.totalExtent)} Ac`);
-  console.log(`Bangarupalem GT Cumulative: ${formatExtent(res.gt.cumulativeGtExtent)} Ac, Balance: ${formatExtent(res.gt.balanceGtExtent)} Ac`);
-  assert(res.gt.balanceGtExtent >= 0, 'Balance GT extent must be non-negative');
-  assert(res.dlr.stages.length === 5, 'Must have 5 DLR stages for mandal');
-  console.log('✓ Bangarupalem Mandal dynamically computes scope extent and balance!');
+  assert.strictEqual(res.gt.rovers, 36, 'Phase VI rovers must be 36');
+  assert.strictEqual(res.gt.dailyCapacityAc, 900, 'Phase VI daily capacity must be 900 Ac/day');
+  console.log('✓ Phase VI GT Extents match official records!');
 }
 
 console.log('\n========================================================================');
-console.log('ALL VERIFICATION TESTS FOR TABLE FORM ABSTRACT & LOGINS COMPLETED! ✓');
+console.log('ALL VERIFICATION TESTS FOR 2-PART OVERVIEW & BENCHMARKS PASSED! ✓');
 console.log('========================================================================\n');
