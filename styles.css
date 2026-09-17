@@ -2436,6 +2436,429 @@ body.auth-locked .primary-nav, body.auth-locked .top-actions { display: none; }
   background: #cbd5e1;
 }
 
+/* --------------------------------------------------------------------------
+   Executive Abstract in Table Form (Scope, GT Extents, DLR Logins, Milestones)
+   -------------------------------------------------------------------------- */
+.abstract-table-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin-top: 14px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: all 0.25s ease;
+}
+
+.abstract-table-card.gt-focus-active {
+  border: 2px solid #10b981;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 60px);
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.18);
+}
+
+.abstract-table-card.dlr-focus-active {
+  border: 2px solid #6366f1;
+  background: linear-gradient(180deg, #eef2ff 0%, #ffffff 60px);
+  box-shadow: 0 4px 20px rgba(99, 102, 241, 0.18);
+}
+
+.executive-abstract-card.gt-card-active {
+  border-color: #10b981;
+}
+
+.executive-abstract-card.dlr-card-active {
+  border-color: #6366f1;
+}
+
+.abstract-section-hdr {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.abstract-tbl-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.gt-focus-active .abstract-tbl-icon {
+  background: #dcfce7;
+}
+
+.dlr-focus-active .abstract-tbl-icon {
+  background: #e0e7ff;
+}
+
+.abstract-tbl-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 0.3px;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.abstract-tbl-sub {
+  display: block;
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.abstract-subhdr {
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: #475569;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.abstract-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.abstract-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.abstract-data-table thead th {
+  background: #f8fafc;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 11px 14px;
+  border-bottom: 2px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.abstract-data-table thead th.num,
+.abstract-data-table tbody td.num,
+.abstract-data-table tfoot td.num {
+  text-align: right;
+}
+
+.abstract-data-table tbody td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.abstract-data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.abstract-data-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.abstract-data-table tfoot td {
+  background: #f8fafc;
+  font-size: 12.5px;
+  font-weight: 800;
+  padding: 11px 14px;
+  border-top: 2px solid #cbd5e1;
+  color: #0f172a;
+}
+
+/* Highlighting specific columns */
+.abstract-data-table th.highlight-col-today {
+  background: #f0fdf4;
+  color: #15803d;
+  border-bottom-color: #86efac;
+}
+
+.abstract-data-table th.highlight-col-cum {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-bottom-color: #93c5fd;
+}
+
+.abstract-data-table th.highlight-col-bal {
+  background: #fffbeb;
+  color: #b45309;
+  border-bottom-color: #fde68a;
+}
+
+/* Cells styling */
+.today-extent-cell,
+.today-entries-cell {
+  background: rgba(240, 253, 244, 0.6);
+}
+
+.cum-extent-cell,
+.cum-entries-cell {
+  background: rgba(239, 246, 255, 0.5);
+}
+
+.bal-extent-cell,
+.bal-entries-cell {
+  background: rgba(254, 243, 199, 0.4);
+}
+
+.extent-big-today,
+.entries-today-val {
+  font-size: 16px;
+  font-weight: 800;
+  color: #047857;
+}
+
+.extent-val-cum,
+.entries-cum-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+.extent-val-bal,
+.entries-bal-val {
+  font-size: 14px;
+  font-weight: 800;
+  color: #b45309;
+}
+
+.sub-progress-tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sub-progress-tag.text-emerald { color: #059669; }
+.sub-progress-tag.text-amber { color: #d97706; }
+
+.stage-cell-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.stage-cell-title strong {
+  font-size: 13.5px;
+  color: #0f172a;
+}
+
+.stage-cell-title small {
+  font-size: 11.5px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+/* Active Row and Card Highlighting */
+.row-highlight-gt {
+  background: #ecfdf5 !important;
+}
+
+.row-highlight-dlr {
+  background: #f5f3ff !important;
+}
+
+.active-stage-row {
+  background: #f1f5f9;
+  outline: 1px solid #94a3b8;
+}
+
+.focus-indicator-pill {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.focus-indicator-pill.gt-pill {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.focus-indicator-pill.dlr-pill {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #a5b4fc;
+}
+
+.abstract-filter-btn {
+  font-size: 12px;
+  font-weight: 700;
+  background: #ffffff;
+  color: #047857;
+  border: 1px solid #10b981;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.abstract-filter-btn:hover {
+  background: #ecfdf5;
+}
+
+.abstract-filter-btn.active {
+  background: #047857;
+  color: #ffffff;
+}
+
+.abstract-clear-filter-btn {
+  font-size: 12px;
+  font-weight: 700;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+  padding: 5px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.abstract-clear-filter-btn:hover {
+  background: #fecaca;
+}
+
+.table-row-filter-btn {
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.table-row-filter-btn:hover {
+  background: #1e40af;
+  color: #ffffff;
+  border-color: #1e40af;
+}
+
+.table-row-filter-btn.btn-active {
+  background: #047857;
+  color: #ffffff;
+  border-color: #047857;
+}
+
+.table-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 4px;
+}
+
+.table-badge.badge-blue { background: #dbeafe; color: #1e40af; }
+.table-badge.badge-dark { background: #0f172a; color: #ffffff; }
+.table-badge.badge-purple { background: #ede9fe; color: #6d28d9; }
+
+.badge-pct {
+  font-size: 13px;
+  font-weight: 800;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.role-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #475569;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.stage-active-badge {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 800;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-ported {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11.5px;
+}
+
+.mini-progress-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.mini-progress-box .pct-num {
+  font-size: 12px;
+  font-weight: 800;
+  font-family: 'DM Mono', monospace;
+  color: #0f172a;
+}
+
+.mini-progress-bar {
+  width: 58px;
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.mini-progress-fill {
+  height: 100%;
+  background: #10b981;
+  border-radius: 3px;
+}
+
+.mini-progress-fill.fill-cyan {
+  background: #06b6d4;
+}
+
+.row-step-done {
+  background: #ffffff;
+}
+
+.row-step-prog {
+  background: #f0f9ff;
+}
+
+.row-step-pend {
+  background: #ffffff;
+}
+
 /* Selected row highlight in table */
 .home-village-table tbody tr.selected-village-row {
   background: #eff6ff !important;
