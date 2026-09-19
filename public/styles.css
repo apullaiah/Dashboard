@@ -3440,3 +3440,892 @@ body.auth-locked .primary-nav, body.auth-locked .top-actions { display: none; }
 
 
 
+
+
+/* ==========================================================================
+   SYSTEM-WIDE FONT SIZE ENHANCEMENT & READABILITY IMPROVEMENTS
+   ========================================================================== */
+
+/* Increased Base Typography Scale */
+body {
+  font-size: 15.5px !important;
+}
+
+.primary-nav .nav-link {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  padding: 12px 14px !important;
+}
+
+.brand-block h1 {
+  font-size: 16.5px !important;
+}
+
+.eyebrow {
+  font-size: 10px !important;
+}
+
+.page-context h2 {
+  font-size: 18px !important;
+}
+
+.page-title-red-bold {
+  font-size: 18.5px !important;
+  font-weight: 900 !important;
+  color: #b91c1c !important;
+}
+
+.gov-main-title {
+  font-size: 24px !important;
+}
+
+.gov-sub-title {
+  font-size: 13.5px !important;
+}
+
+.gov-office-title-red {
+  font-size: 18px !important;
+  font-weight: 900 !important;
+}
+
+/* Abstract & Two-Row Tables Font Scaling */
+.abstract-two-row-table thead tr.row-parameters th {
+  font-size: 12.5px !important;
+  padding: 14px 15px !important;
+  letter-spacing: 0.5px !important;
+}
+
+.abstract-two-row-table tbody tr.row-numerics td {
+  font-size: 18px !important;
+  padding: 17px 15px !important;
+}
+
+.abstract-two-row-table tbody tr.row-numerics td.num-bold {
+  font-size: 20px !important;
+  font-weight: 900 !important;
+}
+
+.abstract-two-row-table tbody tr.row-numerics td small {
+  font-size: 12px !important;
+}
+
+/* Data Table Typography */
+.data-table th, .performance-table th, .source-table th {
+  font-size: 12.5px !important;
+  letter-spacing: 0.6px !important;
+  font-weight: 800 !important;
+  color: #334155 !important;
+  padding: 13px 15px !important;
+}
+
+.data-table td, .performance-table td, .source-table td {
+  font-size: 14px !important;
+  line-height: 1.45 !important;
+  padding: 13px 15px !important;
+}
+
+.village-name {
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+}
+
+.status-pill {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  padding: 4px 10px !important;
+}
+
+.filter-select, .search-box input {
+  font-size: 13px !important;
+}
+
+.ref-filter-pill {
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  padding: 6px 13px !important;
+}
+
+.filter-row-label {
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+}
+
+.kpi-value {
+  font-size: 34px !important;
+}
+
+.kpi-card .kpi-label {
+  font-size: 11.5px !important;
+}
+
+.kpi-card .kpi-description {
+  font-size: 12.5px !important;
+}
+
+/* ==========================================================================
+   INTERACTIVE PARAMETER INSPECTION & HOVER INDICATORS (OVERVIEW)
+   ========================================================================== */
+
+.clickable-param {
+  cursor: pointer !important;
+  position: relative;
+  transition: all 0.2s ease !important;
+}
+
+.clickable-param:hover {
+  background-color: #f1f5f9 !important;
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+  box-shadow: inset 0 0 10px rgba(59, 130, 246, 0.15);
+}
+
+.abstract-two-row-table td.col-highlight-today.clickable-param:hover {
+  background-color: #dcfce7 !important;
+  outline-color: #10b981;
+}
+
+.abstract-two-row-table td.col-highlight-cum.clickable-param:hover {
+  background-color: #dbeafe !important;
+  outline-color: #2563eb;
+}
+
+.abstract-two-row-table td.col-highlight-bal.clickable-param:hover {
+  background-color: #fef3c7 !important;
+  outline-color: #f59e0b;
+}
+
+.tahsildar-th-highlight {
+  background: #1e3a8a !important;
+  color: #fef08a !important;
+  border-bottom: 2px solid #facc15 !important;
+}
+
+.tahsildar-cell-highlight {
+  background: #f8fafc;
+  border: 2px solid #3b82f6 !important;
+}
+
+.inspect-hint-label {
+  font-size: 10.5px;
+  color: #2563eb;
+  font-weight: 800;
+  margin-top: 3px;
+  opacity: 0.85;
+}
+
+.clickable-param:hover .inspect-hint-label {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   OVERVIEW SECTION SWITCHER (SEPARATED RESURVEY & PPB)
+   ========================================================================== */
+
+.overview-section-switcher {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+
+.overview-switch-btn {
+  border: 1px solid var(--line-dark);
+  background: #f8fafc;
+  color: #334155;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.overview-switch-btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.overview-switch-btn.active {
+  background: var(--navy);
+  color: #ffffff;
+  border-color: var(--navy);
+  box-shadow: 0 2px 8px rgba(16, 26, 48, 0.2);
+}
+
+.launch-ppb-btn {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  padding: 9px 16px !important;
+  color: #1d4ed8 !important;
+  border-color: #93c5fd !important;
+  background: #eff6ff !important;
+}
+
+.launch-ppb-btn:hover {
+  background: #dbeafe !important;
+  border-color: #3b82f6 !important;
+}
+
+/* ==========================================================================
+   STAGE FOCUS DRILLDOWN & TARGET ANALYSIS CARD (VILLAGE MONITORING)
+   ========================================================================== */
+
+.stage-focus-ribbon-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+
+.stage-ribbon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stage-ribbon-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stage-ribbon-hint {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.stage-focus-ribbon {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.stage-focus-chip {
+  border: 1px solid var(--line-dark);
+  background: #ffffff;
+  color: #334155;
+  border-radius: 7px;
+  padding: 8px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.stage-focus-chip:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: var(--ink);
+}
+
+.stage-focus-chip.active {
+  background: var(--navy);
+  color: #ffffff;
+  border-color: var(--navy);
+  box-shadow: 0 2px 6px rgba(16, 26, 48, 0.2);
+}
+
+.stage-focus-chip.tahsildar-chip {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.stage-focus-chip.tahsildar-chip:hover {
+  background: #fef3c7;
+}
+
+.stage-focus-chip.tahsildar-chip.active {
+  background: #b45309;
+  color: #ffffff;
+  border-color: #b45309;
+}
+
+/* Stage Performance Card */
+.stage-performance-card {
+  background: #ffffff;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+}
+
+.stage-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.stage-card-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.stage-num-badge {
+  font-size: 11px;
+  font-weight: 800;
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.stage-authority-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.stage-card-name {
+  font-size: 19px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.stage-telugu-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.stage-card-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+
+.stage-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.stage-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.stage-kpi-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stage-kpi-box.box-today {
+  border-top: 4px solid #10b981;
+  background: #f0fdf4;
+}
+
+.stage-kpi-box.box-cum {
+  border-top: 4px solid #3b82f6;
+  background: #eff6ff;
+}
+
+.stage-kpi-box.box-bal {
+  border-top: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.stage-kpi-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #475569;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.stage-kpi-value {
+  font-size: 28px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  margin: 6px 0 2px;
+}
+
+.stage-kpi-sub {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Target Analysis Banner */
+.target-analysis-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 9px;
+  border: 1.5px solid #e2e8f0;
+}
+
+.target-analysis-banner.reached {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.target-analysis-banner.not-reached {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.target-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.target-badge.reached {
+  background: #15803d;
+  color: #ffffff;
+}
+
+.target-badge.not-reached {
+  background: #b45309;
+  color: #ffffff;
+}
+
+.target-badge.scheduled {
+  background: #475569;
+  color: #ffffff;
+}
+
+.target-analysis-content {
+  flex: 1;
+}
+
+.target-rule-line {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.target-rule-line strong {
+  color: #0f172a;
+}
+
+.shortfall-badge {
+  display: inline-block;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.surplus-badge {
+  display: inline-block;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+.target-analysis-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #1e293b;
+  margin: 0;
+}
+
+/* Focused Stage Table Custom Styles */
+.focused-table-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.focused-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-right: 8px;
+}
+
+.focused-rule-pill {
+  font-size: 12px;
+  background: #e2e8f0;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: #334155;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.entry-today-badge {
+  display: inline-flex;
+  align-items: center;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 5px;
+}
+
+.entry-na-text {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.balance-action-pill {
+  display: inline-block;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   DEDICATED PPB DISTRIBUTION CYCLE SECTION
+   ========================================================================== */
+
+.gov-kicker-strip {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.gov-badge-gold {
+  font-size: 11px;
+  font-weight: 800;
+  background: #ca8a04;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.gov-badge-navy {
+  font-size: 11px;
+  font-weight: 800;
+  background: #1e3a8a;
+  color: #ffffff;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.ppb-executive-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.ppb-kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.ppb-kpi-card.total-target { border-top: 4px solid #0f172a; }
+.ppb-kpi-card.printed { border-top: 4px solid #2563eb; }
+.ppb-kpi-card.distributed { border-top: 4px solid #10b981; }
+.ppb-kpi-card.balance { border-top: 4px solid #f59e0b; }
+.ppb-kpi-card.today { border-top: 4px solid #059669; }
+.ppb-kpi-card.active-drive { border-top: 4px solid #7c3aed; }
+
+.ppb-kpi-label {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.ppb-kpi-val {
+  font-size: 26px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  margin: 6px 0 2px;
+  color: #0f172a;
+}
+
+.ppb-kpi-val.num-today-big {
+  color: #059669;
+}
+
+.ppb-kpi-sub {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* PPB Cycles Cards Grid */
+.ppb-cycles-hub-card {
+  margin-bottom: 20px;
+}
+
+.ppb-cycles-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 16px 20px;
+}
+
+.ppb-cycle-card {
+  border: 1px solid var(--line-dark);
+  background: #ffffff;
+  border-radius: 9px;
+  padding: 13px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ppb-cycle-card:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.ppb-cycle-card.selected {
+  border: 2px solid #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.15);
+}
+
+.cycle-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cycle-month-name {
+  font-size: 12px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.cycle-card-val {
+  font-size: 17px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  margin: 2px 0;
+}
+
+.cycle-card-sub {
+  font-size: 11.5px;
+  color: #64748b;
+}
+
+.ppb-cycle-analysis-card {
+  margin: 0 20px 20px;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 9px;
+}
+
+.analysis-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.analysis-title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cycle-selected-pill {
+  font-size: 12px;
+  background: #e2e8f0;
+  padding: 4px 9px;
+  border-radius: 5px;
+  color: #0f172a;
+}
+
+.analysis-target-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.cycle-analysis-narrative {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #1e293b;
+  margin: 0;
+}
+
+.ppb-table-filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* ==========================================================================
+   PARAMETER INSPECTION MODAL
+   ========================================================================== */
+
+.param-inspector-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.param-header-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #1e40af;
+}
+
+.param-icon {
+  font-size: 18px;
+}
+
+.param-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.param-kpi-cell {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.param-kpi-cell.col-today { background: #f0fdf4; border-color: #bbf7d0; }
+.param-kpi-cell.col-cum { background: #eff6ff; border-color: #bfdbfe; }
+.param-kpi-cell.col-bal { background: #fffbeb; border-color: #fde68a; }
+
+.param-kpi-label {
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #475569;
+  text-transform: uppercase;
+}
+
+.param-kpi-val {
+  font-size: 26px;
+  font-weight: 900;
+  font-family: 'DM Mono', monospace;
+  margin: 4px 0 2px;
+}
+
+.param-target-analysis-card {
+  padding: 14px 16px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+}
+
+.param-target-analysis-card.reached {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.param-target-analysis-card.not-reached {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.target-analysis-badge-line {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.target-benchmark-pacing {
+  font-size: 12.5px;
+  color: #475569;
+}
+
+.target-analysis-message {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #1e293b;
+  margin: 0;
+}
+
+.param-inspector-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}

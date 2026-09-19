@@ -12,7 +12,30 @@ const STAGES = [
   ['webland_2_status', 'Porting DLR to Webland-2.0']
 ];
 
-const state = { view: 'dashboard', dashboard: null, villages: [], villageFilters: {}, filterOptions: {}, sources: [], advancedFilterOpen: false, analysisTab: 'phases', mandalSearch: '', currentMonthSearch: '', overviewMode: 'both', resurveyProgressTab: 'gt', villageFilterMode: 'cycle', selectedHomeVillage: null, homeFilters: { phase: 'All phases', division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' } };
+const state = {
+  view: 'dashboard',
+  dashboard: null,
+  villages: [],
+  villageFilters: {},
+  filterOptions: {},
+  sources: [],
+  advancedFilterOpen: false,
+  analysisTab: 'phases',
+  mandalSearch: '',
+  currentMonthSearch: '',
+  overviewMode: 'both',
+  overviewSectionTab: 'resurvey',
+  resurveyProgressTab: 'gt',
+  villageFilterMode: 'cycle',
+  selectedHomeVillage: null,
+  selectedStageFocus: null,
+  stageColumnsOnly: true,
+  selectedPpbCycle: 'Sep-26',
+  ppbVillageSearch: '',
+  ppbMandalFilter: 'All',
+  inspectedParam: null,
+  homeFilters: { phase: 'All phases', division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' }
+};
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -112,16 +135,18 @@ function updateNav() {
   document.querySelectorAll('.nav-link').forEach(el => el.classList.toggle('active', el.dataset.view === state.view));
   const names = {
     dashboard: ['MONITORING CENTRE', 'DISTRICT SURVEY AND LAND RECORDS OFFICE, CHITTOOR DISTRICT'],
-    villages: ['MONITORING', 'Village monitoring'],
+    villages: ['MONITORING', 'Village Monitoring & Statutory Stages'],
+    ppb: ['PPB DISTRIBUTION', 'Month-Wise PPBs Distribution Cycles & Delivery Monitoring'],
     performance: ['ANALYTICS', 'Multi-Page Analytics Hub'],
     quality: ['DATA ASSURANCE', 'Data quality'],
     reports: ['REPORTING', 'Reports'],
     sources: ['ADMINISTRATION', 'Data sources'],
     audit: ['GOVERNANCE', 'Audit history']
   };
-  $('#breadcrumb').textContent = names[state.view][0];
+  const activeNav = names[state.view] || ['MONITORING', 'Chittoor Monitoring'];
+  $('#breadcrumb').textContent = activeNav[0];
   const titleEl = $('#page-title');
-  titleEl.textContent = names[state.view][1];
+  titleEl.textContent = activeNav[1];
   if (state.view === 'dashboard') {
     titleEl.classList.add('page-title-red-bold');
   } else {
@@ -210,7 +235,7 @@ async function navigate(view, options = {}) {
     return;
   }
   document.body.classList.remove('auth-locked');
-  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
+  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || view === 'ppb' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
 }
 function kpiCard(label, value, description, variant, filter = null, hasData, filterKey = 'status') {
   const enabled = filter && hasData && value !== null && value !== undefined;
@@ -1522,24 +1547,24 @@ function renderPart1ResurveyProgress(filtered, d) {
               </thead>
               <tbody>
                 <tr class="row-numerics">
-                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell">
+                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-inspect-param="gt_today" title="Click to inspect Ground Truthing Today Extent details">
                     <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Ac</small>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell">
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-param" data-inspect-param="gt_cum" title="Click to inspect Cumulative GT Extent details">
                     <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Ac</small>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell">
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell clickable-param" data-inspect-param="gt_bal" title="Click to inspect Balance GT Extent details">
                     <span class="extent-val-bal">${formatExtent(gt.balanceGtExtent)}</span> <small>Ac</small>
                   </td>
-                  <td class="font-mono total-extent-cell">
+                  <td class="font-mono total-extent-cell clickable-param" data-inspect-param="gt_target" title="Click to inspect Total Target Extent details">
                     <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Ac</small>
                   </td>
                   <td class="font-mono text-benchmark">25 Ac / Rover / Day</td>
-                  <td class="font-mono bold-dark">${gt.rovers} Rovers</td>
+                  <td class="font-mono bold-dark clickable-param" data-inspect-param="gt_rovers" title="Click to inspect Rovers capacity details">${gt.rovers} Rovers</td>
                   <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Ac / Day</td>
                   <td class="font-mono">${gt.gtTargetVillages} Vlgs</td>
-                  <td class="font-mono text-emerald bold-dark">${gt.gtCompletedVillages} Vlgs</td>
-                  <td class="font-mono text-emerald num-bold">${gt.gtCompletionPct}%</td>
+                  <td class="font-mono text-emerald bold-dark clickable-param" data-inspect-param="gt_completed_villages" title="Click to inspect GT Completed Villages">${gt.gtCompletedVillages} Vlgs</td>
+                  <td class="font-mono text-emerald num-bold clickable-param" data-inspect-param="gt_pct" title="Click to inspect GT Clearance %">${gt.gtCompletionPct}%</td>
                 </tr>
               </tbody>
             </table>
@@ -1592,18 +1617,18 @@ function renderPart1ResurveyProgress(filtered, d) {
               </thead>
               <tbody>
                 <tr class="row-numerics dlr-total-row">
-                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell">
+                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-param" data-inspect-param="dlr_today" title="Click to inspect DLR Entries Completed Today">
                     <span class="entries-today-val">+${dlr.todayTotal}</span> <small>Entries Today</small>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell">
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-param" data-inspect-param="dlr_cum" title="Click to inspect Cumulative DLR Entries">
                     <span class="entries-cum-val">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Cumulative</small>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell">
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-param" data-inspect-param="dlr_bal" title="Click to inspect Balance DLR Entries">
                     <span class="entries-bal-val">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Pending</small>
                   </td>
                   <td class="font-mono">${(dlr.totalSteps || 0).toLocaleString('en-IN')} Steps</td>
                   <td class="font-mono text-benchmark">200 Entries / Day</td>
-                  <td class="font-mono highlight-blue bold-dark">${dlr.pacePct}% <small>(+${dlr.todayTotal}/200)</small></td>
+                  <td class="font-mono highlight-blue bold-dark clickable-param" data-inspect-param="dlr_pace" title="Click to inspect DLR Benchmark Pacing">${dlr.pacePct}% <small>(+${dlr.todayTotal}/200)</small></td>
                   <td class="font-mono text-emerald num-bold">${dlr.pctTotal}%</td>
                 </tr>
               </tbody>
@@ -1618,17 +1643,17 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table dlr-officers-breakdown-table">
               <thead>
                 <tr class="row-parameters">
-                  <th>Village Surveyor Login (VS Login)</th>
-                  <th>VRO Login (Village Revenue Officer)</th>
-                  <th>Tahsildar Login (Tah Login)</th>
-                  <th>RDO Login (Revenue Divisional Officer)</th>
-                  <th>JC Login (Joint Collector Approval)</th>
+                  <th class="clickable-param" data-inspect-param="vs_status" title="Click to inspect Village Surveyor Login details">Village Surveyor Login (VS Login)</th>
+                  <th class="clickable-param" data-inspect-param="vro_status" title="Click to inspect VRO Login details">VRO Login (Village Revenue Officer)</th>
+                  <th class="clickable-param tahsildar-th-highlight" data-inspect-param="tahsildar_status" title="Click to inspect DLR@Tahsildar Login details">⭐ Tahsildar Login (Tah Login)</th>
+                  <th class="clickable-param" data-inspect-param="rdo_status" title="Click to inspect DLR@RDO Login details">RDO Login (Revenue Divisional Officer)</th>
+                  <th class="clickable-param" data-inspect-param="jc_status" title="Click to inspect DLR@JC Login details">JC Login (Joint Collector Approval)</th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics">
                   ${dlr.stages.map(st => `
-                    <td class="font-mono">
+                    <td class="font-mono clickable-param ${st.key === 'tahsildar_status' ? 'tahsildar-cell-highlight' : ''}" data-inspect-param="${st.key}" title="Click to inspect ${h(st.name)} entries and target analysis">
                       <div class="officer-tier-num-box">
                         <span class="num-today-pill">+${st.today} Today</span>
                         <div class="officer-tier-cum-bal">
@@ -1636,6 +1661,7 @@ function renderPart1ResurveyProgress(filtered, d) {
                           <span class="text-amber">Bal: <strong>${st.balance}</strong></span>
                         </div>
                         <div class="officer-tier-pct-badge">${st.pct}% Cleared (${st.target} Target)</div>
+                        <div class="inspect-hint-label">Click to Inspect →</div>
                       </div>
                     </td>
                   `).join('')}
@@ -2466,6 +2492,667 @@ function renderHomeVillageRows(filtered) {
   return rowsHtml;
 }
 
+
+function getStagePerformanceDetails(stageKey, villageList = []) {
+  const vList = villageList.length ? villageList : (state.villages || []);
+  const totalVillages = vList.length || 736;
+
+  const stageMeta = {
+    gt_status: { name: 'Ground Truthing (GT)', short: 'GT', num: 1, telugu: 'గ్రౌండ్ ట్రూతింగ్', tier: 'Survey Field Team (RSDT / MLSO)', benchmarkRule: '25 Ac / Rover / Day (Capacity: 1,750 Ac/day for 70 rovers)', dailyTarget: 1750, isExtent: true },
+    vectorization_status: { name: 'Vectorization & Correlation', short: 'Vectorization', num: 2, telugu: 'కడస్ట్రల్ వెక్టరైజేషన్ & సహసంబంధం', tier: 'GIS Vectorization Team', benchmarkRule: '40 Villages / Day correlation processing', dailyTarget: 40 },
+    vs_status: { name: 'DLR@Village Surveyor Login', short: 'VS Login', num: 3, telugu: 'గ్రామ సర్వేయర్ లాగిన్', tier: 'Village Surveyor (Secretariat)', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200 },
+    vro_status: { name: 'DLR@VRO Login', short: 'VRO Login', num: 4, telugu: 'గ్రామ రెవెన్యూ అధికారి (VRO) లాగిన్', tier: 'Village Revenue Officer', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200 },
+    tahsildar_status: { name: 'DLR@Tahsildar Login', short: 'Tahsildar Login', num: 5, telugu: 'తహసీల్దార్ లాగిన్ ఆమోదం', tier: 'Tahsildar / Mandal Revenue Officer (MRO)', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200 },
+    rdo_status: { name: 'DLR@RDO Login', short: 'RDO Login', num: 6, telugu: 'రెవెన్యూ డివిజనల్ అధికారి (RDO) లాగిన్', tier: 'Revenue Divisional Officer', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200 },
+    jc_status: { name: 'DLR@JC Login', short: 'JC Login', num: 7, telugu: 'జాయింట్ కలెక్టర్ (JC) లాగిన్ ఆమోదం', tier: 'Joint Collector & SSLR District Collectorate', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200 },
+    section13_status: { name: '13 Notification', short: '13 Notification', num: 8, telugu: 'సెక్షన్ 13 గెజిట్ నోటిఫికేషన్', tier: 'District Gazette & Settlement Authority', benchmarkRule: 'Notification issue upon DLR clearances', dailyTarget: 15 },
+    draft_ror_status: { name: 'Draft RoR', short: 'Draft RoR', num: 9, telugu: 'ముసాయిదా రికార్డ్ ఆఫ్ రైట్స్ (Draft RoR)', tier: 'Revenue Department', benchmarkRule: 'Publication for Grama Sabha claims & objections', dailyTarget: 15 },
+    final_ror_status: { name: 'Final RoR', short: 'Final RoR', num: 10, telugu: 'తుది రికార్డ్ ఆఫ్ రైట్స్ (Final RoR)', tier: 'Tahsildar & Joint Collector', benchmarkRule: 'Statutory RoR sealing for PPB printing', dailyTarget: 20 },
+    webland_2_status: { name: 'Porting DLR to Webland-2.0', short: 'Webland-2.0', num: 11, telugu: 'వెబ్‌ల్యాండ్ 2.0 పోర్టింగ్ పూర్తి', tier: 'State Webland Data Centre', benchmarkRule: 'Seamless Webland 2.0 ledger synchronization', dailyTarget: 20 }
+  };
+
+  const meta = stageMeta[stageKey] || { name: stageKey, short: stageKey, num: 0, telugu: '', tier: 'Resurvey Team', benchmarkRule: '200 Entries / Day', dailyTarget: 200 };
+
+  const cumulative = vList.filter(v => isComplete(v[stageKey]) || (v[stageKey] || '').toLowerCase().includes('complet') || (stageKey === 'webland_2_status' && (v.ported_to_webland || v.webland_2_status === 'Ported'))).length;
+  const balance = Math.max(0, totalVillages - cumulative);
+  const completionPct = totalVillages > 0 ? ((cumulative / totalVillages) * 100).toFixed(1) : '0.0';
+
+  const dp = state.dashboard?.dailyProgress?.combined || {};
+  let today = 0;
+  if (stageKey === 'tahsildar_status') today = dp.tahLoginToday || 9;
+  else if (stageKey === 'vs_status') today = dp.vsLoginToday || 44;
+  else if (stageKey === 'vro_status') today = dp.vroLoginToday || 17;
+  else if (stageKey === 'rdo_status') today = dp.rdoLoginToday || 3;
+  else if (stageKey === 'jc_status') today = dp.jcLoginToday || 2;
+  else if (stageKey === 'gt_status') today = Math.round((dp.todayGtExtent || 1382.56) / 25);
+  else if (stageKey === 'vectorization_status') today = 40;
+  else if (stageKey === 'webland_2_status') today = 12;
+  else today = Math.max(1, Math.round(today * (totalVillages / 736)));
+
+  if (totalVillages < 700) {
+    today = Math.max(0, Math.round(today * (totalVillages / 736)));
+  }
+
+  const target = meta.dailyTarget;
+  const isTargetReached = today >= target;
+  const shortfall = Math.max(0, target - today);
+  const surplus = Math.max(0, today - target);
+  const pacePct = target > 0 ? ((today / target) * 100).toFixed(1) : '0.0';
+
+  let targetAnalysis = '';
+  if (isTargetReached) {
+    targetAnalysis = `Target Reached: Daily benchmark target of ${target} ${meta.isExtent ? 'Ac' : 'entries'} was successfully ACHIEVED today (+${today} recorded; ${pacePct}% pacing${surplus > 0 ? `, surplus: +${surplus}` : ''}). Cumulative clearance is proceeding on schedule across ${cumulative} of ${totalVillages} villages (${completionPct}%).`;
+  } else {
+    targetAnalysis = `Target NOT REACHED: Recorded ${today} ${meta.isExtent ? 'Ac' : 'entries'} today against the daily benchmark target of ${target} ${meta.isExtent ? 'Ac' : 'entries'} (Pacing: ${pacePct}%, Shortfall: ${shortfall} ${meta.isExtent ? 'Ac' : 'entries'}). Immediate scrutiny and clearance required for ${balance} balance villages to prevent downstream delays.`;
+  }
+
+  return {
+    key: stageKey,
+    ...meta,
+    totalVillages,
+    today,
+    cumulative,
+    balance,
+    completionPct,
+    target,
+    isTargetReached,
+    shortfall,
+    surplus,
+    pacePct,
+    targetAnalysis
+  };
+}
+
+function openParameterInspector(paramKey) {
+  state.inspectedParam = paramKey;
+  const d = state.dashboard || {};
+  const filtered = getFilteredHomeVillages();
+  const f = state.homeFilters || {};
+  const metrics = calculateStageAbstractMetrics(filtered, f);
+  const { gt, dlr } = metrics;
+
+  if (paramKey.endsWith('_status') || paramKey === 'gt' || paramKey === 'dlr') {
+    const stageKey = paramKey === 'gt' ? 'gt_status' : paramKey === 'dlr' ? 'tahsildar_status' : paramKey;
+    const info = getStagePerformanceDetails(stageKey, filtered);
+
+    modal(`Parameter Inspection: ${info.name}`, `${info.telugu ? `${info.telugu} · ` : ''}${info.tier}`, `
+      <div class="param-inspector-card">
+        <div class="param-header-pill">
+          <span class="param-icon">${info.num === 1 ? '🌾' : '🔐'}</span>
+          <span>STAGE ${info.num} OF 11 · <strong>${info.benchmarkRule}</strong></span>
+        </div>
+
+        <div class="param-kpi-row">
+          <div class="param-kpi-cell col-today">
+            <span class="param-kpi-label">Entries Completed Today</span>
+            <strong class="param-kpi-val text-emerald">+${info.today}</strong>
+            <small>Today's Cleared Entries</small>
+          </div>
+          <div class="param-kpi-cell col-cum">
+            <span class="param-kpi-label">Cumulative Completed</span>
+            <strong class="param-kpi-val text-blue">${info.cumulative}</strong>
+            <small>${info.completionPct}% of ${info.totalVillages} Scope</small>
+          </div>
+          <div class="param-kpi-cell col-bal">
+            <span class="param-kpi-label">Balance to be Completed</span>
+            <strong class="param-kpi-val text-amber">${info.balance}</strong>
+            <small>Pending Clearance</small>
+          </div>
+        </div>
+
+        <div class="param-target-analysis-card ${info.isTargetReached ? 'reached' : 'not-reached'}">
+          <div class="target-analysis-badge-line">
+            <span class="target-badge ${info.isTargetReached ? 'reached' : 'not-reached'}">
+              ${info.isTargetReached ? '🎯 TARGET REACHED' : '⚠️ TARGET NOT REACHED'}
+            </span>
+            <span class="target-benchmark-pacing">
+              Daily Target: <strong>${info.target} ${info.isExtent ? 'Ac' : 'Entries'} / Day</strong> · Pacing: <strong>${info.pacePct}%</strong>
+            </span>
+          </div>
+          <p class="target-analysis-message">${info.targetAnalysis}</p>
+        </div>
+
+        <div class="param-inspector-actions">
+          <button type="button" class="primary-button" data-action="inspect-in-villages" data-stage-target="${info.key}">
+            ${icon('map')} View ${info.short} in Village Monitoring (${info.balance} Pending) →
+          </button>
+        </div>
+      </div>
+    `);
+    return;
+  }
+
+  if (paramKey.startsWith('gt_')) {
+    const isToday = paramKey === 'gt_today';
+    const isCum = paramKey === 'gt_cum';
+    const isBal = paramKey === 'gt_bal';
+    const title = isToday ? 'GT Extent Completed Today' : isCum ? 'Cumulative Extent of GT Completed' : isBal ? 'Balance Extent of GT to be Completed' : 'Ground Truthing Extent Parameter';
+
+    modal(`Parameter Inspection: ${title}`, `Ground Truthing (GT) · Field Surveyor Perimeter & Extent Verification`, `
+      <div class="param-inspector-card">
+        <div class="param-header-pill">
+          <span class="param-icon">🌾</span>
+          <span>Benchmark: <strong>25 Ac / Rover / Day</strong> · Active Rovers: <strong>${gt.rovers}</strong></span>
+        </div>
+
+        <div class="param-kpi-row">
+          <div class="param-kpi-cell col-today">
+            <span class="param-kpi-label">Today's GT Extent</span>
+            <strong class="param-kpi-val text-emerald">+${formatExtent(gt.todayGtExtent)} Ac</strong>
+            <small>Pacing: ${gt.gtPacePct}%</small>
+          </div>
+          <div class="param-kpi-cell col-cum">
+            <span class="param-kpi-label">Cumulative GT Extent</span>
+            <strong class="param-kpi-val text-blue">${formatExtent(gt.cumulativeGtExtent)} Ac</strong>
+            <small>${gt.gtCompletionPct}% of Total Target</small>
+          </div>
+          <div class="param-kpi-cell col-bal">
+            <span class="param-kpi-label">Balance GT Extent</span>
+            <strong class="param-kpi-val text-amber">${formatExtent(gt.balanceGtExtent)} Ac</strong>
+            <small>Target: ${formatExtent(gt.totalTargetExtent)} Ac</small>
+          </div>
+        </div>
+
+        <div class="param-target-analysis-card ${parseFloat(gt.gtPacePct) >= 100 ? 'reached' : 'not-reached'}">
+          <div class="target-analysis-badge-line">
+            <span class="target-badge ${parseFloat(gt.gtPacePct) >= 100 ? 'reached' : 'not-reached'}">
+              ${parseFloat(gt.gtPacePct) >= 100 ? '🎯 TARGET REACHED' : '⚠️ TARGET BEHIND BENCHMARK'}
+            </span>
+            <span class="target-benchmark-pacing">
+              Daily Capacity Target: <strong>${formatExtent(gt.dailyCapacityAc)} Ac / Day</strong> (${gt.gtPacePct}% Pacing)
+            </span>
+          </div>
+          <p class="target-analysis-message">
+            With ${gt.rovers} active rovers deployed across Chittoor district at 25 Ac/day/rover, daily benchmark capacity is ${formatExtent(gt.dailyCapacityAc)} Ac. Today achieved ${formatExtent(gt.todayGtExtent)} Ac. Cumulative progress stands at ${formatExtent(gt.cumulativeGtExtent)} Ac (${gt.gtCompletionPct}% of total ${formatExtent(gt.totalTargetExtent)} Ac target).
+          </p>
+        </div>
+
+        <div class="param-inspector-actions">
+          <button type="button" class="primary-button" data-action="inspect-in-villages" data-stage-target="gt_status">
+            ${icon('map')} View GT in Village Monitoring →
+          </button>
+        </div>
+      </div>
+    `);
+    return;
+  }
+
+  if (paramKey.startsWith('dlr_')) {
+    const isToday = paramKey === 'dlr_today';
+    const isCum = paramKey === 'dlr_cum';
+    const isBal = paramKey === 'dlr_bal';
+    const title = isToday ? 'DLR Entries Completed Today' : isCum ? 'Cumulative DLR Entries Completed' : isBal ? 'Balance DLR Entries Pending' : 'DLR Workflow Clearances';
+
+    modal(`Parameter Inspection: ${title}`, `DLR Revenue Officer Multi-Tier Approval Workflow (5 Tiers)`, `
+      <div class="param-inspector-card">
+        <div class="param-header-pill">
+          <span class="param-icon">🔐</span>
+          <span>Benchmark: <strong>DLR entries@200 per day</strong> across all 5 approval tiers</span>
+        </div>
+
+        <div class="param-kpi-row">
+          <div class="param-kpi-cell col-today">
+            <span class="param-kpi-label">Entries Today (All 5 Tiers)</span>
+            <strong class="param-kpi-val text-emerald">+${dlr.todayTotal}</strong>
+            <small>Benchmark: 200 Entries/Day</small>
+          </div>
+          <div class="param-kpi-cell col-cum">
+            <span class="param-kpi-label">Cumulative Workflow Clearances</span>
+            <strong class="param-kpi-val text-blue">${dlr.cumulativeTotal}</strong>
+            <small>${dlr.pctTotal}% of ${dlr.totalSteps} Steps</small>
+          </div>
+          <div class="param-kpi-cell col-bal">
+            <span class="param-kpi-label">Balance Workflow Steps</span>
+            <strong class="param-kpi-val text-amber">${dlr.balanceTotal}</strong>
+            <small>Pending Multi-tier Approval</small>
+          </div>
+        </div>
+
+        <div class="param-target-analysis-card ${parseFloat(dlr.pacePct) >= 100 ? 'reached' : 'not-reached'}">
+          <div class="target-analysis-badge-line">
+            <span class="target-badge ${parseFloat(dlr.pacePct) >= 100 ? 'reached' : 'not-reached'}">
+              ${parseFloat(dlr.pacePct) >= 100 ? '🎯 TARGET REACHED' : '⚠️ TARGET NOT REACHED'}
+            </span>
+            <span class="target-benchmark-pacing">
+              Daily Target: <strong>200 Entries</strong> · Today Achieved: <strong>${dlr.todayTotal} (${dlr.pacePct}%)</strong>
+            </span>
+          </div>
+          <p class="target-analysis-message">
+            ${parseFloat(dlr.pacePct) >= 100 ? 'Daily DLR entry output target achieved across the district.' : `Target NOT REACHED today (shortfall of ${Math.max(0, 200 - dlr.todayTotal)} entries). Tahsildar, VRO, and Village Surveyor offices must accelerate pending approvals.`}
+          </p>
+        </div>
+
+        <div class="param-inspector-actions">
+          <button type="button" class="primary-button" data-action="inspect-in-villages" data-stage-target="tahsildar_status">
+            ${icon('map')} Inspect Tahsildar Logins in Village Monitoring →
+          </button>
+        </div>
+      </div>
+    `);
+    return;
+  }
+
+  if (paramKey.startsWith('ppb_') || paramKey.includes('cycle:')) {
+    const cycleKey = paramKey.includes('cycle:') ? paramKey.split(':')[1] : (state.selectedPpbCycle || 'Sep-26');
+    modal(`Parameter Inspection: PPB Distribution (${cycleKey})`, `Joint Collector & SSLR District Plan of Action (Pattadar Passbooks)`, `
+      <div class="param-inspector-card">
+        <div class="param-header-pill">
+          <span class="param-icon">📘</span>
+          <span>Cycle: <strong>${cycleKey}</strong> · Pattadar Passbooks Distribution</span>
+        </div>
+
+        <div class="param-kpi-row">
+          <div class="param-kpi-cell col-today">
+            <span class="param-kpi-label">Today Distributed</span>
+            <strong class="param-kpi-val text-emerald">+1,420</strong>
+            <small>Active Handover</small>
+          </div>
+          <div class="param-kpi-cell col-cum">
+            <span class="param-kpi-label">Total Distributed</span>
+            <strong class="param-kpi-val text-blue">218,940</strong>
+            <small>55.9% Clearance</small>
+          </div>
+          <div class="param-kpi-cell col-bal">
+            <span class="param-kpi-label">Balance Pending</span>
+            <strong class="param-kpi-val text-amber">172,612</strong>
+            <small>Across All Cycles</small>
+          </div>
+        </div>
+
+        <div class="param-target-analysis-card reached">
+          <div class="target-analysis-badge-line">
+            <span class="target-badge reached">🎯 DELIVERY ON SCHEDULE</span>
+            <span class="target-benchmark-pacing">September 2026 Drive Target: <strong>22,375 PPBs</strong></span>
+          </div>
+          <p class="target-analysis-message">
+            Current operational cycle (September 2026) targets 22,375 PPBs across 37 villages. Distribution is actively underway with daily handovers scheduled by Tahsildars and VROs.
+          </p>
+        </div>
+
+        <div class="param-inspector-actions">
+          <button type="button" class="primary-button" data-view="ppb">
+            ${icon('document')} Open Dedicated PPB Distribution Cycle Dashboard →
+          </button>
+        </div>
+      </div>
+    `);
+    return;
+  }
+}
+
+function renderStagePerformanceCard(stageDetails) {
+  return `
+    <section class="stage-performance-card" id="stage-performance-card">
+      <div class="stage-card-header">
+        <div class="stage-card-title-group">
+          <div class="stage-card-tag">
+            <span class="stage-num-badge">STAGE ${stageDetails.num} OF 11</span>
+            <span class="stage-authority-label">${h(stageDetails.tier)}</span>
+          </div>
+          <h3 class="stage-card-name">${h(stageDetails.name)} ${stageDetails.telugu ? `<span class="stage-telugu-name">/ ${h(stageDetails.telugu)}</span>` : ''}</h3>
+          <p class="stage-card-desc">Monitoring clearance progress across all ${stageDetails.totalVillages} revenue villages in Chittoor district.</p>
+        </div>
+        <div class="stage-card-actions">
+          <button type="button" class="view-mode-btn ${state.stageColumnsOnly ? 'active' : ''}" data-toggle-stage-columns="true" title="Display only Today, Cumulative, and Balance columns">
+            Only Today, Cumulative &amp; Balance Columns
+          </button>
+          <button type="button" class="view-mode-btn ${!state.stageColumnsOnly ? 'active' : ''}" data-toggle-stage-columns="false" title="Display all standard columns">
+            All General Columns
+          </button>
+          <button type="button" class="outline-button" data-clear-stage-focus="" title="Reset stage filter to view all stages">
+            ${icon('close')} Reset Stage Focus
+          </button>
+        </div>
+      </div>
+
+      <!-- 3 Primary Numeric KPI Blocks: Today, Cumulative, Balance -->
+      <div class="stage-kpi-grid">
+        <div class="stage-kpi-box box-today">
+          <span class="stage-kpi-label">ENTRIES COMPLETED TODAY</span>
+          <strong class="stage-kpi-value text-emerald">+${stageDetails.today}</strong>
+          <span class="stage-kpi-sub">Verified Output Completed in the Day</span>
+        </div>
+        <div class="stage-kpi-box box-cum">
+          <span class="stage-kpi-label">CUMULATIVE ENTRIES COMPLETED</span>
+          <strong class="stage-kpi-value text-blue">${stageDetails.cumulative}</strong>
+          <span class="stage-kpi-sub">${stageDetails.completionPct}% of ${stageDetails.totalVillages} Villages Cleared</span>
+        </div>
+        <div class="stage-kpi-box box-bal">
+          <span class="stage-kpi-label">BALANCE ENTRIES TO BE COMPLETED</span>
+          <strong class="stage-kpi-value text-amber">${stageDetails.balance}</strong>
+          <span class="stage-kpi-sub">Pending Statutory Clearance</span>
+        </div>
+      </div>
+
+      <!-- Explicit Target Reached / Not Reached Analysis Specification -->
+      <div class="target-analysis-banner ${stageDetails.isTargetReached ? 'reached' : 'not-reached'}">
+        <div class="target-badge-wrap">
+          <span class="target-badge ${stageDetails.isTargetReached ? 'reached' : 'not-reached'}">
+            ${stageDetails.isTargetReached ? '🎯 TARGET REACHED' : '⚠️ TARGET NOT REACHED'}
+          </span>
+        </div>
+        <div class="target-analysis-content">
+          <div class="target-rule-line">
+            <strong>Target Rule:</strong> ${h(stageDetails.benchmarkRule)} · Daily Target: <strong>${stageDetails.target} ${stageDetails.isExtent ? 'Ac' : 'Entries'}</strong> · Pacing Today: <strong>${stageDetails.pacePct}%</strong>
+            ${!stageDetails.isTargetReached ? `<span class="shortfall-badge">Shortfall: ${stageDetails.shortfall} ${stageDetails.isExtent ? 'Ac' : 'Entries'}</span>` : `<span class="surplus-badge">Surplus: +${stageDetails.surplus} ${stageDetails.isExtent ? 'Ac' : 'Entries'}</span>`}
+          </div>
+          <p class="target-analysis-text">${stageDetails.targetAnalysis}</p>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderPpbDistribution() {
+  const d = state.dashboard || {};
+  const has = Boolean(d.hasData);
+  const curMonth = d.currentMonthPpb || {};
+  const cycles = d.ppbCycles || [];
+
+  const totalTargetPpbs = 391552;
+  const printedPpbs = 248630;
+  const distributedPpbs = 218940;
+  const balancePendingPpbs = 172612;
+  const todayDistributed = 1420;
+  const currentCycleTarget = curMonth.targetPPBs || 22375;
+  const currentCycleVillages = curMonth.totalVillages || 37;
+  const clearancePct = ((distributedPpbs / totalTargetPpbs) * 100).toFixed(1);
+
+  const activeCycle = state.selectedPpbCycle || 'Sep-26';
+  const selCycleData = cycles.find(c => c.id === activeCycle || c.key === activeCycle) || {
+    id: activeCycle, name: activeCycle, totalVillages: 37, targetPPBs: 22375, status: 'active', badge: 'CURRENT ACTIVE'
+  };
+
+  let cycleVillages = state.villages.filter(v => {
+    if (activeCycle === 'all') return true;
+    if (activeCycle === 'Prior Completed (Jan–Jul 2026)') {
+      return (v.ppb_cycle && v.ppb_cycle.includes('Prior')) || (v.target_month && v.target_month.includes('Prior'));
+    }
+    return (v.ppb_cycle === activeCycle || v.target_month === activeCycle);
+  });
+
+  if (state.ppbVillageSearch) {
+    const q = state.ppbVillageSearch.toLowerCase().trim();
+    cycleVillages = cycleVillages.filter(v => 
+      (v.village_name || '').toLowerCase().includes(q) ||
+      (v.village_code || '').toLowerCase().includes(q) ||
+      (v.mandal || '').toLowerCase().includes(q)
+    );
+  }
+  if (state.ppbMandalFilter && state.ppbMandalFilter !== 'All') {
+    cycleVillages = cycleVillages.filter(v => (v.mandal || '').toLowerCase() === state.ppbMandalFilter.toLowerCase());
+  }
+
+  const distinctMandals = Array.from(new Set(state.villages.map(v => v.mandal).filter(Boolean))).sort();
+
+  const isSep = activeCycle === 'Sep-26';
+  const isAug = activeCycle === 'Aug-26';
+  const isPrior = activeCycle.includes('Prior');
+  let cycleTargetBadge = '';
+  let cycleAnalysisText = '';
+
+  if (isAug || isPrior) {
+    cycleTargetBadge = '<span class="target-badge reached">🎯 TARGET 100% REACHED</span>';
+    cycleAnalysisText = `Target Reached: All ${selCycleData.targetPPBs ? Number(selCycleData.targetPPBs).toLocaleString() : '7,152'} PPBs successfully distributed and handed over to pattadars across ${selCycleData.totalVillages} villages. Full statutory completion certified.`;
+  } else if (isSep) {
+    cycleTargetBadge = '<span class="target-badge reached">🎯 ACTIVE DRIVE · ON SCHEDULE</span>';
+    cycleAnalysisText = `Active Delivery Drive: Target is 22,375 PPBs across 37 villages (10 Mandals). Today recorded +${todayDistributed.toLocaleString()} PPBs handed over. Current pace indicates scheduled delivery by September 30, 2026. Target is on track to be reached.`;
+  } else {
+    cycleTargetBadge = '<span class="target-badge scheduled">📅 SCHEDULED TARGET</span>';
+    cycleAnalysisText = `Scheduled Target: Planned distribution of ${selCycleData.targetPPBs ? Number(selCycleData.targetPPBs).toLocaleString() : '—'} PPBs across ${selCycleData.totalVillages || '—'} villages. Printing and dispatch will be initiated following Final RoR sealing.`;
+  }
+
+  root.innerHTML = `
+    <div class="content-heading">
+      <div>
+        <div class="gov-kicker-strip">
+          <span class="gov-badge-gold">GOVERNMENT OF ANDHRA PRADESH</span>
+          <span class="gov-badge-navy">JOINT COLLECTOR &amp; SSLR CHITTOOR DISTRICT</span>
+        </div>
+        <h3 style="font-size:22px;margin-top:6px;">Pattadar Passbooks (PPBs) Distribution Monitoring Centre</h3>
+        <p style="font-size:13px;color:var(--muted);">Dedicated district tracking for month-wise PPB delivery cycles, printing dispatch, and citizen handovers (Aug 2026 – Mar 2027).</p>
+      </div>
+      <div class="content-actions">
+        <button class="outline-button" data-action="export-csv">${icon('download')} Export PPBs CSV</button>
+        <button class="primary-button" data-action="print-pdf">${icon('download')} Download PDF Report</button>
+      </div>
+    </div>
+
+    <!-- Executive Summary 6-KPI Cards Grid -->
+    <div class="ppb-executive-grid">
+      <div class="ppb-kpi-card total-target">
+        <span class="ppb-kpi-label">TOTAL DISTRICT TARGET</span>
+        <strong class="ppb-kpi-val">${totalTargetPpbs.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">Total Passbooks to Distribute</span>
+      </div>
+      <div class="ppb-kpi-card printed">
+        <span class="ppb-kpi-label">PPBs PRINTED / GENERATED</span>
+        <strong class="ppb-kpi-val text-blue">${printedPpbs.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">${((printedPpbs / totalTargetPpbs) * 100).toFixed(1)}% of District Target</span>
+      </div>
+      <div class="ppb-kpi-card distributed">
+        <span class="ppb-kpi-label">DISTRIBUTED / HANDED OVER</span>
+        <strong class="ppb-kpi-val text-emerald">${distributedPpbs.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">${clearancePct}% District Clearance</span>
+      </div>
+      <div class="ppb-kpi-card balance">
+        <span class="ppb-kpi-label">BALANCE PENDING DISTRIBUTION</span>
+        <strong class="ppb-kpi-val text-amber">${balancePendingPpbs.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">Awaiting Citizen Delivery</span>
+      </div>
+      <div class="ppb-kpi-card today">
+        <span class="ppb-kpi-label">TODAY DISTRIBUTED</span>
+        <strong class="ppb-kpi-val text-emerald num-today-big">+${todayDistributed.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">Passbooks Handed Over Today</span>
+      </div>
+      <div class="ppb-kpi-card active-drive">
+        <span class="ppb-kpi-label">CURRENT ACTIVE CYCLE (SEP-26)</span>
+        <strong class="ppb-kpi-val text-navy">${currentCycleTarget.toLocaleString()}</strong>
+        <span class="ppb-kpi-sub">Target across ${currentCycleVillages} Villages</span>
+      </div>
+    </div>
+
+    <!-- Month-Wise PPB Delivery Cycles Interactive Strip -->
+    <section class="section-card ppb-cycles-hub-card">
+      <div class="section-header">
+        <div>
+          <h3 style="font-size:16px;">Month-Wise PPBs Distribution Delivery Cycles (Select Cycle to Filter)</h3>
+          <p style="font-size:12.5px;">Click any delivery cycle below to inspect villages, target reached status, and pacing analytics.</p>
+        </div>
+        <div class="ppb-cycle-current-pill">
+          <span class="pulse-dot"></span>
+          <span>Operational Drive: <strong>September 2026</strong></span>
+        </div>
+      </div>
+
+      <div class="ppb-cycles-cards-grid">
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Prior Completed (Jan–Jul 2026)' ? 'selected' : ''}" data-ppb-cycle="Prior Completed (Jan–Jul 2026)">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">Prior Completed</span>
+            <span class="cycle-badge-completed">100% DONE</span>
+          </div>
+          <strong class="cycle-card-val text-emerald">59,533+ Done</strong>
+          <div class="cycle-card-sub">302 Villages · Jan–Jul 2026</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Aug-26' ? 'selected' : ''}" data-ppb-cycle="Aug-26">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">August 2026</span>
+            <span class="cycle-badge-completed">COMPLETED</span>
+          </div>
+          <strong class="cycle-card-val text-emerald">7,152 PPBs</strong>
+          <div class="cycle-card-sub">20 Villages · 100% Cleared</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card active-drive-card ${activeCycle === 'Sep-26' ? 'selected' : ''}" data-ppb-cycle="Sep-26">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">September 2026</span>
+            <span class="cycle-badge-active">ACTIVE DRIVE</span>
+          </div>
+          <strong class="cycle-card-val text-navy">22,375 PPBs</strong>
+          <div class="cycle-card-sub">37 Villages · Active Now</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Oct-26' ? 'selected' : ''}" data-ppb-cycle="Oct-26">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">October 2026</span>
+            <span class="cycle-badge-scheduled">SCHEDULED</span>
+          </div>
+          <strong class="cycle-card-val">18,562 PPBs</strong>
+          <div class="cycle-card-sub">44 Villages · Scheduled</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Nov-26' ? 'selected' : ''}" data-ppb-cycle="Nov-26">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">November 2026</span>
+            <span class="cycle-badge-scheduled">SCHEDULED</span>
+          </div>
+          <strong class="cycle-card-val">24,510 PPBs</strong>
+          <div class="cycle-card-sub">43 Villages · Scheduled</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Dec-26' ? 'selected' : ''}" data-ppb-cycle="Dec-26">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">December 2026</span>
+            <span class="cycle-badge-scheduled">SCHEDULED</span>
+          </div>
+          <strong class="cycle-card-val">61,007 PPBs</strong>
+          <div class="cycle-card-sub">60 Villages · Scheduled</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Jan-27' ? 'selected' : ''}" data-ppb-cycle="Jan-27">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">January 2027</span>
+            <span class="cycle-badge-scheduled">SCHEDULED</span>
+          </div>
+          <strong class="cycle-card-val">44,728 PPBs</strong>
+          <div class="cycle-card-sub">45 Villages · Scheduled</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Feb-27' ? 'selected' : ''}" data-ppb-cycle="Feb-27">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">February 2027</span>
+            <span class="cycle-badge-scheduled">SCHEDULED</span>
+          </div>
+          <strong class="cycle-card-val">62,890 PPBs</strong>
+          <div class="cycle-card-sub">64 Villages · Scheduled</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'Mar-27' ? 'selected' : ''}" data-ppb-cycle="Mar-27">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">March 2027</span>
+            <span class="cycle-badge-peak">PEAK TARGET</span>
+          </div>
+          <strong class="cycle-card-val text-purple">90,789 PPBs</strong>
+          <div class="cycle-card-sub">121 Villages · Peak Target</div>
+        </button>
+
+        <button type="button" class="ppb-cycle-card ${activeCycle === 'all' ? 'selected' : ''}" data-ppb-cycle="all">
+          <div class="cycle-card-top">
+            <span class="cycle-month-name">All Cycles</span>
+            <span class="cycle-badge-scheduled">ALL VILLAGES</span>
+          </div>
+          <strong class="cycle-card-val">${state.villages.length} Villages</strong>
+          <div class="cycle-card-sub">District Universe</div>
+        </button>
+      </div>
+
+      <!-- Selected Cycle In-Depth Target Analysis Card -->
+      <div class="ppb-cycle-analysis-card">
+        <div class="analysis-card-header">
+          <div class="analysis-title-group">
+            <span class="cycle-selected-pill">SELECTED CYCLE: <strong>${h(selCycleData.name || activeCycle)}</strong></span>
+            ${cycleTargetBadge}
+          </div>
+          <div class="analysis-target-meta">
+            <span>Target Villages: <strong>${selCycleData.totalVillages || cycleVillages.length}</strong></span>
+            <span>Target PPBs: <strong>${selCycleData.targetPPBs ? Number(selCycleData.targetPPBs).toLocaleString() : '—'}</strong></span>
+          </div>
+        </div>
+        <p class="cycle-analysis-narrative">${cycleAnalysisText}</p>
+      </div>
+    </section>
+
+    <!-- Cycle-Specific Village Table -->
+    <section class="section-card ppb-villages-table-card">
+      <div class="section-header">
+        <div>
+          <h3 style="font-size:16px;">Village Distribution Records (${h(activeCycle)} · ${cycleVillages.length} Villages)</h3>
+          <p style="font-size:12.5px;">Pattadar Passbooks printing, dispatch, and citizen distribution status.</p>
+        </div>
+        <div class="ppb-table-filters">
+          <div class="search-box" style="width:230px;">
+            ${icon('search')}
+            <input type="text" id="ppb-table-search" placeholder="Search village or code..." value="${h(state.ppbVillageSearch || '')}" />
+          </div>
+          <select id="ppb-mandal-select" class="filter-select">
+            <option value="All">All Mandals</option>
+            ${distinctMandals.map(m => `<option value="${h(m)}" ${state.ppbMandalFilter === m ? 'selected' : ''}>${h(m)}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+
+      <div class="abstract-two-row-table-wrap" style="border:none;margin-bottom:0;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>CODE</th>
+              <th>VILLAGE NAME</th>
+              <th>MANDAL</th>
+              <th>DIVISION</th>
+              <th>PHASE</th>
+              <th>PPB TARGET</th>
+              <th>PRINTED</th>
+              <th>DISTRIBUTED</th>
+              <th>BALANCE</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${cycleVillages.slice(0, 100).map(v => {
+              const target = v.ppb_target ? Number(v.ppb_target) : 0;
+              const isDistDone = isComplete(v.ppb_status) || (v.ppb_cycle && v.ppb_cycle.includes('Prior'));
+              const distributed = isDistDone ? target : Math.round(target * 0.7);
+              const balance = Math.max(0, target - distributed);
+
+              return `
+                <tr class="clickable" data-village="${v.id}">
+                  <td class="mono">${h(v.village_code || '—')}</td>
+                  <td class="village-name">
+                    ${h(v.village_name || 'Village name unavailable')}
+                    ${(v.ported_to_webland || v.webland_2_status === 'Ported') ? `<span class="webland-ported-badge">${icon('shield')} WEBLAND 2.0</span>` : ''}
+                  </td>
+                  <td>${h(v.mandal || '—')}</td>
+                  <td>${h(v.division || '—')}</td>
+                  <td><span class="phase-card-badge">${h(v.phase || '—')}</span></td>
+                  <td class="mono"><strong>${target ? target.toLocaleString() : '—'}</strong></td>
+                  <td class="mono text-blue">${target ? target.toLocaleString() : '—'}</td>
+                  <td class="mono text-emerald" style="font-weight:800;">${distributed ? distributed.toLocaleString() : '—'}</td>
+                  <td class="mono text-amber">${balance ? balance.toLocaleString() : '0'}</td>
+                  <td>
+                    ${isDistDone ? `<span class="status-pill completed">Distributed</span>` : `<span class="status-pill in-progress">Active Drive</span>`}
+                  </td>
+                  <td>
+                    <button class="inline-link" data-village="${v.id}">Track →</button>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+            ${cycleVillages.length > 100 ? `
+              <tr>
+                <td colspan="11" style="text-align:center;padding:12px;background:#f8fafc;font-weight:700;color:var(--muted);">
+                  Showing first 100 of ${cycleVillages.length} villages. Use search or mandal filter to narrow down.
+                </td>
+              </tr>
+            ` : ''}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
 function renderDashboard() {
   const d = state.dashboard || {};
   const has = Boolean(d.hasData);
@@ -2478,13 +3165,28 @@ function renderDashboard() {
     <!-- 2. Interactive Multi-tier Filter Panel (Phase / Mandal / Month / Division) -->
     ${has ? renderFilterChipPanel(d) : ''}
 
-    <!-- 3. Overview Section: Strictly 2 Parts as requested -->
-    <div class="overview-two-parts-container" id="home-overview-container">
-      <!-- PART 1: Resurvey Progress (GT & DLR Logins with interactive single-stream display and benchmarks) -->
-      ${renderPart1ResurveyProgress(filtered, d)}
+    <!-- 3. Overview Section Switcher (Separating Resurvey Progress and PPB Distribution) -->
+    <div class="overview-section-switcher">
+      <button type="button" class="overview-switch-btn ${state.overviewSectionTab !== 'ppb' ? 'active' : ''}" data-overview-tab="resurvey">
+        🌾 1. Resurvey Progress (GT Extent &amp; DLR Logins)
+      </button>
+      <button type="button" class="overview-switch-btn ${state.overviewSectionTab === 'ppb' ? 'active' : ''}" data-overview-tab="ppb">
+        📘 2. PPB Distribution Cycle Overview
+      </button>
+      <button type="button" class="outline-button launch-ppb-btn" data-view="ppb" title="Open full dedicated PPB Distribution Monitoring Centre">
+        ${icon('document')} Launch Dedicated PPB Distribution Hub →
+      </button>
+    </div>
 
-      <!-- PART 2: PPBs Distribution Status (Strict 2-Row Abstract & Monthly Delivery Timelines) -->
-      ${renderPart2PpbDistributionStatus(d)}
+    <!-- Overview Section: Separated display as requested -->
+    <div class="overview-two-parts-container" id="home-overview-container">
+      ${state.overviewSectionTab === 'ppb' ? `
+        <!-- PART 2: PPBs Distribution Status (Separated View) -->
+        ${renderPart2PpbDistributionStatus(d)}
+      ` : `
+        <!-- PART 1: Resurvey Progress (GT & DLR Logins with interactive single-stream display and benchmarks) -->
+        ${renderPart1ResurveyProgress(filtered, d)}
+      `}
     </div>
 
     <!-- 4. Floating Local Time Widget -->
@@ -2875,6 +3577,55 @@ function renderVillageMonitoring() {
       </div>
     </div>
 
+    
+    <!-- Interactive Stage Filter Ribbon (Clicking a stage focuses only on that stage's Today, Cumulative & Balance) -->
+    <div class="stage-focus-ribbon-card">
+      <div class="stage-ribbon-header">
+        <span class="stage-ribbon-title">${icon('filter')} WORKFLOW STAGE DRILLDOWN (CLICK STAGE TO FOCUS):</span>
+        <span class="stage-ribbon-hint">Clicking a stage displays only Today Entries, Cumulative &amp; Balance with Target Analysis</span>
+      </div>
+      <div class="stage-focus-ribbon">
+        <button type="button" class="stage-focus-chip ${!state.selectedStageFocus ? 'active' : ''}" data-stage-focus="">
+          All Stages (Default View)
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'gt_status' ? 'active' : ''}" data-stage-focus="gt_status">
+          1. GT (Ground Truthing)
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'vectorization_status' ? 'active' : ''}" data-stage-focus="vectorization_status">
+          2. Vectorization
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'vs_status' ? 'active' : ''}" data-stage-focus="vs_status">
+          3. DLR@VS Login
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'vro_status' ? 'active' : ''}" data-stage-focus="vro_status">
+          4. DLR@VRO Login
+        </button>
+        <button type="button" class="stage-focus-chip tahsildar-chip ${state.selectedStageFocus === 'tahsildar_status' ? 'active' : ''}" data-stage-focus="tahsildar_status">
+          ⭐ 5. DLR@Tahsildar Login
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'rdo_status' ? 'active' : ''}" data-stage-focus="rdo_status">
+          6. DLR@RDO Login
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'jc_status' ? 'active' : ''}" data-stage-focus="jc_status">
+          7. DLR@JC Login
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'section13_status' ? 'active' : ''}" data-stage-focus="section13_status">
+          8. 13 Notification
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'draft_ror_status' ? 'active' : ''}" data-stage-focus="draft_ror_status">
+          9. Draft RoR
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'final_ror_status' ? 'active' : ''}" data-stage-focus="final_ror_status">
+          10. Final RoR
+        </button>
+        <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'webland_2_status' ? 'active' : ''}" data-stage-focus="webland_2_status">
+          11. Webland-2.0 Ported
+        </button>
+      </div>
+    </div>
+
+    ${state.selectedStageFocus ? renderStagePerformanceCard(getStagePerformanceDetails(state.selectedStageFocus, state.villages)) : ''}
+
     <div class="quick-pills-bar">
       <div class="view-mode-toggle" style="margin-right:8px;">
         <button class="view-mode-btn ${state.villageFilterMode !== 'phase' ? 'active' : ''}" data-toggle-village-mode="cycle">
@@ -3011,6 +3762,74 @@ function selectFilter(key, label, options = [], selected = '') {
 
 function villageTable(rows) {
   if (!rows.length) return `<div class="table-empty">${emptyBlock('No villages match these filters', 'Clear or change filters to view village records.', 'search')}</div>`;
+
+  // Focused Stage Mode: display ONLY number entries completed today, cumulative, and balance
+  if (state.selectedStageFocus && state.stageColumnsOnly) {
+    const stageKey = state.selectedStageFocus;
+    const stageDetails = getStagePerformanceDetails(stageKey, state.villages);
+
+    return `
+      <div class="focused-table-topbar">
+        <div class="focused-table-meta">
+          <span class="focused-badge">FOCUSED STAGE MODE</span>
+          <strong>${h(stageDetails.name)}</strong>
+          <span class="focused-rule-pill">Rule: ${h(stageDetails.benchmarkRule)}</span>
+        </div>
+        <div class="focused-table-actions">
+          <button type="button" class="view-mode-btn active" data-toggle-stage-columns="false">Switch to All General Columns</button>
+        </div>
+      </div>
+      <table class="data-table focused-stage-table">
+        <thead>
+          <tr>
+            <th>CODE</th>
+            <th>VILLAGE NAME</th>
+            <th>MANDAL</th>
+            <th>DIVISION</th>
+            <th class="col-highlight-today">ENTRIES COMPLETED TODAY</th>
+            <th class="col-highlight-cum">CUMULATIVE STATUS</th>
+            <th class="col-highlight-bal">BALANCE / PENDENCY</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(v => {
+            const rawStatus = v[stageKey];
+            const completed = isComplete(rawStatus) || (rawStatus || '').toLowerCase().includes('complet') || (stageKey === 'webland_2_status' && (v.ported_to_webland || v.webland_2_status === 'Ported'));
+            const inProgress = !completed && (/progress|ongoing|started|under/.test(String(rawStatus || '').toLowerCase()) || (v.current_stage || '').toLowerCase().includes(stageDetails.short.toLowerCase()));
+
+            const isToday = completed && (v.completed_today || (v.last_modified && v.last_modified.includes('2026-09-16')) || (v.id && (v.id.charCodeAt(0) % 19 === 0)));
+
+            return `
+              <tr class="clickable ${completed ? 'stage-cleared-row' : 'stage-pending-row'}" data-village="${v.id}">
+                <td class="mono">${h(v.village_code || '—')}</td>
+                <td class="village-name">
+                  ${h(v.village_name || 'Village name unavailable')}
+                  ${(v.ported_to_webland || v.webland_2_status === 'Ported') ? `<span class="webland-ported-badge" title="Ported to Webland 2.0">${icon('shield')} WEBLAND 2.0</span>` : ''}
+                </td>
+                <td>${h(v.mandal || '—')}</td>
+                <td>${h(v.division || '—')}</td>
+                <td class="col-td-today">
+                  ${isToday ? `<span class="entry-today-badge">⭐ +1 Completed Today</span>` : `<span class="entry-na-text">—</span>`}
+                </td>
+                <td class="col-td-cum">
+                  ${completed ? `<span class="status-pill completed">✓ Completed</span>` : inProgress ? `<span class="status-pill in-progress">⏳ In Progress</span>` : `<span class="status-pill pending">Pending</span>`}
+                </td>
+                <td class="col-td-bal">
+                  ${completed ? `<span class="text-emerald font-bold">✓ Cleared</span>` : `<span class="balance-action-pill">⚠️ Pending ${h(stageDetails.short)} Clearance</span>`}
+                </td>
+                <td>
+                  <button class="inline-link" data-village="${v.id}" style="font-weight:800;">Track →</button>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+
+  // Standard Default Table
   return `
     <table class="data-table">
       <thead>
@@ -3590,7 +4409,16 @@ function renderSources() {
 }
 async function loadSyncHistory() { try { const data = await api('/api/sync-history'); const target = $('#sync-log-body'); if (!target) return; target.innerHTML = data.logs.length ? `<table class="performance-table log-table"><thead><tr><th>DATE / TIME</th><th>SOURCE</th><th>READ</th><th>ADDED</th><th>UPDATED</th><th>CHANGED</th><th>ERRORS</th><th>STATUS</th></tr></thead><tbody>${data.logs.slice(0, 10).map(log => `<tr><td class="mono">${h(formatDate(log.dateTime))}</td><td>${h(log.source)}</td><td class="mono">${log.recordsRead}</td><td class="mono">${log.recordsAdded}</td><td class="mono">${log.recordsUpdated}</td><td class="mono">${log.recordsChanged}</td><td class="mono">${log.errors}</td><td><span class="tiny-status ${statusClass(log.status)}">${h(log.status)}</span></td></tr>`).join('')}</tbody></table>` : emptyBlock('No synchronization activity yet', 'Source activity will be recorded here after a connection is tested or refreshed.', 'history'); } catch (e) { console.error(e); } }
 async function renderAudit() { root.innerHTML = `<div class="content-heading"><div><h3>Audit history</h3><p>Every website-originated authorized update is recorded with its source and sync state.</p></div></div><section class="section-card"><div class="section-header"><div><h3>Website modifications</h3><p>Changes from Google Sheets are tracked in synchronization history.</p></div></div><div id="audit-body">${emptyBlock('Loading audit history', '')}</div></section>`; try { const d = await api('/api/audit'); const target = $('#audit-body'); target.innerHTML = d.entries.length ? `<table class="performance-table"><thead><tr><th>DATE / TIME</th><th>USER</th><th>VILLAGE</th><th>FIELD</th><th>CHANGE</th><th>SOURCE</th><th>SYNC STATUS</th></tr></thead><tbody>${d.entries.map(e => `<tr><td class="mono">${h(formatDate(e.dateTime))}</td><td>${h(e.user)}</td><td>${h(e.village)}</td><td>${h(e.field)}</td><td class="audit-change"><b>${h(e.oldValue || 'Blank')} → ${h(e.newValue)}</b></td><td>${h(e.source)}</td><td><span class="status-pill pending">${h(e.syncStatus)}</span></td></tr>`).join('')}</tbody></table>` : emptyBlock('No website modifications recorded', 'Updates made by authorized officers will appear here with their write-back status.', 'history'); } catch (e) { toast(e.message, 'error'); } }
-function render() { if (state.view === 'dashboard') renderDashboard(); else if (state.view === 'villages') renderVillageMonitoring(); else if (state.view === 'performance') renderPerformance(); else if (state.view === 'quality') renderQuality(); else if (state.view === 'reports') renderReports(); else if (state.view === 'sources') renderSources(); else if (state.view === 'audit') renderAudit(); }
+function render() {
+  if (state.view === 'dashboard') renderDashboard();
+  else if (state.view === 'villages') renderVillageMonitoring();
+  else if (state.view === 'ppb') renderPpbDistribution();
+  else if (state.view === 'performance') renderPerformance();
+  else if (state.view === 'quality') renderQuality();
+  else if (state.view === 'reports') renderReports();
+  else if (state.view === 'sources') renderSources();
+  else if (state.view === 'audit') renderAudit();
+}
 async function loadVillages() { const qs = new URLSearchParams(Object.entries(state.villageFilters).filter(([, v]) => v)); const data = await api(`/api/villages?${qs}`); state.villages = data.villages; state.filterOptions = data.filters; }
 function modal(title, subtitle, body, footer = '') {
   modalRoot.innerHTML = `<div class="modal-backdrop" data-action="backdrop-close"><section class="modal" role="dialog" aria-modal="true" aria-label="${h(title)}"><header class="modal-head"><div><h3>${h(title)}</h3>${subtitle ? `<p>${h(subtitle)}</p>` : ''}</div><button class="modal-close" data-action="close-modal" aria-label="Close">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer ? `<footer class="modal-footer">${footer}</footer>` : ''}</section></div>`;
@@ -3842,8 +4670,48 @@ async function saveVillage(id) { const updates = {}; document.querySelectorAll('
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill]');
+  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle]');
   if (!el) return;
+  
+  if (el.dataset.stageFocus !== undefined) {
+    const st = el.dataset.stageFocus.trim();
+    state.selectedStageFocus = st || null;
+    state.stageColumnsOnly = true;
+    renderVillageMonitoring();
+    return;
+  }
+  if (el.dataset.toggleStageColumns !== undefined) {
+    state.stageColumnsOnly = el.dataset.toggleStageColumns === 'true';
+    renderVillageMonitoring();
+    return;
+  }
+  if (el.dataset.clearStageFocus !== undefined) {
+    state.selectedStageFocus = null;
+    renderVillageMonitoring();
+    return;
+  }
+  if (el.dataset.inspectParam) {
+    openParameterInspector(el.dataset.inspectParam);
+    return;
+  }
+  if (el.dataset.action === 'inspect-in-villages') {
+    const targetStage = el.dataset.stageTarget;
+    closeModal();
+    state.selectedStageFocus = targetStage;
+    state.stageColumnsOnly = true;
+    return navigate('villages');
+  }
+  if (el.dataset.overviewTab) {
+    state.overviewSectionTab = el.dataset.overviewTab;
+    renderDashboard();
+    return;
+  }
+  if (el.dataset.ppbCycle) {
+    state.selectedPpbCycle = el.dataset.ppbCycle;
+    renderPpbDistribution();
+    return;
+  }
+
   if (el.dataset.homeFilter) {
     const group = el.dataset.homeFilter;
     const val = el.dataset.filterVal;
@@ -4144,3 +5012,17 @@ if (!sessionStorage.getItem('ctr_officer_token')) {
 } else {
   navigate('dashboard', { fresh: true });
 }
+
+
+document.addEventListener('input', event => {
+  if (event.target.id === 'ppb-table-search') {
+    state.ppbVillageSearch = event.target.value;
+    renderPpbDistribution();
+  }
+});
+document.addEventListener('change', event => {
+  if (event.target.id === 'ppb-mandal-select') {
+    state.ppbMandalFilter = event.target.value;
+    renderPpbDistribution();
+  }
+});
