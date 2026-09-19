@@ -101,9 +101,10 @@ vm.runInContext(fn2Match[0], context);
 // Test 1: Render GT stage inline
 context.state.overviewActiveStage = 'gt_status';
 const gtHtml = vm.runInContext('renderInlineVillageWiseProgress(sampleVillages, {})', context);
-assert(gtHtml.includes('TOTAL EXTENT (ACRES)'), 'GT table must include TOTAL EXTENT (ACRES)');
+assert(gtHtml.includes('GT EXTENT TODAY (AC)'), 'GT table must include GT EXTENT TODAY (AC)');
 assert(gtHtml.includes('GT COMPLETED (ACRES)'), 'GT table must include GT COMPLETED (ACRES)');
 assert(gtHtml.includes('BALANCE GT (ACRES)'), 'GT table must include BALANCE GT (ACRES)');
+assert(gtHtml.includes('TOTAL EXTENT'), 'GT table must include TOTAL EXTENT');
 assert(gtHtml.includes('PROGRESS IN ACRES'), 'GT header must indicate PROGRESS IN ACRES');
 assert(gtHtml.includes('25 Acres per rover per day'), 'GT header must state daily benchmark in Acres');
 console.log('✓ renderInlineVillageWiseProgress renders GT progress correctly in Acres');
@@ -111,7 +112,7 @@ console.log('✓ renderInlineVillageWiseProgress renders GT progress correctly i
 // Test 2: Render DLR stage inline (e.g. Tahsildar Login)
 context.state.overviewActiveStage = 'tahsildar_status';
 const dlrHtml = vm.runInContext('renderInlineVillageWiseProgress(sampleVillages, {})', context);
-assert(dlrHtml.includes('TOTAL KHATAS / ENTRIES'), 'DLR table must include TOTAL KHATAS / ENTRIES');
+assert(dlrHtml.includes('TOTAL ENTRIES'), 'DLR table must include TOTAL ENTRIES');
 assert(dlrHtml.includes('ENTRIES COMPLETED TODAY'), 'DLR table must include ENTRIES COMPLETED TODAY');
 assert(dlrHtml.includes('CUMULATIVE ENTRIES'), 'DLR table must include CUMULATIVE ENTRIES');
 assert(dlrHtml.includes('BALANCE ENTRIES'), 'DLR table must include BALANCE ENTRIES');
@@ -127,10 +128,11 @@ assert(villageCardHtml.includes('1061001'), 'Card must show village code');
 assert(villageCardHtml.includes('GROUND TRUTHING (GT) PROGRESS'), 'Card must have GT progress section');
 assert(villageCardHtml.includes('MEASURED STRICTLY IN ACRES'), 'Card must state GT measured strictly in Acres');
 assert(villageCardHtml.includes('1,450.50 <small>Acres</small>'), 'Card must show extent in Acres');
+assert(villageCardHtml.includes('GT Extent Done Today'), 'Card must show GT Extent Done Today');
 assert(villageCardHtml.includes('DLR REVENUE OFFICER LOGINS'), 'Card must have DLR logins section');
 assert(villageCardHtml.includes('MEASURED STRICTLY IN NUMBER OF ENTRIES'), 'Card must state DLR measured strictly in Number of Entries');
-assert(villageCardHtml.includes('3/5 Entries Cleared'), 'Card must show 3 of 5 entries cleared for sample village');
-assert(villageCardHtml.includes('1 Entry Done'), 'Card must show 1 Entry Done for cleared tiers');
+assert(villageCardHtml.includes('DLR Entries Done Today'), 'Card must show DLR Entries Done Today');
+assert(villageCardHtml.includes('3/5 Tiers Cleared'), 'Card must show 3 of 5 tiers cleared for sample village');
 assert(villageCardHtml.includes('COMPLETE 11-STAGE RESURVEY LIFECYCLE FOR PEDDUR'), 'Card must include 11-stage stepper');
 console.log('✓ renderIndividualVillageProgressCard renders individual village metrics with strict unit discipline and 11 stages');
 

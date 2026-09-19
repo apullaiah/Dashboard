@@ -17,3 +17,8 @@ dashboard/
 # OS and IDE files
 .DS_Store
 Thumbs.db
+
+# Temporary screenshots and scratch inspect dumps
+screenshot_*.png
+emergent_dom.html
+reference_site_full.html

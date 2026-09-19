@@ -36,17 +36,17 @@ assert(appContent.includes('CUMULATIVE NUMBER OF ENTRIES COMPLETED'), 'DLR cumul
 assert(appContent.includes('BALANCE NUMBER OF ENTRIES TO BE COMPLETED'), 'DLR balance must specify Number of Entries');
 assert(appContent.includes('200 ENTRIES / DAY'), 'DLR benchmark must specify 200 Entries / Day');
 assert(appContent.includes('MEASURED STRICTLY IN NUMBER OF ENTRIES'), 'DLR box must state measured strictly in Number of Entries');
-assert(appContent.includes('1 Entry Done'), 'DLR officer chip must display in entries format (1 Entry Done)');
+assert(appContent.includes('DLR Entries Done Today'), 'DLR officer chip must display today entries');
 console.log('✓ DLR login progress metrics and headers strictly display in Number of Entries');
 
 // 4. Inline Village-Wise Stage Progress Component
 assert(appContent.includes('function renderInlineVillageWiseProgress'), 'renderInlineVillageWiseProgress must be defined');
 assert(appContent.includes('inline-village-wise-section'), 'inline-village-wise-section container must exist');
 assert(appContent.includes('ivw-stage-tabs'), 'ivw-stage-tabs stage switcher must exist');
-assert(appContent.includes('TOTAL EXTENT (ACRES)'), 'GT columns in village-wise table must specify Acres');
+assert(appContent.includes('GT EXTENT TODAY (AC)'), 'GT columns in village-wise table must specify GT EXTENT TODAY (AC)');
 assert(appContent.includes('GT COMPLETED (ACRES)'), 'GT completed column must specify Acres');
 assert(appContent.includes('BALANCE GT (ACRES)'), 'GT balance column must specify Acres');
-assert(appContent.includes('TOTAL KHATAS / ENTRIES'), 'DLR columns in village-wise table must specify Entries');
+assert(appContent.includes('TOTAL ENTRIES'), 'DLR columns in village-wise table must specify Entries');
 assert(appContent.includes('ENTRIES COMPLETED TODAY'), 'DLR today column must specify Entries');
 assert(appContent.includes('CUMULATIVE ENTRIES'), 'DLR cumulative column must specify Entries');
 assert(appContent.includes('BALANCE ENTRIES'), 'DLR balance column must specify Entries');
@@ -56,9 +56,11 @@ console.log('✓ Inline Village-Wise Stage Progress component renders both GT (i
 assert(appContent.includes('function renderIndividualVillageProgressCard'), 'renderIndividualVillageProgressCard must be defined');
 assert(appContent.includes('individual-village-progress-card'), 'individual-village-progress-card container must exist');
 assert(appContent.includes('iv-dual-progress-grid'), 'Dual progress grid for GT and DLR must exist');
-assert(appContent.includes('GT Extent Cleared'), 'GT progress box must show cleared extent in Acres');
+assert(appContent.includes('GT Extent Done Today'), 'GT progress box must show GT Extent Done Today');
+assert(appContent.includes('Cumulative GT Cleared'), 'GT progress box must show Cumulative GT Cleared');
 assert(appContent.includes('Balance GT Extent'), 'GT progress box must show balance extent in Acres');
-assert(appContent.includes('Entries Cleared'), 'DLR progress box must show cleared entries');
+assert(appContent.includes('DLR Entries Done Today'), 'DLR progress box must show DLR Entries Done Today');
+assert(appContent.includes('Cumulative Entries'), 'DLR progress box must show cumulative entries');
 assert(appContent.includes('Balance Entries'), 'DLR progress box must show balance entries');
 assert(appContent.includes('iv-stepper-track'), '11-stage lifecycle timeline stepper must exist');
 console.log('✓ Individual Village Dedicated Progress Card renders clear village-level metrics for both GT (Acres) and DLR (Entries)');

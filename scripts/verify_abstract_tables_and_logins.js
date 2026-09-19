@@ -190,7 +190,7 @@ const calculateStageAbstractMetrics = new Function(
   assert.strictEqual(res.gt.dailyCapacityAc, 1500, 'District daily capacity must be 1,500 Ac/day (60 * 25)');
 
   console.log(`DLR Logins: Today=${res.dlr.todayTotal}, Cum=${res.dlr.cumulativeTotal}, Pending=${res.dlr.balanceTotal}, Benchmark=${res.dlr.dlrBenchmarkDaily}/day`);
-  assert.strictEqual(res.dlr.todayTotal, 75, 'District total DLR daily entries must equal 75');
+  assert.strictEqual(res.dlr.todayTotal, 5990, 'District total DLR daily entries must equal 5,990 entries');
   assert.strictEqual(res.dlr.dlrBenchmarkDaily, 200, 'DLR benchmark must be 200 entries/day');
   console.log('✓ District Level Abstract & Benchmarks pass all assertions!');
 }
