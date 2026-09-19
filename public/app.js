@@ -26,6 +26,11 @@ const state = {
   overviewMode: 'both',
   overviewSectionTab: 'resurvey',
   resurveyProgressTab: 'gt',
+  overviewActiveStage: 'gt_status',
+  overviewVillageSearch: '',
+  overviewMandalFilter: 'All',
+  overviewStatusFilter: 'All',
+  overviewSelectedVillageId: null,
   villageFilterMode: 'cycle',
   selectedHomeVillage: null,
   selectedStageFocus: null,
@@ -1482,6 +1487,408 @@ function calculateStageAbstractMetrics(filtered, f = {}) {
   };
 }
 
+function renderIndividualVillageProgressCard(village) {
+  if (!village) return '';
+  const isPorted = Boolean(village.ported_to_webland || village.webland_2_status === 'Ported');
+  const totExt = village.extent ? parseFloat(village.extent) : 0;
+  const isGtDone = isPorted || isComplete(village.gt_status);
+  const gtClearedAc = isGtDone ? totExt : (village.gt_status === 'In Progress' ? Math.round(totExt * 0.6 * 100) / 100 : 0);
+  const gtBalAc = Math.max(0, Math.round((totExt - gtClearedAc) * 100) / 100);
+
+  const dlrStages = [
+    { key: 'vs_status', num: 1, name: 'DLR@VS Login', officer: 'Village Surveyor / Secretariat' },
+    { key: 'vro_status', num: 2, name: 'DLR@VRO Login', officer: 'Village Revenue Officer' },
+    { key: 'tahsildar_status', num: 3, name: 'DLR@Tahsildar Login', officer: 'Mandal Revenue Officer / Tahsildar', highlight: true },
+    { key: 'rdo_status', num: 4, name: 'DLR@RDO Login', officer: 'Revenue Divisional Officer' },
+    { key: 'jc_status', num: 5, name: 'DLR@JC Login', officer: 'Joint Collector' }
+  ];
+
+  const dlrClearedCount = dlrStages.filter(s => isPorted || isComplete(village[s.key])).length;
+  const dlrBalanceCount = 5 - dlrClearedCount;
+
+  const citizenSteps = [
+    { num: 1, name: 'GT', unit: 'Acres', done: isPorted || isComplete(village.gt_status) },
+    { num: 2, name: 'Vectorization', unit: 'Correlation', done: isPorted || isComplete(village.vectorization_status) },
+    { num: 3, name: 'VS Login', unit: '1 Entry', done: isPorted || isComplete(village.vs_status) },
+    { num: 4, name: 'VRO Login', unit: '1 Entry', done: isPorted || isComplete(village.vro_status) },
+    { num: 5, name: 'Tahsildar Login', unit: '1 Entry', done: isPorted || isComplete(village.tahsildar_status), highlight: true },
+    { num: 6, name: 'RDO Login', unit: '1 Entry', done: isPorted || isComplete(village.rdo_status) },
+    { num: 7, name: 'JC Login', unit: '1 Entry', done: isPorted || isComplete(village.jc_status) },
+    { num: 8, name: '13 Notification', unit: 'Gazette', done: isPorted || isComplete(village.section13_status) },
+    { num: 9, name: 'Draft RoR', unit: 'Claims', done: isPorted || isComplete(village.draft_ror_status) },
+    { num: 10, name: 'Final RoR', unit: 'Title', done: isPorted || isComplete(village.final_ror_status) },
+    { num: 11, name: 'Webland-2.0', unit: 'Ported', done: isPorted || isComplete(village.webland_2_status) }
+  ];
+
+  return `
+    <div class="individual-village-progress-card" id="individual-village-progress-card">
+      <div class="iv-card-header">
+        <div class="iv-title-group">
+          <span class="iv-tag-badge">INDIVIDUAL VILLAGE PROGRESS · వ్యక్తిగత గ్రామ ప్రగతి</span>
+          <h4 class="iv-village-name">
+            ${h(village.village_name)}
+            <span class="iv-village-code">CODE: ${h(village.village_code || '—')}</span>
+            ${isPorted ? '<span class="webland-ported-badge">WEBLAND 2.0 PORTED</span>' : ''}
+          </h4>
+          <p class="iv-sub-meta">
+            Mandal: <strong>${h(village.mandal)}</strong> · Division: <strong>${h(village.division)}</strong> · Phase: <strong>${h(village.phase)}</strong> · PPB Cycle: <strong>${h(village.ppb_cycle || '—')}</strong>
+          </p>
+        </div>
+        <div class="iv-header-actions">
+          <button type="button" class="iv-action-btn primary" data-action="track-village-modal" data-village-id="${village.id}" title="Open full official record popup for this village">
+            ${icon('document')} Full Details Modal ↗
+          </button>
+          <button type="button" class="iv-action-btn close-btn" data-action="close-overview-village" title="Close individual village view">
+            × Close
+          </button>
+        </div>
+      </div>
+
+      <div class="iv-dual-progress-grid">
+        <!-- 1. Ground Truthing (GT) Progress - Strictly in Acres -->
+        <div class="iv-progress-box gt-box">
+          <div class="iv-box-title">
+            <span class="iv-box-icon">🌾</span>
+            <div>
+              <strong>GROUND TRUTHING (GT) PROGRESS</strong>
+              <small>MEASURED STRICTLY IN ACRES</small>
+            </div>
+            <span class="status-pill ${isGtDone ? 'status-completed' : (village.gt_status === 'In Progress' ? 'status-progress' : 'status-pending')}">
+              ${isGtDone ? 'Completed' : (village.gt_status || 'Pending')}
+            </span>
+          </div>
+
+          <div class="iv-metrics-row">
+            <div class="iv-metric-cell highlight-green">
+              <span class="iv-metric-label">GT Extent Cleared</span>
+              <strong class="iv-metric-val font-mono">${formatExtent(gtClearedAc)} <small>Acres</small></strong>
+              <span class="iv-metric-sub">${totExt ? Math.round((gtClearedAc / totExt) * 100) : 0}% of Village Target</span>
+            </div>
+            <div class="iv-metric-cell highlight-amber">
+              <span class="iv-metric-label">Balance GT Extent</span>
+              <strong class="iv-metric-val font-mono">${formatExtent(gtBalAc)} <small>Acres</small></strong>
+              <span class="iv-metric-sub">${gtBalAc > 0 ? 'Pending Field Survey' : '100% Surveyed'}</span>
+            </div>
+            <div class="iv-metric-cell">
+              <span class="iv-metric-label">Total Village Extent</span>
+              <strong class="iv-metric-val font-mono">${formatExtent(totExt)} <small>Acres</small></strong>
+              <span class="iv-metric-sub">Patta: ${formatExtent(village.patta_extent || 0)} Ac · Govt: ${formatExtent(village.govt_extent || 0)} Ac</span>
+            </div>
+          </div>
+          <div class="iv-benchmark-note">
+            ⭐ <strong>Field Quota Rule:</strong> 25 Acres per rover per day statutory benchmark.
+          </div>
+        </div>
+
+        <!-- 2. DLR Revenue Officer Logins - Strictly in Number of Entries -->
+        <div class="iv-progress-box dlr-box">
+          <div class="iv-box-title">
+            <span class="iv-box-icon">🔐</span>
+            <div>
+              <strong>DLR REVENUE OFFICER LOGINS</strong>
+              <small>MEASURED STRICTLY IN NUMBER OF ENTRIES</small>
+            </div>
+            <span class="status-pill ${dlrClearedCount === 5 ? 'status-completed' : 'status-progress'}">
+              ${dlrClearedCount}/5 Entries Cleared
+            </span>
+          </div>
+
+          <div class="iv-metrics-row">
+            <div class="iv-metric-cell highlight-blue">
+              <span class="iv-metric-label">Entries Cleared</span>
+              <strong class="iv-metric-val font-mono">${dlrClearedCount} <small>Entries</small></strong>
+              <span class="iv-metric-sub">${Math.round((dlrClearedCount / 5) * 100)}% of Approval Chain</span>
+            </div>
+            <div class="iv-metric-cell highlight-amber">
+              <span class="iv-metric-label">Balance Entries</span>
+              <strong class="iv-metric-val font-mono">${dlrBalanceCount} <small>Entries Pending</small></strong>
+              <span class="iv-metric-sub">${dlrBalanceCount === 0 ? 'All 5 Tiers Approved' : 'Awaiting Sign-off'}</span>
+            </div>
+            <div class="iv-metric-cell">
+              <span class="iv-metric-label">Total Khatas</span>
+              <strong class="iv-metric-val font-mono">${(Number(village.khatas) || 0).toLocaleString()} <small>Entries</small></strong>
+              <span class="iv-metric-sub">Target PPBs: ${village.ppb_target || '—'}</span>
+            </div>
+          </div>
+
+          <!-- 5 Officer Tiers Status Breakdown -->
+          <div class="iv-tiers-strip">
+            ${dlrStages.map(st => {
+              const done = isPorted || isComplete(village[st.key]);
+              return `
+                <div class="iv-tier-chip ${done ? 'tier-done' : 'tier-pending'} ${st.highlight ? 'tier-tahsildar' : ''}">
+                  <span class="tier-dot ${done ? 'dot-green' : 'dot-amber'}"></span>
+                  <span class="tier-name">${h(st.name)}:</span>
+                  <strong class="tier-val font-mono">${done ? '1 Entry Done' : '0/1 Pending'}</strong>
+                </div>
+              `;
+            }).join('')}
+          </div>
+          <div class="iv-benchmark-note">
+            ⭐ <strong>Statutory Benchmark:</strong> 200 DLR entries per day quota across 5 approval tiers.
+          </div>
+        </div>
+      </div>
+
+      <!-- 11-Stage Interactive Timeline Stepper -->
+      <div class="iv-stepper-container">
+        <div class="iv-stepper-title">
+          <span>COMPLETE 11-STAGE RESURVEY LIFECYCLE FOR ${h(village.village_name).toUpperCase()}:</span>
+        </div>
+        <div class="iv-stepper-track">
+          ${citizenSteps.map(st => `
+            <div class="iv-step-item ${st.done ? 'step-completed' : 'step-pending'} ${st.highlight ? 'step-tahsildar' : ''}">
+              <div class="step-bubble font-mono">${st.done ? '✓' : st.num}</div>
+              <div class="step-label">${st.num}. ${h(st.name)}</div>
+              <div class="step-unit font-mono">${st.done ? 'Cleared' : st.unit}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderInlineVillageWiseProgress(filtered, d = {}) {
+  const activeStageKey = state.overviewActiveStage || 'gt_status';
+  const isGtActive = activeStageKey === 'gt_status';
+
+  const stagesList = [
+    { key: 'gt_status', name: 'Ground Truthing (GT)', unit: 'Acres', icon: '🌾', isGt: true },
+    { key: 'vs_status', name: 'DLR@VS Login', unit: 'Entries', icon: '🔐' },
+    { key: 'vro_status', name: 'DLR@VRO Login', unit: 'Entries', icon: '🔐' },
+    { key: 'tahsildar_status', name: 'DLR@Tahsildar Login', unit: 'Entries', icon: '⭐', highlight: true },
+    { key: 'rdo_status', name: 'DLR@RDO Login', unit: 'Entries', icon: '🔐' },
+    { key: 'jc_status', name: 'DLR@JC Login', unit: 'Entries', icon: '🔐' }
+  ];
+
+  const currentStageObj = stagesList.find(s => s.key === activeStageKey) || stagesList[0];
+
+  // Apply search and mandal filters
+  let list = filtered || [];
+  const search = clean(state.overviewVillageSearch).toLowerCase();
+  if (search) {
+    list = list.filter(v => 
+      clean(v.village_name).toLowerCase().includes(search) ||
+      clean(v.village_code).toLowerCase().includes(search) ||
+      clean(v.mandal).toLowerCase().includes(search)
+    );
+  }
+  if (state.overviewMandalFilter && state.overviewMandalFilter !== 'All') {
+    list = list.filter(v => clean(v.mandal) === state.overviewMandalFilter);
+  }
+
+  // Filter by status if set
+  if (state.overviewStatusFilter && state.overviewStatusFilter !== 'All') {
+    if (state.overviewStatusFilter === 'Completed') {
+      list = list.filter(v => v.ported_to_webland || isComplete(v[activeStageKey]));
+    } else if (state.overviewStatusFilter === 'Pending') {
+      list = list.filter(v => !v.ported_to_webland && !isComplete(v[activeStageKey]));
+    } else if (state.overviewStatusFilter === 'Delayed') {
+      list = list.filter(v => v.status === 'Delayed' || Number(v.days_delayed) > 0);
+    }
+  }
+
+  // All mandals for dropdown
+  const mandals = [...new Set((filtered || []).map(v => v.mandal).filter(Boolean))].sort();
+
+  // Find selected village if any
+  const selectedVillage = state.overviewSelectedVillageId 
+    ? (filtered || []).find(v => v.id === state.overviewSelectedVillageId)
+    : null;
+
+  // Compute stage stats for header
+  const completedCount = (filtered || []).filter(v => v.ported_to_webland || isComplete(v[activeStageKey])).length;
+  const pendingCount = (filtered || []).length - completedCount;
+
+  return `
+    <div class="inline-village-wise-section" id="inline-village-wise-section">
+      <div class="ivw-section-header">
+        <div class="ivw-title-block">
+          <div class="ivw-badge-row">
+            <span class="ivw-kicker">STAGE-SPECIFIC VILLAGE BREAKDOWN</span>
+            <span class="ivw-unit-badge ${isGtActive ? 'badge-acres' : 'badge-entries'}">
+              ${isGtActive ? '🌾 PROGRESS IN ACRES' : '🔐 PROGRESS IN NUMBER OF ENTRIES'}
+            </span>
+          </div>
+          <h3 class="ivw-main-title">
+            ${currentStageObj.icon} ${currentStageObj.name} · Village-Wise Progress Breakdown
+          </h3>
+          <p class="ivw-sub-title">
+            ${isGtActive 
+              ? 'Village-level Ground Truthing (GT) coverage in <strong>Acres</strong>. Daily benchmark: <strong>25 Acres per rover per day</strong>.'
+              : `Village-level approval clearances in <strong>Number of Entries</strong>. Statutory benchmark: <strong>200 DLR entries per day</strong>.`
+            }
+          </p>
+        </div>
+
+        <!-- Stage Switcher Tabs -->
+        <div class="ivw-stage-tabs">
+          ${stagesList.map(st => `
+            <button type="button" class="ivw-tab-btn ${st.key === activeStageKey ? 'active' : ''} ${st.highlight ? 'tab-tahsildar' : ''}" data-overview-stage="${st.key}">
+              <span class="tab-icon">${st.icon}</span>
+              <span class="tab-name">${st.name}</span>
+              <span class="tab-unit font-mono">(${st.unit})</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Quick Stage KPI Ribbon -->
+      <div class="ivw-stage-kpi-strip">
+        <div class="ivw-kpi-item ${isGtActive ? 'kpi-acres' : 'kpi-entries'}">
+          <span class="kpi-label">Active Milestone</span>
+          <strong class="kpi-val">${currentStageObj.name}</strong>
+          <small>${isGtActive ? 'Measured in Acres' : 'Measured in Number of Entries'}</small>
+        </div>
+        <div class="ivw-kpi-item kpi-green">
+          <span class="kpi-label">Cleared Villages</span>
+          <strong class="kpi-val font-mono">${completedCount} <small>Villages</small></strong>
+          <small>${filtered.length ? Math.round((completedCount / filtered.length) * 100) : 0}% Cleared</small>
+        </div>
+        <div class="ivw-kpi-item kpi-amber">
+          <span class="kpi-label">Pending Villages</span>
+          <strong class="kpi-val font-mono">${pendingCount} <small>Villages</small></strong>
+          <small>Balance to be Cleared</small>
+        </div>
+        <div class="ivw-kpi-item">
+          <span class="kpi-label">Daily Benchmark Rule</span>
+          <strong class="kpi-val">${isGtActive ? '25 Ac / Rover / Day' : '200 Entries / Day'}</strong>
+          <small>${isGtActive ? 'Total Capacity: 1,500 Ac/day' : 'Quota for 5 Approval Tiers'}</small>
+        </div>
+      </div>
+
+      <!-- Individual Village Card (Rendered if a village is clicked) -->
+      ${selectedVillage ? renderIndividualVillageProgressCard(selectedVillage) : ''}
+
+      <!-- Filter and Search Bar -->
+      <div class="ivw-filter-bar">
+        <div class="ivw-search-wrap">
+          <svg class="search-icon"><use href="#icon-search" /></svg>
+          <input type="text" id="overview-village-search" class="ivw-search-input" placeholder="Search village by name, code or mandal..." value="${h(state.overviewVillageSearch || '')}" />
+          ${state.overviewVillageSearch ? `<button type="button" class="clear-search-btn" data-action="clear-overview-search">×</button>` : ''}
+        </div>
+
+        <div class="ivw-filter-controls">
+          <label class="ivw-control-label">
+            <span>Mandal:</span>
+            <select id="overview-mandal-select" class="ivw-select">
+              <option value="All">All Mandals (${mandals.length})</option>
+              ${mandals.map(m => `<option value="${h(m)}" ${state.overviewMandalFilter === m ? 'selected' : ''}>${h(m)}</option>`).join('')}
+            </select>
+          </label>
+
+          <label class="ivw-control-label">
+            <span>Status:</span>
+            <select id="overview-status-select" class="ivw-select">
+              <option value="All" ${state.overviewStatusFilter === 'All' ? 'selected' : ''}>All Status</option>
+              <option value="Completed" ${state.overviewStatusFilter === 'Completed' ? 'selected' : ''}>Completed Only</option>
+              <option value="Pending" ${state.overviewStatusFilter === 'Pending' ? 'selected' : ''}>Pending Only</option>
+              <option value="Delayed" ${state.overviewStatusFilter === 'Delayed' ? 'selected' : ''}>Delayed Only</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="ivw-count-badge font-mono">
+          Showing <strong>${list.length}</strong> of ${filtered.length} Villages
+        </div>
+      </div>
+
+      <!-- Village-Wise Table -->
+      <div class="ivw-table-responsive">
+        <table class="ivw-data-table">
+          <thead>
+            <tr>
+              <th style="width:45px;">SL</th>
+              <th style="width:90px;">CODE</th>
+              <th>VILLAGE NAME</th>
+              <th>MANDAL</th>
+              <th>DIVISION</th>
+              ${isGtActive ? `
+                <th class="col-highlight-today">TOTAL EXTENT (ACRES)</th>
+                <th class="col-highlight-cum">GT COMPLETED (ACRES)</th>
+                <th class="col-highlight-bal">BALANCE GT (ACRES)</th>
+                <th>GT STATUS</th>
+              ` : `
+                <th>TOTAL KHATAS / ENTRIES</th>
+                <th class="col-highlight-today">ENTRIES COMPLETED TODAY</th>
+                <th class="col-highlight-cum">CUMULATIVE ENTRIES</th>
+                <th class="col-highlight-bal">BALANCE ENTRIES</th>
+                <th>STAGE STATUS</th>
+              `}
+              <th style="width:110px;text-align:center;">ACTION</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.length === 0 ? `
+              <tr>
+                <td colspan="${isGtActive ? 10 : 11}" class="empty-table-row">
+                  No villages match the selected search or mandal filter.
+                </td>
+              </tr>
+            ` : list.slice(0, 150).map((v, idx) => {
+              const isSelected = state.overviewSelectedVillageId === v.id;
+              const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+              const isStageDone = isPorted || isComplete(v[activeStageKey]);
+              const totAc = v.extent ? parseFloat(v.extent) : 0;
+              const compAc = isStageDone ? totAc : (v.gt_status === 'In Progress' ? Math.round(totAc * 0.6 * 100) / 100 : 0);
+              const balAc = Math.max(0, Math.round((totAc - compAc) * 100) / 100);
+
+              return `
+                <tr class="ivw-village-row ${isSelected ? 'selected-row' : ''} ${isStageDone ? 'row-done' : ''}" data-inspect-village="${v.id}" title="Click to view full progress for ${h(v.village_name)}">
+                  <td class="font-mono muted-cell">${idx + 1}</td>
+                  <td class="font-mono bold-code">${h(v.village_code || '—')}</td>
+                  <td class="village-name-cell">
+                    <strong class="village-title">${h(v.village_name)}</strong>
+                    ${isPorted ? '<span class="mini-webland-badge">WEBLAND 2.0</span>' : ''}
+                  </td>
+                  <td><strong>${h(v.mandal)}</strong></td>
+                  <td class="text-muted">${h(v.division)}</td>
+                  ${isGtActive ? `
+                    <td class="font-mono"><strong>${formatExtent(totAc)}</strong> Ac</td>
+                    <td class="font-mono col-highlight-cum num-bold">${formatExtent(compAc)} Ac</td>
+                    <td class="font-mono col-highlight-bal num-bold">${formatExtent(balAc)} Ac</td>
+                    <td>
+                      <span class="status-pill ${isStageDone ? 'status-completed' : (v.gt_status === 'In Progress' ? 'status-progress' : 'status-pending')}">
+                        ${isStageDone ? 'Completed' : (v.gt_status || 'Pending')}
+                      </span>
+                    </td>
+                  ` : `
+                    <td class="font-mono">${(Number(v.khatas) || 0).toLocaleString()} Khatas</td>
+                    <td class="font-mono col-highlight-today num-bold">
+                      ${isStageDone ? '<span class="text-emerald">+1 Entry</span>' : '<span class="text-muted">0 Today</span>'}
+                    </td>
+                    <td class="font-mono col-highlight-cum num-bold">
+                      ${isStageDone ? '1 Entry Done' : '0 Entries'}
+                    </td>
+                    <td class="font-mono col-highlight-bal num-bold">
+                      ${isStageDone ? '0 Pending' : '<span class="text-amber">1 Entry Pending</span>'}
+                    </td>
+                    <td>
+                      <span class="status-pill ${isStageDone ? 'status-completed' : 'status-pending'}">
+                        ${isStageDone ? 'Completed' : 'Pending'}
+                      </span>
+                    </td>
+                  `}
+                  <td style="text-align:center;">
+                    <button type="button" class="ivw-inspect-btn ${isSelected ? 'active-inspect' : ''}" data-inspect-village="${v.id}">
+                      ${isSelected ? '✓ Viewing' : 'Inspect →'}
+                    </button>
+                  </td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      ${list.length > 150 ? `
+        <div class="ivw-more-hint">
+          Showing first 150 of <strong>${list.length}</strong> matching villages. Use the search or mandal filter to narrow down.
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
 
 function renderPart1ResurveyProgress(filtered, d) {
   const f = state.homeFilters || {};
@@ -1533,13 +1940,13 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table gt-extent-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today">EXTENT COMPLETED DURING THE DAY (TODAY)</th>
-                  <th class="col-highlight-cum">CUMULATIVE EXTENT OF GT COMPLETED</th>
-                  <th class="col-highlight-bal">BALANCE EXTENT TO BE COMPLETED</th>
-                  <th>TOTAL TARGET EXTENT</th>
-                  <th>DAILY BENCHMARK RULE</th>
+                  <th class="col-highlight-today">EXTENT COMPLETED TODAY (IN ACRES)</th>
+                  <th class="col-highlight-cum">CUMULATIVE EXTENT COMPLETED (IN ACRES)</th>
+                  <th class="col-highlight-bal">BALANCE EXTENT TO BE COMPLETED (IN ACRES)</th>
+                  <th>TOTAL TARGET EXTENT (IN ACRES)</th>
+                  <th>DAILY BENCHMARK RULE (25 ACRES / ROVER / DAY)</th>
                   <th>ACTIVE ROVERS</th>
-                  <th>DAILY BENCHMARK CAPACITY</th>
+                  <th>DAILY BENCHMARK CAPACITY (IN ACRES / DAY)</th>
                   <th>TARGET VILLAGES</th>
                   <th>COMPLETED VILLAGES</th>
                   <th>GT CLEARANCE %</th>
@@ -1547,21 +1954,21 @@ function renderPart1ResurveyProgress(filtered, d) {
               </thead>
               <tbody>
                 <tr class="row-numerics">
-                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-inspect-param="gt_today" title="Click to inspect Ground Truthing Today Extent details">
-                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Ac</small>
+                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-inspect-param="gt_today" title="Click to view Ground Truthing village-wise extent in Acres">
+                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today</small>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-param" data-inspect-param="gt_cum" title="Click to inspect Cumulative GT Extent details">
-                    <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Ac</small>
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-param" data-inspect-param="gt_cum" title="Click to view Cumulative GT village-wise extent in Acres">
+                    <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell clickable-param" data-inspect-param="gt_bal" title="Click to inspect Balance GT Extent details">
-                    <span class="extent-val-bal">${formatExtent(gt.balanceGtExtent)}</span> <small>Ac</small>
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell clickable-param" data-inspect-param="gt_bal" title="Click to view Balance GT village-wise extent in Acres">
+                    <span class="extent-val-bal">${formatExtent(gt.balanceGtExtent)}</span> <small>Acres</small>
                   </td>
-                  <td class="font-mono total-extent-cell clickable-param" data-inspect-param="gt_target" title="Click to inspect Total Target Extent details">
-                    <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Ac</small>
+                  <td class="font-mono total-extent-cell clickable-param" data-inspect-param="gt_target" title="Click to view Total Target Extent in Acres">
+                    <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Acres</small>
                   </td>
-                  <td class="font-mono text-benchmark">25 Ac / Rover / Day</td>
+                  <td class="font-mono text-benchmark">25 Acres / Rover / Day</td>
                   <td class="font-mono bold-dark clickable-param" data-inspect-param="gt_rovers" title="Click to inspect Rovers capacity details">${gt.rovers} Rovers</td>
-                  <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Ac / Day</td>
+                  <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Acres / Day</td>
                   <td class="font-mono">${gt.gtTargetVillages} Vlgs</td>
                   <td class="font-mono text-emerald bold-dark clickable-param" data-inspect-param="gt_completed_villages" title="Click to inspect GT Completed Villages">${gt.gtCompletedVillages} Vlgs</td>
                   <td class="font-mono text-emerald num-bold clickable-param" data-inspect-param="gt_pct" title="Click to inspect GT Clearance %">${gt.gtCompletionPct}%</td>
@@ -1575,7 +1982,7 @@ function renderPart1ResurveyProgress(filtered, d) {
             <div class="benchmark-icon-cell">🌾</div>
             <div class="benchmark-info-cell">
               <strong>Ground Truthing Capacity & Benchmark Pacing Analysis:</strong>
-              <div>Every day one team should complete <strong>25 Ac of GT per day per rover</strong>. With <strong>${gt.rovers} active rovers</strong> deployed across Chittoor district, the daily benchmark capacity is <strong>${formatExtent(gt.dailyCapacityAc)} Ac/day</strong>. Today achieved <strong>${formatExtent(gt.todayGtExtent)} Ac</strong> (${gt.gtPacePct}% pacing). Cumulative completed extent is <strong>${formatExtent(gt.cumulativeGtExtent)} Ac</strong> (${gt.gtCompletionPct}% of total target ${formatExtent(gt.totalTargetExtent)} Ac, balance: ${formatExtent(gt.balanceGtExtent)} Ac).</div>
+              <div>Every day one team should complete <strong>25 Acres of GT per day per rover</strong>. With <strong>${gt.rovers} active rovers</strong> deployed across Chittoor district, the daily benchmark capacity is <strong>${formatExtent(gt.dailyCapacityAc)} Acres/day</strong>. Today achieved <strong>${formatExtent(gt.todayGtExtent)} Acres</strong> (${gt.gtPacePct}% pacing). Cumulative completed extent is <strong>${formatExtent(gt.cumulativeGtExtent)} Acres</strong> (${gt.gtCompletionPct}% of total target ${formatExtent(gt.totalTargetExtent)} Acres, balance: ${formatExtent(gt.balanceGtExtent)} Acres).</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">GT Clearance: <strong>${gt.gtCompletionPct}%</strong></div>
@@ -1590,13 +1997,13 @@ function renderPart1ResurveyProgress(filtered, d) {
         <div class="stream-content-panel dlr-stream-panel abstract-table-card dlr-logins-abstract-card" id="dlr-logins-abstract-card">
           <div class="stream-panel-header">
             <div class="stream-badge-title">
-              <span class="stream-type-pill pill-dlr">🔐 DLR REVENUE OFFICER LOGINS ABSTRACT</span>
+              <span class="stream-type-pill pill-dlr">🔐 DLR REVENUE OFFICER LOGINS ABSTRACT · MEASURED STRICTLY IN NUMBER OF ENTRIES</span>
               <span class="stream-benchmark-callout">
-                ⭐ <strong>Benchmark Rule:</strong> <strong>DLR entries@200 per day</strong>.
+                ⭐ <strong>Benchmark Rule:</strong> <strong>DLR entries@200 per day (Number of Entries)</strong>.
               </span>
             </div>
             <div class="stream-quick-stats">
-              <span class="badge-mini-stat"><strong>200</strong> Target Entries/Day</span>
+              <span class="badge-mini-stat"><strong>200</strong> Target Entries / Day</span>
               <span class="badge-mini-stat"><strong>5</strong> Revenue Officer Approval Tiers</span>
             </div>
           </div>
@@ -1606,29 +2013,29 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table dlr-logins-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today">ENTRIES COMPLETED IN THE DAY (TODAY)</th>
-                  <th class="col-highlight-cum">CUMULATIVE ENTRIES COMPLETED</th>
-                  <th class="col-highlight-bal">BALANCE ENTRIES TO BE COMPLETED</th>
-                  <th>TOTAL TARGET WORKFLOW STEPS</th>
-                  <th>DAILY BENCHMARK RULE</th>
+                  <th class="col-highlight-today">NUMBER OF ENTRIES COMPLETED TODAY</th>
+                  <th class="col-highlight-cum">CUMULATIVE NUMBER OF ENTRIES COMPLETED</th>
+                  <th class="col-highlight-bal">BALANCE NUMBER OF ENTRIES TO BE COMPLETED</th>
+                  <th>TOTAL TARGET WORKFLOW ENTRIES</th>
+                  <th>DAILY BENCHMARK RULE (200 ENTRIES / DAY)</th>
                   <th>TODAY PACING VS BENCHMARK</th>
-                  <th>TOTAL DLR WORKFLOW CLEARANCES (5 APPROVAL TIERS)</th>
+                  <th>TOTAL DLR WORKFLOW CLEARANCES</th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics dlr-total-row">
-                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-param" data-inspect-param="dlr_today" title="Click to inspect DLR Entries Completed Today">
+                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-param" data-inspect-param="dlr_today" title="Click to view DLR Entries village-wise breakdown">
                     <span class="entries-today-val">+${dlr.todayTotal}</span> <small>Entries Today</small>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-param" data-inspect-param="dlr_cum" title="Click to inspect Cumulative DLR Entries">
-                    <span class="entries-cum-val">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Cumulative</small>
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-param" data-inspect-param="dlr_cum" title="Click to view Cumulative DLR Entries breakdown">
+                    <span class="entries-cum-val">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Entries Cumulative</small>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-param" data-inspect-param="dlr_bal" title="Click to inspect Balance DLR Entries">
-                    <span class="entries-bal-val">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Pending</small>
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-param" data-inspect-param="dlr_bal" title="Click to view Balance DLR Entries breakdown">
+                    <span class="entries-bal-val">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Entries Balance</small>
                   </td>
-                  <td class="font-mono">${(dlr.totalSteps || 0).toLocaleString('en-IN')} Steps</td>
+                  <td class="font-mono">${(dlr.totalSteps || 0).toLocaleString('en-IN')} Entries</td>
                   <td class="font-mono text-benchmark">200 Entries / Day</td>
-                  <td class="font-mono highlight-blue bold-dark clickable-param" data-inspect-param="dlr_pace" title="Click to inspect DLR Benchmark Pacing">${dlr.pacePct}% <small>(+${dlr.todayTotal}/200)</small></td>
+                  <td class="font-mono highlight-blue bold-dark clickable-param" data-inspect-param="dlr_pace" title="Click to inspect DLR Benchmark Pacing">${dlr.pacePct}% <small>(+${dlr.todayTotal}/200 Entries)</small></td>
                   <td class="font-mono text-emerald num-bold">${dlr.pctTotal}%</td>
                 </tr>
               </tbody>
@@ -1637,31 +2044,31 @@ function renderPart1ResurveyProgress(filtered, d) {
 
           <!-- 5-Tier Officer Logins Strict 2-Row Abstract Table -->
           <div class="abstract-subtable-heading">
-            <span>5 APPROVAL TIERS BREAKDOWN (VS · VRO · TAHSILDAR · RDO · JC)</span>
+            <span>5 APPROVAL TIERS BREAKDOWN (VS · VRO · TAHSILDAR · RDO · JC) · MEASURED IN NUMBER OF ENTRIES</span>
           </div>
           <div class="abstract-two-row-table-wrap">
             <table class="abstract-data-table abstract-two-row-table dlr-officers-breakdown-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="clickable-param" data-inspect-param="vs_status" title="Click to inspect Village Surveyor Login details">Village Surveyor Login (VS Login)</th>
-                  <th class="clickable-param" data-inspect-param="vro_status" title="Click to inspect VRO Login details">VRO Login (Village Revenue Officer)</th>
-                  <th class="clickable-param tahsildar-th-highlight" data-inspect-param="tahsildar_status" title="Click to inspect DLR@Tahsildar Login details">⭐ Tahsildar Login (Tah Login)</th>
-                  <th class="clickable-param" data-inspect-param="rdo_status" title="Click to inspect DLR@RDO Login details">RDO Login (Revenue Divisional Officer)</th>
-                  <th class="clickable-param" data-inspect-param="jc_status" title="Click to inspect DLR@JC Login details">JC Login (Joint Collector Approval)</th>
+                  <th class="clickable-param" data-inspect-param="vs_status" title="Click to view Village Surveyor Login village-wise entries">1. Village Surveyor Login (VS Login)<br><small class="th-sub-unit">Number of Entries</small></th>
+                  <th class="clickable-param" data-inspect-param="vro_status" title="Click to view VRO Login village-wise entries">2. VRO Login (Village Revenue Officer)<br><small class="th-sub-unit">Number of Entries</small></th>
+                  <th class="clickable-param tahsildar-th-highlight" data-inspect-param="tahsildar_status" title="Click to view DLR@Tahsildar Login village-wise entries">⭐ 3. Tahsildar Login (Tah Login)<br><small class="th-sub-unit">Number of Entries</small></th>
+                  <th class="clickable-param" data-inspect-param="rdo_status" title="Click to view DLR@RDO Login village-wise entries">4. RDO Login (Revenue Divisional Officer)<br><small class="th-sub-unit">Number of Entries</small></th>
+                  <th class="clickable-param" data-inspect-param="jc_status" title="Click to view DLR@JC Login village-wise entries">5. JC Login (Joint Collector Approval)<br><small class="th-sub-unit">Number of Entries</small></th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics">
                   ${dlr.stages.map(st => `
-                    <td class="font-mono clickable-param ${st.key === 'tahsildar_status' ? 'tahsildar-cell-highlight' : ''}" data-inspect-param="${st.key}" title="Click to inspect ${h(st.name)} entries and target analysis">
+                    <td class="font-mono clickable-param ${st.key === 'tahsildar_status' ? 'tahsildar-cell-highlight' : ''}" data-inspect-param="${st.key}" title="Click to view village-wise entries for ${h(st.name)}">
                       <div class="officer-tier-num-box">
-                        <span class="num-today-pill">+${st.today} Today</span>
+                        <span class="num-today-pill">+${st.today} Entries Today</span>
                         <div class="officer-tier-cum-bal">
-                          <span>Cum: <strong>${st.cumulative}</strong></span> · 
-                          <span class="text-amber">Bal: <strong>${st.balance}</strong></span>
+                          <span>Cum: <strong>${st.cumulative} Entries</strong></span> · 
+                          <span class="text-amber">Bal: <strong>${st.balance} Entries</strong></span>
                         </div>
-                        <div class="officer-tier-pct-badge">${st.pct}% Cleared (${st.target} Target)</div>
-                        <div class="inspect-hint-label">Click to Inspect →</div>
+                        <div class="officer-tier-pct-badge">${st.pct}% Cleared (${st.target} Target Entries)</div>
+                        <div class="inspect-hint-label">Click to View Village-Wise Below ↓</div>
                       </div>
                     </td>
                   `).join('')}
@@ -1675,7 +2082,7 @@ function renderPart1ResurveyProgress(filtered, d) {
             <div class="benchmark-icon-cell">🔐</div>
             <div class="benchmark-info-cell">
               <strong>DLR Revenue Officer Entries & Benchmark Pacing Analysis:</strong>
-              <div>Target benchmark output is <strong>DLR entries@200 per day</strong>. Today recorded <strong>${dlr.todayTotal} entries</strong> across all 5 officer approval tiers (${dlr.pacePct}% pacing). Cumulative clearances stand at <strong>${dlr.cumulativeTotal}</strong> of <strong>${dlr.totalSteps} total workflow steps</strong> across ${filtered.length} villages (${dlr.pctTotal}% cleared, ${dlr.balanceTotal} balance steps remaining).</div>
+              <div>Target benchmark output is <strong>DLR entries@200 per day (Number of Entries)</strong>. Today recorded <strong>${dlr.todayTotal} entries</strong> across all 5 officer approval tiers (${dlr.pacePct}% pacing). Cumulative clearances stand at <strong>${dlr.cumulativeTotal} entries</strong> of <strong>${dlr.totalSteps} total workflow entries</strong> across ${filtered.length} villages (${dlr.pctTotal}% cleared, ${dlr.balanceTotal} balance entries remaining).</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">DLR Clearance: <strong>${dlr.pctTotal}%</strong></div>
@@ -1686,6 +2093,9 @@ function renderPart1ResurveyProgress(filtered, d) {
           </div>
         </div>
       `}
+
+      <!-- Inline Village-Wise Progress Breakdown & Individual Village Detail Tracker -->
+      ${renderInlineVillageWiseProgress(filtered, d)}
     </section>
   `;
 }
@@ -4670,9 +5080,41 @@ async function saveVillage(id) { const updates = {}; document.querySelectorAll('
 async function showConflicts() { try { const data = await api('/api/conflicts'); const rows = data.conflicts.filter(c => c.status === 'Open'); modal('Data sync conflicts', 'Select a resolution; no values are silently overwritten.', rows.length ? `<div class="attention-list">${rows.map(c => `<div class="review-item"><span class="review-bullet alert"></span><p><b>${h(c.village)}</b><br><small>${h(c.field)} · ${h(c.source)}</small><br>Website: <b>${h(c.websiteValue)}</b><br>Google Sheet: <b>${h(c.sheetValue)}</b></p><div><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Website Value">Keep website</button><button class="row-action" data-resolve-conflict="${c.id}" data-resolution="Keep Google Sheet Value">Keep sheet</button></div></div>`).join('')}</div>` : emptyBlock('No open conflicts', 'No reconciliation is currently required.', 'shield'), `<button class="soft-button" data-action="close-modal">Close</button>`); } catch (e) { toast(e.message, 'error'); } }
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle]');
+  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-overview-stage],[data-inspect-village]');
   if (!el) return;
   
+  if (el.dataset.overviewStage) {
+    state.overviewActiveStage = el.dataset.overviewStage;
+    renderDashboard();
+    const sec = document.getElementById('inline-village-wise-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (el.dataset.inspectVillage) {
+    const vid = el.dataset.inspectVillage;
+    state.overviewSelectedVillageId = (state.overviewSelectedVillageId === vid) ? null : vid;
+    renderDashboard();
+    if (state.overviewSelectedVillageId) {
+      const card = document.getElementById('individual-village-progress-card');
+      if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return;
+  }
+  if (el.dataset.action === 'close-overview-village') {
+    state.overviewSelectedVillageId = null;
+    renderDashboard();
+    return;
+  }
+  if (el.dataset.action === 'clear-overview-search') {
+    state.overviewVillageSearch = '';
+    renderDashboard();
+    return;
+  }
+  if (el.dataset.action === 'open-stage-modal') {
+    const st = el.dataset.stage;
+    if (st) openParameterInspector(st);
+    return;
+  }
   if (el.dataset.stageFocus !== undefined) {
     const st = el.dataset.stageFocus.trim();
     state.selectedStageFocus = st || null;
@@ -4691,7 +5133,34 @@ document.addEventListener('click', async event => {
     return;
   }
   if (el.dataset.inspectParam) {
-    openParameterInspector(el.dataset.inspectParam);
+    const param = el.dataset.inspectParam;
+    let targetStage = null;
+    if (param.startsWith('gt') || param === 'gt') {
+      targetStage = 'gt_status';
+    } else if (param === 'vs_status') {
+      targetStage = 'vs_status';
+    } else if (param === 'vro_status') {
+      targetStage = 'vro_status';
+    } else if (param === 'tahsildar_status') {
+      targetStage = 'tahsildar_status';
+    } else if (param === 'rdo_status') {
+      targetStage = 'rdo_status';
+    } else if (param === 'jc_status') {
+      targetStage = 'jc_status';
+    } else if (param.startsWith('dlr') || param === 'dlr') {
+      targetStage = 'tahsildar_status';
+    }
+
+    if (targetStage) {
+      state.overviewActiveStage = targetStage;
+      renderDashboard();
+      const sec = document.getElementById('inline-village-wise-section');
+      if (sec) {
+        sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      return;
+    }
+    openParameterInspector(param);
     return;
   }
   if (el.dataset.action === 'inspect-in-villages') {
@@ -5018,11 +5487,32 @@ document.addEventListener('input', event => {
   if (event.target.id === 'ppb-table-search') {
     state.ppbVillageSearch = event.target.value;
     renderPpbDistribution();
+  } else if (event.target.id === 'overview-village-search') {
+    state.overviewVillageSearch = event.target.value;
+    clearTimeout(event.target._debounce);
+    event.target._debounce = setTimeout(() => {
+      renderDashboard();
+      const inp = document.getElementById('overview-village-search');
+      if (inp) {
+        inp.focus();
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+      }
+    }, 200);
   }
 });
 document.addEventListener('change', event => {
   if (event.target.id === 'ppb-mandal-select') {
     state.ppbMandalFilter = event.target.value;
     renderPpbDistribution();
+  } else if (event.target.id === 'overview-mandal-select') {
+    state.overviewMandalFilter = event.target.value;
+    renderDashboard();
+    const sec = document.getElementById('inline-village-wise-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'overview-status-select') {
+    state.overviewStatusFilter = event.target.value;
+    renderDashboard();
+    const sec = document.getElementById('inline-village-wise-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 });
