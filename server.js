@@ -1337,7 +1337,19 @@ async function handleApi(req, res, url) {
       return json(res, 200, { success: true, token, role: 'DISTRICT OFFICER' });
     } else {
       recordFailedLogin(clientIp);
-      return json(res, 401, { error: 'Invalid Officer PIN. Unauthorized access attempts are monitored and recorded.' });
+      return json(res, 401, {
+        error: 'Invalid Officer PIN. Unauthorized access attempts are monitored and recorded.',
+        debug: {
+          hasBody: Boolean(req.body),
+          bodyType: typeof req.body,
+          isBuffer: Buffer.isBuffer(req.body),
+          keys: (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) ? Object.keys(req.body) : [],
+          hasPin: Boolean(b && b.pin),
+          submittedLen: submittedPin.length,
+          configLen: configuredPin.length,
+          configMatchesDefault: configuredPin === 'APCTR2026'
+        }
+      });
     }
   }
 
