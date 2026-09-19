@@ -1211,11 +1211,15 @@ function verifyToken(token) {
 
 function readBody(req) {
   if (req.body !== undefined && req.body !== null) {
-    if (typeof req.body === 'object') return Promise.resolve(req.body);
+    if (Buffer.isBuffer(req.body)) {
+      try { return Promise.resolve(JSON.parse(req.body.toString('utf8'))); }
+      catch { return Promise.resolve({}); }
+    }
     if (typeof req.body === 'string') {
       try { return Promise.resolve(JSON.parse(req.body)); }
       catch { return Promise.resolve({}); }
     }
+    if (typeof req.body === 'object') return Promise.resolve(req.body);
   }
   return new Promise((resolve, reject) => {
     let raw = '';
