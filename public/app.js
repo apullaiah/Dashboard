@@ -31,6 +31,7 @@ const state = {
   overviewMandalFilter: 'All',
   overviewStatusFilter: 'All',
   overviewSelectedVillageId: null,
+  activeGtTodayOnly: false,
   villageFilterMode: 'cycle',
   selectedHomeVillage: null,
   selectedStageFocus: null,
@@ -1809,9 +1810,34 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
     ? (filtered || []).find(v => v.id === state.overviewSelectedVillageId)
     : null;
 
-  // Compute stage stats for header
+  // Compute stage stats for header strictly in Acres for GT and Number of Entries for DLR
   const completedCount = (filtered || []).filter(v => v.ported_to_webland || isComplete(v[activeStageKey])).length;
   const pendingCount = (filtered || []).length - completedCount;
+
+  const totCompExtent = (filtered || []).reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : 0)), 0);
+  const totBalExtent = (filtered || []).reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0))), 0);
+  const totScopeExtent = (filtered || []).reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
+
+  const totCumEntries = (filtered || []).reduce((s, v) => s + (Number(v.dlr_entries_cumulative) || 0), 0);
+  const totBalEntries = (filtered || []).reduce((s, v) => s + ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : 0), 0);
+  const totScopeEntries = (filtered || []).reduce((s, v) => s + (Number(v.dlr_total_entries) || (Number(v.khatas) || 0)), 0);
+
+  // If activeGtTodayOnly is active, filter list strictly to villages where GT extent was completed today
+  if (state.activeGtTodayOnly && isGtActive) {
+    list = list.filter(v => (parseFloat(v.today_gt_extent) || 0) > 0);
+    list.sort((a, b) => (parseFloat(b.today_gt_extent) || 0) - (parseFloat(a.today_gt_extent) || 0));
+  }
+
+  // Compute Grand Totals across the active list
+  const grandTodayGt = list.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
+  const grandCompGt = list.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : 0)), 0);
+  const grandBalGt = list.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0))), 0);
+  const grandTotExtent = list.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
+
+  const grandTodayDlr = list.reduce((s, v) => s + (Number(v.dlr_entries_today) || 0), 0);
+  const grandCumDlr = list.reduce((s, v) => s + (Number(v.dlr_entries_cumulative) || 0), 0);
+  const grandBalDlr = list.reduce((s, v) => s + ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : 0), 0);
+  const grandTotDlr = list.reduce((s, v) => s + (Number(v.dlr_total_entries) || (Number(v.khatas) || 0)), 0);
 
   return `
     <div class="inline-village-wise-section" id="inline-village-wise-section">
@@ -1854,14 +1880,14 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
           <small>${isGtActive ? 'Measured in Acres' : 'Measured in Number of Entries'}</small>
         </div>
         <div class="ivw-kpi-item kpi-green">
-          <span class="kpi-label">Cleared Villages</span>
-          <strong class="kpi-val font-mono">${completedCount} <small>Villages</small></strong>
-          <small>${filtered.length ? Math.round((completedCount / filtered.length) * 100) : 0}% Cleared</small>
+          <span class="kpi-label">${isGtActive ? 'Cumulative GT Cleared' : 'Cumulative Cleared Entries'}</span>
+          <strong class="kpi-val font-mono">${isGtActive ? `${formatExtent(totCompExtent)} <small>Acres</small>` : `${totCumEntries.toLocaleString('en-IN')} <small>Entries</small>`}</strong>
+          <small>${isGtActive ? `${totScopeExtent ? Math.round((totCompExtent / totScopeExtent) * 100) : 0}% Cleared` : `${totScopeEntries ? Math.round((totCumEntries / totScopeEntries) * 100) : 0}% Cleared`}</small>
         </div>
         <div class="ivw-kpi-item kpi-amber">
-          <span class="kpi-label">Pending Villages</span>
-          <strong class="kpi-val font-mono">${pendingCount} <small>Villages</small></strong>
-          <small>Balance to be Cleared</small>
+          <span class="kpi-label">${isGtActive ? 'Balance GT Extent' : 'Balance Pending Entries'}</span>
+          <strong class="kpi-val font-mono">${isGtActive ? `${formatExtent(totBalExtent)} <small>Acres</small>` : `${totBalEntries.toLocaleString('en-IN')} <small>Entries</small>`}</strong>
+          <small>${isGtActive ? 'Pending Field Survey' : 'In Approval Pipeline'}</small>
         </div>
         <div class="ivw-kpi-item">
           <span class="kpi-label">Daily Benchmark Rule</span>
@@ -1904,7 +1930,27 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
         <div class="ivw-count-badge font-mono">
           Showing <strong>${list.length}</strong> of ${filtered.length} Villages
         </div>
+        <button type="button" class="btn-reset-filters-ivw" data-action="reset-all-filters" title="Reset all section filters">
+          ✕ Reset All Filters
+        </button>
       </div>
+
+      <!-- Active GT Today Filter Banner -->
+      ${(state.activeGtTodayOnly && isGtActive) ? `
+        <div class="active-gt-filter-banner">
+          <div class="agf-left">
+            <span class="agf-icon">🌾</span>
+            <div>
+              <strong>ACTIVE VILLAGES WITH GT EXTENT COMPLETED TODAY (${list.length} Active Villages)</strong>
+              <p>Showing villages actively surveyed today. Full telemetry &amp; Grand Total summarized at bottom of table.</p>
+            </div>
+          </div>
+          <div class="agf-actions">
+            <button type="button" class="btn-clear-active-gt" data-action="clear-active-gt">Show All Villages ✕</button>
+            <button type="button" class="btn-reset-all" data-action="reset-all-filters">Reset All Filters ✕</button>
+          </div>
+        </div>
+      ` : ''}
 
       <!-- Village-Wise Table -->
       <div class="ivw-table-responsive">
@@ -2001,6 +2047,49 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
               `;
             }).join('')}
           </tbody>
+          <tfoot class="ivw-table-footer-grand-total">
+            <tr class="grand-total-row">
+              <td colspan="5" class="gt-label-cell ivw-grand-total-label">
+                <strong>GRAND TOTAL (${list.length} ${state.activeGtTodayOnly ? 'ACTIVE VILLAGES' : 'VILLAGES'})</strong>
+              </td>
+              ${isGtActive ? `
+                <td class="font-mono col-highlight-today num-bold text-emerald gt-val">
+                  <strong>+${formatExtent(grandTodayGt)} Ac</strong>
+                </td>
+                <td class="font-mono col-highlight-cum num-bold text-blue gt-val">
+                  <strong>${formatExtent(grandCompGt)} Ac</strong>
+                </td>
+                <td class="font-mono col-highlight-bal num-bold text-amber gt-val">
+                  <strong>${formatExtent(grandBalGt)} Ac</strong>
+                </td>
+                <td class="font-mono font-bold gt-val">
+                  <strong>${formatExtent(grandTotExtent)} Ac</strong>
+                </td>
+                <td class="gt-status-cell">
+                  <span class="status-pill status-completed">Active Field Progress</span>
+                </td>
+              ` : `
+                <td class="font-mono col-highlight-today num-bold text-blue gt-val">
+                  <strong>+${grandTodayDlr.toLocaleString('en-IN')} Today</strong>
+                </td>
+                <td class="font-mono col-highlight-cum num-bold text-blue gt-val">
+                  <strong>${grandCumDlr.toLocaleString('en-IN')} Entries</strong>
+                </td>
+                <td class="font-mono col-highlight-bal num-bold text-amber gt-val">
+                  <strong>${grandBalDlr.toLocaleString('en-IN')} Pending</strong>
+                </td>
+                <td class="font-mono font-bold gt-val">
+                  <strong>${grandTotDlr.toLocaleString('en-IN')} Khatas</strong>
+                </td>
+                <td class="gt-status-cell">
+                  <span class="status-pill status-completed">Multi-Tier Clearances</span>
+                </td>
+              `}
+              <td style="text-align:center;">
+                <span class="badge-pill-green">SUM TOTAL</span>
+              </td>
+            </tr>
+          </tfoot>
         </table>
       </div>
       ${list.length > 150 ? `
@@ -2062,22 +2151,22 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table gt-extent-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today">EXTENT COMPLETED TODAY (IN ACRES)</th>
+                  <th class="col-highlight-today clickable-th" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed today and Grand Total">EXTENT COMPLETED TODAY (IN ACRES) ↗</th>
                   <th class="col-highlight-cum">CUMULATIVE EXTENT COMPLETED (IN ACRES)</th>
                   <th class="col-highlight-bal">BALANCE EXTENT TO BE COMPLETED (IN ACRES)</th>
                   <th>TOTAL TARGET EXTENT (IN ACRES)</th>
                   <th>DAILY BENCHMARK RULE (25 ACRES / ROVER / DAY)</th>
                   <th>ACTIVE ROVERS</th>
                   <th>DAILY BENCHMARK CAPACITY (IN ACRES / DAY)</th>
-                  <th>TARGET VILLAGES</th>
-                  <th>COMPLETED VILLAGES</th>
+                  <th>TODAY PACING VS BENCHMARK</th>
+                  <th>DAILY CAPACITY TARGET (ACRES)</th>
                   <th>GT CLEARANCE %</th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics">
-                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-inspect-param="gt_today" title="Click to view Ground Truthing village-wise extent in Acres">
-                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today</small>
+                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-action="filter-active-gt-today" data-inspect-param="gt_today" title="Click to view Active Villages with GT extent completed today and Grand Total">
+                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today ↗</small>
                   </td>
                   <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-param" data-inspect-param="gt_cum" title="Click to view Cumulative GT village-wise extent in Acres">
                     <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
@@ -2091,8 +2180,8 @@ function renderPart1ResurveyProgress(filtered, d) {
                   <td class="font-mono text-benchmark">25 Acres / Rover / Day</td>
                   <td class="font-mono bold-dark clickable-param" data-inspect-param="gt_rovers" title="Click to inspect Rovers capacity details">${gt.rovers} Rovers</td>
                   <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Acres / Day</td>
-                  <td class="font-mono">${gt.gtTargetVillages} Vlgs</td>
-                  <td class="font-mono text-emerald bold-dark clickable-param" data-inspect-param="gt_completed_villages" title="Click to inspect GT Completed Villages">${gt.gtCompletedVillages} Vlgs</td>
+                  <td class="font-mono text-emerald bold-dark">${gt.gtPacePct}% Pacing</td>
+                  <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Ac / Day</td>
                   <td class="font-mono text-emerald num-bold clickable-param" data-inspect-param="gt_pct" title="Click to inspect GT Clearance %">${gt.gtCompletionPct}%</td>
                 </tr>
               </tbody>
@@ -2597,9 +2686,9 @@ function renderHomeExecutiveAbstract(filtered) {
                 <th class="num highlight-col-today">EXTENT COMPLETED DURING THE DAY (TODAY)</th>
                 <th class="num highlight-col-cum">CUMULATIVE EXTENT OF GT COMPLETED</th>
                 <th class="num highlight-col-bal">BALANCE EXTENT TO BE COMPLETED</th>
-                <th class="num">TOTAL TARGET EXTENT</th>
-                <th class="num">COMPLETED VILLAGES</th>
-                <th class="num">BALANCE VILLAGES</th>
+                <th class="num">TOTAL TARGET EXTENT (IN ACRES)</th>
+                <th class="num">DAILY BENCHMARK CAPACITY (IN ACRES / DAY)</th>
+                <th class="num">TODAY PACING VS BENCHMARK</th>
                 <th class="num">GT CLEARANCE %</th>
               </tr>
             </thead>
@@ -2611,7 +2700,7 @@ function renderHomeExecutiveAbstract(filtered) {
                     <small>భూ సరిచూపు & సరిహద్దుల నిర్ధారణ (Drone verification)</small>
                   </div>
                 </td>
-                <td class="num font-mono today-extent-cell">
+                <td class="num font-mono today-extent-cell clickable-param" data-action="filter-active-gt-today" data-inspect-param="gt_today" title="Click to view Active Villages with GT extent completed today and Grand Total">
                   <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Ac</small>
                   <div class="sub-progress-tag">Completed During the Day</div>
                 </td>
@@ -2627,11 +2716,13 @@ function renderHomeExecutiveAbstract(filtered) {
                   <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Ac</small>
                   <div class="sub-progress-tag">Total Target Extent</div>
                 </td>
-                <td class="num font-mono text-emerald">
-                  <strong>${gt.gtCompletedVillages}</strong> <small>/ ${gt.gtTargetVillages}</small>
+                <td class="num font-mono">
+                  <strong>${formatExtent(gt.dailyCapacityAc || 1775)}</strong> <small>Ac/day</small>
+                  <div class="sub-progress-tag text-muted">71 Rovers · 25 Ac/day</div>
                 </td>
-                <td class="num font-mono text-amber">
-                  <strong>${gt.gtBalanceVillages}</strong>
+                <td class="num font-mono ${parseFloat(gt.gtPacePct) >= 100 ? 'text-emerald' : 'text-amber'}">
+                  <strong>${gt.gtPacePct || '0.0'}%</strong>
+                  <div class="sub-progress-tag">${parseFloat(gt.gtPacePct) >= 100 ? 'Target Reached' : 'Behind Pace'}</div>
                 </td>
                 <td class="num font-mono">
                   <div class="mini-progress-box">
@@ -2704,7 +2795,7 @@ function renderHomeExecutiveAbstract(filtered) {
                       <div class="sub-progress-tag text-amber">Balance to Complete</div>
                     </td>
                     <td class="num font-mono total-entries-cell">
-                      <strong>${st.target}</strong> <small>villages</small>
+                      <strong>${st.target}</strong> <small>entries</small>
                     </td>
                     <td class="num font-mono">
                       <div class="mini-progress-box">
@@ -3719,6 +3810,9 @@ function renderReferenceTopHeader(d) {
         <button type="button" class="ref-action-btn refresh-btn" data-action="sync-all" id="ref-refresh-sheets-btn" title="Synchronize Google Sheets Telemetry">
           ${icon('sync')} Refresh sheets
         </button>
+        <button type="button" class="ref-action-btn topbar-reset-btn" data-action="reset-all-filters" title="Reset all applied filters across all sections">
+          ✕ Reset All Filters
+        </button>
       </div>
     </header>
   `;
@@ -4268,6 +4362,21 @@ function renderMandalWiseDailyProformaSection(d, filtered) {
   `;
 }
 
+function resetAllOverviewFilters() {
+  state.homeFilters = { phase: 'All phases', division: 'All', mandal: 'All mandals', month: 'All months', stage: 'All stages', zone: 'All', search: '' };
+  state.overviewVillageSearch = '';
+  state.overviewMandalFilter = 'All';
+  state.overviewStatusFilter = 'All';
+  state.overviewSelectedVillageId = null;
+  state.activeGtTodayOnly = false;
+  state.inspectedParam = null;
+  state.villageTablePageIndex = 0;
+  state.villageTableSortCol = 'village_name';
+  state.villageTableSortDir = 'asc';
+  renderDashboard();
+  toast('All filters have been reset across all sections.', 'info');
+}
+
 function renderDashboard() {
   const d = state.dashboard || {};
   const has = Boolean(d.hasData);
@@ -4293,6 +4402,9 @@ function renderDashboard() {
       </button>
       <button type="button" class="outline-button launch-ppb-btn" data-view="ppb" title="Open full dedicated PPB Distribution Monitoring Centre">
         ${icon('document')} Launch Dedicated PPB Distribution Hub →
+      </button>
+      <button type="button" class="btn-reset-filters-pill" data-action="reset-all-filters" title="Reset all applied filters">
+        ✕ Reset All Filters
       </button>
     </div>
 
@@ -4333,6 +4445,11 @@ function renderDashboard() {
         </div>
       `}
     </div>
+
+    <!-- Persistent Floating Reset Button (Visible at any scroll position) -->
+    <button type="button" class="floating-reset-btn" data-action="reset-all-filters" title="Click to reset all section filters across the dashboard">
+      ↺ Reset All Filters
+    </button>
 
     <!-- Floating Local Time Widget -->
     ${renderFloatingTimeWidget()}
@@ -5898,6 +6015,24 @@ document.addEventListener('click', async event => {
   const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-overview-stage],[data-inspect-village]');
   if (!el) return;
   
+  if (el.dataset.action === 'reset-all-filters' || el.dataset.action === 'reset-home-filters') {
+    resetAllOverviewFilters();
+    return;
+  }
+  if (el.dataset.action === 'clear-active-gt') {
+    state.activeGtTodayOnly = false;
+    renderDashboard();
+    return;
+  }
+  if (el.dataset.action === 'filter-active-gt-today' || el.dataset.inspectParam === 'gt_today') {
+    state.activeGtTodayOnly = true;
+    state.overviewActiveStage = 'gt_status';
+    state.resurveyProgressTab = 'gt';
+    renderDashboard();
+    const sec = document.getElementById('inline-village-wise-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
   if (el.dataset.resurveyTab) {
     state.resurveyProgressTab = el.dataset.resurveyTab;
     renderDashboard();
