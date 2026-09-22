@@ -41,9 +41,15 @@ const MANDAL_ALIASES = {
   palmaner: 'Palamaner', bangarupalyam: 'Bangarupalem', bangarupalem: 'Bangarupalem',
   'v kota': 'Venkatagirikota', 'v.kota': 'Venkatagirikota', venkatagirikota: 'Venkatagirikota',
   penumur: 'Penumuru', penumuru: 'Penumuru', puthalapatu: 'Puthalapattu', puthalapattu: 'Puthalapattu',
-  thavanampalle: 'Thavanampalli', thavanampalli: 'Thavanampalli', 'g.d.nellore': 'G.D.Nellore',
-  'g d nellore': 'G.D.Nellore', 'gd nellore': 'G.D.Nellore', 's.r.puram': 'S.R.Puram',
-  's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
+  thavanampalle: 'Thavanampalli', thavanampalli: 'Thavanampalli',
+  'g.d.nellore': 'G.D.Nellore', 'g d nellore': 'G.D.Nellore', 'gd nellore': 'G.D.Nellore',
+  'g.d nellore': 'G.D.Nellore', 'g.d. nellore': 'G.D.Nellore',
+  gangadharanellore: 'G.D.Nellore', 'gangadhara nellore': 'G.D.Nellore', 'gangadhara-nellore': 'G.D.Nellore',
+  baireddipalle: 'Baireddipalle', baireddipalli: 'Baireddipalle',
+  'baireddi palle': 'Baireddipalle', 'baireddi palli': 'Baireddipalle',
+  'baireddy palle': 'Baireddipalle', 'baireddy palli': 'Baireddipalle',
+  baireddypalle: 'Baireddipalle', baireddypalli: 'Baireddipalle',
+  's.r.puram': 'S.R.Puram', 's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
 };
 
 const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Yet to be Scheduled', 'Before 2024'];
@@ -636,7 +642,7 @@ function dashboard(store) {
       inProgress: villages.filter(v => v.status === 'In Progress').length,
       notUpdated: villages.filter(v => v.status === 'Not Updated').length,
       // Today's Progress & Webland-2 Ported Metrics
-      todayGtExtent: 1440.82,
+      todayGtExtent: Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.today_gt_extent) || 0), 0) * 100) / 100,
       todayVsLoginVillages: 20,
       todayVroLoginVillages: 12,
       portedToWeblandVillages: villages.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported').length
@@ -1236,12 +1242,14 @@ function generateToken(role = 'DISTRICT OFFICER') {
   const salt = crypto.randomBytes(8).toString('hex');
   const payload = `${role}:${expiry}:${salt}`;
   const hmac = crypto.createHmac('sha256', AUTH_SECRET).update(payload).digest('hex');
-  return Buffer.from(`${payload}:${hmac}`).toString('base64url');
+  return Buffer.from(`${payload}:${hmac}`).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 function verifyToken(token) {
   if (!token) return null;
   try {
-    const raw = Buffer.from(token, 'base64url').toString('utf8');
+    let b64 = token.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    const raw = Buffer.from(b64, 'base64').toString('utf8');
     const parts = raw.split(':');
     if (parts.length !== 4) return null;
     const [role, expiryStr, salt, hmac] = parts;

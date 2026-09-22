@@ -120,6 +120,28 @@ const isDlrPoorVillage = (v, activeLogin) => {
   return false;
 };
 
+const MANDAL_ALIASES = {
+  gudupalle: 'Gudipalle', gudipalle: 'Gudipalle', palamaneru: 'Palamaner', palamaner: 'Palamaner',
+  palmaner: 'Palamaner', bangarupalyam: 'Bangarupalem', bangarupalem: 'Bangarupalem',
+  'v kota': 'Venkatagirikota', 'v.kota': 'Venkatagirikota', venkatagirikota: 'Venkatagirikota',
+  penumur: 'Penumuru', penumuru: 'Penumuru', puthalapatu: 'Puthalapattu', puthalapattu: 'Puthalapattu',
+  thavanampalle: 'Thavanampalli', thavanampalli: 'Thavanampalli',
+  'g.d.nellore': 'G.D.Nellore', 'g d nellore': 'G.D.Nellore', 'gd nellore': 'G.D.Nellore',
+  'g.d nellore': 'G.D.Nellore', 'g.d. nellore': 'G.D.Nellore',
+  gangadharanellore: 'G.D.Nellore', 'gangadhara nellore': 'G.D.Nellore', 'gangadhara-nellore': 'G.D.Nellore',
+  baireddipalle: 'Baireddipalle', baireddipalli: 'Baireddipalle',
+  'baireddi palle': 'Baireddipalle', 'baireddi palli': 'Baireddipalle',
+  'baireddy palle': 'Baireddipalle', 'baireddy palli': 'Baireddipalle',
+  baireddypalle: 'Baireddipalle', baireddypalli: 'Baireddipalle',
+  's.r.puram': 'S.R.Puram', 's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
+};
+
+function normalizeMandal(val) {
+  if (!val) return '';
+  const key = String(val).trim().toLowerCase().replace(/\s+/g, ' ');
+  return MANDAL_ALIASES[key] || String(val).trim();
+}
+
 function normalizePhase(val) {
   if (!val) return '';
   const str = String(val).trim();
@@ -795,13 +817,18 @@ function getFilteredHomeVillages() {
       if ((v.division || '').toLowerCase() !== f.division.toLowerCase()) return false;
     }
     if (f.mandal && f.mandal !== 'All mandals') {
-      const vMan = (v.mandal || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-      const qMan = f.mandal.toLowerCase().replace(/[^a-z0-9]/g, '');
-      const isMandalMatch = vMan === qMan ||
-        vMan.includes(qMan) || qMan.includes(vMan) ||
-        (qMan.includes('srpuram') && (vMan.includes('srirangarajapuram') || vMan.includes('srpuram'))) ||
-        (qMan.includes('gangadhara') && (vMan.includes('gdnellore') || vMan.includes('gangadhara')));
-      if (!isMandalMatch) return false;
+      const vManNorm = normalizeMandal(v.mandal);
+      const qManNorm = normalizeMandal(f.mandal);
+      if (vManNorm.toLowerCase() !== qManNorm.toLowerCase()) {
+        const vMan = (v.mandal || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const qMan = f.mandal.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const isMandalMatch = vMan === qMan ||
+          vMan.includes(qMan) || qMan.includes(vMan) ||
+          (qMan.includes('srpuram') && (vMan.includes('srirangarajapuram') || vMan.includes('srpuram'))) ||
+          ((qMan.includes('gangadhara') || qMan.includes('gdnellore') || qMan.includes('nellore')) && (vMan.includes('gdnellore') || vMan.includes('gangadhara') || vMan.includes('nellore'))) ||
+          ((qMan.includes('baireddi') || qMan.includes('baireddy')) && (vMan.includes('baireddi') || vMan.includes('baireddy')));
+        if (!isMandalMatch) return false;
+      }
     }
     if (f.month && f.month !== 'All months') {
       const cyc = (v.ppb_cycle || v.target_month || '').toLowerCase();
@@ -984,7 +1011,7 @@ function renderFilterChipPanel(d) {
   ];
   const divisionsList = ['All', 'Chittoor', 'Nagari', 'Palamaner', 'Kuppam'];
   const mandalsList = [
-    'Baireddipalle', 'Bangarupalem', 'Chittoor', 'Chowdepalle', 'Gangadhara Nellore', 'Gangavaram',
+    'Baireddipalle', 'Bangarupalem', 'Chittoor', 'Chowdepalle', 'G.D.Nellore', 'Gangavaram',
     'Gudipala', 'Gudipalle', 'Irala', 'Karvetinagar', 'Kuppam', 'Nagari', 'Nindra', 'Palamaner',
     'Palasamudram', 'Peddapanjani', 'Penumuru', 'Pulicherla', 'Punganur', 'Puthalapattu',
     'Ramakuppam', 'Rompicherla', 'Santhipuram', 'SR Puram', 'Thavanampalle', 'Vedurukuppam',
@@ -1251,50 +1278,29 @@ function calculateStageAbstractMetrics(filtered, f = {}) {
   const pattaExtent = filtered.reduce((s, v) => s + (parseFloat(v.patta_extent) || 0), 0);
   const totalKhathas = filtered.reduce((s, v) => s + (Number(v.ppb_target) || Number(v.khatas) || 0), 0);
 
-  // Ground Truthing (GT) Extent Calculation
-  let todayGtExtent = c.todayGtExtent || 1382.56;
-  let cumulativeGtExtent = c.cumulativeGtExtent || 106543.57;
-  let totalTargetExtent = c.totalTargetExtent || 277090.35;
-  let gtTargetVillages = c.totalVillages || 152;
-  let gtCompletedVillages = c.gtCompletedVillages || 60;
-
+  // Ground Truthing (GT) Extent Calculation directly from filtered villages (Google Sheets synchronized)
   const isP5 = f.phase === 'Phase V' || f.phase === '5' || f.phase === 'Phase 5';
   const isP6 = f.phase === 'Phase VI' || f.phase === '6' || f.phase === 'Phase 6';
   const isMandalFiltered = Boolean(f.mandal && f.mandal !== 'All mandals');
 
-  if (isP5) {
-    todayGtExtent = p5.todayGtExtent || 425.96;
-    cumulativeGtExtent = p5.cumulativeGtExtent || 82184.05;
-    totalTargetExtent = p5.totalExtent || 116517.28;
-    gtTargetVillages = p5.totalVillages || 60;
-    gtCompletedVillages = p5.gtCompletedVillages || 49;
-  } else if (isP6) {
-    todayGtExtent = p6.todayGtExtent || 956.60;
-    cumulativeGtExtent = p6.cumulativeGtExtent || 24359.52;
-    totalTargetExtent = p6.totalExtent || 160573.07;
-    gtTargetVillages = p6.totalVillages || 92;
-    gtCompletedVillages = p6.gtCompletedVillages || 11;
-  } else if (isMandalFiltered || (f.phase && f.phase !== 'All phases')) {
-    totalTargetExtent = totalExtent > 0 ? totalExtent : totalTargetExtent;
-    gtTargetVillages = totalScope;
-    gtCompletedVillages = filtered.filter(v => isComplete(v.gt_status)).length;
-    const calcCumExt = filtered.filter(v => isComplete(v.gt_status)).reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
-    cumulativeGtExtent = calcCumExt > 0 ? calcCumExt : Math.min(totalTargetExtent, (gtCompletedVillages / (gtTargetVillages || 1)) * totalTargetExtent);
-    const mandalShare = totalTargetExtent / (c.totalTargetExtent || 277090.35);
-    todayGtExtent = Number(((c.todayGtExtent || 1382.56) * Math.min(1, mandalShare)).toFixed(2));
-  }
+  const todayGtExtent = Number(filtered.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0).toFixed(2));
+  const cumulativeGtExtent = Number(filtered.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : 0)), 0).toFixed(2));
+  const totalTargetExtent = Number(filtered.reduce((s, v) => s + (parseFloat(v.extent) || ((parseFloat(v.patta_extent) || 0) + (parseFloat(v.govt_extent) || 0))), 0).toFixed(2));
+  const balanceGtExtent = Number(filtered.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0))), 0).toFixed(2));
+  const gtTargetVillages = filtered.length;
+  const gtCompletedVillages = filtered.filter(v => isComplete(v.gt_status) || v.ported_to_webland).length;
 
-    let rovers = 60;
-  if (isP5) rovers = 24;
-  else if (isP6) rovers = 36;
-  else if (isMandalFiltered) {
-    rovers = Math.max(1, Math.round(60 * (totalScope / 736)));
+  let rovers = 63;
+  if (isP5) rovers = 9;
+  else if (isP6) rovers = 54;
+  else if (filtered.length < 700) {
+    if (filtered.length === 1) rovers = 1;
+    else rovers = Math.max(1, Math.min(63, Math.round(63 * (totalTargetExtent / 277090.35)) || Math.round(63 * (filtered.length / 736)) || 1));
   }
   const benchmarkRateAc = 25; // 25 Ac per day per rover
   const dailyCapacityAc = rovers * benchmarkRateAc;
   const gtPacePct = dailyCapacityAc > 0 ? ((todayGtExtent / dailyCapacityAc) * 100).toFixed(1) : '0.0';
 
-  const balanceGtExtent = Math.max(0, totalTargetExtent - cumulativeGtExtent);
   const gtBalanceVillages = Math.max(0, gtTargetVillages - gtCompletedVillages);
   const gtCompletionPct = totalTargetExtent > 0 ? ((cumulativeGtExtent / totalTargetExtent) * 100).toFixed(1) : '0.0';
 
@@ -2151,7 +2157,7 @@ function renderGtVillageTable(filtered, d) {
     );
   }
   if (state.overviewMandalFilter && state.overviewMandalFilter !== 'All') {
-    list = list.filter(v => clean(v.mandal) === state.overviewMandalFilter);
+    list = list.filter(v => normalizeMandal(v.mandal) === normalizeMandal(state.overviewMandalFilter));
   }
   if (state.overviewStatusFilter && state.overviewStatusFilter !== 'All') {
     if (state.overviewStatusFilter === 'Completed') {
@@ -2183,7 +2189,7 @@ function renderGtVillageTable(filtered, d) {
     list = completedGtList;
   }
 
-  const mandals = [...new Set((filtered || []).map(v => v.mandal).filter(Boolean))].sort();
+  const mandals = [...new Set((filtered || []).map(v => normalizeMandal(v.mandal)).filter(Boolean))].sort();
 
   // Grand totals across the filtered list
   const grandPattaExtent = list.reduce((s, v) => s + (parseFloat(v.patta_extent) || 0), 0);
@@ -2207,7 +2213,7 @@ function renderGtVillageTable(filtered, d) {
             <span class="ivw-unit-badge badge-acres">🌾 EXTENT IN ACRES</span>
           </div>
           <h3 class="ivw-main-title">🌾 Ground Truthing (GT) · Village-Wise Extent Progress Breakdown</h3>
-          <p class="ivw-sub-title">Village-level Ground Truthing coverage in <strong>Acres</strong>. Patta &amp; Govt land extents, start dates, today's 24-hr survey progress, and grand total.</p>
+          <p class="ivw-sub-title">Village-level Ground Truthing coverage in <strong>Acres</strong>. Patta &amp; Govt land extents, start dates, today's survey progress (00:00 to 23:59 Hrs · Railway timings), and grand total.</p>
         </div>
       </div>
 
@@ -2257,7 +2263,7 @@ function renderGtVillageTable(filtered, d) {
           All Scope Villages (${filtered.length})
         </button>
         <button type="button" class="perf-tab-btn tab-active-today ${currentPerfFilter === 'active_today' ? 'active' : ''}" data-gt-perf="active_today">
-          ⚡ Active in Last 24h (${activeTodayList.length})
+          ⚡ Active Today (00:00–23:59 Hrs) (${activeTodayList.length})
         </button>
         <button type="button" class="perf-tab-btn tab-poor ${currentPerfFilter === 'poor' ? 'active' : ''}" data-gt-perf="poor">
           ⚠️ Poor Performing (${poorGtList.length})
@@ -2273,7 +2279,7 @@ function renderGtVillageTable(filtered, d) {
           <span class="alert-icon">⚠️</span>
           <div class="alert-text">
             <strong>POOR PERFORMING VILLAGES IN GROUND TRUTHING (${poorGtList.length} VILLAGES IDENTIFIED)</strong>
-            <p>These villages recorded <strong>0.00 Ac</strong> surveyed in the last 24 hours (00:00 to 23:59 Hrs) with active pending balance. Immediate rover mobilization and field inspection required.</p>
+            <p>These villages recorded <strong>0.00 Ac</strong> surveyed today during 00:00 to 23:59 Hrs (Railway timings) with active pending balance. Immediate rover mobilization and field inspection required.</p>
           </div>
           <button type="button" class="btn-clear-perf" data-gt-perf="all">Show All Villages ✕</button>
         </div>
@@ -2286,7 +2292,7 @@ function renderGtVillageTable(filtered, d) {
             <span class="agf-icon">🌾</span>
             <div>
               <strong>ACTIVE VILLAGES WITH GT EXTENT COMPLETED TODAY (${list.length} Villages)</strong>
-              <p>Showing villages where ground truthing teams surveyed acreage today in the last 24 hours (00:00 to 23:59 Hrs). Grand Total summarized at bottom.</p>
+              <p>Showing villages where ground truthing teams surveyed acreage today during 00:00 to 23:59 Hrs (Railway timings). Grand Total summarized at bottom.</p>
             </div>
           </div>
           <div class="agf-actions">
@@ -2308,7 +2314,7 @@ function renderGtVillageTable(filtered, d) {
               <th>GT started on</th>
               <th class="col-highlight-today">
                 Today's GT extent (Ac)
-                <div style="font-size:9.5px;font-weight:600;opacity:0.85;">Last 24 Hrs (00:00–23:59)</div>
+                <div style="font-size:9.5px;font-weight:600;opacity:0.85;">(00:00 to 23:59 Hrs · Railway Timings)</div>
               </th>
               <th class="col-highlight-cum">Cumulative extent</th>
               <th class="col-highlight-bal">Balance extent</th>
@@ -2699,9 +2705,71 @@ function renderDlrVillageTable(filtered, d) {
 function renderPart1ResurveyProgress(filtered, d) {
   const f = state.homeFilters || {};
   const metrics = calculateStageAbstractMetrics(filtered, f);
-  const { scope, gt, dlr, pipeline } = metrics;
+  const { scope, dlr, pipeline } = metrics;
   const currentTab = state.resurveyProgressTab || 'gt';
   const isGt = currentTab === 'gt';
+
+  // Build the effective filtered list of villages for GT (reflecting Mandal, Phase, Search, or selected Village)
+  let gtList = filtered || [];
+  if (state.overviewMandalFilter && state.overviewMandalFilter !== 'All') {
+    gtList = gtList.filter(v => normalizeMandal(v.mandal) === normalizeMandal(state.overviewMandalFilter));
+  }
+  if (state.overviewVillageSearch) {
+    const q = state.overviewVillageSearch.toLowerCase().trim();
+    gtList = gtList.filter(v =>
+      (v.village_name || '').toLowerCase().includes(q) ||
+      (v.village_code || '').toLowerCase().includes(q) ||
+      normalizeMandal(v.mandal).toLowerCase().includes(q)
+    );
+  }
+  if (state.overviewStatusFilter && state.overviewStatusFilter !== 'All') {
+    if (state.overviewStatusFilter === 'Completed') {
+      gtList = gtList.filter(v => v.ported_to_webland || isComplete(v.gt_status));
+    } else if (state.overviewStatusFilter === 'In Progress') {
+      gtList = gtList.filter(v => !v.ported_to_webland && !isComplete(v.gt_status) && v.gt_status === 'In Progress');
+    } else if (state.overviewStatusFilter === 'Pending') {
+      gtList = gtList.filter(v => !v.ported_to_webland && !isComplete(v.gt_status) && v.gt_status !== 'In Progress');
+    }
+  }
+  if (state.overviewSelectedVillageId) {
+    const sel = gtList.find(v => v.id === state.overviewSelectedVillageId);
+    if (sel) gtList = [sel];
+  }
+  if (state.selectedHomeVillage) {
+    const sel = gtList.find(v => v.id === state.selectedHomeVillage);
+    if (sel) gtList = [sel];
+  }
+
+  // Calculate GT totals strictly reflecting the filtered Mandal, Phase, or Village
+  const gtTotalTarget = gtList.reduce((s, v) => s + (parseFloat(v.extent) || ((parseFloat(v.patta_extent) || 0) + (parseFloat(v.govt_extent) || 0))), 0);
+  const gtCumExtent = gtList.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : 0)), 0);
+  const gtBalExtent = gtList.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0))), 0);
+  const gtTodayExtent = gtList.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
+  const gtCompPct = gtTotalTarget > 0 ? ((gtCumExtent / gtTotalTarget) * 100).toFixed(1) : '0.0';
+
+  // Dynamic rovers allocation reflecting filtered scope
+  const isDistrictAll = gtList.length >= 700;
+  let rovers = 63;
+  if (state.homeFilters?.phase === 'Phase V' || state.homeFilters?.phase === 'Phase 5') rovers = 9;
+  else if (state.homeFilters?.phase === 'Phase VI' || state.homeFilters?.phase === 'Phase 6') rovers = 54;
+  else if (!isDistrictAll) {
+    if (gtList.length === 1) rovers = 1;
+    else rovers = Math.max(1, Math.min(63, Math.round(63 * (gtTotalTarget / 277090.35)) || Math.round(63 * (gtList.length / 736)) || 1));
+  }
+  const dailyCapacityAc = rovers * 25;
+  const gtPacePct = dailyCapacityAc > 0 ? ((gtTodayExtent / dailyCapacityAc) * 100).toFixed(1) : '0.0';
+
+  const gt = {
+    todayGtExtent: gtTodayExtent,
+    cumulativeGtExtent: gtCumExtent,
+    balanceGtExtent: gtBalExtent,
+    totalTargetExtent: gtTotalTarget,
+    gtCompletionPct: gtCompPct,
+    rovers,
+    dailyCapacityAc,
+    gtPacePct,
+    filteredVillagesCount: gtList.length
+  };
 
   return `
     <section class="overview-part-card" id="part-1-resurvey-progress">
@@ -2734,9 +2802,10 @@ function renderPart1ResurveyProgress(filtered, d) {
               <span class="stream-benchmark-callout">
                 ⭐ <strong>Benchmark Rule:</strong> Every day one team should complete <strong>25 Ac of GT per day per rover</strong>.
               </span>
+              ${!isDistrictAll ? `<span class="scope-filtered-pill font-mono" style="background:#0f172a;color:#38bdf8;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700;">📍 Filtered Scope: ${gt.filteredVillagesCount} Village${gt.filteredVillagesCount > 1 ? 's' : ''}</span>` : ''}
             </div>
             <div class="stream-quick-stats">
-              <span class="badge-mini-stat"><strong>${gt.rovers}</strong> Active Rovers</span>
+              <span class="badge-mini-stat"><strong>${gt.rovers}</strong> Active Rover${gt.rovers > 1 ? 's' : ''}</span>
               <span class="badge-mini-stat"><strong>${formatExtent(gt.dailyCapacityAc)} Ac</strong> Daily Target Capacity</span>
             </div>
           </div>
@@ -2746,7 +2815,7 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table gt-extent-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today clickable-th" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed in last 24 hrs (00:00 to 23:59 Hrs)">GT COMPLETED TODAY (LAST 24 HRS: 00:00 TO 23:59 HRS) ↗</th>
+                  <th class="col-highlight-today clickable-th" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">GT COMPLETED TODAY (00:00 TO 23:59 HRS · RAILWAY TIMINGS) ↗</th>
                   <th class="col-highlight-cum">CUMULATIVE EXTENT COMPLETED (IN ACRES)</th>
                   <th class="col-highlight-bal">BALANCE EXTENT TO BE COMPLETED (IN ACRES)</th>
                   <th>TOTAL TARGET EXTENT (IN ACRES)</th>
@@ -2759,9 +2828,9 @@ function renderPart1ResurveyProgress(filtered, d) {
               </thead>
               <tbody>
                 <tr class="row-numerics">
-                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed in last 24 hrs (00:00 to 23:59 Hrs)">
-                    <div class="twenty-four-hr-badge">LAST 24 HRS CYCLE (00:00 TO 23:59 HRS)</div>
-                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres in Last 24 Hrs ↗</small>
+                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">
+                    <div class="twenty-four-hr-badge">TODAY'S WORK (00:00 TO 23:59 HRS)</div>
+                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today (00:00 to 23:59 Hrs) ↗</small>
                   </td>
                   <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell">
                     <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
@@ -2773,7 +2842,7 @@ function renderPart1ResurveyProgress(filtered, d) {
                     <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Acres</small>
                   </td>
                   <td class="font-mono text-benchmark">25 Acres / Rover / Day</td>
-                  <td class="font-mono bold-dark">${gt.rovers} Rovers</td>
+                  <td class="font-mono bold-dark">${gt.rovers} Rover${gt.rovers > 1 ? 's' : ''}</td>
                   <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Acres / Day</td>
                   <td class="font-mono text-emerald bold-dark">${gt.gtPacePct}% Pacing</td>
                   <td class="font-mono text-emerald num-bold">${gt.gtCompletionPct}%</td>
@@ -2787,7 +2856,7 @@ function renderPart1ResurveyProgress(filtered, d) {
             <div class="benchmark-icon-cell">🌾</div>
             <div class="benchmark-info-cell">
               <strong>Ground Truthing Capacity & Benchmark Pacing Analysis:</strong>
-              <div>Every day one team should complete <strong>25 Acres of GT per day per rover</strong>. With <strong>${gt.rovers} active rovers</strong> deployed across Chittoor district, the daily benchmark capacity is <strong>${formatExtent(gt.dailyCapacityAc)} Acres/day</strong>. Today achieved <strong>${formatExtent(gt.todayGtExtent)} Acres</strong> in the last 24 hrs (00:00 to 23:59 Hrs cycle) (${gt.gtPacePct}% pacing vs benchmark). Cumulative completed extent is <strong>${formatExtent(gt.cumulativeGtExtent)} Acres</strong> (${gt.gtCompletionPct}% of total target ${formatExtent(gt.totalTargetExtent)} Acres, balance: ${formatExtent(gt.balanceGtExtent)} Acres).</div>
+              <div>Every day one team should complete <strong>25 Acres of GT per day per rover</strong>. For the active scope (${gt.filteredVillagesCount} villages with <strong>${gt.rovers} rovers</strong>), the daily capacity is <strong>${formatExtent(gt.dailyCapacityAc)} Acres/day</strong>. Today achieved <strong>${formatExtent(gt.todayGtExtent)} Acres</strong> (work done today during 00:00 to 23:59 Hrs Railway timings) (${gt.gtPacePct}% pacing vs benchmark). Cumulative completed extent is <strong>${formatExtent(gt.cumulativeGtExtent)} Acres</strong> (${gt.gtCompletionPct}% of target ${formatExtent(gt.totalTargetExtent)} Acres, balance: ${formatExtent(gt.balanceGtExtent)} Acres).</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">GT Clearance: <strong>${gt.gtCompletionPct}%</strong></div>
@@ -3712,7 +3781,7 @@ function getStagePerformanceDetails(stageKey, villageList = []) {
 
   if (meta.isExtent) {
     // 1. GT: STRICTLY EXTENT IN ACRES (ZERO VILLAGE COUNTS)
-    today = vList.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0) || 1820.53;
+    today = vList.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
     cumulative = vList.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : (v.gt_status === 'In Progress' ? Math.round((parseFloat(v.extent) || 0) * 0.6 * 100) / 100 : 0))), 0) || 57690.08;
     total = vList.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) || 130882.07;
     balance = vList.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, Math.round(((parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0)) * 100) / 100)), 0) || 94632.24;
@@ -6342,7 +6411,12 @@ function render() {
   else if (state.view === 'sources') renderSources();
   else if (state.view === 'audit') renderAudit();
 }
-async function loadVillages() { const qs = new URLSearchParams(Object.entries(state.villageFilters).filter(([, v]) => v)); const data = await api(`/api/villages?${qs}`); state.villages = data.villages; state.filterOptions = data.filters; }
+async function loadVillages() {
+  const qs = new URLSearchParams(Object.entries(state.villageFilters).filter(([, v]) => v));
+  const data = await api(`/api/villages?${qs}`);
+  state.villages = (data.villages || []).map(v => ({ ...v, mandal: normalizeMandal(v.mandal) }));
+  state.filterOptions = data.filters;
+}
 function modal(title, subtitle, body, footer = '') {
   modalRoot.innerHTML = `<div class="modal-backdrop" data-action="backdrop-close"><section class="modal" role="dialog" aria-modal="true" aria-label="${h(title)}"><header class="modal-head"><div><h3>${h(title)}</h3>${subtitle ? `<p>${h(subtitle)}</p>` : ''}</div><button class="modal-close" data-action="close-modal" aria-label="Close">${icon('close')}</button></header><div class="modal-body">${body}</div>${footer ? `<footer class="modal-footer">${footer}</footer>` : ''}</section></div>`;
 }
