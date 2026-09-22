@@ -401,7 +401,7 @@ function recordView(v, store) {
     workflow_conflict: isComplete(enriched.final_ror_status) && STAGES.slice(0, -1).some(([key]) => clean(enriched[key]) && !isComplete(enriched[key]))
   };
 }
-function grouped(items, key) { return items.reduce((map, item) => { const k = item[key] || 'Not Available'; (map[k] ||= []).push(item); return map; }, {}); }
+function grouped(items, key) { return items.reduce((map, item) => { const k = item[key] || 'Not Available'; if (!map[k]) map[k] = []; map[k].push(item); return map; }, {}); }
 function percent(part, total) { return total ? Math.round((part / total) * 100) : 0; }
 function rollup(items, name) {
   const total = items.length;
@@ -435,7 +435,7 @@ function rollup(items, name) {
   return row;
 }
 function dataQuality(items) {
-  const codes = {}; items.forEach(v => { if (clean(v.village_code)) (codes[clean(v.village_code)] ||= []).push(v); });
+  const codes = {}; items.forEach(v => { if (clean(v.village_code)) { const c = clean(v.village_code); if (!codes[c]) codes[c] = []; codes[c].push(v); } });
   return {
     duplicateVillageCodes: Object.values(codes).filter(x => x.length > 1).flat().length,
     missingVillageCodes: items.filter(v => !clean(v.village_code)).length,
@@ -997,7 +997,7 @@ async function syncSource(store, source) {
     const skipRows = Number(source.skipRows || 0); if (skipRows) rows = rows.slice(skipRows);
     let added = 0, updated = 0, changed = 0, conflicts = 0;
     if (source.recordType === 'summary') {
-      store.sourceSummaries ||= {}; store.sourceSummaries[sourceId] = { source: source.name, records: rows.length, syncedAt: now(), headers };
+      if (!store.sourceSummaries) store.sourceSummaries = {}; store.sourceSummaries[sourceId] = { source: source.name, records: rows.length, syncedAt: now(), headers };
     }
     let carryDivision = '';
     let carryMandal = '';
@@ -1138,7 +1138,7 @@ async function syncSource(store, source) {
         }
         existing.last_synced = now(); updated++;
       }
-      existing.source_meta ||= {};
+      if (!existing.source_meta) existing.source_meta = {};
       Object.keys(incoming).forEach(field => {
         const mappedHeader = (source.mappings || DEFAULT_MAPPINGS)[field] || DEFAULT_MAPPINGS[field];
         const sheetColumn = Number.isInteger(mappedHeader) ? mappedHeader : headers.findIndex(header => normalKey(header) === normalKey(mappedHeader));

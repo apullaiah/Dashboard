@@ -6952,3 +6952,280 @@ body {
   color: #92400e !important;
   border-bottom: 2px solid #f59e0b !important;
 }
+
+/* ==========================================================================
+   DLR SEQUENTIAL 5-TIER OFFICER LOGINS & GRAND TOTAL FOOTER ENHANCEMENTS
+   ========================================================================== */
+
+.dlr-sequence-section {
+  margin: 20px 0 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.dlr-sequence-header {
+  margin-bottom: 14px;
+}
+
+.dlr-sequence-kicker {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.dlr-sequence-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.dlr-sequence-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.dlr-sequence-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.dlr-sequence-card:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+}
+
+.dlr-sequence-card.active-tier {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  box-shadow: 0 0 0 2px rgba(2, 132, 199, 0.25), 0 4px 12px rgba(2, 132, 199, 0.15);
+}
+
+.dlr-sequence-card.tier-tahsildar {
+  border-color: #f59e0b;
+}
+
+.dlr-sequence-card.tier-tahsildar.active-tier {
+  border-color: #d97706;
+  background: #fffbeb;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.25), 0 4px 12px rgba(217, 119, 6, 0.15);
+}
+
+.tier-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.tier-step-badge {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.tier-active-pill {
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #0284c7;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+.tier-click-hint {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.tier-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.tier-stat-today {
+  margin-bottom: 6px;
+}
+
+.badge-today-entries {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.tier-stats-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.tier-stats-row span {
+  color: #64748b;
+}
+
+.tier-progress-track {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.tier-progress-fill {
+  height: 100%;
+  background: #0284c7;
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.dlr-sequence-card.tier-tahsildar .tier-progress-fill {
+  background: #d97706;
+}
+
+.tier-pct-foot {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.tier-pct-foot strong {
+  color: #0f172a;
+}
+
+/* Grand Total Sticky Footer across GT and DLR tables */
+.grand-total-row {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  border-top: 3px solid #3b82f6 !important;
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  box-shadow: 0 -3px 10px rgba(0,0,0,0.12);
+}
+
+.grand-total-row td {
+  background: #0f172a !important;
+  color: #f8fafc !important;
+  padding: 13px 12px !important;
+  border-bottom: none !important;
+  border-right: 1px solid #1e293b !important;
+  font-size: 13.5px !important;
+  vertical-align: middle !important;
+}
+
+.grand-total-row td:last-child {
+  border-right: none !important;
+}
+
+.gt-label-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gt-badge {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.gt-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.grand-total-row td.col-highlight-today {
+  background: #064e3b !important;
+  color: #a7f3d0 !important;
+}
+
+.grand-total-row td.col-highlight-cum {
+  background: #1e3a8a !important;
+  color: #bfdbfe !important;
+}
+
+.grand-total-row td.col-highlight-bal {
+  background: #78350f !important;
+  color: #fde68a !important;
+}
+
+.part2-footer-action-bar {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.part2-footer-text {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.launch-ppb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1e3a8a;
+  color: #ffffff;
+  border: 1px solid #1e3a8a;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.launch-ppb-btn:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+  color: #ffffff;
+  transform: translateX(2px);
+}
