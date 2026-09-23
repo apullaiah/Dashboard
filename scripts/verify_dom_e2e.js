@@ -95,6 +95,10 @@ const extractFn = (name) => {
   return m ? m[0] : null;
 };
 
+global.renderGtVillageTable = () => '<div id="gt-abstract-table">GT Village Table</div>';
+global.renderDlrSequenceBar = () => '<div id="dlr-sequence-bar">DLR Sequence Bar</div>';
+global.renderDlrVillageTable = () => '<div id="dlr-village-table">DLR Village Table</div>';
+
 eval(extractFn('calculateStageAbstractMetrics'));
 eval(extractFn('renderPart1ResurveyProgress'));
 eval(extractFn('renderPart2PpbDistributionStatus'));
