@@ -166,20 +166,53 @@ async function syncGtFromGoogleSheets() {
 
   const grandToday = p5TodaySum + p6TodaySum;
   const grandActive = p5ActiveCount + p6ActiveCount;
+
+  // Compute GT summary scoped to Phase V and Phase VI (currently active GT phases)
+  const p5v = villages.filter(v => (v.phase || '').includes('V') && !(v.phase || '').includes('VI'));
+  const p6v = villages.filter(v => (v.phase || '').includes('VI'));
+  const activeGtVillages = [...p5v, ...p6v];
+
+  const cumulativeGtExtent = Math.round(activeGtVillages.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || 0), 0) * 100) / 100;
+  const totalExtent = Math.round(activeGtVillages.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100;
+  const balanceGtExtent = Math.round(Math.max(0, totalExtent - cumulativeGtExtent) * 100) / 100;
+  const completionPct = totalExtent > 0 ? ((cumulativeGtExtent / totalExtent) * 100).toFixed(1) : '0.0';
+  const totalRovers = 60;
+  const dailyCapacityAc = totalRovers * 25;
+  const pacePct = dailyCapacityAc > 0 ? ((grandToday / dailyCapacityAc) * 100).toFixed(1) : '0.0';
+
+  store.gtSummary = {
+    todayTotal: Math.round(grandToday * 100) / 100,
+    cumulativeTotal: cumulativeGtExtent,
+    balanceTotal: balanceGtExtent,
+    totalExtent,
+    benchmarkDaily: 25,
+    rovers: totalRovers,
+    dailyCapacityAc,
+    completionPct,
+    pacePct,
+    activeVillagesToday: grandActive,
+    lastSynced: new Date().toISOString()
+  };
+
   console.log(`\n======================================================`);
   console.log(`GRAND TOTAL TODAY GT EXTENT: ${grandToday.toFixed(2)} Ac across ${grandActive} active villages.`);
-  console.log(`Official Google Spreadsheet District Total: 1226.44 Ac.`);
+  console.log(`P5+P6 Scope — Cumulative: ${cumulativeGtExtent} Ac | Balance: ${balanceGtExtent} Ac | Total: ${totalExtent} Ac`);
+  console.log(`Completion: ${completionPct}% | Pace: ${pacePct}% of daily capacity`);
 
-  // Save to store.json
-  fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
+  // Re-read the latest store before saving to preserve fields written by other scripts (e.g. dlr_records, dlrSummary)
+  const latestStore = JSON.parse(fs.readFileSync(STORE_PATH, 'utf8'));
+  latestStore.villages = store.villages; // updated GT data per village
+  latestStore.gtSummary = store.gtSummary; // updated GT summary
+  fs.writeFileSync(STORE_PATH, JSON.stringify(latestStore, null, 2), 'utf8');
   console.log('Successfully saved updated data to data/store.json.');
 
   // Also check if dashboard/data/store.json exists
   const altStore = path.join(__dirname, '../dashboard/data/store.json');
   if (fs.existsSync(altStore)) {
-    fs.writeFileSync(altStore, JSON.stringify(store, null, 2), 'utf8');
+    fs.writeFileSync(altStore, JSON.stringify(latestStore, null, 2), 'utf8');
     console.log('Also updated dashboard/data/store.json.');
   }
+
 }
 
 syncGtFromGoogleSheets().catch(err => {

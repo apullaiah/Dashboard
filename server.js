@@ -9,6 +9,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { syncAllLiveData } = require('./lib/syncService.js');
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
@@ -731,110 +732,126 @@ function dashboard(store) {
       totalUniversePPBs: 0
     },
     dailyProgress: total ? {
-      asOnDate: '19-09-2026',
+      asOnDate: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }),
       dlrSummary: store.dlrSummary || {
-        todayTotal: 5990,
-        cumulativeTotal: 99685,
-        balanceTotal: 105771,
-        totalEntries: 281353,
+        todayTotal: 0,
+        cumulativeTotal: 0,
+        balanceTotal: 0,
+        totalEntries: 0,
         benchmarkDaily: 200,
-        pacePct: '2995.0',
-        pctTotal: '35.4',
+        pacePct: '0.0',
+        pctTotal: '0.0',
         byStage: {
-          vs_status: { name: 'Village Surveyor Login (VS Login)', today: 1688, cumulative: 17433, balance: 31761, total: 49094, pct: '35.5' },
-          vro_status: { name: 'VRO Login (Village Revenue Officer)', today: 1554, cumulative: 14866, balance: 27531, total: 42397, pct: '35.1' },
-          tahsildar_status: { name: 'Tahsildar Login (Tah Login)', today: 2748, cumulative: 67386, balance: 41558, total: 105957, pct: '63.6' },
-          rdo_status: { name: 'RDO Login (Revenue Divisional Officer)', today: 0, cumulative: 0, balance: 4921, total: 79611, pct: '0.0' },
-          jc_status: { name: 'JC Login (Joint Collector Approval)', today: 0, cumulative: 0, balance: 0, total: 4294, pct: '0.0' }
+          vs_status: { name: 'Village Surveyor Login (VS Login)', today: 0, cumulative: 0, balance: 0, total: 0, pct: '0.0' },
+          vro_status: { name: 'VRO Login (Village Revenue Officer)', today: 0, cumulative: 0, balance: 0, total: 0, pct: '0.0' },
+          tahsildar_status: { name: 'Tahsildar Login (Tah Login)', today: 0, cumulative: 0, balance: 0, total: 0, pct: '0.0' },
+          rdo_status: { name: 'RDO Login (Revenue Divisional Officer)', today: 0, cumulative: 0, balance: 0, total: 0, pct: '0.0' },
+          jc_status: { name: 'JC Login (Joint Collector Approval)', today: 0, cumulative: 0, balance: 0, total: 0, pct: '0.0' }
         }
       },
       gtSummary: store.gtSummary || {
-        todayTotal: 2659.65,
-        cumulativeTotal: 106543.57,
-        balanceTotal: 170546.78,
+        todayTotal: 0,
+        cumulativeTotal: 0,
+        balanceTotal: 0,
         totalExtent: 277090.35,
         benchmarkDaily: 25,
         rovers: 60,
         dailyCapacityAc: 1500,
-        completionPct: '38.4',
-        pacePct: '177.3'
+        completionPct: '0.0',
+        pacePct: '0.0'
       },
-      combined: {
-        todayGtExtent: 2659.65,
-        cumulativeGtExtent: 106543.57,
-        totalTargetExtent: 277090.35,
-        gtCompletedVillages: 60,
-        totalVillages: 152,
-        todayDlrEntries: 5990,
-        cumulativeDlrEntries: 99685,
-        balanceDlrEntries: 105771,
-        totalDlrEntries: 281353,
-        vsLoginToday: 1688,
-        vroLoginToday: 1554,
-        tahLoginToday: 2748,
-        rdoLoginToday: 0,
-        jcLoginToday: 0,
-        vsLoginVillagesToday: 44,
-        vroLoginVillagesToday: 17,
-        tahLoginVillagesToday: 9,
-        rdoLoginVillagesToday: 3,
-        jcLoginVillagesToday: 2,
-        portedVillages: 72
-      },
-      phase5: {
-        phase: 'Phase V',
-        date: '19-09-2026',
-        totalVillages: 60,
-        totalExtent: 116517.28,
-        todayGtExtent: 422.63,
-        cumulativeGtExtent: 82184.05,
-        gtCompletedVillages: 49,
-        gtStartedVillages: 60,
-        gtNotStartedVillages: 0,
-        todayDlrEntries: 3425,
-        vsLoginToday: 1254,
-        vroLoginToday: 1525,
-        tahLoginToday: 646,
-        rdoLoginToday: 0,
-        vectorizationVillages: 40,
-        correlationAreaVillages: 24
-      },
-      phase6: {
-        phase: 'Phase VI',
-        date: '19-09-2026',
-        totalVillages: 92,
-        totalExtent: 160573.07,
-        todayGtExtent: 2237.02,
-        cumulativeGtExtent: 24359.52,
-        gtStartedVillages: 68,
-        gtNotStartedVillages: 24,
-        gtCompletedVillages: 11,
-        todayDlrEntries: 463,
-        vsLoginToday: 434,
-        vroLoginToday: 29,
-        tahLoginToday: 0,
-        rdoLoginToday: 0,
-        vectorizationVillages: 4,
-        correlationAreaVillages: 0
-      },
-      phase4: {
-        phase: 'Phase IV',
-        date: '19-09-2026',
-        todayDlrEntries: 2102,
-        tahLoginToday: 2102,
-        rdoLoginToday: 0,
-        jcLoginToday: 0
-      },
+      combined: (() => {
+        const dlr = store.dlrSummary || {};
+        const gt = store.gtSummary || {};
+        const dlrBy = dlr.byStage || {};
+        const portedVillages = villages.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported').length;
+        return {
+          todayGtExtent: gt.todayTotal || 0,
+          cumulativeGtExtent: gt.cumulativeTotal || 0,
+          totalTargetExtent: gt.totalExtent || 277090.35,
+          gtCompletedVillages: villages.filter(v => v.gt_status === 'Completed' || v.ported_to_webland).length,
+          totalVillages: villages.length,
+          todayDlrEntries: dlr.todayTotal || 0,
+          cumulativeDlrEntries: dlr.cumulativeTotal || 0,
+          balanceDlrEntries: dlr.balanceTotal || 0,
+          totalDlrEntries: dlr.totalEntries || 0,
+          vsLoginToday: (dlrBy.vs_status || {}).today || 0,
+          vroLoginToday: (dlrBy.vro_status || {}).today || 0,
+          tahLoginToday: (dlrBy.tahsildar_status || {}).today || 0,
+          rdoLoginToday: (dlrBy.rdo_status || {}).today || 0,
+          jcLoginToday: (dlrBy.jc_status || {}).today || 0,
+          vsLoginVillagesToday: (store.dlr_records || []).filter(r => r.login_key === 'vs_status' && r.today > 0).length,
+          vroLoginVillagesToday: (store.dlr_records || []).filter(r => r.login_key === 'vro_status' && r.today > 0).length,
+          tahLoginVillagesToday: (store.dlr_records || []).filter(r => r.login_key === 'tahsildar_status' && r.today > 0).length,
+          rdoLoginVillagesToday: (store.dlr_records || []).filter(r => r.login_key === 'rdo_status' && r.today > 0).length,
+          jcLoginVillagesToday: (store.dlr_records || []).filter(r => r.login_key === 'jc_status' && r.today > 0).length,
+          portedVillages
+        };
+      })(),
+      phase5: (() => {
+        const p5v = villages.filter(v => (v.phase || '').includes('V') && !(v.phase || '').includes('VI'));
+        const dlrRecs = (store.dlr_records || []).filter(r => r.phase === 'Phase V');
+        return {
+          phase: 'Phase V',
+          date: new Date().toLocaleDateString('en-IN'),
+          totalVillages: p5v.length,
+          totalExtent: Math.round(p5v.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100,
+          todayGtExtent: Math.round(p5v.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0) * 100) / 100,
+          cumulativeGtExtent: Math.round(p5v.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || 0), 0) * 100) / 100,
+          gtCompletedVillages: p5v.filter(v => v.gt_status === 'Completed').length,
+          gtStartedVillages: p5v.filter(v => v.gt_status === 'In Progress' || v.gt_status === 'Completed').length,
+          gtNotStartedVillages: p5v.filter(v => !v.gt_status || v.gt_status === 'Not Started').length,
+          todayDlrEntries: dlrRecs.reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+        };
+      })(),
+      phase6: (() => {
+        const p6v = villages.filter(v => (v.phase || '').includes('VI'));
+        const dlrRecs = (store.dlr_records || []).filter(r => r.phase === 'Phase VI');
+        return {
+          phase: 'Phase VI',
+          date: new Date().toLocaleDateString('en-IN'),
+          totalVillages: p6v.length,
+          totalExtent: Math.round(p6v.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100,
+          todayGtExtent: Math.round(p6v.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0) * 100) / 100,
+          cumulativeGtExtent: Math.round(p6v.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || 0), 0) * 100) / 100,
+          gtStartedVillages: p6v.filter(v => v.gt_status === 'In Progress' || v.gt_status === 'Completed').length,
+          gtNotStartedVillages: p6v.filter(v => !v.gt_status || v.gt_status === 'Not Started').length,
+          gtCompletedVillages: p6v.filter(v => v.gt_status === 'Completed').length,
+          todayDlrEntries: dlrRecs.reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+        };
+      })(),
+      phase4: (() => {
+        const dlrRecs = (store.dlr_records || []).filter(r => r.phase === 'Phase IV');
+        return {
+          phase: 'Phase IV',
+          date: new Date().toLocaleDateString('en-IN'),
+          todayDlrEntries: dlrRecs.reduce((s, r) => s + (Number(r.today) || 0), 0),
+          tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          jcLoginToday: dlrRecs.filter(r => r.login_key === 'jc_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+        };
+      })(),
       portedToWebland: {
-        totalPorted: 72,
-        phase1: 27,
-        phase2: 34,
-        phase3: 11,
+        totalPorted: villages.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported').length,
+        phase1: villages.filter(v => (v.phase || '').includes('I') && !(v.phase || '').match(/II|III|IV|V/) && (v.ported_to_webland || v.webland_2_status === 'Ported')).length,
+        phase2: villages.filter(v => (v.phase || '').match(/Phase II$|Phase 2$/) && (v.ported_to_webland || v.webland_2_status === 'Ported')).length,
+        phase3: villages.filter(v => (v.phase || '').match(/Phase III$|Phase 3$/) && (v.ported_to_webland || v.webland_2_status === 'Ported')).length,
         allActivitiesCompleted: true
       }
     } : null,
     bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
-    quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null
+    quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null,
+    dlrRecords: store.dlr_records || []
   };
 }
 function getToken() { return process.env.GOOGLE_SHEETS_ACCESS_TOKEN || ''; }
@@ -1514,8 +1531,34 @@ async function handleApi(req, res, url) {
     if (req.method === 'POST' && sourceMatch[2] === 'sync') { if (!requireAuthorized(req,res)) return; const log = await syncSource(store, source); save(store); return json(res, 200, { result: log }); }
     if (req.method === 'POST' && sourceMatch[2] === 'disable') { if (!requireAuthorized(req,res)) return; source.status = 'Disabled'; save(store); return json(res, 200, source); }
   }
-  if (req.method === 'POST' && pathname === '/api/sync') {
-    if (!requireAuthorized(req,res)) return; const logs = []; for (const source of store.sources.filter(s => s.status !== 'Disabled' && s.direction !== 'WRITE ONLY')) logs.push(await syncSource(store, source)); save(store); return json(res, 200, { logs });
+  if (req.method === 'POST' && (pathname === '/api/sync' || pathname === '/api/sync-live')) {
+    if (!requireAuthorized(req, res)) return;
+    const logs = [];
+    try {
+      await syncAllLiveData(store);
+      logs.push({
+        id: id(),
+        source: 'Google Spreadsheets Live Sync',
+        status: 'Success',
+        records: (store.dlr_records || []).length,
+        dateTime: now(),
+        message: `Synced ${store.gtSummary?.todayTotal || 0} Ac GT and ${store.dlrSummary?.todayTotal || 0} DLR entries directly from Google Spreadsheets.`
+      });
+    } catch (liveErr) {
+      console.error('Google Spreadsheets Live Sync Error:', liveErr.message);
+      logs.push({
+        id: id(),
+        source: 'Google Spreadsheets Live Sync',
+        status: 'Warning',
+        message: liveErr.message,
+        dateTime: now()
+      });
+    }
+    for (const source of store.sources.filter(s => s.status !== 'Disabled' && s.direction !== 'WRITE ONLY')) {
+      logs.push(await syncSource(store, source));
+    }
+    save(store);
+    return json(res, 200, { logs, gtSummary: store.gtSummary, dlrSummary: store.dlrSummary, dlrRecordsCount: (store.dlr_records || []).length });
   }
   if (req.method === 'POST' && pathname === '/api/mandal-aliases') {
     if (!requireAuthorized(req, res)) return; const b = await readBody(req); const alias = normalKey(b.alias); const standard = clean(b.standard);
@@ -1586,9 +1629,11 @@ let schedulerRunning = false;
 async function runScheduledSync() {
   if (schedulerRunning) return; schedulerRunning = true;
   try {
-    const store = load(); const due = store.sources.filter(source => source.status !== 'Disabled' && source.direction !== 'WRITE ONLY' && source.accessMode !== 'LOCAL' && (!source.nextSync || new Date(source.nextSync) <= new Date()));
+    const store = load();
+    try { await syncAllLiveData(store); } catch (e) {}
+    const due = store.sources.filter(source => source.status !== 'Disabled' && source.direction !== 'WRITE ONLY' && source.accessMode !== 'LOCAL' && (!source.nextSync || new Date(source.nextSync) <= new Date()));
     for (const source of due) await syncSource(store, source);
-    if (due.length) save(store);
+    save(store);
   } catch (error) { console.error('Scheduled synchronization failed:', error.message); }
   finally { schedulerRunning = false; }
 }

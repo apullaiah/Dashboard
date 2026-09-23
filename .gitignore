@@ -9,6 +9,8 @@ node_modules/
 *.xlsx
 *.xls
 *.pdf
+*.docx
+*.doc
 data/action_plan.json
 data/master_villages.json
 scratch/

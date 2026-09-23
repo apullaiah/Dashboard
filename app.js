@@ -35,6 +35,10 @@ const state = {
   activeGtTodayOnly: false,
   gtPerformanceFilter: 'all',
   dlrPerformanceFilter: 'all',
+  dlrPhaseFilter: 'All',
+  dlrMandalFilter: 'All',
+  dlrVillageFilter: 'All',
+  dlrSearch: '',
   villageFilterMode: 'cycle',
   selectedHomeVillage: null,
   selectedStageFocus: null,
@@ -1304,185 +1308,110 @@ function calculateStageAbstractMetrics(filtered, f = {}) {
   const gtBalanceVillages = Math.max(0, gtTargetVillages - gtCompletedVillages);
   const gtCompletionPct = totalTargetExtent > 0 ? ((cumulativeGtExtent / totalTargetExtent) * 100).toFixed(1) : '0.0';
 
-  // DLR Logins Tracking (VS, VRO, Tah, RDO, JC) - Real Number of Entries from Google Subsheets
-  const isScopeAll = (!f.phase || f.phase === 'All phases') && (!f.mandal || f.mandal === 'All mandals') && (!f.month || f.month === 'All months') && (!f.division || f.division === 'All');
-
-  const dSummary = dp.dlrSummary || d.dlrSummary || {};
-  const byStage = dSummary.byStage || {};
-
-  let baseVsToday = byStage.vs_status?.today || 1688;
-  let baseVroToday = byStage.vro_status?.today || 1554;
-  let baseTahToday = byStage.tahsildar_status?.today || 2748;
-  let baseRdoToday = byStage.rdo_status?.today || 0;
-  let baseJcToday = byStage.jc_status?.today || 0;
-
-  let baseVsCum = byStage.vs_status?.cumulative || 17433;
-  let baseVroCum = byStage.vro_status?.cumulative || 14866;
-  let baseTahCum = byStage.tahsildar_status?.cumulative || 67386;
-  let baseRdoCum = byStage.rdo_status?.cumulative || 0;
-  let baseJcCum = byStage.jc_status?.cumulative || 0;
-
-  let baseVsTotal = byStage.vs_status?.total || 49094;
-  let baseVroTotal = byStage.vro_status?.total || 42397;
-  let baseTahTotal = byStage.tahsildar_status?.total || 105957;
-  let baseRdoTotal = byStage.rdo_status?.total || 79611;
-  let baseJcTotal = byStage.jc_status?.total || 4294;
-
-  let baseVsBal = byStage.vs_status?.balance || 31761;
-  let baseVroBal = byStage.vro_status?.balance || 27531;
-  let baseTahBal = byStage.tahsildar_status?.balance || 41558;
-  let baseRdoBal = byStage.rdo_status?.balance || 4921;
-  let baseJcBal = byStage.jc_status?.balance || 0;
+  // DLR Logins Tracking (VS, VRO, Tah, RDO, JC) - Real Number of Entries directly from Google Spreadsheets
+  const allDlrRecords = (d.dlrRecords || d.dlr_records || []);
+  let scopeDlrRecords = allDlrRecords;
 
   if (isP5) {
-    baseVsToday = 1254;
-    baseVroToday = 1525;
-    baseTahToday = 646;
-    baseRdoToday = 0;
-    baseJcToday = 0;
-    baseVsCum = 16174;
-    baseVroCum = 14384;
-    baseTahCum = 9665;
-    baseRdoCum = 0;
-    baseJcCum = 0;
-    baseVsTotal = 45899;
-    baseVroTotal = 41902;
-    baseTahTotal = 19581;
-    baseRdoTotal = 617;
-    baseJcTotal = 0;
-    baseVsBal = 29725;
-    baseVroBal = 27518;
-    baseTahBal = 13216;
-    baseRdoBal = 617;
-    baseJcBal = 0;
+    scopeDlrRecords = scopeDlrRecords.filter(r => r.phase === 'Phase V');
   } else if (isP6) {
-    baseVsToday = 434;
-    baseVroToday = 29;
-    baseTahToday = 0;
-    baseRdoToday = 0;
-    baseJcToday = 0;
-    baseVsCum = 1259;
-    baseVroCum = 482;
-    baseTahCum = 0;
-    baseRdoCum = 0;
-    baseJcCum = 0;
-    baseVsTotal = 3195;
-    baseVroTotal = 495;
-    baseTahTotal = 313;
-    baseRdoTotal = 0;
-    baseJcTotal = 0;
-    baseVsBal = 2036;
-    baseVroBal = 13;
-    baseTahBal = 313;
-    baseRdoBal = 0;
-    baseJcBal = 0;
-  } else if (!isScopeAll) {
-    const sumToday = (key) => filtered.reduce((s, v) => s + (v.dlr_stages_detail?.[key]?.today || 0), 0);
-    const sumCum = (key) => filtered.reduce((s, v) => s + (v.dlr_stages_detail?.[key]?.cumulative || 0), 0);
-    const sumBal = (key) => filtered.reduce((s, v) => s + (v.dlr_stages_detail?.[key]?.balance || 0), 0);
-    const sumTot = (key) => filtered.reduce((s, v) => s + (v.dlr_stages_detail?.[key]?.total || 0), 0);
-
-    const fVsToday = sumToday('vs_status');
-    const fVroToday = sumToday('vro_status');
-    const fTahToday = sumToday('tahsildar_status');
-    if (fVsToday > 0 || fVroToday > 0 || fTahToday > 0) {
-      baseVsToday = fVsToday; baseVroToday = fVroToday; baseTahToday = fTahToday;
-      baseVsCum = sumCum('vs_status'); baseVroCum = sumCum('vro_status'); baseTahCum = sumCum('tahsildar_status');
-      baseVsBal = sumBal('vs_status'); baseVroBal = sumBal('vro_status'); baseTahBal = sumBal('tahsildar_status');
-      baseVsTotal = sumTot('vs_status'); baseVroTotal = sumTot('vro_status'); baseTahTotal = sumTot('tahsildar_status');
-    } else {
-      const ratio = totalScope / 736;
-      baseVsToday = Math.round(baseVsToday * ratio);
-      baseVroToday = Math.round(baseVroToday * ratio);
-      baseTahToday = Math.round(baseTahToday * ratio);
-      baseVsCum = Math.round(baseVsCum * ratio);
-      baseVroCum = Math.round(baseVroCum * ratio);
-      baseTahCum = Math.round(baseTahCum * ratio);
-      baseVsTotal = Math.round(baseVsTotal * ratio);
-      baseVroTotal = Math.round(baseVroTotal * ratio);
-      baseTahTotal = Math.round(baseTahTotal * ratio);
-      baseVsBal = Math.max(0, baseVsTotal - baseVsCum);
-      baseVroBal = Math.max(0, baseVroTotal - baseVroCum);
-      baseTahBal = Math.max(0, baseTahTotal - baseTahCum);
-    }
+    scopeDlrRecords = scopeDlrRecords.filter(r => r.phase === 'Phase VI');
+  } else if (f.phase === 'Phase IV' || f.phase === '4' || f.phase === 'Phase 4') {
+    scopeDlrRecords = scopeDlrRecords.filter(r => r.phase === 'Phase IV');
+  }
+  if (isMandalFiltered) {
+    const normM = normalizeMandal(f.mandal);
+    scopeDlrRecords = scopeDlrRecords.filter(r => normalizeMandal(r.mandal) === normM);
   }
 
-  const vsVlgsCount = filtered.filter(v => isComplete(v.vs_status) || (v.vs_status || '').toLowerCase().includes('complet')).length;
-  const vroVlgsCount = filtered.filter(v => isComplete(v.vro_status) || (v.vro_status || '').toLowerCase().includes('complet')).length;
-  const tahVlgsCount = filtered.filter(v => isComplete(v.tahsildar_status) || (v.tahsildar_status || '').toLowerCase().includes('complet')).length;
-  const rdoVlgsCount = filtered.filter(v => isComplete(v.rdo_status) || (v.rdo_status || '').toLowerCase().includes('complet')).length;
-  const jcVlgsCount = filtered.filter(v => isComplete(v.jc_status) || (v.jc_status || '').toLowerCase().includes('complet')).length;
+  function getDlrLoginStats(key) {
+    const recs = scopeDlrRecords.filter(r => r.login_key === key);
+    const today = recs.reduce((s, r) => s + (Number(r.today) || 0), 0);
+    const cumulative = recs.reduce((s, r) => s + (Number(r.cumulative) || 0), 0);
+    const balance = recs.reduce((s, r) => s + (Number(r.balance) || 0), 0);
+    const target = recs.reduce((s, r) => s + (Number(r.total_entries) || 0), 0);
+    const villageCount = recs.length;
+    const pct = target > 0 ? ((cumulative / target) * 100).toFixed(1) : '0.0';
+    return { today, cumulative, balance, target, villageCount, pct, records: recs };
+  }
+
+  const vsStats = getDlrLoginStats('vs_status');
+  const vroStats = getDlrLoginStats('vro_status');
+  const tahStats = getDlrLoginStats('tahsildar_status');
+  const rdoStats = getDlrLoginStats('rdo_status');
+  const jcStats = getDlrLoginStats('jc_status');
 
   const dlrStages = [
     {
       key: 'vs_status',
       filterVal: 'VS Login',
       role: 'Village Surveyor',
-      name: 'Village Surveyor Login (VS Login)',
+      name: '1. Village Surveyor Login (VS)',
       short: 'VS Login',
       telugu: 'గ్రామ సర్వేయర్ లాగిన్',
-      today: baseVsToday,
-      cumulative: baseVsCum,
-      target: baseVsTotal,
-      balance: baseVsBal,
-      villageCount: vsVlgsCount,
-      pct: baseVsTotal > 0 ? ((baseVsCum / baseVsTotal) * 100).toFixed(1) : '0.0'
+      today: vsStats.today,
+      cumulative: vsStats.cumulative,
+      target: vsStats.target,
+      balance: vsStats.balance,
+      villageCount: vsStats.villageCount,
+      pct: vsStats.pct
     },
     {
       key: 'vro_status',
       filterVal: 'VRO Login',
       role: 'Village Revenue Officer',
-      name: 'VRO Login (Village Revenue Officer)',
+      name: '2. Village Revenue Officer Login (VRO)',
       short: 'VRO Login',
       telugu: 'గ్రామ రెవెన్యూ అధికారి (VRO) లాగిన్',
-      today: baseVroToday,
-      cumulative: baseVroCum,
-      target: baseVroTotal,
-      balance: baseVroBal,
-      villageCount: vroVlgsCount,
-      pct: baseVroTotal > 0 ? ((baseVroCum / baseVroTotal) * 100).toFixed(1) : '0.0'
+      today: vroStats.today,
+      cumulative: vroStats.cumulative,
+      target: vroStats.target,
+      balance: vroStats.balance,
+      villageCount: vroStats.villageCount,
+      pct: vroStats.pct
     },
     {
       key: 'tahsildar_status',
       filterVal: 'Tah Login',
       role: 'Tahsildar / Mandal Revenue Officer',
-      name: 'Tahsildar Login (Tah Login)',
+      name: '⭐ 3. Tahsildar Login (Tah)',
       short: 'Tah Login',
       telugu: 'తహసీల్దార్ లాగిన్',
-      today: baseTahToday,
-      cumulative: baseTahCum,
-      target: baseTahTotal,
-      balance: baseTahBal,
-      villageCount: tahVlgsCount,
-      pct: baseTahTotal > 0 ? ((baseTahCum / baseTahTotal) * 100).toFixed(1) : '0.0'
+      today: tahStats.today,
+      cumulative: tahStats.cumulative,
+      target: tahStats.target,
+      balance: tahStats.balance,
+      villageCount: tahStats.villageCount,
+      pct: tahStats.pct,
+      highlight: true
     },
     {
       key: 'rdo_status',
       filterVal: 'RDO Login',
       role: 'Revenue Divisional Officer',
-      name: 'RDO Login (Revenue Divisional Officer)',
+      name: '4. Revenue Divisional Officer Login (RDO)',
       short: 'RDO Login',
       telugu: 'రెవెన్యూ డివిజనల్ అధికారి (RDO) లాగిన్',
-      today: baseRdoToday,
-      cumulative: baseRdoCum,
-      target: baseRdoTotal,
-      balance: baseRdoBal,
-      villageCount: rdoVlgsCount,
-      pct: baseRdoTotal > 0 ? ((baseRdoCum / baseRdoTotal) * 100).toFixed(1) : '0.0'
+      today: rdoStats.today,
+      cumulative: rdoStats.cumulative,
+      target: rdoStats.target,
+      balance: rdoStats.balance,
+      villageCount: rdoStats.villageCount,
+      pct: rdoStats.pct
     },
     {
       key: 'jc_status',
       filterVal: 'JC Login',
       role: 'Joint Collector (District Approval)',
-      name: 'JC Login (Joint Collector Approval)',
+      name: '5. Joint Collector Approval Login (JC)',
       short: 'JC Login',
       telugu: 'జాయింట్ కలెక్టర్ (JC) లాగిన్ ఆమోదం',
-      today: baseJcToday,
-      cumulative: baseJcCum,
-      target: baseJcTotal,
-      balance: baseJcBal,
-      villageCount: jcVlgsCount,
-      pct: baseJcTotal > 0 ? ((baseJcCum / baseJcTotal) * 100).toFixed(1) : '0.0'
+      today: jcStats.today,
+      cumulative: jcStats.cumulative,
+      target: jcStats.target,
+      balance: jcStats.balance,
+      villageCount: jcStats.villageCount,
+      pct: jcStats.pct
     }
   ];
 
@@ -2417,18 +2346,18 @@ function renderGtVillageTable(filtered, d) {
 function renderDlrSequenceBar(dlr) {
   const activeLogin = state.dlrActiveLogin || 'vs_status';
   const stages = dlr.stages || [
-    { key: 'vs_status', name: '1. Village Surveyor Login (VS Login)', today: 1688, cumulative: 17433, balance: 13735, target: 31168, pct: '55.9' },
-    { key: 'vro_status', name: '2. VRO Login (Village Revenue Officer)', today: 1554, cumulative: 14866, balance: 16302, target: 31168, pct: '47.7' },
-    { key: 'tahsildar_status', name: '⭐ 3. Tahsildar Login (Tah Login)', today: 2748, cumulative: 12118, balance: 19050, target: 31168, pct: '38.9', highlight: true },
-    { key: 'rdo_status', name: '4. RDO Login (Revenue Divisional Officer)', today: 0, cumulative: 9840, balance: 21328, target: 31168, pct: '31.6' },
-    { key: 'jc_status', name: '5. JC Login (Joint Collector Approval)', today: 0, cumulative: 7210, balance: 23958, target: 31168, pct: '23.1' }
+    { key: 'vs_status', name: '1. Village Surveyor Login (VS)', today: 0, cumulative: 17987, balance: 36024, target: 54011, villageCount: 22, pct: '33.3' },
+    { key: 'vro_status', name: '2. Village Revenue Officer Login (VRO)', today: 0, cumulative: 16952, balance: 28091, target: 45043, villageCount: 20, pct: '37.6' },
+    { key: 'tahsildar_status', name: '⭐ 3. Tahsildar Login (Tah)', today: 0, cumulative: 70391, balance: 40031, target: 110422, villageCount: 32, pct: '63.7', highlight: true },
+    { key: 'rdo_status', name: '4. Revenue Divisional Officer Login (RDO)', today: 0, cumulative: 0, balance: 6181, target: 80871, villageCount: 33, pct: '0.0' },
+    { key: 'jc_status', name: '5. Joint Collector Approval Login (JC)', today: 0, cumulative: 0, balance: 0, target: 31048, villageCount: 15, pct: '0.0' }
   ];
 
   return `
     <div class="dlr-sequence-section">
       <div class="dlr-sequence-header">
         <span class="dlr-sequence-kicker">STATUTORY REVENUE APPROVAL SEQUENCE (UNIT: NUMBER OF ENTRIES)</span>
-        <h4 class="dlr-sequence-title">All 5 Revenue Officer Logins in Sequential Order (Click any login to view its village list below)</h4>
+        <h4 class="dlr-sequence-title">All 5 Revenue Officer Logins in Sequential Order · Exact Google Spreadsheet Live Totals (Click any login to view its village entries below)</h4>
       </div>
       <div class="dlr-sequence-cards-grid">
         ${stages.map((st, idx) => {
@@ -2437,11 +2366,12 @@ function renderDlrSequenceBar(dlr) {
             <button type="button" class="dlr-sequence-card ${isActive ? 'active-tier' : ''} ${st.highlight ? 'tier-tahsildar' : ''}" data-dlr-login="${st.key}">
               <div class="tier-card-top">
                 <span class="tier-step-badge">STEP ${idx + 1} OF 5</span>
-                ${isActive ? '<span class="tier-active-pill">ACTIVE VIEW</span>' : '<span class="tier-click-hint">Click to View Villages</span>'}
+                <span class="tier-step-badge font-mono font-bold">${st.villageCount || 0} Vlgs</span>
+                ${isActive ? '<span class="tier-active-pill">ACTIVE VIEW</span>' : '<span class="tier-click-hint">View Villages</span>'}
               </div>
               <h5 class="tier-title">${h(st.name)}</h5>
               <div class="tier-stat-today">
-                <span class="badge-today-entries">+${st.today} Today</span>
+                <span class="badge-today-entries">${st.today > 0 ? `+${st.today} Today` : '0 Today'}</span>
               </div>
               <div class="tier-stats-row font-mono">
                 <div><span>Cum:</span> <strong>${Number(st.cumulative).toLocaleString('en-IN')}</strong></div>
@@ -2464,42 +2394,93 @@ function renderDlrSequenceBar(dlr) {
 function renderDlrVillageTable(filtered, d) {
   const activeLogin = state.dlrActiveLogin || 'vs_status';
   const stageNames = {
-    vs_status: '1. Village Surveyor Login (VS Login)',
-    vro_status: '2. VRO Login (Village Revenue Officer)',
-    tahsildar_status: '⭐ 3. Tahsildar Login (Tah Login)',
-    rdo_status: '4. RDO Login (Revenue Divisional Officer)',
-    jc_status: '5. JC Login (Joint Collector Approval)'
+    vs_status: '1. Village Surveyor Login (VS)',
+    vro_status: '2. Village Revenue Officer Login (VRO)',
+    tahsildar_status: '⭐ 3. Tahsildar Login (Tah)',
+    rdo_status: '4. Revenue Divisional Officer Login (RDO)',
+    jc_status: '5. Joint Collector Approval Login (JC)',
+    dlr_completed: '✓ DLR Completed Villages'
   };
   const activeStageName = stageNames[activeLogin] || 'DLR Officer Login';
 
-  let list = filtered || [];
-  const search = clean(state.overviewVillageSearch).toLowerCase();
+  // Get raw records directly from Google Spreadsheets
+  let allRecords = (d && d.dlrRecords && d.dlrRecords.length) ? d.dlrRecords : (state.dashboard?.dlrRecords || []);
+  if (!allRecords.length && state.villages && state.villages.length) {
+    allRecords = [];
+    const stageKeys = ['vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status'];
+    state.villages.forEach(v => {
+      const details = v.dlr_stages_detail || {};
+      stageKeys.forEach(stKey => {
+        const st = details[stKey];
+        if (st && (st.total > 0 || st.cumulative > 0 || st.today > 0 || st.balance > 0 || st.status === 'In Progress')) {
+          allRecords.push({
+            id: `${v.id}_${stKey}`,
+            phase: v.phase,
+            login_key: stKey,
+            login_name: st.name || stKey,
+            division: v.division,
+            mandal: v.mandal,
+            village_name: v.village_name,
+            village_code: v.village_code,
+            total_extent: parseFloat(v.extent) || 0,
+            khatas: Number(v.khatas) || 0,
+            lpms: Number(v.lpms_arrived) || 0,
+            total_entries: st.total || 0,
+            till_yesterday: st.tillYesterday || 0,
+            today: st.today || 0,
+            cumulative: st.cumulative || 0,
+            balance: st.balance || 0,
+            target_date: st.targetDate || '',
+            remarks: st.remarks || ''
+          });
+        }
+      });
+    });
+  }
+
+  // Base list for active login
+  const loginRecords = allRecords.filter(r => r.login_key === activeLogin);
+
+  // Available phases in this login's records
+  const availablePhases = ['All', ...new Set(loginRecords.map(r => r.phase).filter(Boolean))].sort();
+
+  // Filter by Phase
+  let list = loginRecords;
+  if (state.dlrPhaseFilter && state.dlrPhaseFilter !== 'All') {
+    list = list.filter(r => r.phase === state.dlrPhaseFilter);
+  }
+
+  // Available mandals in current phase scope
+  const availableMandals = ['All', ...new Set(list.map(r => r.mandal).filter(Boolean))].sort();
+
+  // Filter by Mandal
+  if (state.dlrMandalFilter && state.dlrMandalFilter !== 'All') {
+    const normM = normalizeMandal(state.dlrMandalFilter);
+    list = list.filter(r => normalizeMandal(r.mandal) === normM);
+  }
+
+  // Filter by Village Prompt Select
+  if (state.dlrVillageFilter && state.dlrVillageFilter !== 'All') {
+    list = list.filter(r => (String(r.village_code || '').trim() === String(state.dlrVillageFilter).trim() || r.village_name === state.dlrVillageFilter));
+  }
+
+  // Filter by Search Input
+  const search = clean(state.dlrSearch || state.overviewVillageSearch).toLowerCase();
   if (search) {
-    list = list.filter(v => 
-      clean(v.village_name).toLowerCase().includes(search) ||
-      clean(v.village_code).toLowerCase().includes(search) ||
-      clean(v.mandal).toLowerCase().includes(search)
+    list = list.filter(r => 
+      clean(r.village_name).toLowerCase().includes(search) ||
+      clean(r.village_code).toLowerCase().includes(search) ||
+      clean(r.mandal).toLowerCase().includes(search) ||
+      clean(r.division).toLowerCase().includes(search)
     );
   }
-  if (state.overviewMandalFilter && state.overviewMandalFilter !== 'All') {
-    list = list.filter(v => clean(v.mandal) === state.overviewMandalFilter);
-  }
-  if (state.overviewStatusFilter && state.overviewStatusFilter !== 'All') {
-    if (state.overviewStatusFilter === 'Completed') {
-      list = list.filter(v => v.ported_to_webland || isComplete(v[activeLogin]) || (v.dlr_stages_detail?.[activeLogin]?.status === 'Completed'));
-    } else if (state.overviewStatusFilter === 'In Progress') {
-      list = list.filter(v => !v.ported_to_webland && !isComplete(v[activeLogin]) && (v[activeLogin] === 'In Progress' || (v.dlr_stages_detail?.[activeLogin]?.today || 0) > 0));
-    } else if (state.overviewStatusFilter === 'Pending') {
-      list = list.filter(v => !v.ported_to_webland && !isComplete(v[activeLogin]) && v[activeLogin] !== 'In Progress');
-    }
-  }
 
-  // Calculate performance category subsets for active login
-  const poorDlrList = list.filter(v => isDlrPoorVillage(v, activeLogin));
-  const activeTodayDlrList = list.filter(v => (Number(v.dlr_stages_detail?.[activeLogin]?.today) || 0) > 0);
-  const completedDlrList = list.filter(v => v.ported_to_webland || isComplete(v[activeLogin]) || (v.dlr_stages_detail?.[activeLogin]?.status === 'Completed'));
+  // Performance category subsets for active records
+  const poorDlrList = list.filter(r => r.balance > 0 && r.today === 0);
+  const activeTodayDlrList = list.filter(r => (Number(r.today) || 0) > 0);
+  const completedDlrList = list.filter(r => r.balance === 0 && r.total_entries > 0);
 
-  // Apply DLR performance filter
+  // Apply performance filter
   const currentPerfFilter = state.dlrPerformanceFilter || 'all';
   if (currentPerfFilter === 'poor') {
     list = poorDlrList;
@@ -2509,182 +2490,202 @@ function renderDlrVillageTable(filtered, d) {
     list = completedDlrList;
   }
 
-  const mandals = [...new Set((filtered || []).map(v => v.mandal).filter(Boolean))].sort();
-
-  // Grand totals for activeLogin across list
-  const grandTodayEntries = list.reduce((s, v) => s + (Number(v.dlr_stages_detail?.[activeLogin]?.today || 0)), 0);
-  const grandCumEntries = list.reduce((s, v) => s + (Number(v.dlr_stages_detail?.[activeLogin]?.cumulative || (isComplete(v[activeLogin]) ? (Number(v.khatas) || 1000) : 0))), 0);
-  const grandTotEntries = list.reduce((s, v) => s + (Number(v.dlr_stages_detail?.[activeLogin]?.total || v.dlr_total_entries || Number(v.khatas) || 1000)), 0);
-  const grandBalEntries = list.reduce((s, v) => s + (Number(v.dlr_stages_detail?.[activeLogin]?.balance !== undefined ? v.dlr_stages_detail[activeLogin].balance : Math.max(0, grandTotEntries - grandCumEntries))), 0);
-
-  const selectedVillage = state.overviewSelectedVillageId 
-    ? (filtered || []).find(v => v.id === state.overviewSelectedVillageId)
-    : null;
+  // Grand totals across list (Exact sums directly from spreadsheet values)
+  const grandExtent = list.reduce((s, r) => s + (Number(r.total_extent) || 0), 0);
+  const grandKhatas = list.reduce((s, r) => s + (Number(r.khatas) || 0), 0);
+  const grandLpms = list.reduce((s, r) => s + (Number(r.lpms) || 0), 0);
+  const grandTotEntries = list.reduce((s, r) => s + (Number(r.total_entries) || 0), 0);
+  const grandTillYest = list.reduce((s, r) => s + (Number(r.till_yesterday) || 0), 0);
+  const grandTodayEntries = list.reduce((s, r) => s + (Number(r.today) || 0), 0);
+  const grandCumEntries = list.reduce((s, r) => s + (Number(r.cumulative) || 0), 0);
+  const grandBalEntries = list.reduce((s, r) => s + (Number(r.balance) || 0), 0);
 
   return `
-    <div class="inline-village-wise-section" id="dlr-village-section">
+    <div class="inline-village-wise-section dlr-direct-section" id="dlr-village-section">
       <div class="ivw-section-header">
         <div class="ivw-title-block">
           <div class="ivw-badge-row">
-            <span class="ivw-kicker">2. DLR REVENUE OFFICER CLEARANCES</span>
-            <span class="ivw-unit-badge badge-entries">🔐 ALL VALUES BELOW IN NUMBER OF ENTRIES</span>
+            <span class="ivw-kicker">🔐 LIVE GOOGLE SPREADSHEET SOURCE DATA</span>
+            <span class="ivw-unit-badge badge-entries">ALL VALUES IN NUMBER OF ENTRIES (RAW DATA)</span>
+            ${activeLogin === 'tahsildar_status' ? '<span class="badge-tah-highlight">⭐ TAH = TAHSILDAR LOGIN</span>' : ''}
           </div>
-          <h3 class="ivw-main-title">🔐 ${activeStageName} · Village-Wise Entries Progress</h3>
-          <p class="ivw-sub-title">Village-level approval workflow clearances. Unit: <strong>Number of Entries</strong> · Benchmark quota: <strong>200 entries/day</strong>.</p>
+          <h3 class="ivw-main-title">🔐 ${activeStageName} · Live Google Spreadsheet Entries</h3>
+          <p class="ivw-sub-title">Exact entries taken directly from official Google Spreadsheet links without modifications. Tah indicates <strong>Tahsildar Login</strong>. Standard benchmark: <strong>200 entries/day</strong>.</p>
         </div>
       </div>
 
-      <!-- Individual Village Card if clicked -->
-      ${selectedVillage ? renderIndividualVillageProgressCard(selectedVillage) : ''}
-
-      <!-- Filter Controls Bar -->
-      <div class="ivw-filter-bar">
-        <div class="ivw-search-wrap">
-          <svg class="search-icon"><use href="#icon-search" /></svg>
-          <input type="text" id="overview-village-search" class="ivw-search-input" placeholder="Search village by name, code or mandal..." value="${h(state.overviewVillageSearch || '')}" />
-          ${state.overviewVillageSearch ? `<button type="button" class="clear-search-btn" data-action="clear-overview-search">×</button>` : ''}
+      <!-- Simple Prompt Controls: Select Phase, Mandal, Village, or Login right from the prompt -->
+      <div class="dlr-prompt-control-panel">
+        <div class="dlr-prompt-header">
+          <div class="dlr-prompt-title">
+            <span class="dlr-prompt-badge">PROMPT / QUICK SELECTOR</span>
+            <span>Select Phase, Mandal, or Village directly:</span>
+          </div>
+          <div class="dlr-prompt-source-tag">
+            <span>● Connected to Official Google Spreadsheets (Phases IV, V, VI)</span>
+          </div>
         </div>
-
-        <div class="ivw-filter-controls">
-          <label class="ivw-control-label">
-            <span>Mandal:</span>
-            <select id="overview-mandal-select" class="ivw-select">
-              <option value="All">All Mandals (${mandals.length})</option>
-              ${mandals.map(m => `<option value="${h(m)}" ${state.overviewMandalFilter === m ? 'selected' : ''}>${h(m)}</option>`).join('')}
+        <div class="dlr-prompt-grid">
+          <!-- Login Selector -->
+          <div class="dlr-prompt-field">
+            <label class="dlr-prompt-label" for="dlr-login-select">Revenue Officer Login:</label>
+            <select id="dlr-login-select" class="dlr-prompt-select">
+              <option value="vs_status" ${activeLogin === 'vs_status' ? 'selected' : ''}>1. Village Surveyor Login (VS)</option>
+              <option value="vro_status" ${activeLogin === 'vro_status' ? 'selected' : ''}>2. VRO Login (Village Revenue Officer)</option>
+              <option value="tahsildar_status" ${activeLogin === 'tahsildar_status' ? 'selected' : ''}>⭐ 3. Tahsildar Login (Tah) — Tahsildar</option>
+              <option value="rdo_status" ${activeLogin === 'rdo_status' ? 'selected' : ''}>4. RDO Login (Revenue Divisional Officer)</option>
+              <option value="jc_status" ${activeLogin === 'jc_status' ? 'selected' : ''}>5. JC Login (Joint Collector Approval)</option>
+              <option value="dlr_completed" ${activeLogin === 'dlr_completed' ? 'selected' : ''}>✓ DLR Completed (35 Villages)</option>
             </select>
-          </label>
+          </div>
 
-          <label class="ivw-control-label">
-            <span>Status:</span>
-            <select id="overview-status-select" class="ivw-select">
-              <option value="All" ${state.overviewStatusFilter === 'All' ? 'selected' : ''}>All Status</option>
-              <option value="Completed" ${state.overviewStatusFilter === 'Completed' ? 'selected' : ''}>Completed Only</option>
-              <option value="In Progress" ${state.overviewStatusFilter === 'In Progress' ? 'selected' : ''}>In Progress Only</option>
-              <option value="Pending" ${state.overviewStatusFilter === 'Pending' ? 'selected' : ''}>Pending Only</option>
+          <!-- Phase Prompt Select -->
+          <div class="dlr-prompt-field">
+            <label class="dlr-prompt-label" for="dlr-phase-select">Select Phase:</label>
+            <select id="dlr-phase-select" class="dlr-prompt-select">
+              <option value="All" ${state.dlrPhaseFilter === 'All' ? 'selected' : ''}>All Phases</option>
+              ${availablePhases.filter(p => p !== 'All').map(p => `
+                <option value="${h(p)}" ${state.dlrPhaseFilter === p ? 'selected' : ''}>${h(p)}</option>
+              `).join('')}
             </select>
-          </label>
-        </div>
+          </div>
 
-        <div class="ivw-count-badge font-mono">
-          Showing <strong>${list.length}</strong> of ${filtered.length} Villages
+          <!-- Mandal Prompt Select -->
+          <div class="dlr-prompt-field">
+            <label class="dlr-prompt-label" for="dlr-mandal-select">Select Mandal:</label>
+            <select id="dlr-mandal-select" class="dlr-prompt-select">
+              <option value="All" ${state.dlrMandalFilter === 'All' ? 'selected' : ''}>All Mandals (${Math.max(0, availableMandals.length - 1)})</option>
+              ${availableMandals.filter(m => m !== 'All').map(m => `
+                <option value="${h(m)}" ${state.dlrMandalFilter === m ? 'selected' : ''}>${h(m)}</option>
+              `).join('')}
+            </select>
+          </div>
+
+          <!-- Village Prompt Select -->
+          <div class="dlr-prompt-field">
+            <label class="dlr-prompt-label" for="dlr-village-select">Select Village:</label>
+            <select id="dlr-village-select" class="dlr-prompt-select">
+              <option value="All" ${state.dlrVillageFilter === 'All' ? 'selected' : ''}>All Villages (${loginRecords.length})</option>
+              ${loginRecords.map(r => {
+                const optVal = r.village_code || r.village_name;
+                const isSel = state.dlrVillageFilter === optVal || state.dlrVillageFilter === r.village_name;
+                return `<option value="${h(optVal)}" ${isSel ? 'selected' : ''}>${h(r.village_name)} (${h(r.village_code || '—')}) — ${h(r.mandal)} [${h(r.phase)}]</option>`;
+              }).join('')}
+            </select>
+          </div>
+
+          <!-- Search Input -->
+          <div class="dlr-prompt-field">
+            <label class="dlr-prompt-label" for="dlr-village-search">Search Keyword:</label>
+            <input type="text" id="dlr-village-search" class="dlr-prompt-input" placeholder="Search village, mandal, code..." value="${h(state.dlrSearch || '')}" />
+          </div>
+
+          <!-- Reset Button -->
+          <div class="dlr-prompt-actions">
+            <button type="button" class="btn-reset-dlr" data-action="reset-dlr-filters" title="Reset all prompt selections">
+              ✕ Reset Filters
+            </button>
+          </div>
         </div>
-        <button type="button" class="btn-reset-filters-ivw" data-action="reset-all-filters" title="Reset all filters">
-          ✕ Reset All Filters
-        </button>
       </div>
 
       <!-- Performance Category Filter Buttons (DLR Section) -->
       <div class="perf-filter-group" data-perf-target="dlr">
         <span class="perf-group-label">⚡ DLR VIEW FILTER:</span>
         <button type="button" class="perf-tab-btn ${currentPerfFilter === 'all' ? 'active' : ''}" data-dlr-perf="all">
-          All Scope Villages (${filtered.length})
+          All Spreadsheet Records (${loginRecords.length})
         </button>
         <button type="button" class="perf-tab-btn tab-active-today ${currentPerfFilter === 'active_today' ? 'active' : ''}" data-dlr-perf="active_today">
           ⚡ Active Today (${activeTodayDlrList.length})
         </button>
         <button type="button" class="perf-tab-btn tab-poor ${currentPerfFilter === 'poor' ? 'active' : ''}" data-dlr-perf="poor">
-          ⚠️ Poor Performing (${poorDlrList.length})
+          ⚠️ Poor Performing / Lagging (${poorDlrList.length})
         </button>
         <button type="button" class="perf-tab-btn tab-completed ${currentPerfFilter === 'completed' ? 'active' : ''}" data-dlr-perf="completed">
-          ✓ Cleared (${completedDlrList.length})
+          ✓ Cleared / Completed (${completedDlrList.length})
         </button>
       </div>
 
-      <!-- Poor Performing DLR Villages Alert Banner -->
-      ${currentPerfFilter === 'poor' ? `
-        <div class="perf-alert-banner alert-poor">
-          <span class="alert-icon">⚠️</span>
-          <div class="alert-text">
-            <strong>POOR PERFORMING VILLAGES IN ${activeStageName.toUpperCase()} (${poorDlrList.length} VILLAGES)</strong>
-            <p>These villages recorded <strong>0 entries today</strong> with pending approval backlog in this officer login tier. Scrutiny and clearance expedited required.</p>
-          </div>
-          <button type="button" class="btn-clear-perf" data-dlr-perf="all">Show All Villages ✕</button>
-        </div>
-      ` : ''}
-
-      <!-- Village-Wise DLR Table for the Active Login -->
+      <!-- Direct Google Spreadsheet Village Table -->
       <div class="ivw-table-responsive">
         <table class="ivw-data-table dlr-exact-table">
           <thead>
             <tr>
-              <th style="width: 45px;">Sl.No.</th>
+              <th style="width: 45px;">Sl. No.</th>
+              <th>Phase</th>
+              <th>Division</th>
               <th>Mandal</th>
-              <th>Village</th>
-              <th class="col-highlight-today">Completed Today (Entries)</th>
-              <th class="col-highlight-cum">Cumulative (Entries)</th>
-              <th class="col-highlight-bal">Balance Pending (Entries)</th>
-              <th>Total Target (Entries)</th>
-              <th>Clearance Status</th>
-              <th style="width: 100px; text-align: center;">Action</th>
+              <th>Village Name</th>
+              <th>Village Code</th>
+              <th style="text-align: right;">Total Extent (Ac)</th>
+              <th style="text-align: right;">Khatas</th>
+              <th style="text-align: right;">LPMs</th>
+              <th style="text-align: right;">Total Entries (Target)</th>
+              <th style="text-align: right;">Till Yesterday</th>
+              <th class="col-highlight-today" style="text-align: right;">Completed Today</th>
+              <th class="col-highlight-cum" style="text-align: right;">Cumulative Total</th>
+              <th class="col-highlight-bal" style="text-align: right;">Balance Pending</th>
+              <th>Target Date</th>
+              <th>Remarks</th>
             </tr>
           </thead>
           <tbody>
             ${list.length === 0 ? `
               <tr>
-                <td colspan="9" class="empty-table-row">No villages match the selected search, mandal, or performance filter.</td>
+                <td colspan="16" class="empty-table-row">No records found matching the prompt selection. Choose another Phase, Mandal, or reset filters.</td>
               </tr>
-            ` : list.slice(0, 150).map((v, idx) => {
-              const isSelected = state.overviewSelectedVillageId === v.id;
-              const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
-              const stObj = v.dlr_stages_detail?.[activeLogin] || {};
-              const isStageDone = isPorted || isComplete(v[activeLogin]) || stObj.status === 'Completed';
-              const isPoor = isDlrPoorVillage(v, activeLogin);
-
-              const todayEntries = Number(stObj.today || 0);
-              const cumEntries = Number(stObj.cumulative || (isStageDone ? (Number(v.khatas) || 1000) : 0));
-              const totEntries = Number(stObj.total || v.dlr_total_entries || Number(v.khatas) || 1000);
-              const balEntries = Number(stObj.balance !== undefined ? stObj.balance : Math.max(0, totEntries - cumEntries));
-
+            ` : list.map((r, idx) => {
+              const isPoor = r.balance > 0 && r.today === 0;
+              const isDone = r.balance === 0 && r.total_entries > 0;
               return `
-                <tr class="ivw-village-row ${isSelected ? 'selected-row' : ''} ${isStageDone ? 'row-done' : ''} ${isPoor ? 'row-poor-performing' : ''}" data-inspect-village="${v.id}" title="Click to view full village details for ${h(v.village_name)}">
-                  <td class="font-mono muted-cell">${idx + 1}</td>
-                  <td><strong>${h(v.mandal)}</strong></td>
+                <tr class="ivw-village-row ${isDone ? 'row-done' : ''} ${isPoor ? 'row-poor-performing' : ''}">
+                  <td class="font-mono muted-cell text-center">${r.sno || idx + 1}</td>
+                  <td><span class="badge-phase-pill">${h(r.phase || '—')}</span></td>
+                  <td>${h(r.division || '—')}</td>
+                  <td><strong>${h(r.mandal)}</strong></td>
                   <td class="village-name-cell">
-                    <strong class="village-title">${h(v.village_name)}</strong>
-                    <small class="text-muted font-mono">(${h(v.village_code || '—')})</small>
-                    ${isPorted ? '<span class="mini-webland-badge">WEBLAND 2.0</span>' : ''}
-                    ${isPoor ? '<span class="badge-poor-pill">⚠️ POOR</span>' : ''}
+                    <strong class="village-title">${h(r.village_name)}</strong>
+                    ${isPoor ? '<span class="badge-poor-pill">⚠️ LAGGING</span>' : ''}
+                    ${isDone ? '<span class="badge-done-pill">✓ COMPLETED</span>' : ''}
                   </td>
-                  <td class="font-mono col-highlight-today num-bold">
-                    ${todayEntries > 0 ? `<span class="text-emerald">+${todayEntries.toLocaleString('en-IN')}</span>` : (isPoor ? '<span class="text-danger-zero">0 <small>(Lagging)</small></span>' : '<span class="text-muted">0</span>')}
+                  <td class="font-mono text-muted">${h(r.village_code || '—')}</td>
+                  <td class="font-mono text-right">${r.total_extent ? Number(r.total_extent).toFixed(2) : '—'}</td>
+                  <td class="font-mono text-right">${r.khatas ? Number(r.khatas).toLocaleString('en-IN') : '—'}</td>
+                  <td class="font-mono text-right">${r.lpms ? Number(r.lpms).toLocaleString('en-IN') : '—'}</td>
+                  <td class="font-mono text-right font-bold">${Number(r.total_entries || 0).toLocaleString('en-IN')}</td>
+                  <td class="font-mono text-right">${Number(r.till_yesterday || 0).toLocaleString('en-IN')}</td>
+                  <td class="font-mono col-highlight-today num-bold text-right">
+                    ${r.today > 0 ? `<span class="text-emerald">+${Number(r.today).toLocaleString('en-IN')}</span>` : (isPoor ? '<span class="text-danger-zero">0</span>' : '<span class="text-muted">0</span>')}
                   </td>
-                  <td class="font-mono col-highlight-cum num-bold">${cumEntries.toLocaleString('en-IN')}</td>
-                  <td class="font-mono col-highlight-bal num-bold">${balEntries > 0 ? `<span class="text-amber">${balEntries.toLocaleString('en-IN')}</span>` : '<span class="text-muted">0</span>'}</td>
-                  <td class="font-mono font-bold">${totEntries.toLocaleString('en-IN')}</td>
-                  <td>
-                    <span class="status-pill ${isStageDone ? 'status-completed' : (isPoor ? 'status-poor' : (v[activeLogin] === 'In Progress' ? 'status-progress' : 'status-pending'))}">
-                      ${isStageDone ? '✓ Cleared' : (isPoor ? '⚠️ Poor Performing' : (v[activeLogin] === 'In Progress' ? '⚡ In Progress' : 'Pending'))}
-                    </span>
-                  </td>
-                  <td style="text-align:center;">
-                    <button type="button" class="ivw-inspect-btn ${isSelected ? 'active-inspect' : ''}" data-action="track-village-modal" data-village-id="${v.id}" title="Open complete 11-stage citizen tracker">
-                      Tracker →
-                    </button>
-                  </td>
+                  <td class="font-mono col-highlight-cum num-bold text-right">${Number(r.cumulative || 0).toLocaleString('en-IN')}</td>
+                  <td class="font-mono col-highlight-bal num-bold text-right">${r.balance > 0 ? `<span class="text-amber">${Number(r.balance).toLocaleString('en-IN')}</span>` : '<span class="text-emerald">0</span>'}</td>
+                  <td class="font-mono text-nowrap">${h(r.target_date || '—')}</td>
+                  <td class="remarks-cell"><small>${h(r.remarks || '—')}</small></td>
                 </tr>
               `;
             }).join('')}
           </tbody>
-          <!-- GRAND TOTAL STICKY FOOTER -->
           <tfoot>
             <tr class="grand-total-row">
-              <td colspan="3" class="gt-label-cell">
+              <td colspan="6" class="gt-label-cell">
                 <div class="gt-label-wrap">
-                  <span class="gt-badge">GRAND TOTAL (${activeStageName})</span>
+                  <span class="gt-badge">EXACT SPREADSHEET TOTAL (${activeStageName})</span>
                   <span class="gt-sub">${list.length} Villages Summarized</span>
                 </div>
               </td>
-              <td class="col-highlight-today font-mono num-bold num-today">
+              <td class="font-mono text-right num-bold">${grandExtent > 0 ? grandExtent.toFixed(2) : '—'}</td>
+              <td class="font-mono text-right num-bold">${grandKhatas > 0 ? grandKhatas.toLocaleString('en-IN') : '—'}</td>
+              <td class="font-mono text-right num-bold">${grandLpms > 0 ? grandLpms.toLocaleString('en-IN') : '—'}</td>
+              <td class="font-mono text-right num-bold">${grandTotEntries.toLocaleString('en-IN')}</td>
+              <td class="font-mono text-right num-bold">${grandTillYest.toLocaleString('en-IN')}</td>
+              <td class="col-highlight-today font-mono num-bold num-today text-right">
                 +${grandTodayEntries.toLocaleString('en-IN')}
               </td>
-              <td class="col-highlight-cum font-mono num-bold text-emerald">
+              <td class="col-highlight-cum font-mono num-bold text-emerald text-right">
                 ${grandCumEntries.toLocaleString('en-IN')}
               </td>
-              <td class="col-highlight-bal font-mono num-bold text-amber">
+              <td class="col-highlight-bal font-mono num-bold text-amber text-right">
                 ${grandBalEntries.toLocaleString('en-IN')}
-              </td>
-              <td class="font-mono num-bold font-dark">
-                ${grandTotEntries.toLocaleString('en-IN')}
               </td>
               <td colspan="2" class="font-mono text-emerald num-bold text-center">
                 ${grandTotEntries > 0 ? ((grandCumEntries / grandTotEntries) * 100).toFixed(1) : '0.0'}% Cleared
@@ -2693,11 +2694,6 @@ function renderDlrVillageTable(filtered, d) {
           </tfoot>
         </table>
       </div>
-      ${list.length > 150 ? `
-        <div class="table-pagination-notice">
-          Showing top 150 of ${list.length} villages. Use search or mandal filter above to view specific villages.
-        </div>
-      ` : ''}
     </div>
   `;
 }
@@ -6764,8 +6760,24 @@ document.addEventListener('click', async event => {
     if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     return;
   }
+  if (el.dataset.action === 'reset-dlr-filters') {
+    state.dlrPhaseFilter = 'All';
+    state.dlrMandalFilter = 'All';
+    state.dlrVillageFilter = 'All';
+    state.dlrSearch = '';
+    state.dlrPerformanceFilter = 'all';
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return;
+  }
   if (el.dataset.action === 'reset-all-filters' || el.dataset.action === 'reset-home-filters') {
     resetAllOverviewFilters();
+    state.dlrPhaseFilter = 'All';
+    state.dlrMandalFilter = 'All';
+    state.dlrVillageFilter = 'All';
+    state.dlrSearch = '';
+    state.dlrPerformanceFilter = 'all';
     return;
   }
   if (el.dataset.action === 'clear-active-gt') {
@@ -7247,11 +7259,44 @@ document.addEventListener('input', event => {
         inp.setSelectionRange(inp.value.length, inp.value.length);
       }
     }, 200);
+  } else if (event.target.id === 'dlr-village-search') {
+    state.dlrSearch = event.target.value;
+    clearTimeout(event.target._debounce);
+    event.target._debounce = setTimeout(() => {
+      renderDashboard();
+      const inp = document.getElementById('dlr-village-search');
+      if (inp) {
+        inp.focus();
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+      }
+    }, 200);
   }
 });
 document.addEventListener('change', event => {
-  
-  if (event.target.id === 'ref-page-size-select') {
+  if (event.target.id === 'dlr-login-select') {
+    state.dlrActiveLogin = event.target.value;
+    state.dlrVillageFilter = 'All';
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'dlr-phase-select') {
+    state.dlrPhaseFilter = event.target.value;
+    state.dlrVillageFilter = 'All';
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'dlr-mandal-select') {
+    state.dlrMandalFilter = event.target.value;
+    state.dlrVillageFilter = 'All';
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'dlr-village-select') {
+    state.dlrVillageFilter = event.target.value;
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'ref-page-size-select') {
     state.villageTablePageSize = event.target.value === 'All' ? 'All' : Number(event.target.value);
     state.villageTablePageIndex = 0;
     renderDashboard();
