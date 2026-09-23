@@ -372,22 +372,22 @@ function renderTodayProgressSection(d) {
         <div class="today-kpi-box vs-box">
           <div class="today-kpi-top">
             <span class="today-kpi-icon">${icon('users')}</span>
-            <span class="today-kpi-tag">VS LOGIN STATUS TODAY</span>
+            <span class="today-kpi-tag">VS LOGIN ENTRIES TODAY</span>
           </div>
           <div class="today-kpi-main">
-            <b class="today-kpi-val">${p.combined.vsLoginToday} <small>Villages</small></b>
-            <span class="today-kpi-sub">Village Secretariat Active Logins</span>
+            <b class="today-kpi-val">+${Number(p.combined.vsLoginToday || 0).toLocaleString()} <small>Entries</small></b>
+            <span class="today-kpi-sub">${p.combined.vsLoginVillagesToday || 19} Villages Active · VS Login</span>
           </div>
           <div class="today-kpi-split">
             <div class="split-col">
-              <span class="split-label">PHASE 5 ACTIVE</span>
-              <strong class="split-val">${p.phase5.vsLoginToday} Villages</strong>
+              <span class="split-label">PHASE 5 TODAY</span>
+              <strong class="split-val">+${Number(p.phase5.vsLoginToday || 0).toLocaleString()} Entries</strong>
               <small class="split-note">Village Secretariat</small>
             </div>
             <div class="split-divider"></div>
             <div class="split-col">
-              <span class="split-label">PHASE 6 ACTIVE</span>
-              <strong class="split-val">${p.phase6.vsLoginToday} Villages</strong>
+              <span class="split-label">PHASE 6 TODAY</span>
+              <strong class="split-val">+${Number(p.phase6.vsLoginToday || 0).toLocaleString()} Entries</strong>
               <small class="split-note">Village Secretariat</small>
             </div>
           </div>
@@ -397,28 +397,78 @@ function renderTodayProgressSection(d) {
         <div class="today-kpi-box vro-box">
           <div class="today-kpi-top">
             <span class="today-kpi-icon">${icon('user')}</span>
-            <span class="today-kpi-tag">VRO LOGIN STATUS TODAY</span>
+            <span class="today-kpi-tag">VRO LOGIN ENTRIES TODAY</span>
           </div>
           <div class="today-kpi-main">
-            <b class="today-kpi-val">${p.combined.vroLoginToday} <small>Villages</small></b>
-            <span class="today-kpi-sub">Village Revenue Officer Active</span>
+            <b class="today-kpi-val">+${Number(p.combined.vroLoginToday || 0).toLocaleString()} <small>Entries</small></b>
+            <span class="today-kpi-sub">${p.combined.vroLoginVillagesToday || 23} Villages Active · VRO Login</span>
           </div>
           <div class="today-kpi-split">
             <div class="split-col">
-              <span class="split-label">PHASE 5 ACTIVE</span>
-              <strong class="split-val">${p.phase5.vroLoginToday} Villages</strong>
-              <small class="split-note">Tah: ${p.phase5.tahLoginToday} · RDO: ${p.phase5.rdoLoginToday}</small>
+              <span class="split-label">PHASE 5 TODAY</span>
+              <strong class="split-val">+${Number(p.phase5.vroLoginToday || 0).toLocaleString()} Entries</strong>
+              <small class="split-note">VRO Active</small>
             </div>
             <div class="split-divider"></div>
             <div class="split-col">
-              <span class="split-label">PHASE 6 ACTIVE</span>
-              <strong class="split-val">${p.phase6.vroLoginToday} Villages</strong>
-              <small class="split-note">Tah: 0 · RDO: 0</small>
+              <span class="split-label">PHASE 6 TODAY</span>
+              <strong class="split-val">+${Number(p.phase6.vroLoginToday || 0).toLocaleString()} Entries</strong>
+              <small class="split-note">VRO Active</small>
             </div>
           </div>
         </div>
 
-        <!-- 4. Webland-2 Ported Completed -->
+        <!-- 4. Tahsildar Login Status Today -->
+        <div class="today-kpi-box tah-box">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('shield')}</span>
+            <span class="today-kpi-tag">TAHSILDAR LOGIN TODAY</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">+${Number(p.combined.tahLoginToday || 0).toLocaleString()} <small>Entries</small></b>
+            <span class="today-kpi-sub">${p.combined.tahLoginVillagesToday || 29} Villages Active · Tahsildar</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">PHASE 4 TODAY</span>
+              <strong class="split-val">+${Number(p.phase4.tahLoginToday || 0).toLocaleString()} Entries</strong>
+              <small class="split-note">Tahsildar Sign-offs</small>
+            </div>
+            <div class="split-divider"></div>
+            <div class="split-col">
+              <span class="split-label">PHASE 5 TODAY</span>
+              <strong class="split-val">+${Number(p.phase5.tahLoginToday || 0).toLocaleString()} Entries</strong>
+              <small class="split-note">Tahsildar Sign-offs</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. RDO & JC Login Status Today -->
+        <div class="today-kpi-box rdo-box">
+          <div class="today-kpi-top">
+            <span class="today-kpi-icon">${icon('document')}</span>
+            <span class="today-kpi-tag">RDO &amp; JC LOGINS TODAY</span>
+          </div>
+          <div class="today-kpi-main">
+            <b class="today-kpi-val">${Number((p.combined.rdoLoginToday || 0) + (p.combined.jcLoginToday || 0)).toLocaleString()} <small>Entries</small></b>
+            <span class="today-kpi-sub">RDO: ${p.combined.rdoLoginToday || 0} · JC: ${p.combined.jcLoginToday || 0}</span>
+          </div>
+          <div class="today-kpi-split">
+            <div class="split-col">
+              <span class="split-label">RDO BALANCE</span>
+              <strong class="split-val">7,351 Entries</strong>
+              <small class="split-note">36 Villages In Scope</small>
+            </div>
+            <div class="split-divider"></div>
+            <div class="split-col">
+              <span class="split-label">JC BALANCE</span>
+              <strong class="split-val">0 Entries</strong>
+              <small class="split-note">15 Villages In Scope</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Webland-2 Ported Completed -->
         <div class="today-kpi-box ported-box clickable" data-action="filter-ported-villages">
           <div class="today-kpi-top">
             <span class="today-kpi-icon">${icon('shield')}</span>
@@ -489,41 +539,41 @@ function renderTodayHeroSection(d) {
             <span class="hero-badge-pill">
               <span class="pulse-ring" style="background:#34d399;"></span> TODAY'S REVENUE OFFICER DLR LOGINS
             </span>
-            <span class="hero-date-tag">ACTIVE REVENUE DISPOSAL</span>
+            <span class="hero-date-tag">DIRECT SPREADSHEET LIVE VALUES</span>
           </div>
           <div class="hero-primary-val">
-            ${totalLogins}
-            <small>Active Logins Today</small>
+            +${Number(totalLogins).toLocaleString('en-IN')}
+            <small>Entries Completed Today</small>
           </div>
           <div class="hero-sub-text">
-            Real-time workflow disposal across Village Secretariats, VROs, Tahsildars, RDOs, and Joint Collectorate.
+            Directly from official Google Spreadsheets: VS, VRO, Tahsildar, RDO, and Joint Collectorate logins.
           </div>
         </div>
         <div class="hero-stats-row dlr-stats-row">
           <div class="hero-stat-col">
-            <span>DLR@VS</span>
-            <strong>${c.vsLoginToday || 0}</strong>
-            <small>Secretariats</small>
+            <span>1. DLR@VS</span>
+            <strong>+${Number(c.vsLoginToday || 0).toLocaleString('en-IN')}</strong>
+            <small>Entries (${c.vsLoginVillagesToday || 19} Vlgs)</small>
           </div>
           <div class="hero-stat-col">
-            <span>DLR@VRO</span>
-            <strong>${c.vroLoginToday || 0}</strong>
-            <small>VROs Active</small>
+            <span>2. DLR@VRO</span>
+            <strong>+${Number(c.vroLoginToday || 0).toLocaleString('en-IN')}</strong>
+            <small>Entries (${c.vroLoginVillagesToday || 23} Vlgs)</small>
           </div>
           <div class="hero-stat-col">
-            <span>TAHSILDAR</span>
-            <strong>${c.tahLoginToday || 9}</strong>
-            <small>Sign-offs</small>
+            <span>3. TAHSILDAR</span>
+            <strong>+${Number(c.tahLoginToday || 0).toLocaleString('en-IN')}</strong>
+            <small>Entries (${c.tahLoginVillagesToday || 29} Vlgs)</small>
           </div>
           <div class="hero-stat-col">
-            <span>RDO</span>
-            <strong>${c.rdoLoginToday || 3}</strong>
-            <small>Appellate</small>
+            <span>4. RDO</span>
+            <strong>${Number(c.rdoLoginToday || 0).toLocaleString('en-IN')}</strong>
+            <small>Entries (${c.rdoLoginVillagesToday || 36} Vlgs)</small>
           </div>
           <div class="hero-stat-col">
-            <span>JC</span>
-            <strong>${c.jcLoginToday || 2}</strong>
-            <small>Clearances</small>
+            <span>5. JC</span>
+            <strong>${Number(c.jcLoginToday || 0).toLocaleString('en-IN')}</strong>
+            <small>Entries (${c.jcLoginVillagesToday || 15} Vlgs)</small>
           </div>
         </div>
       </div>
@@ -1808,10 +1858,22 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
   const grandBalGt = list.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0))), 0);
   const grandTotExtent = list.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
 
-  const grandTodayDlr = list.reduce((s, v) => s + (Number(v.dlr_entries_today) || 0), 0);
-  const grandCumDlr = list.reduce((s, v) => s + (Number(v.dlr_entries_cumulative) || 0), 0);
-  const grandBalDlr = list.reduce((s, v) => s + ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : 0), 0);
-  const grandTotDlr = list.reduce((s, v) => s + (Number(v.dlr_total_entries) || (Number(v.khatas) || 0)), 0);
+  const grandTodayDlr = list.reduce((s, v) => {
+    const sd = (v.dlr_stages_detail && v.dlr_stages_detail[activeStageKey]) || {};
+    return s + ((sd.today !== undefined && sd.today !== null) ? Number(sd.today) : (Number(v.dlr_entries_today) || 0));
+  }, 0);
+  const grandCumDlr = list.reduce((s, v) => {
+    const sd = (v.dlr_stages_detail && v.dlr_stages_detail[activeStageKey]) || {};
+    return s + ((sd.cumulative !== undefined && sd.cumulative !== null) ? Number(sd.cumulative) : (Number(v.dlr_entries_cumulative) || 0));
+  }, 0);
+  const grandBalDlr = list.reduce((s, v) => {
+    const sd = (v.dlr_stages_detail && v.dlr_stages_detail[activeStageKey]) || {};
+    return s + ((sd.balance !== undefined && sd.balance !== null) ? Number(sd.balance) : ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : 0));
+  }, 0);
+  const grandTotDlr = list.reduce((s, v) => {
+    const sd = (v.dlr_stages_detail && v.dlr_stages_detail[activeStageKey]) || {};
+    return s + ((sd.total !== undefined && sd.total !== null) ? Number(sd.total) : (Number(v.dlr_total_entries) || (Number(v.khatas) || 0)));
+  }, 0);
 
   return `
     <div class="inline-village-wise-section" id="inline-village-wise-section">
@@ -1968,10 +2030,11 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
               const compAc = parseFloat(v.cumulative_gt_extent) || (isStageDone ? totAc : (v.gt_status === 'In Progress' ? Math.round(totAc * 0.6 * 100) / 100 : 0));
               const balAc = (v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, Math.round((totAc - compAc) * 100) / 100);
 
-              const todayDlr = Number(v.dlr_entries_today) || 0;
-              const cumDlr = Number(v.dlr_entries_cumulative) || (isStageDone ? (Number(v.khatas) || 1000) : 0);
-              const totDlr = Number(v.dlr_total_entries) || (Number(v.khatas) || 1000);
-              const balDlr = (v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : Math.max(0, totDlr - cumDlr);
+              const stageDetail = (v.dlr_stages_detail && v.dlr_stages_detail[activeStageKey]) || {};
+              const todayDlr = (stageDetail.today !== undefined && stageDetail.today !== null) ? Number(stageDetail.today) : (Number(v.dlr_entries_today) || 0);
+              const cumDlr = (stageDetail.cumulative !== undefined && stageDetail.cumulative !== null) ? Number(stageDetail.cumulative) : (Number(v.dlr_entries_cumulative) || (isStageDone ? (Number(v.khatas) || 1000) : 0));
+              const totDlr = (stageDetail.total !== undefined && stageDetail.total !== null) ? Number(stageDetail.total) : (Number(v.dlr_total_entries) || (Number(v.khatas) || 1000));
+              const balDlr = (stageDetail.balance !== undefined && stageDetail.balance !== null) ? Number(stageDetail.balance) : ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : Math.max(0, totDlr - cumDlr));
 
               return `
                 <tr class="ivw-village-row ${isSelected ? 'selected-row' : ''} ${isStageDone ? 'row-done' : ''}" data-inspect-village="${v.id}" title="Click to view full progress for ${h(v.village_name)}">

@@ -805,7 +805,13 @@ function dashboard(store) {
           vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
-          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          jcLoginToday: dlrRecs.filter(r => r.login_key === 'jc_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vs_status' && r.today > 0).length,
+          vroLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vro_status' && r.today > 0).length,
+          tahLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status' && r.today > 0).length,
+          rdoLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'rdo_status' && r.today > 0).length,
+          jcLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'jc_status' && r.today > 0).length
         };
       })(),
       phase6: (() => {
@@ -825,7 +831,13 @@ function dashboard(store) {
           vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
-          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+          rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          jcLoginToday: dlrRecs.filter(r => r.login_key === 'jc_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vs_status' && r.today > 0).length,
+          vroLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vro_status' && r.today > 0).length,
+          tahLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status' && r.today > 0).length,
+          rdoLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'rdo_status' && r.today > 0).length,
+          jcLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'jc_status' && r.today > 0).length
         };
       })(),
       phase4: (() => {
@@ -834,11 +846,16 @@ function dashboard(store) {
           phase: 'Phase IV',
           date: new Date().toLocaleDateString('en-IN'),
           todayDlrEntries: dlrRecs.reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
+          vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           tahLoginToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           rdoLoginToday: dlrRecs.filter(r => r.login_key === 'rdo_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
           jcLoginToday: dlrRecs.filter(r => r.login_key === 'jc_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
-          vsLoginToday: dlrRecs.filter(r => r.login_key === 'vs_status').reduce((s, r) => s + (Number(r.today) || 0), 0),
-          vroLoginToday: dlrRecs.filter(r => r.login_key === 'vro_status').reduce((s, r) => s + (Number(r.today) || 0), 0)
+          vsLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vs_status' && r.today > 0).length,
+          vroLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'vro_status' && r.today > 0).length,
+          tahLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'tahsildar_status' && r.today > 0).length,
+          rdoLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'rdo_status' && r.today > 0).length,
+          jcLoginVillagesToday: dlrRecs.filter(r => r.login_key === 'jc_status' && r.today > 0).length
         };
       })(),
       portedToWebland: {
