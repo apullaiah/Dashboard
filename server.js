@@ -1329,25 +1329,8 @@ function generateToken(role = 'DISTRICT OFFICER') {
   return Buffer.from(`${payload}:${hmac}`).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 function verifyToken(token) {
-  if (!token) return null;
-  if (token === 'OFFICER-VIEW-APCTR2026' || token === 'DISTRICT-OFFICER-VIEW' || token === 'GUEST_OFFICER_TOKEN') {
-    return { role: 'DISTRICT OFFICER', valid: true };
-  }
-  try {
-    let b64 = token.replace(/-/g, '+').replace(/_/g, '/');
-    while (b64.length % 4) b64 += '=';
-    const raw = Buffer.from(b64, 'base64').toString('utf8');
-    const parts = raw.split(':');
-    if (parts.length !== 4) return null;
-    const [role, expiryStr, salt, hmac] = parts;
-    const payload = `${role}:${expiryStr}:${salt}`;
-    const expectedHmac = crypto.createHmac('sha256', AUTH_SECRET).update(payload).digest('hex');
-    if (!crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(expectedHmac))) return null;
-    if (Date.now() > Number(expiryStr)) return null;
-    return { role, valid: true };
-  } catch {
-    return null;
-  }
+  // Open access: No password/PIN required
+  return { role: 'DISTRICT OFFICER', valid: true };
 }
 
 function readBody(req) {
@@ -1375,7 +1358,7 @@ function readBody(req) {
     req.on('error', reject);
   });
 }
-function requireAuthorized(req, res) { const role = req.headers['x-user-role'] || 'ADMIN'; if (!['ADMIN', 'DISTRICT OFFICER', 'DIVISION OFFICER', 'MANDAL OFFICER'].includes(role)) { json(res, 403, { error: 'This role is not authorized to make changes.' }); return null; } return role; }
+function requireAuthorized(req, res) { return 'ADMIN'; }
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
   'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
@@ -1464,51 +1447,18 @@ async function handleApi(req, res, url) {
   let pathname = (url.pathname || '').replace(/\/+$/, '') || '/';
   const clientIp = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || '127.0.0.1';
 
-  // Public authentication endpoints
+  // Public authentication endpoints - open access, no password required
   if (req.method === 'POST' && pathname === '/api/auth/login') {
-    if (!checkRateLimit(clientIp)) {
-      return json(res, 429, { error: 'Too many failed login attempts. Portal access temporarily locked for 10 minutes.' });
-    }
-    const b = await readBody(req);
-    const submittedPin = clean(b.pin);
-    const configuredPin = clean(process.env.OFFICER_PIN || OFFICER_PIN);
-    if (submittedPin && submittedPin === configuredPin) {
-      clearLoginAttempts(clientIp);
-      const token = generateToken('DISTRICT OFFICER');
-      return json(res, 200, { success: true, token, role: 'DISTRICT OFFICER' });
-    } else {
-      recordFailedLogin(clientIp);
-      return json(res, 401, { error: 'Invalid Officer PIN. Unauthorized access attempts are monitored and recorded.' });
-    }
+    const token = generateToken('DISTRICT OFFICER');
+    return json(res, 200, { success: true, token, role: 'DISTRICT OFFICER' });
   }
 
   if (req.method === 'GET' && pathname === '/api/auth/check') {
-    const authHeader = req.headers['authorization'] || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : req.headers['x-officer-token'];
-    const officer = verifyToken(token);
-    return json(res, 200, { authenticated: Boolean(officer), role: officer?.role || null });
+    return json(res, 200, { authenticated: true, role: 'DISTRICT OFFICER' });
   }
 
-  // Officer Authentication Gate for restricted data / write actions
-  const authHeader = req.headers['authorization'] || '';
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : req.headers['x-officer-token'];
-  const officer = verifyToken(token);
-
-  // Allow read-only monitoring dashboard endpoints for public/officer review
-  const isReadOnlyMonitoringEndpoint = req.method === 'GET' && (
-    pathname === '/api/dashboard' ||
-    pathname === '/api/villages' ||
-    pathname.startsWith('/api/villages/') ||
-    pathname === '/api/health' ||
-    pathname === '/api/ppb' ||
-    pathname === '/api/sources' ||
-    pathname === '/api/mandal-aliases' ||
-    pathname === '/api/sync-history'
-  );
-
-  if (!officer && !isReadOnlyMonitoringEndpoint) {
-    return json(res, 401, { error: 'Restricted Government Portal. Authorized Officer Authentication Required.' });
-  }
+  // Open access: No officer password / PIN required
+  const officer = { role: 'DISTRICT OFFICER', valid: true };
 
   const store = load();
   if (req.method === 'GET' && pathname === '/api/dashboard') return json(res, 200, dashboard(store));

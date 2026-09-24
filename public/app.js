@@ -367,11 +367,7 @@ const api = async (endpoint, options = {}) => {
   }
   const body = await response.json().catch(() => ({}));
   if (response.status === 401) {
-    if (options.method && options.method !== 'GET') {
-      sessionStorage.removeItem('ctr_officer_token');
-      renderAuthGate('Authorized officer credentials required to perform this action.');
-    }
-    throw new Error('Authorized officer credentials required.');
+    throw new Error(body.error || 'Unauthorized request.');
   }
   if (!response.ok) throw new Error(body.error || `Server returned error (${response.status}).`);
   return body;
@@ -412,89 +408,12 @@ function updateNav() {
 }
 async function reloadDashboard() { state.dashboard = await api('/api/dashboard'); setTopbar(state.dashboard); }
 function renderAuthGate(errorMsg = '') {
-  document.body.classList.add('auth-locked');
-  $('#page-title').textContent = 'Officer Authentication';
-  $('#breadcrumb').textContent = 'RESTRICTED GOVERNMENT PORTAL';
-  root.innerHTML = `
-    <div class="auth-gate-wrapper">
-      <div class="auth-gate-card">
-        <div class="auth-emblem">
-          <svg class="auth-logo-svg"><use href="#icon-resurvey-logo" /></svg>
-        </div>
-        <span class="auth-badge">OFFICIAL GOVERNMENT SYSTEM</span>
-        <h2>Chittoor District Resurvey Portal</h2>
-        <p class="auth-sub">Restricted decision-support and continuous monitoring platform for the Andhra Pradesh Resurvey Programme (774 Villages).</p>
-        <div class="auth-notice">
-          ${icon('shield')}
-          <div>
-            <strong>Confidential Revenue Data Protection</strong>
-            <p>Access is restricted exclusively to authorized officials (District Collectorate, SSLR, RSDTs, MLSOs, Tahsildars, VROs). All access events are timestamped and recorded.</p>
-          </div>
-        </div>
-        ${errorMsg ? `<div class="auth-error">${icon('warning')}<span>${h(errorMsg)}</span></div>` : ''}
-        <form id="officer-login-form" class="auth-form">
-          <label for="officer-pin-input">OFFICER ACCESS PIN</label>
-          <div class="pin-input-wrap">
-            <input type="password" id="officer-pin-input" name="pin" required autocomplete="current-password" placeholder="Enter Access PIN" autofocus />
-            <button type="button" id="toggle-pin-vis" title="Toggle PIN visibility">${icon('eye')}</button>
-          </div>
-          <button type="submit" class="auth-submit-btn">
-            ${icon('shield')} Verify Officer Identity
-          </button>
-          <button type="button" id="guest-view-btn" class="auth-guest-btn" style="margin-top:10px;background:none;border:1px solid #334155;color:#94a3b8;padding:10px 16px;border-radius:8px;font-size:13px;cursor:pointer;width:100%;transition:all 0.2s;">
-            👁 View Overview Dashboard (Monitoring Access)
-          </button>
-        </form>
-        <div class="auth-footer-note">
-          <span>GOVERNMENT OF ANDHRA PRADESH · REVENUE (SSLR) DEPARTMENT</span>
-        </div>
-      </div>
-    </div>
-  `;
-  const form = $('#officer-login-form');
-  if (form) {
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const pin = $('#officer-pin-input').value.trim();
-      const btn = form.querySelector('button[type="submit"]');
-      btn.disabled = true;
-      btn.textContent = 'Verifying credentials...';
-      try {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pin })
-        });
-        const data = await res.json();
-        if (res.ok && data.token) {
-          sessionStorage.setItem('ctr_officer_token', data.token);
-          document.body.classList.remove('auth-locked');
-          toast('Officer identity verified. Access granted.');
-          await reloadDashboard();
-          navigate('dashboard');
-        } else {
-          renderAuthGate(data.error || 'Authentication failed.');
-        }
-      } catch (err) {
-        renderAuthGate(err.message || 'Unable to connect to verification service.');
-      }
-    });
-    const toggleBtn = $('#toggle-pin-vis');
-    if (toggleBtn) {
-      toggleBtn.addEventListener('click', () => {
-        const inp = $('#officer-pin-input');
-        inp.type = inp.type === 'password' ? 'text' : 'password';
-      });
-    }
-    const guestBtn = $('#guest-view-btn');
-    if (guestBtn) {
-      guestBtn.addEventListener('click', async () => {
-        sessionStorage.setItem('ctr_officer_token', 'OFFICER-VIEW-APCTR2026');
-        document.body.classList.remove('auth-locked');
-        await reloadDashboard();
-        navigate('dashboard');
-      });
-    }
+  document.body?.classList?.remove('auth-locked');
+  sessionStorage.setItem('ctr_officer_token', 'OFFICER-VIEW-APCTR2026');
+  if (state.view !== 'dashboard') {
+    navigate('dashboard');
+  } else {
+    reloadDashboard().then(render);
   }
 }
 async function navigate(view, options = {}) {
@@ -503,7 +422,7 @@ async function navigate(view, options = {}) {
     token = 'OFFICER-VIEW-APCTR2026';
     sessionStorage.setItem('ctr_officer_token', token);
   }
-  document.body.classList.remove('auth-locked');
+  document.body?.classList?.remove('auth-locked');
   state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || view === 'ppb' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
 }
 function kpiCard(label, value, description, variant, filter = null, hasData, filterKey = 'status') {
@@ -7884,13 +7803,10 @@ document.addEventListener('input', event => {
 });
 
 function performLogout() {
-  sessionStorage.removeItem('ctr_officer_token');
-  localStorage.removeItem('ctr_officer_token');
-  state.dashboard = null;
-  state.villages = [];
-  state.villageFilters = {};
-  renderAuthGate();
-  toast('Officer session locked. Logged out securely.');
+  sessionStorage.setItem('ctr_officer_token', 'OFFICER-VIEW-APCTR2026');
+  document.body?.classList?.remove('auth-locked');
+  toast('Refreshed monitoring data.');
+  navigate('dashboard', { fresh: true });
 }
 
 $('#refresh-button').addEventListener('click', syncAll);
@@ -7903,9 +7819,8 @@ document.addEventListener('keydown', event => { if (event.key === 'Escape') clos
 const urlParams = new URLSearchParams(window.location.search);
 const urlToken = urlParams.get('token');
 if (urlToken) sessionStorage.setItem('ctr_officer_token', urlToken);
-if (!sessionStorage.getItem('ctr_officer_token')) {
-  sessionStorage.setItem('ctr_officer_token', 'OFFICER-VIEW-APCTR2026');
-}
+sessionStorage.setItem('ctr_officer_token', 'OFFICER-VIEW-APCTR2026');
+document.body?.classList?.remove('auth-locked');
 navigate('dashboard', { fresh: true });
 
 
