@@ -23,15 +23,15 @@ const req = http.request({
 
     const chromePath = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 
-    // 1. Capture Villages tab
-    const urlVillages = `http://localhost:4173/?token=${token}#/villages`;
+    // 1. Capture Overview GT table with full width
+    const urlVillages = `http://localhost:4173/?token=${token}`;
     const outVillages = path.resolve(__dirname, '../screenshot_villages_contacts.png');
     const args1 = [
       '--headless=new',
       '--disable-gpu',
       '--no-sandbox',
       '--hide-scrollbars',
-      '--window-size=1440,3200',
+      '--window-size=2400,3200',
       `--screenshot=${outVillages}`,
       '--virtual-time-budget=6000',
       urlVillages

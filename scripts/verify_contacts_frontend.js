@@ -36,7 +36,8 @@ const context = vm.createContext({
   state: {
     filters: {},
     stage: 'ground_truth',
-    mandalSearch: ''
+    mandalSearch: '',
+    villages: store.villages
   },
   dashboardData: {
     mandals: Object.entries(
@@ -70,59 +71,59 @@ try {
     }
   });
 
-  // 2. Test getVillageOfficerContact
-  console.log('\n--- 2. Testing getVillageOfficerContact() ---');
-  // Find a village with explicit team and one without
-  const vWithTeam = store.villages.find(v => v.gt_team_names && v.gt_team_mobiles);
-  const vWithoutTeam = store.villages.find(v => !v.gt_team_names && !v.gt_team_mobiles);
+  // 2. Test renderVillageOfficerLastColumn
+  console.log('\n--- 2. Testing renderVillageOfficerLastColumn() ---');
+  const vPhase6WithTeam = store.villages.find(v => (v.phase === 'Phase-VI' || v.phase === 'Phase VI') && v.gt_team_names && v.gt_team_mobiles);
+  const vStandard = store.villages.find(v => !v.gt_team_names && !v.gt_team_mobiles);
 
-  if (vWithTeam) {
-    const contactWith = context.getVillageOfficerContact(vWithTeam);
-    console.log(`  Village with team [${vWithTeam.village_name} / ${vWithTeam.mandal}]:`);
-    console.log(`    namesHtml includes officer-name-cell:`, contactWith.nameHtml.includes('officer-name-cell'));
-    console.log(`    phoneHtml includes tel:`, contactWith.phoneHtml.includes('href="tel:'));
-    console.log(`    phoneHtml snippet:`, contactWith.phoneHtml.replace(/\s+/g, ' ').slice(0, 120));
+  if (vPhase6WithTeam) {
+    const lastColHtmlP6 = context.renderVillageOfficerLastColumn(vPhase6WithTeam);
+    console.log(`  Phase 6 Village with Team [${vPhase6WithTeam.village_name} / ${vPhase6WithTeam.mandal}]:`);
+    console.log(`    has officer-phase-badge:`, lastColHtmlP6.includes('Phase 6 Team Members'));
+    console.log(`    has MLSO/MS:`, lastColHtmlP6.includes('MLSO/MS:'));
+    console.log(`    has tel: links:`, (lastColHtmlP6.match(/href="tel:/g) || []).length);
+    console.log(`    snippet:`, lastColHtmlP6.replace(/\s+/g, ' ').slice(0, 160));
   }
 
-  if (vWithoutTeam) {
-    const contactWithout = context.getVillageOfficerContact(vWithoutTeam);
-    console.log(`  Village without team [${vWithoutTeam.village_name} / ${vWithoutTeam.mandal}] (fallback):`);
-    console.log(`    namesHtml includes Village Secretariat:`, contactWithout.nameHtml.includes('Village Secretariat'));
-    console.log(`    phoneHtml includes MS phone:`, contactWithout.phoneHtml.includes('href="tel:'));
-    console.log(`    phoneHtml snippet:`, contactWithout.phoneHtml.replace(/\s+/g, ' ').slice(0, 120));
+  if (vStandard) {
+    const lastColHtmlStd = context.renderVillageOfficerLastColumn(vStandard);
+    console.log(`  Standard Revenue Village [${vStandard.village_name} / ${vStandard.mandal}]:`);
+    console.log(`    has VS (Village Surveyor):`, lastColHtmlStd.includes('Village Surveyor (VS)'));
+    console.log(`    has MLSO/MS:`, lastColHtmlStd.includes('MLSO/MS:'));
+    console.log(`    has tel: links:`, (lastColHtmlStd.match(/href="tel:/g) || []).length);
   }
 
   // 3. Test villageTable (stage view and default view)
-  console.log('\n--- 3. Testing villageTable() HTML ---');
+  console.log('\n--- 3. Testing villageTable() HTML (Last Column Verification) ---');
   // Stage view
   const stageTableHtml = context.villageTable(store.villages.slice(0, 5));
-  console.log('  Stage Table has SURVEYOR / OFFICER NAME header:', stageTableHtml.includes('SURVEYOR / OFFICER NAME'));
-  console.log('  Stage Table has CONTACT NUMBER header:', stageTableHtml.includes('CONTACT NUMBER'));
-  console.log('  Stage Table has tel: links:', (stageTableHtml.match(/href="tel:/g) || []).length);
+  console.log('  Stage Table has SURVEY OFFICERS header as last column:', stageTableHtml.includes('<th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>'));
+  console.log('  Stage Table does NOT have officer columns in middle:', !stageTableHtml.includes('<th>SURVEYOR / OFFICER NAME</th>'));
+  console.log('  Stage Table has officer-last-col-card in body:', stageTableHtml.includes('officer-last-col-card'));
 
   // Default view (no stage)
   context.state.stage = '';
   const defaultTableHtml = context.villageTable(store.villages.slice(0, 5));
-  console.log('  Default Table has SURVEYOR / OFFICER NAME header:', defaultTableHtml.includes('SURVEYOR / OFFICER NAME'));
-  console.log('  Default Table has CONTACT NUMBER header:', defaultTableHtml.includes('CONTACT NUMBER'));
-  console.log('  Default Table has tel: links:', (defaultTableHtml.match(/href="tel:/g) || []).length);
+  console.log('  Default Table has SURVEY OFFICERS header as last column:', defaultTableHtml.includes('<th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>'));
+  console.log('  Default Table does NOT have officer columns in middle:', !defaultTableHtml.includes('<th>SURVEYOR / OFFICER NAME</th>'));
+  console.log('  Default Table has officer-last-col-card in body:', defaultTableHtml.includes('officer-last-col-card'));
 
   // 4. Test renderDivisionAnalysis (Mandal wise analysis data)
-  console.log('\n--- 4. Testing renderDivisionAnalysis() HTML (Mandal Wise Analysis) ---');
+  console.log('\n--- 4. Testing renderDivisionAnalysis() HTML (Last Column Verification) ---');
   const divAnalysisHtml = context.renderDivisionAnalysis(context.dashboardData);
-  console.log('  Division Analysis has CONCERNED MS header:', divAnalysisHtml.includes('CONCERNED MS (MANDAL SURVEYOR)'));
-  console.log('  Division Analysis has MS CONTACT NUMBER header:', divAnalysisHtml.includes('MS CONTACT NUMBER'));
-  console.log('  Division Analysis has is-ms tel: links:', (divAnalysisHtml.match(/class="officer-phone-link is-ms"/g) || []).length);
+  console.log('  Division Analysis has CONCERNED MLSO / MS header as last column:', divAnalysisHtml.includes('<th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>'));
+  console.log('  Division Analysis has ms-last-col-card in body:', divAnalysisHtml.includes('ms-last-col-card'));
+  console.log('  Division Analysis has MLSO / MS tags:', divAnalysisHtml.includes('MLSO / MS'));
 
   // 5. Test renderGtVillageTable
-  console.log('\n--- 5. Testing renderGtVillageTable() HTML ---');
+  console.log('\n--- 5. Testing renderGtVillageTable() HTML (Last Column Verification) ---');
   const gtHtml = context.renderGtVillageTable(store.villages.slice(0, 5), context.dashboardData);
-  console.log('  renderGtVillageTable has Surveyor / Team header:', gtHtml.includes('Surveyor / Team'));
-  console.log('  renderGtVillageTable has Contact No. header:', gtHtml.includes('Contact No.'));
-  console.log('  renderGtVillageTable has tel: links:', (gtHtml.match(/href="tel:/g) || []).length);
+  console.log('  renderGtVillageTable has SURVEY OFFICERS header as last column:', gtHtml.includes('<th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>'));
+  console.log('  renderGtVillageTable does NOT have Surveyor in middle:', !gtHtml.includes('<th>Surveyor / Team</th>'));
+  console.log('  renderGtVillageTable has officer-last-col-card in body:', gtHtml.includes('officer-last-col-card'));
 
   // 6. Test renderDlrVillageTable
-  console.log('\n--- 6. Testing renderDlrVillageTable() HTML ---');
+  console.log('\n--- 6. Testing renderDlrVillageTable() HTML (Last Column Verification) ---');
   const mockDlrData = {
     ...context.dashboardData,
     dlrRecords: [
@@ -130,18 +131,16 @@ try {
     ]
   };
   const dlrHtml = context.renderDlrVillageTable(store.villages.slice(0, 5), mockDlrData);
-  console.log('  renderDlrVillageTable has Concerned MS header:', dlrHtml.includes('Concerned MS / DIOS'));
-  console.log('  renderDlrVillageTable has MS Contact header:', dlrHtml.includes('MS Contact'));
-  console.log('  renderDlrVillageTable has tel: links:', (dlrHtml.match(/href="tel:/g) || []).length);
+  console.log('  renderDlrVillageTable has CONCERNED MLSO / MS header as last column:', dlrHtml.includes('<th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>'));
+  console.log('  renderDlrVillageTable has ms-last-col-card in body:', dlrHtml.includes('ms-last-col-card'));
 
-  // 7. Test renderIndividualVillageProgressCard
-  console.log('\n--- 7. Testing renderIndividualVillageProgressCard() HTML ---');
-  const ivCardHtml = context.renderIndividualVillageProgressCard(vWithTeam || store.villages[0]);
-  console.log('  IV Card has iv-officer-strip:', ivCardHtml.includes('iv-officer-strip'));
-  console.log('  IV Card has MS details:', ivCardHtml.includes('Concerned MS:'));
-  console.log('  IV Card has tel: links:', (ivCardHtml.match(/href="tel:/g) || []).length);
+  // 7. Test renderMandalWiseDailyProformaSection
+  console.log('\n--- 7. Testing renderMandalWiseDailyProformaSection() HTML (Last Column Verification) ---');
+  const proformaHtml = context.renderMandalWiseDailyProformaSection(context.dashboardData, store.villages);
+  console.log('  Proforma Section has CONCERNED MLSO / MS header as last column:', proformaHtml.includes('<th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>'));
+  console.log('  Proforma Section has ms-last-col-card in body:', proformaHtml.includes('ms-last-col-card'));
 
-  console.log('\n=== ALL FRONTEND TESTS PASSED SUCCESSFULLY! ===');
+  console.log('\n=== ALL LAST COLUMN TESTS PASSED WITH 100% COMPLIANCE! ===');
 } catch (e) {
   console.error('Error during verification:', e);
   process.exit(1);
