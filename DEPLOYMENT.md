@@ -1,18 +1,14 @@
-## Security & Officer Access Control
+## Security & Access Control
 
-> [!IMPORTANT]
-> **Zero Public / Anonymous Exposure**: The dashboard is protected by an **Officer Authentication Gate**. No revenue survey data, village records, khatas, or extents can be viewed or scraped over the web without verified officer authentication.
+The dashboard is configured for **Direct Open Access** (no officer PIN or password prompt is required to view the monitoring data).
 
-* **Default Officer Access PIN**: `APCTR2026`
-* **Customizing the PIN**: You can change this anytime by setting the environment variable:
-  ```env
-  OFFICER_PIN=YourSecretPinHere
-  ```
-  *(In Vercel, navigate to **Settings → Environment Variables** and add `OFFICER_PIN`)*
-* **Brute-Force Defense**: After 5 failed PIN attempts, access from that IP address is automatically locked for 10 minutes.
-* **Session Security**: Sessions use cryptographically signed HMAC bearer tokens stored in browser `sessionStorage`. Closing the browser window or clicking the **Lock** button in the sidebar footer immediately terminates the session.
-* **Anti-Fraud Security Headers**: Responses include `X-Frame-Options: DENY` (prevents clickjacking/embedding in fraudulent third-party sites) and `X-Content-Type-Options: nosniff`.
-* **Repository Privacy**: Raw `.xlsx` spreadsheets and intermediate extracts are permanently excluded in `.gitignore` and `.dockerignore`. Always keep your GitHub repository set to **Private**.
+### Disabling Vercel Password / Deployment Protection
+If visitors to your Vercel link (`*.vercel.app`) see a password screen from Vercel:
+1. Log in to [vercel.com](https://vercel.com) and open your project.
+2. Go to **Settings** → **Deployment Protection**.
+3. Under **Password Protection**, turn the toggle to **Disabled** (or clear the password).
+4. Under **Vercel Authentication**, ensure it is set to **Disabled**.
+5. Click **Save**. Your Vercel link will now open immediately for anyone without requiring a password.
 
 ---
 
