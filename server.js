@@ -50,8 +50,49 @@ const MANDAL_ALIASES = {
   'baireddi palle': 'Baireddipalle', 'baireddi palli': 'Baireddipalle',
   'baireddy palle': 'Baireddipalle', 'baireddy palli': 'Baireddipalle',
   baireddypalle: 'Baireddipalle', baireddypalli: 'Baireddipalle',
-  's.r.puram': 'S.R.Puram', 's r puram': 'S.R.Puram', srpuram: 'S.R.Puram'
+  's.r.puram': 'S.R.Puram', 's r puram': 'S.R.Puram', srpuram: 'S.R.Puram', srirangarajapuram: 'S.R.Puram'
 };
+
+const MANDAL_SURVEYOR_DIRECTORY = {
+  'Baireddipalle': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006942' },
+  'Bangarupalem': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006930' },
+  'Chittoor': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006921' },
+  'G.D.Nellore': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006925' },
+  'Gangavaram': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006940' },
+  'Gudipala': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006922' },
+  'Gudipalle': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006945' },
+  'Irala': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006924' },
+  'Karvetinagar': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006937' },
+  'Kuppam': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006944' },
+  'Nagari': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006934' },
+  'Nindra': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006935' },
+  'Palamaner': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006939' },
+  'Palasamudram': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006938' },
+  'Peddapanjani': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006941' },
+  'Penumuru': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006931' },
+  'Pulicherla': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006932' },
+  'Puthalapattu': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006933' },
+  'Ramakuppam': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006947' },
+  'Rompicherla': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006929' },
+  'S.R.Puram': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006927' },
+  'Santhipuram': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006946' },
+  'Thavanampalli': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006926' },
+  'Vedurukuppam': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006928' },
+  'Venkatagirikota': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006943' },
+  'Vijayapuram': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006936' },
+  'Yadamari': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006923' }
+};
+
+function getMandalSurveyor(mandalName) {
+  const norm = String(mandalName || '').trim();
+  const k = normalKey(norm);
+  const mapped = MANDAL_ALIASES[k] || norm;
+  if (MANDAL_SURVEYOR_DIRECTORY[mapped]) return MANDAL_SURVEYOR_DIRECTORY[mapped];
+  const found = Object.keys(MANDAL_SURVEYOR_DIRECTORY).find(m => m.toLowerCase() === mapped.toLowerCase());
+  if (found) return MANDAL_SURVEYOR_DIRECTORY[found];
+  return { name: 'Concerned Mandal Surveyor', role: 'Mandal Surveyor', phone: '1800 425 5035' };
+}
+
 
 const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Yet to be Scheduled', 'Before 2024'];
 
@@ -471,7 +512,14 @@ function dashboard(store) {
   });
   const bottleneck = stageProgress.some(stage => stage.available) ? [...stageProgress.filter(stage => stage.available)].sort((a, b) => b.pending - a.pending)[0] : null;
   const divisions = Object.entries(grouped(villages, 'division')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (b.overall ?? 0) - (a.overall ?? 0));
-  const mandals = Object.entries(grouped(villages, 'mandal')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => (a.overall ?? 0) - (b.overall ?? 0));
+  const mandals = Object.entries(grouped(villages, 'mandal')).map(([name, rows]) => {
+    const r = rollup(rows, name);
+    const ms = getMandalSurveyor(name);
+    r.ms_name = ms.name;
+    r.ms_role = ms.role;
+    r.ms_phone = ms.phone;
+    return r;
+  }).sort((a, b) => (a.overall ?? 0) - (b.overall ?? 0));
   const phases = Object.entries(grouped(villages, 'phase')).map(([name, rows]) => rollup(rows, name)).sort((a, b) => {
     const ia = PHASE_ORDER.indexOf(a.name);
     const ib = PHASE_ORDER.indexOf(b.name);

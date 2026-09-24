@@ -15,10 +15,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:21.374Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.219Z",
       "lastError": "fetch is not defined",
       "lastRecords": 736,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.219Z"
     },
     {
       "id": "59fe49e4-bd1e-413a-9605-7ffc36ec2297",
@@ -35,10 +35,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:22.317Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 13,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     },
     {
       "id": "51b8baba-ee5b-4a46-b999-b539af724ef8",
@@ -55,10 +55,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:23.726Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 66,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     },
     {
       "id": "47183bb0-8e72-4928-a9ff-c0c705f02446",
@@ -75,10 +75,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:24.722Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 5,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     },
     {
       "id": "1950b5bb-192b-4ea0-a26b-403e442f4830",
@@ -95,10 +95,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:25.748Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 32,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     },
     {
       "id": "f108bdc5-5db9-48e7-a75f-37a5fb787d96",
@@ -115,10 +115,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T04:33:26.463Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 31,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     },
     {
       "id": "f7635acc-0ff6-490d-991e-1a4c7d0b2b5a",
@@ -135,10 +135,10 @@
       "status": "Connection Error",
       "lastSync": "2026-09-20T02:42:26.341Z",
       "createdAt": "2026-09-16T18:12:36.256Z",
-      "nextSync": "2026-09-24T00:03:02.435Z",
+      "nextSync": "2026-09-24T00:47:15.220Z",
       "lastError": "fetch is not defined",
       "lastRecords": 30,
-      "lastFailedSync": "2026-09-23T23:48:02.435Z"
+      "lastFailedSync": "2026-09-24T00:32:15.220Z"
     }
   ],
   "villages": [
@@ -153191,6 +153191,258 @@
   ],
   "syncLogs": [
     {
+      "id": "5b36d4ec-b71d-4d99-86f6-171e7c9a536e",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Chittoor District Rover Allotment & Status",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "e7f29b68-7ede-4961-97d3-fde47e2cc45f",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Phase-VI Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "e19b7bbc-f9fe-4dce-a938-6cb16eccd1aa",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Phase-V Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "2e41c420-18ae-4baf-a7fc-10ee064fa89a",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Phase-IV GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "ee0d0d6c-98bd-4f21-ad6c-936438585b62",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Phase-V GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "4f83687c-20aa-4f71-8044-68ba4de12064",
+      "dateTime": "2026-09-24T00:32:15.220Z",
+      "source": "Phase-VI GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "f4e90ae6-8ed8-49b5-9588-52b2cdad6ca2",
+      "dateTime": "2026-09-24T00:32:15.219Z",
+      "source": "Chittoor District PPBs Action Plan & Village Universe",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "661ac9c0-c039-4d38-b782-7fcdbb64d0ea",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Chittoor District Rover Allotment & Status",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "3eeded58-771d-4ab0-b795-08bbb7a53f53",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Phase-VI Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "b83fbe4a-180e-42ae-8819-2f01026b1098",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Phase-V Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "c14c0e71-9b90-407e-8ffc-06f7c4977835",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Phase-IV GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "74203948-5543-4b45-bc47-0c82c6c14d6a",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Phase-V GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "beadf88b-6d19-49a8-b024-16ddaccfd4f7",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Phase-VI GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "05527d26-c9fe-4a7a-b5d7-56a6e4329a65",
+      "dateTime": "2026-09-24T00:17:14.685Z",
+      "source": "Chittoor District PPBs Action Plan & Village Universe",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "c59976f4-bd58-4294-bb6c-148be3bd2564",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Chittoor District Rover Allotment & Status",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "9f9ab0a7-1def-45df-8f2d-620b204b5d5c",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Phase-VI Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "2083c8c6-de9f-4785-b04e-0165c574f3b5",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Phase-V Daily Monitoring Proforma (Rovers & Out-turn)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "ea7cc1cb-dd05-4fb7-9de0-82a8b82c5d96",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Phase-IV GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "a1b07a20-b934-4975-91b6-111cf42dff0b",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Phase-V GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "64ede176-c6b3-460a-9b79-b59d30f21b74",
+      "dateTime": "2026-09-24T00:02:14.133Z",
+      "source": "Phase-VI GT Completed Villages (Vectorization & VS Login)",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
+      "id": "5fe241d4-42bb-4929-bf96-c8e33e4309ff",
+      "dateTime": "2026-09-24T00:02:14.132Z",
+      "source": "Chittoor District PPBs Action Plan & Village Universe",
+      "recordsRead": 0,
+      "recordsAdded": 0,
+      "recordsUpdated": 0,
+      "recordsChanged": 0,
+      "errors": 1,
+      "status": "Failed",
+      "error": "fetch is not defined"
+    },
+    {
       "id": "706d1cd5-63e3-4cac-b158-ccb61aac38b8",
       "dateTime": "2026-09-23T23:48:02.435Z",
       "source": "Chittoor District Rover Allotment & Status",
@@ -164133,7 +164385,7 @@
         "villageCount": 15
       }
     },
-    "lastSynced": "2026-09-23T23:59:32.505Z"
+    "lastSynced": "2026-09-24T00:42:41.306Z"
   },
   "gtSummary": {
     "todayTotal": 1228.4,
@@ -164146,7 +164398,7 @@
     "completionPct": "16.7",
     "pacePct": "81.9",
     "activeVillagesToday": 55,
-    "lastSynced": "2026-09-23T23:59:34.742Z"
+    "lastSynced": "2026-09-24T00:42:43.016Z"
   },
   "dlr_records": [
     {
@@ -168101,10 +168353,10 @@
     }
   ],
   "lastSync": {
-    "id": "sync_1790207974742",
+    "id": "sync_1790210563016",
     "source": "Google Spreadsheets Live Sync",
     "status": "Success",
-    "dateTime": "2026-09-23T23:59:34.742Z",
+    "dateTime": "2026-09-24T00:42:43.016Z",
     "recordsProcessed": 736,
     "dlrRecordsCount": 158,
     "gtTodayAc": 1228.4,
