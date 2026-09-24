@@ -32,6 +32,9 @@ const state = {
   overviewMandalFilter: 'All',
   overviewStatusFilter: 'All',
   overviewSelectedVillageId: null,
+  gtFigureFilter: 'total',
+  dlrFigureFilter: 'total',
+  ppbFigureFilter: 'all',
   activeGtTodayOnly: false,
   gtPerformanceFilter: 'all',
   dlrPerformanceFilter: 'all',
@@ -391,7 +394,7 @@ function updateNav() {
     dashboard: ['MONITORING CENTRE', 'DISTRICT SURVEY AND LAND RECORDS OFFICE, CHITTOOR DISTRICT'],
     villages: ['MONITORING', 'Village Monitoring & Statutory Stages'],
     ppb: ['PPB DISTRIBUTION', 'Month-Wise PPBs Distribution Cycles & Delivery Monitoring'],
-    performance: ['ANALYTICS', 'Multi-Page Analytics Hub'],
+    performance: ['PHASE-WISE ANALYSIS', 'Phase wise Analysis'],
     quality: ['DATA ASSURANCE', 'Data quality'],
     reports: ['REPORTING', 'Reports'],
     sources: ['ADMINISTRATION', 'Data sources'],
@@ -2379,24 +2382,21 @@ function renderGtVillageTable(filtered, d) {
     }
   }
 
-  if (state.activeGtTodayOnly) {
-    list = list.filter(v => (parseFloat(v.today_gt_extent) || 0) > 0);
-    list.sort((a, b) => (parseFloat(b.today_gt_extent) || 0) - (parseFloat(a.today_gt_extent) || 0));
-  }
-
-  // Calculate performance category subsets
+  // Calculate performance category subsets before figure filtering
   const poorGtList = list.filter(v => isGtPoorVillage(v));
   const activeTodayList = list.filter(v => (parseFloat(v.today_gt_extent) || 0) > 0);
   const completedGtList = list.filter(v => v.ported_to_webland || isComplete(v.gt_status));
 
-  // Apply GT performance filter
-  const currentPerfFilter = state.gtPerformanceFilter || 'all';
-  if (currentPerfFilter === 'poor') {
-    list = poorGtList;
-  } else if (currentPerfFilter === 'active_today') {
-    list = activeTodayList;
-  } else if (currentPerfFilter === 'completed') {
+  // Handle gtFigureFilter
+  const figFilter = state.gtFigureFilter || (state.activeGtTodayOnly ? 'today' : (state.gtPerformanceFilter === 'active_today' ? 'today' : state.gtPerformanceFilter === 'poor' ? 'balance' : state.gtPerformanceFilter === 'completed' ? 'cumulative' : 'total'));
+  const currentPerfFilter = state.gtPerformanceFilter || (figFilter === 'balance' ? 'poor' : figFilter === 'today' ? 'active_today' : figFilter === 'cumulative' ? 'completed' : 'all');
+
+  if (figFilter === 'today') {
+    list = activeTodayList.slice().sort((a, b) => (parseFloat(b.today_gt_extent) || 0) - (parseFloat(a.today_gt_extent) || 0));
+  } else if (figFilter === 'cumulative') {
     list = completedGtList;
+  } else if (figFilter === 'balance') {
+    list = poorGtList;
   }
 
   const mandals = [...new Set((filtered || []).map(v => normalizeMandal(v.mandal)).filter(Boolean))].sort();
@@ -2426,6 +2426,20 @@ function renderGtVillageTable(filtered, d) {
           <p class="ivw-sub-title">Village-level Ground Truthing coverage in <strong>Acres</strong>. Patta &amp; Govt land extents, start dates, today's survey progress (00:00 to 23:59 Hrs · Railway timings), and grand total.</p>
         </div>
       </div>
+
+      ${figFilter !== 'total' ? `
+        <div class="active-figure-filter-strip">
+          <div class="aff-left">
+            <span class="aff-tag">FIGURE FILTER APPLIED</span>
+            <span class="aff-msg">
+              ${figFilter === 'today' ? `🌾 Viewing <strong>${list.length} Active Villages</strong> with Ground Truthing completed today (+${formatExtent(grandTodayGt)} Acres · 00:00 to 23:59 Hrs Railway timings)` : ''}
+              ${figFilter === 'cumulative' ? `🌾 Viewing <strong>${list.length} Completed Villages</strong> with Cumulative Ground Truthing extent cleared (${formatExtent(grandCompGt)} Acres)` : ''}
+              ${figFilter === 'balance' ? `🌾 Viewing <strong>${list.length} Villages with Balance Extent</strong> remaining to be completed (${formatExtent(grandBalGt)} Acres)` : ''}
+            </span>
+          </div>
+          <button type="button" class="aff-reset-btn" data-action="reset-gt-figure-filter">✕ Show All 736 Villages</button>
+        </div>
+      ` : ''}
 
       <!-- Individual Village Card if clicked -->
       ${selectedVillage ? renderIndividualVillageProgressCard(selectedVillage) : ''}
@@ -2469,16 +2483,16 @@ function renderGtVillageTable(filtered, d) {
       <!-- Performance Category Filter Buttons (GT Section) -->
       <div class="perf-filter-group" data-perf-target="gt">
         <span class="perf-group-label">⚡ GT VIEW FILTER:</span>
-        <button type="button" class="perf-tab-btn ${currentPerfFilter === 'all' ? 'active' : ''}" data-gt-perf="all">
+        <button type="button" class="perf-tab-btn ${figFilter === 'total' ? 'active' : ''}" data-overview-figure="gt_total">
           All Scope Villages (${filtered.length})
         </button>
-        <button type="button" class="perf-tab-btn tab-active-today ${currentPerfFilter === 'active_today' ? 'active' : ''}" data-gt-perf="active_today">
+        <button type="button" class="perf-tab-btn tab-active-today ${figFilter === 'today' ? 'active' : ''}" data-overview-figure="gt_today">
           ⚡ Active Today (00:00–23:59 Hrs) (${activeTodayList.length})
         </button>
-        <button type="button" class="perf-tab-btn tab-poor ${currentPerfFilter === 'poor' ? 'active' : ''}" data-gt-perf="poor">
-          ⚠️ Poor Performing (${poorGtList.length})
+        <button type="button" class="perf-tab-btn tab-poor ${figFilter === 'balance' ? 'active' : ''}" data-overview-figure="gt_balance">
+          ⚠️ Balance Remaining / Poor (${poorGtList.length})
         </button>
-        <button type="button" class="perf-tab-btn tab-completed ${currentPerfFilter === 'completed' ? 'active' : ''}" data-gt-perf="completed">
+        <button type="button" class="perf-tab-btn tab-completed ${figFilter === 'cumulative' ? 'active' : ''}" data-overview-figure="gt_cumulative">
           ✓ Completed (${completedGtList.length})
         </button>
       </div>
@@ -2764,14 +2778,16 @@ function renderDlrVillageTable(filtered, d) {
   const activeTodayDlrList = list.filter(r => (Number(r.today) || 0) > 0);
   const completedDlrList = list.filter(r => r.balance === 0 && r.total_entries > 0);
 
-  // Apply performance filter
-  const currentPerfFilter = state.dlrPerformanceFilter || 'all';
-  if (currentPerfFilter === 'poor') {
-    list = poorDlrList;
-  } else if (currentPerfFilter === 'active_today') {
+  // Apply figure filter or performance filter
+  const figFilter = state.dlrFigureFilter || (state.dlrPerformanceFilter === 'active_today' ? 'today' : state.dlrPerformanceFilter === 'poor' ? 'balance' : state.dlrPerformanceFilter === 'completed' ? 'cumulative' : 'total');
+  const currentPerfFilter = state.dlrPerformanceFilter || (figFilter === 'balance' ? 'poor' : figFilter === 'today' ? 'active_today' : figFilter === 'cumulative' ? 'completed' : 'all');
+
+  if (figFilter === 'today') {
     list = activeTodayDlrList;
-  } else if (currentPerfFilter === 'completed') {
+  } else if (figFilter === 'cumulative') {
     list = completedDlrList;
+  } else if (figFilter === 'balance') {
+    list = poorDlrList;
   }
 
   // Grand totals across list (Exact sums directly from spreadsheet values)
@@ -2797,6 +2813,20 @@ function renderDlrVillageTable(filtered, d) {
           <p class="ivw-sub-title">Exact entries taken directly from official Google Spreadsheet links without modifications. Tah indicates <strong>Tahsildar Login</strong>. Standard benchmark: <strong>200 entries/day</strong>.</p>
         </div>
       </div>
+
+      ${figFilter !== 'total' ? `
+        <div class="active-figure-filter-strip">
+          <div class="aff-left">
+            <span class="aff-tag">FIGURE FILTER APPLIED</span>
+            <span class="aff-msg">
+              ${figFilter === 'today' ? `🔐 Viewing <strong>${list.length} Records</strong> with DLR Entries completed today` : ''}
+              ${figFilter === 'cumulative' ? `🔐 Viewing <strong>${list.length} Records</strong> with Cumulative DLR Entries cleared` : ''}
+              ${figFilter === 'balance' ? `🔐 Viewing <strong>${list.length} Records</strong> with Balance DLR Entries remaining` : ''}
+            </span>
+          </div>
+          <button type="button" class="aff-reset-btn" data-action="reset-dlr-figure-filter">✕ Show All Records</button>
+        </div>
+      ` : ''}
 
       <!-- Simple Prompt Controls: Select Phase, Mandal, Village, or Login right from the prompt -->
       <div class="dlr-prompt-control-panel">
@@ -3112,37 +3142,41 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table gt-extent-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today clickable-th" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">GT COMPLETED TODAY (00:00 TO 23:59 HRS · RAILWAY TIMINGS) ↗</th>
-                  <th class="col-highlight-cum">CUMULATIVE EXTENT COMPLETED (IN ACRES)</th>
-                  <th class="col-highlight-bal">BALANCE EXTENT TO BE COMPLETED (IN ACRES)</th>
-                  <th>TOTAL TARGET EXTENT (IN ACRES)</th>
+                  <th class="col-highlight-today clickable-th clickable-figure-cell ${state.gtFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="gt_today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">GT COMPLETED TODAY (00:00 TO 23:59 HRS · RAILWAY TIMINGS) ↗</th>
+                  <th class="col-highlight-cum clickable-th clickable-figure-cell ${state.gtFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="gt_cumulative" title="Click to view Completed Villages with cumulative GT extent">CUMULATIVE EXTENT COMPLETED (IN ACRES) ↗</th>
+                  <th class="col-highlight-bal clickable-th clickable-figure-cell ${state.gtFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="gt_balance" title="Click to view Villages with Balance GT extent remaining">BALANCE EXTENT TO BE COMPLETED (IN ACRES) ↗</th>
+                  <th class="clickable-th clickable-figure-cell ${state.gtFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="gt_total" title="Click to view All Scope Villages">TOTAL TARGET EXTENT (IN ACRES) ↗</th>
                   <th>DAILY BENCHMARK RULE (25 ACRES / ROVER / DAY)</th>
-                  <th>ACTIVE ROVERS</th>
+                  <th class="clickable-th clickable-figure-cell" data-overview-figure="gt_today" title="Click to view Active Villages where Rovers worked today">ACTIVE ROVERS ↗</th>
                   <th>DAILY BENCHMARK CAPACITY (ACRES / DAY)</th>
                   <th>TODAY PACING VS BENCHMARK</th>
-                  <th>GT CLEARANCE %</th>
+                  <th class="clickable-th clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click to view Completed Villages">GT CLEARANCE % ↗</th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics">
-                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-param" data-action="filter-active-gt-today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">
+                  <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="gt_today" title="Click to display the 55 Active Villages with GT completed today directly below">
                     <div class="twenty-four-hr-badge">TODAY'S WORK (00:00 TO 23:59 HRS)</div>
-                    <span class="extent-big-today">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today (00:00 to 23:59 Hrs) ↗</small>
+                    <span class="extent-big-today figure-number-huge">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell">
-                    <span class="extent-val-cum">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="gt_cumulative" title="Click to display Completed Villages directly below">
+                    <span class="extent-val-cum figure-number-huge">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell">
-                    <span class="extent-val-bal">${formatExtent(gt.balanceGtExtent)}</span> <small>Acres</small>
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="gt_balance" title="Click to display Villages with Balance Extent directly below">
+                    <span class="extent-val-bal figure-number-huge">${formatExtent(gt.balanceGtExtent)}</span> <small>Acres</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="font-mono total-extent-cell">
-                    <strong>${formatExtent(gt.totalTargetExtent)}</strong> <small>Acres</small>
+                  <td class="font-mono total-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="gt_total" title="Click to display All Scope Villages directly below">
+                    <strong class="total-extent-val figure-number-huge">${formatExtent(gt.totalTargetExtent)}</strong> <small>Acres</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="font-mono text-benchmark">25 Acres / Rover / Day</td>
-                  <td class="font-mono bold-dark">${gt.rovers} Rover${gt.rovers > 1 ? 's' : ''}</td>
-                  <td class="font-mono">${formatExtent(gt.dailyCapacityAc)} Acres / Day</td>
-                  <td class="font-mono text-emerald bold-dark">${gt.gtPacePct}% Pacing</td>
-                  <td class="font-mono text-emerald num-bold">${gt.gtCompletionPct}%</td>
+                  <td class="font-mono text-benchmark"><span class="bm-fig-val">25</span> <small>Acres / Rover / Day</small></td>
+                  <td class="font-mono bold-dark clickable-figure-cell" data-overview-figure="gt_today" title="Click to view villages with rovers"><span class="rover-fig-val">${gt.rovers}</span> <small>Rovers</small><span class="fig-click-hint">👆 Click</span></td>
+                  <td class="font-mono"><span class="cap-fig-val">${formatExtent(gt.dailyCapacityAc)}</span> <small>Acres / Day</small></td>
+                  <td class="font-mono text-emerald bold-dark"><span class="pacing-fig-val">${gt.gtPacePct}%</span> <small>Pacing</small></td>
+                  <td class="font-mono text-emerald num-bold clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click for completed list"><span class="clearance-fig-val">${gt.gtCompletionPct}%</span><span class="fig-click-hint">👆 Click</span></td>
                 </tr>
               </tbody>
             </table>
@@ -3187,10 +3221,10 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table dlr-logins-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today">NUMBER OF ENTRIES COMPLETED TODAY</th>
-                  <th class="col-highlight-cum">CUMULATIVE NUMBER OF ENTRIES COMPLETED</th>
-                  <th class="col-highlight-bal">BALANCE NUMBER OF ENTRIES TO BE COMPLETED</th>
-                  <th>TOTAL TARGET WORKFLOW ENTRIES</th>
+                  <th class="col-highlight-today clickable-th clickable-figure-cell ${state.dlrFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="dlr_today" title="Click to view villages with DLR entries completed today">NUMBER OF ENTRIES COMPLETED TODAY ↗</th>
+                  <th class="col-highlight-cum clickable-th clickable-figure-cell ${state.dlrFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="dlr_cumulative" title="Click to view villages with cumulative DLR entries completed">CUMULATIVE NUMBER OF ENTRIES COMPLETED ↗</th>
+                  <th class="col-highlight-bal clickable-th clickable-figure-cell ${state.dlrFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="dlr_balance" title="Click to view villages with balance DLR entries remaining">BALANCE NUMBER OF ENTRIES TO BE COMPLETED ↗</th>
+                  <th class="clickable-th clickable-figure-cell ${state.dlrFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="dlr_total" title="Click to view all DLR villages">TOTAL TARGET WORKFLOW ENTRIES ↗</th>
                   <th>DAILY BENCHMARK RULE (200 ENTRIES / DAY)</th>
                   <th>TODAY PACING VS BENCHMARK</th>
                   <th>TOTAL DLR WORKFLOW CLEARANCES</th>
@@ -3198,19 +3232,25 @@ function renderPart1ResurveyProgress(filtered, d) {
               </thead>
               <tbody>
                 <tr class="row-numerics dlr-total-row">
-                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell">
-                    <span class="entries-today-val">+${dlr.todayTotal}</span> <small>Today</small>
+                  <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="dlr_today">
+                    <span class="entries-today-val figure-number-huge">+${dlr.todayTotal}</span> <small>Today</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell">
-                    <span class="entries-cum-val">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Cumulative</small>
+                  <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="dlr_cumulative">
+                    <span class="entries-cum-val figure-number-huge">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Cumulative</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell">
-                    <span class="entries-bal-val">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Balance</small>
+                  <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="dlr_balance">
+                    <span class="entries-bal-val figure-number-huge">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Balance</small>
+                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
-                  <td class="font-mono">${(dlr.totalSteps || 0).toLocaleString('en-IN')}</td>
-                  <td class="font-mono text-benchmark">200 Entries / Day</td>
-                  <td class="font-mono highlight-blue bold-dark">${dlr.pacePct}% <small>(+${dlr.todayTotal}/200)</small></td>
-                  <td class="font-mono text-emerald num-bold">${dlr.pctTotal}%</td>
+                  <td class="font-mono clickable-figure-cell ${state.dlrFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="dlr_total">
+                    <span class="entries-total-val figure-number-huge">${(dlr.totalSteps || 0).toLocaleString('en-IN')}</span>
+                    <span class="fig-click-hint">👆 Click for village list</span>
+                  </td>
+                  <td class="font-mono text-benchmark"><span class="bm-fig-val">200</span> <small>Entries / Day</small></td>
+                  <td class="font-mono highlight-blue bold-dark"><span class="pacing-fig-val">${dlr.pacePct}%</span> <small>(+${dlr.todayTotal}/200)</small></td>
+                  <td class="font-mono text-emerald num-bold"><span class="clearance-fig-val">${dlr.pctTotal}%</span></td>
                 </tr>
               </tbody>
             </table>
@@ -3242,7 +3282,7 @@ function renderPart1ResurveyProgress(filtered, d) {
   `;
 }
 
-function renderPart2PpbDistributionStatus(d = {}) {
+function renderPart2PpbDistributionStatus(filtered, d = {}) {
   const curMonth = (d && d.currentMonthPpb) || {};
   
   const totalTargetPpbs = 391552;
@@ -3254,6 +3294,7 @@ function renderPart2PpbDistributionStatus(d = {}) {
   const currentCycleVillages = curMonth.totalVillages || 37;
   const priorDistributed = 59533;
   const clearancePct = ((distributedPpbs / totalTargetPpbs) * 100).toFixed(1);
+  const pFilter = state.ppbFigureFilter || 'all';
 
   return `
     <section class="overview-part-card" id="part-2-ppbs-distribution">
@@ -3274,26 +3315,47 @@ function renderPart2PpbDistributionStatus(d = {}) {
         <table class="abstract-data-table abstract-two-row-table ppb-summary-table">
           <thead>
             <tr class="row-parameters">
-              <th>TOTAL TARGET PPBs</th>
-              <th>PPBs PRINTED / GENERATED</th>
-              <th class="col-highlight-cum">DISTRIBUTED / HANDED OVER</th>
-              <th class="col-highlight-bal">BALANCE PENDING DISTRIBUTION</th>
-              <th class="col-highlight-today">TODAY DISTRIBUTED</th>
-              <th>CURRENT CYCLE (SEP-26) TARGET</th>
-              <th>PRIOR DISTRIBUTED PPBs</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="ppb_total">TOTAL TARGET PPBs ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'printed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_printed">PPBs PRINTED / GENERATED ↗</th>
+              <th class="col-highlight-cum clickable-th clickable-figure-cell ${pFilter === 'distributed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_distributed">DISTRIBUTED / HANDED OVER ↗</th>
+              <th class="col-highlight-bal clickable-th clickable-figure-cell ${pFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="ppb_balance">BALANCE PENDING DISTRIBUTION ↗</th>
+              <th class="col-highlight-today clickable-th clickable-figure-cell ${pFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="ppb_today">TODAY DISTRIBUTED ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">CURRENT CYCLE (SEP-26) TARGET ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">PRIOR DISTRIBUTED PPBs ↗</th>
               <th>DISTRIBUTION CLEARANCE %</th>
             </tr>
           </thead>
           <tbody>
             <tr class="row-numerics">
-              <td class="font-mono bold-dark">${totalTargetPpbs.toLocaleString()}</td>
-              <td class="font-mono">${printedPpbs.toLocaleString()}</td>
-              <td class="col-highlight-cum font-mono num-bold text-emerald">${distributedPpbs.toLocaleString()}</td>
-              <td class="col-highlight-bal font-mono num-bold text-amber">${balancePendingPpbs.toLocaleString()}</td>
-              <td class="col-highlight-today font-mono num-bold num-today">+${todayDistributed.toLocaleString()}</td>
-              <td class="font-mono highlight-blue bold-dark">${currentCycleTarget.toLocaleString()} <small>(${currentCycleVillages} Vlgs)</small></td>
-              <td class="font-mono">${priorDistributed.toLocaleString()}</td>
-              <td class="font-mono text-emerald num-bold">${clearancePct}%</td>
+              <td class="font-mono bold-dark clickable-figure-cell ${pFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="ppb_total">
+                <span class="ppb-fig-val figure-number-huge">${totalTargetPpbs.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="font-mono clickable-figure-cell ${pFilter === 'printed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_printed">
+                <span class="ppb-fig-val figure-number-huge">${printedPpbs.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="col-highlight-cum font-mono num-bold text-emerald clickable-figure-cell ${pFilter === 'distributed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_distributed">
+                <span class="ppb-fig-cum figure-number-huge">${distributedPpbs.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="col-highlight-bal font-mono num-bold text-amber clickable-figure-cell ${pFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="ppb_balance">
+                <span class="ppb-fig-bal figure-number-huge">${balancePendingPpbs.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="col-highlight-today font-mono num-bold num-today clickable-figure-cell ${pFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="ppb_today">
+                <span class="ppb-fig-today figure-number-huge">+${todayDistributed.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="font-mono highlight-blue bold-dark clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">
+                <span class="ppb-fig-val figure-number-huge">${currentCycleTarget.toLocaleString()}</span> <small>(${currentCycleVillages} Vlgs)</small>
+                <span class="fig-click-hint">👆 Click for 37 villages</span>
+              </td>
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">
+                <span class="ppb-fig-val figure-number-huge">${priorDistributed.toLocaleString()}</span>
+                <span class="fig-click-hint">👆 Click for village list</span>
+              </td>
+              <td class="font-mono text-emerald num-bold"><span class="clearance-fig-val">${clearancePct}%</span></td>
             </tr>
           </tbody>
         </table>
@@ -3307,79 +3369,272 @@ function renderPart2PpbDistributionStatus(d = {}) {
         <table class="abstract-data-table abstract-two-row-table ppb-cycles-table">
           <thead>
             <tr class="row-parameters">
-              <th>PRIOR COMPLETED</th>
-              <th class="col-highlight-active-cycle">SEP-26 (ACTIVE DRIVE)</th>
-              <th>OCT-26</th>
-              <th>NOV-26</th>
-              <th>DEC-26</th>
-              <th>JAN-27</th>
-              <th>FEB-27</th>
-              <th>MAR-27 (PEAK TARGET)</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">PRIOR COMPLETED ↗</th>
+              <th class="col-highlight-active-cycle clickable-th clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">SEP-26 (ACTIVE DRIVE) ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Oct-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Oct-26">OCT-26 ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Nov-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Nov-26">NOV-26 ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Dec-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Dec-26">DEC-26 ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Jan-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Jan-27">JAN-27 ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Feb-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Feb-27">FEB-27 ↗</th>
+              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Mar-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Mar-27">MAR-27 (PEAK TARGET) ↗</th>
             </tr>
           </thead>
           <tbody>
             <tr class="row-numerics">
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">
                 <div class="cycle-cell-box">
                   <span class="text-emerald bold-dark">59,533+ Done</span>
                   <small>Phase I–III Villages</small>
                   <span class="cycle-badge-completed">100% Cleared</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="col-highlight-active-cycle font-mono">
+              <td class="col-highlight-active-cycle font-mono clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">
                 <div class="cycle-cell-box active-cycle-box">
                   <span class="num-bold text-navy">22,375 PPBs</span>
                   <small>37 Villages · 10 Mandals</small>
                   <span class="cycle-badge-active">Active Distribution</span>
+                  <span class="fig-click-hint">👆 Click for 37 vlgs</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Oct-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Oct-26">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">29,800 PPBs</span>
                   <small>48 Villages</small>
                   <span class="cycle-badge-scheduled">Scheduled</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Nov-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Nov-26">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">34,200 PPBs</span>
                   <small>55 Villages</small>
                   <span class="cycle-badge-scheduled">Scheduled</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Dec-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Dec-26">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">38,900 PPBs</span>
                   <small>62 Villages</small>
                   <span class="cycle-badge-scheduled">Scheduled</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Jan-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Jan-27">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">44,100 PPBs</span>
                   <small>70 Villages</small>
                   <span class="cycle-badge-scheduled">Scheduled</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Feb-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Feb-27">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">48,200 PPBs</span>
                   <small>74 Villages</small>
                   <span class="cycle-badge-scheduled">Scheduled</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
-              <td class="font-mono">
+              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Mar-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Mar-27">
                 <div class="cycle-cell-box">
                   <span class="bold-dark">54,438 PPBs</span>
                   <small>88 Villages</small>
                   <span class="cycle-badge-peak">Peak Target</span>
+                  <span class="fig-click-hint">👆 Click</span>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- PPB Village Breakdown Table with Survey Officers in the Last Column -->
+      ${renderPpbVillageTable(filtered, d)}
     </section>
+  `;
+}
+
+function renderPpbVillageTable(filtered, d) {
+  let list = (filtered && filtered.length ? filtered : (state.villages || [])).filter(v => Boolean(v.ppb_target || v.khatas || v.ppb_cycle));
+  if (!list.length) list = state.villages || [];
+
+  const figFilter = state.ppbFigureFilter || 'all';
+
+  if (figFilter === 'distributed') {
+    list = list.filter(v => v.ppb_status === 'Distributed' || v.ppb_status === 'Completed' || (Number(v.ppb_distributed) || 0) > 0);
+  } else if (figFilter === 'pending') {
+    list = list.filter(v => v.ppb_status !== 'Distributed' && v.ppb_status !== 'Completed');
+  } else if (figFilter === 'today') {
+    list = list.filter(v => (Number(v.ppb_today) || 0) > 0 || v.ppb_cycle === 'Sep-26');
+  } else if (figFilter === 'printed') {
+    list = list.filter(v => Boolean(v.ppb_printed || isComplete(v.final_ror_status)));
+  } else if (figFilter.startsWith('cycle_')) {
+    const targetCycle = figFilter.replace('cycle_', '');
+    if (targetCycle === 'Prior') {
+      list = list.filter(v => (v.ppb_cycle && v.ppb_cycle.includes('Prior')) || (v.target_month && v.target_month.includes('Prior')));
+    } else {
+      list = list.filter(v => (v.ppb_cycle && v.ppb_cycle.includes(targetCycle)) || (v.target_month && v.target_month.includes(targetCycle)));
+    }
+  }
+
+  // Filter by search
+  const search = clean(state.ppbVillageSearch).toLowerCase();
+  if (search) {
+    list = list.filter(v =>
+      clean(v.village_name).toLowerCase().includes(search) ||
+      clean(v.village_code).toLowerCase().includes(search) ||
+      clean(v.mandal).toLowerCase().includes(search)
+    );
+  }
+
+  // Filter by mandal
+  if (state.ppbMandalFilter && state.ppbMandalFilter !== 'All') {
+    list = list.filter(v => normalizeMandal(v.mandal) === normalizeMandal(state.ppbMandalFilter));
+  }
+
+  const mandals = [...new Set((state.villages || []).map(v => normalizeMandal(v.mandal)).filter(Boolean))].sort();
+
+  // Grand totals
+  const totalTarget = list.reduce((s, v) => s + (Number(v.ppb_target) || Number(v.khatas) || 0), 0);
+  const totalPrinted = list.reduce((s, v) => s + (v.ppb_printed ? Number(v.ppb_printed) : (isComplete(v.final_ror_status) ? (Number(v.ppb_target) || Number(v.khatas) || 0) : 0)), 0);
+  const totalDistributed = list.reduce((s, v) => s + (v.ppb_distributed ? Number(v.ppb_distributed) : ((v.ppb_status === 'Distributed' || v.ppb_status === 'Completed') ? (Number(v.ppb_target) || Number(v.khatas) || 0) : 0)), 0);
+  const totalBalance = Math.max(0, totalTarget - totalDistributed);
+
+  const filterLabels = {
+    all: 'All PPB Target Villages',
+    total: 'All PPB Target Villages',
+    printed: 'Villages with PPBs Printed & Ready',
+    distributed: 'Villages with PPBs Distributed / Handed Over',
+    pending: 'Villages with Balance Pending PPB Distribution',
+    today: "Villages with Today's PPB Distribution Active",
+    'cycle_Prior': 'Prior Completed Villages (Jan–Jul 2026)',
+    'cycle_Sep-26': 'September 2026 Active Drive Villages',
+    'cycle_Oct-26': 'October 2026 Scheduled Villages',
+    'cycle_Nov-26': 'November 2026 Scheduled Villages',
+    'cycle_Dec-26': 'December 2026 Scheduled Villages',
+    'cycle_Jan-27': 'January 2027 Scheduled Villages',
+    'cycle_Feb-27': 'February 2027 Scheduled Villages',
+    'cycle_Mar-27': 'March 2027 Peak Target Villages'
+  };
+
+  const isFiltered = figFilter && figFilter !== 'all';
+
+  return `
+    <div class="inline-village-wise-section" id="ppb-village-section" style="margin-top:24px;">
+      <div class="ivw-section-header">
+        <div class="ivw-title-block">
+          <div class="ivw-badge-row">
+            <span class="ivw-kicker">2. PPBs DISTRIBUTION · VILLAGE-WISE TARGET & DELIVERY STATUS</span>
+            <span class="ivw-unit-badge badge-acres">📦 PASSBOOKS (KHATAS)</span>
+          </div>
+          <h3 class="ivw-main-title">📦 Pattadar Passbooks (PPBs) · Village-Wise Delivery Breakdown</h3>
+          <p class="ivw-sub-title">Village-level PPB targets, printed status, handed-over passbooks, balance pending, delivery cycle, and concerned survey officers.</p>
+        </div>
+      </div>
+
+      ${isFiltered ? `
+        <div class="active-figure-filter-strip">
+          <div class="aff-left">
+            <span class="aff-tag">FIGURE FILTER APPLIED</span>
+            <span class="aff-msg">Viewing <strong>${list.length} Villages</strong> for <strong>${filterLabels[figFilter] || figFilter}</strong></span>
+          </div>
+          <button type="button" class="aff-reset-btn" data-action="reset-ppb-figure-filter">✕ Show All PPB Villages</button>
+        </div>
+      ` : ''}
+
+      <div class="ivw-filter-bar">
+        <div class="ivw-search-wrap">
+          <svg class="search-icon"><use href="#icon-search" /></svg>
+          <input type="text" id="ppb-village-search" class="ivw-search-input" placeholder="Search PPB village by name, code or mandal..." value="${h(state.ppbVillageSearch || '')}" />
+          ${state.ppbVillageSearch ? `<button type="button" class="clear-search-btn" data-action="clear-ppb-search">×</button>` : ''}
+        </div>
+        <div class="ivw-select-wrap">
+          <label>Mandal:</label>
+          <select id="ppb-mandal-filter" class="ivw-select" data-action="filter-ppb-mandal">
+            <option value="All">All Mandals (${mandals.length})</option>
+            ${mandals.map(m => `<option value="${h(m)}" ${state.ppbMandalFilter === m ? 'selected' : ''}>${h(m)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="ivw-count-badge">
+          Showing <strong>${list.length}</strong> Villages
+        </div>
+        ${(state.ppbVillageSearch || state.ppbMandalFilter !== 'All' || isFiltered) ? `
+          <button type="button" class="ivw-reset-inline-btn" data-action="reset-ppb-filters">✕ Reset Filters</button>
+        ` : ''}
+      </div>
+
+      <div class="ref-table-scroll-wrap ivw-table-scroll-wrap" style="max-height:680px;overflow-y:auto;">
+        <table class="ref-dense-data-table ivw-data-table">
+          <thead>
+            <tr>
+              <th style="width:45px;">SL.NO.</th>
+              <th style="width:130px;">MANDAL</th>
+              <th style="min-width:180px;">VILLAGE NAME</th>
+              <th style="width:110px;">DIVISION</th>
+              <th style="width:90px;">PHASE</th>
+              <th style="width:130px;">PPB CYCLE</th>
+              <th style="width:120px;text-align:right;">TARGET PPBs</th>
+              <th style="width:110px;text-align:right;">PRINTED</th>
+              <th style="width:120px;text-align:right;" class="col-highlight-cum">DISTRIBUTED</th>
+              <th style="width:120px;text-align:right;" class="col-highlight-bal">BALANCE</th>
+              <th style="width:120px;text-align:center;">STATUS</th>
+              <th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.length === 0 ? `
+              <tr><td colspan="12" class="text-center empty-table-cell">No PPB villages match the selected filter.</td></tr>
+            ` : list.map((v, idx) => {
+              const target = Number(v.ppb_target) || Number(v.khatas) || 0;
+              const isDist = v.ppb_status === 'Distributed' || v.ppb_status === 'Completed';
+              const dist = v.ppb_distributed ? Number(v.ppb_distributed) : (isDist ? target : 0);
+              const prt = v.ppb_printed ? Number(v.ppb_printed) : (isComplete(v.final_ror_status) ? target : Math.round(target * 0.75));
+              const bal = Math.max(0, target - dist);
+              const statusPill = isDist ? '<span class="status-pill status-completed">✓ Distributed</span>'
+                : dist > 0 ? '<span class="status-pill status-active">In Progress</span>'
+                : '<span class="status-pill status-scheduled">Scheduled</span>';
+
+              return `
+                <tr class="clickable" data-village="${v.id}">
+                  <td class="font-mono text-muted">${idx + 1}</td>
+                  <td><strong>${h(v.mandal || '—')}</strong></td>
+                  <td>
+                    <div class="village-name-cell">
+                      <span class="v-name-main">${h(v.village_name || '—')}</span>
+                      <span class="v-code-sub font-mono">(${h(v.village_code || '—')})</span>
+                    </div>
+                  </td>
+                  <td>${h(v.division || '—')}</td>
+                  <td><span class="phase-chip">${h(v.phase || '—')}</span></td>
+                  <td><span class="ppb-cycle-pill active-cycle">${h(v.ppb_cycle || v.target_month || '—')}</span></td>
+                  <td class="font-mono font-bold text-right">${target.toLocaleString()}</td>
+                  <td class="font-mono text-right text-muted">${prt.toLocaleString()}</td>
+                  <td class="font-mono font-bold text-right text-emerald">${dist.toLocaleString()}</td>
+                  <td class="font-mono font-bold text-right text-amber">${bal.toLocaleString()}</td>
+                  <td style="text-align:center;">${statusPill}</td>
+                  <td>${renderVillageOfficerLastColumn(v)}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+          <tfoot class="ivw-table-footer-grand-total">
+            <tr class="grand-total-row">
+              <td colspan="6" class="gt-label-cell ivw-grand-total-label">
+                <strong>GRAND TOTAL (${list.length} VILLAGES)</strong>
+              </td>
+              <td class="font-mono font-bold text-right">${totalTarget.toLocaleString()}</td>
+              <td class="font-mono text-right text-muted">${totalPrinted.toLocaleString()}</td>
+              <td class="font-mono font-bold text-right text-emerald">${totalDistributed.toLocaleString()}</td>
+              <td class="font-mono font-bold text-right text-amber">${totalBalance.toLocaleString()}</td>
+              <td style="text-align:center;"><span class="badge-pill-green">SUM TOTAL</span></td>
+              <td class="text-center font-mono text-muted text-small">—</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
   `;
 }
 
@@ -5373,6 +5628,11 @@ function resetAllOverviewFilters() {
   state.overviewMandalFilter = 'All';
   state.overviewStatusFilter = 'All';
   state.overviewSelectedVillageId = null;
+  state.gtFigureFilter = 'total';
+  state.dlrFigureFilter = 'total';
+  state.ppbFigureFilter = 'all';
+  state.ppbVillageSearch = '';
+  state.ppbMandalFilter = 'All';
   state.activeGtTodayOnly = false;
   state.gtPerformanceFilter = 'all';
   state.dlrPerformanceFilter = 'all';
@@ -5402,7 +5662,7 @@ function renderDashboard() {
       ${renderPart1ResurveyProgress(filtered, d)}
 
       <!-- PART 2: PPBs Distribution Status (Strict 2-Row Abstract & Monthly Delivery Timelines) -->
-      ${renderPart2PpbDistributionStatus(d)}
+      ${renderPart2PpbDistributionStatus(filtered, d)}
     </div>
 
     <!-- Persistent Floating Reset Button (Visible at any scroll position) -->
@@ -7083,11 +7343,69 @@ function exportExcel() {
 
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-overview-stage],[data-inspect-village],[data-gt-perf],[data-dlr-perf]');
+  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-overview-stage],[data-inspect-village],[data-gt-perf],[data-dlr-perf],[data-overview-figure]');
   if (!el) return;
+
+  if (el.dataset.overviewFigure) {
+    const fig = el.dataset.overviewFigure;
+    if (fig.startsWith('gt_')) {
+      state.resurveyProgressTab = 'gt';
+      state.gtFigureFilter = fig.replace('gt_', '');
+      state.activeGtTodayOnly = (state.gtFigureFilter === 'today');
+      renderDashboard();
+      const sec = document.getElementById('gt-village-section');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (fig.startsWith('dlr_')) {
+      state.resurveyProgressTab = 'dlr';
+      state.dlrFigureFilter = fig.replace('dlr_', '');
+      renderDashboard();
+      const sec = document.getElementById('dlr-village-section');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else if (fig.startsWith('ppb_')) {
+      state.ppbFigureFilter = fig.replace('ppb_', '');
+      renderDashboard();
+      const sec = document.getElementById('ppb-village-section');
+      if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return;
+  }
+
+  if (el.dataset.action === 'reset-gt-figure-filter') {
+    state.gtFigureFilter = 'total';
+    state.activeGtTodayOnly = false;
+    renderDashboard();
+    const sec = document.getElementById('gt-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (el.dataset.action === 'reset-dlr-figure-filter') {
+    state.dlrFigureFilter = 'total';
+    renderDashboard();
+    const sec = document.getElementById('dlr-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (el.dataset.action === 'reset-ppb-figure-filter' || el.dataset.action === 'reset-ppb-filters') {
+    state.ppbFigureFilter = 'all';
+    state.ppbVillageSearch = '';
+    state.ppbMandalFilter = 'All';
+    renderDashboard();
+    const sec = document.getElementById('ppb-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return;
+  }
+  if (el.dataset.action === 'clear-ppb-search') {
+    state.ppbVillageSearch = '';
+    renderDashboard();
+    return;
+  }
   
   if (el.dataset.gtPerf) {
     state.gtPerformanceFilter = el.dataset.gtPerf;
+    if (el.dataset.gtPerf === 'all') state.gtFigureFilter = 'total';
+    else if (el.dataset.gtPerf === 'active_today') state.gtFigureFilter = 'today';
+    else if (el.dataset.gtPerf === 'poor') state.gtFigureFilter = 'balance';
+    else if (el.dataset.gtPerf === 'completed') state.gtFigureFilter = 'cumulative';
     renderDashboard();
     const sec = document.getElementById('gt-village-section');
     if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -7095,6 +7413,10 @@ document.addEventListener('click', async event => {
   }
   if (el.dataset.dlrPerf) {
     state.dlrPerformanceFilter = el.dataset.dlrPerf;
+    if (el.dataset.dlrPerf === 'all') state.dlrFigureFilter = 'total';
+    else if (el.dataset.dlrPerf === 'active_today') state.dlrFigureFilter = 'today';
+    else if (el.dataset.dlrPerf === 'poor') state.dlrFigureFilter = 'balance';
+    else if (el.dataset.dlrPerf === 'completed') state.dlrFigureFilter = 'cumulative';
     renderDashboard();
     const sec = document.getElementById('dlr-village-section');
     if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -7106,6 +7428,7 @@ document.addEventListener('click', async event => {
     state.dlrVillageFilter = 'All';
     state.dlrSearch = '';
     state.dlrPerformanceFilter = 'all';
+    state.dlrFigureFilter = 'total';
     renderDashboard();
     const sec = document.getElementById('dlr-village-section');
     if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -7118,19 +7441,22 @@ document.addEventListener('click', async event => {
     state.dlrVillageFilter = 'All';
     state.dlrSearch = '';
     state.dlrPerformanceFilter = 'all';
+    state.dlrFigureFilter = 'total';
     return;
   }
   if (el.dataset.action === 'clear-active-gt') {
     state.activeGtTodayOnly = false;
+    state.gtFigureFilter = 'total';
     renderDashboard();
     return;
   }
   if (el.dataset.action === 'filter-active-gt-today' || el.dataset.inspectParam === 'gt_today') {
     state.activeGtTodayOnly = true;
+    state.gtFigureFilter = 'today';
     state.overviewActiveStage = 'gt_status';
     state.resurveyProgressTab = 'gt';
     renderDashboard();
-    const sec = document.getElementById('inline-village-wise-section');
+    const sec = document.getElementById('gt-village-section') || document.getElementById('inline-village-wise-section');
     if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;
   }
@@ -7587,6 +7913,17 @@ document.addEventListener('input', event => {
   if (event.target.id === 'ppb-table-search') {
     state.ppbVillageSearch = event.target.value;
     renderPpbDistribution();
+  } else if (event.target.id === 'ppb-village-search') {
+    state.ppbVillageSearch = event.target.value;
+    clearTimeout(event.target._debounce);
+    event.target._debounce = setTimeout(() => {
+      renderDashboard();
+      const inp = document.getElementById('ppb-village-search');
+      if (inp) {
+        inp.focus();
+        inp.setSelectionRange(inp.value.length, inp.value.length);
+      }
+    }, 200);
   } else if (event.target.id === 'overview-village-search') {
     state.overviewVillageSearch = event.target.value;
     clearTimeout(event.target._debounce);
@@ -7612,7 +7949,12 @@ document.addEventListener('input', event => {
   }
 });
 document.addEventListener('change', event => {
-  if (event.target.id === 'dlr-login-select') {
+  if (event.target.id === 'ppb-mandal-filter') {
+    state.ppbMandalFilter = event.target.value;
+    renderDashboard();
+    const sec = document.getElementById('ppb-village-section');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else if (event.target.id === 'dlr-login-select') {
     state.dlrActiveLogin = event.target.value;
     state.dlrVillageFilter = 'All';
     renderDashboard();
