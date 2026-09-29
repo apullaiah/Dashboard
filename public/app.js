@@ -47,6 +47,7 @@ const state = {
   selectedStageFocus: null,
   stageColumnsOnly: true,
   selectedPpbCycle: 'Sep-26',
+  selectedPpbStage: null,
   ppbVillageSearch: '',
   ppbMandalFilter: 'All',
   inspectedParam: null,
@@ -920,7 +921,7 @@ function renderCurrentMonthPpbSection(d, has) {
                 <td><span style="background:#fef3c7;color:#92400e;padding:3px 8px;border-radius:4px;font-weight:700;font-size:11.5px;">Distribution Active</span></td>
                 <td><button class="inline-link" data-village="${v.id}" title="Drill down to village details">Track →</button></td>
               </tr>
-            `).join('') : `<tr><td colspan="11" style="text-align:center;padding:24px;color:var(--muted);">No September 2026 villages match "${h(q)}"</td></tr>`}
+            `).join('') : `<tr><td colspan="12" style="text-align:center;padding:24px;color:var(--muted);">No September 2026 villages match "${h(q)}"</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -4628,6 +4629,272 @@ function renderStagePerformanceCard(stageDetails) {
   `;
 }
 
+const RESURVEY_STAGES_CONFIG = [
+  {
+    key: 'gt_not_started',
+    filterVal: 'GT Not Started',
+    step: 1,
+    name: 'GT Not Started',
+    short: 'GT Not Started',
+    telugu: 'భూ సరిచూపు ప్రారంభం కానివి',
+    authority: 'Survey Field Team',
+    icon: '⏳',
+    color: '#64748b',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('not started') || s.includes('not yet') || v.gt_status === 'Not Started';
+    }
+  },
+  {
+    key: 'gt_ongoing',
+    filterVal: 'GT Ongoing',
+    step: 2,
+    name: 'GT Ongoing',
+    short: 'GT Ongoing',
+    telugu: 'భూ సరిచూపు జరుగుతున్నవి',
+    authority: 'Survey Field Team',
+    icon: '🌾',
+    color: '#f59e0b',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return (s.includes('ongoing') || s.includes('gt')) && !s.includes('not');
+    }
+  },
+  {
+    key: 'vectorization',
+    filterVal: 'Vectorization',
+    step: 3,
+    name: 'Cadastral Vectorization',
+    short: 'Vectorization',
+    telugu: 'కడస్ట్రల్ వెక్టరైజేషన్ & కోరిలేషన్',
+    authority: 'GIS Vectorization Team',
+    icon: '📐',
+    color: '#8b5cf6',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('vector') || s.includes('area') || s.includes('corr');
+    }
+  },
+  {
+    key: 'vs_login',
+    filterVal: 'VS Login',
+    step: 4,
+    name: 'Village Surveyor Login',
+    short: 'VS Login',
+    telugu: 'గ్రామ సర్వేయర్ లాగిన్',
+    authority: 'Village Surveyor',
+    icon: '🔐',
+    color: '#3b82f6',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('surveyor') || s.includes('vs login') || s === 'vs login';
+    }
+  },
+  {
+    key: 'vro_login',
+    filterVal: 'VRO Login',
+    step: 5,
+    name: 'VRO Login',
+    short: 'VRO Login',
+    telugu: 'గ్రామ రెవెన్యూ అధికారి లాగిన్',
+    authority: 'Village Revenue Officer',
+    icon: '🔐',
+    color: '#2563eb',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('vro');
+    }
+  },
+  {
+    key: 'tah_login',
+    filterVal: 'Tah Login',
+    step: 6,
+    name: 'Tahsildar Login',
+    short: 'Tahsildar Login',
+    telugu: 'తహసీల్దార్ లాగిన్ ఆమోదం',
+    authority: 'Tahsildar / MRO',
+    icon: '⭐',
+    color: '#d97706',
+    highlight: true,
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('tah');
+    }
+  },
+  {
+    key: 'rdo_login',
+    filterVal: 'RDO Login',
+    step: 7,
+    name: 'RDO Login',
+    short: 'RDO Login',
+    telugu: 'డివిజనల్ అధికారి (RDO) లాగిన్',
+    authority: 'Revenue Divisional Officer',
+    icon: '🔐',
+    color: '#1d4ed8',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('rdo');
+    }
+  },
+  {
+    key: 'jc_login',
+    filterVal: 'JC Login',
+    step: 8,
+    name: 'Joint Collector Login',
+    short: 'JC Login',
+    telugu: 'జాయింట్ కలెక్టర్ (JC) లాగిన్',
+    authority: 'Joint Collector',
+    icon: '🔐',
+    color: '#4338ca',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('jc');
+    }
+  },
+  {
+    key: 'section13',
+    filterVal: '13 Completed',
+    step: 9,
+    name: 'Section 13 Notification',
+    short: '13 Notification',
+    telugu: 'సెక్షన్ 13 గెజిట్ నోటిఫికేషన్',
+    authority: 'District Administration',
+    icon: '📜',
+    color: '#7c3aed',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('13');
+    }
+  },
+  {
+    key: 'draft_ror',
+    filterVal: 'Draft RoR',
+    step: 10,
+    name: 'Draft RoR / E-KYC',
+    short: 'Draft RoR',
+    telugu: 'ముసాయిదా రికార్డ్ ఆఫ్ రైట్స్',
+    authority: 'Revenue Department',
+    icon: '📑',
+    color: '#0284c7',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return s.includes('draft');
+    }
+  },
+  {
+    key: 'final_ror',
+    filterVal: 'Final ROR Completed',
+    step: 11,
+    name: 'Final RoR Completed',
+    short: 'Final RoR',
+    telugu: 'తుది రికార్డ్ ఆఫ్ రైట్స్',
+    authority: 'CCLA / Joint Collector',
+    icon: '✅',
+    color: '#059669',
+    match: v => {
+      const s = (v.current_stage || '').toLowerCase();
+      return (s.includes('final ror') || v.status === 'Completed') && !v.ported_to_webland && v.webland_2_status !== 'Ported';
+    }
+  },
+  {
+    key: 'webland_2',
+    filterVal: 'Ported',
+    step: 12,
+    name: 'Webland 2.0 Ported',
+    short: 'Webland 2.0',
+    telugu: 'వెబ్‌ల్యాండ్ 2.0 పోర్టింగ్ పూర్తి',
+    authority: 'Webland State Center',
+    icon: '🌐',
+    color: '#047857',
+    match: v => v.ported_to_webland || v.webland_2_status === 'Ported'
+  }
+];
+
+function renderPpbCycleStageBreakdown(villages, activeCycle, selectedStageKey, context = 'ppb') {
+  const totalInCycle = villages.length;
+  
+  const stageStats = RESURVEY_STAGES_CONFIG.map(st => {
+    const matching = villages.filter(v => st.match(v));
+    const count = matching.length;
+    const pct = totalInCycle > 0 ? ((count / totalInCycle) * 100).toFixed(1) : '0.0';
+    return {
+      ...st,
+      count,
+      pct,
+      isSelected: selectedStageKey === st.key
+    };
+  });
+
+  const selectedStageObj = stageStats.find(s => s.key === selectedStageKey);
+  const activeCycleTitle = activeCycle === 'all' ? 'All PPB Cycles' : (activeCycle || 'Sep-26');
+
+  return `
+    <section class="section-card ppb-stage-breakdown-card" id="ppb-stage-breakdown-section" data-context="${context}">
+      <div class="ppb-stage-section-hdr">
+        <div>
+          <div class="ppb-stage-super-title">
+            <span class="live-pulse-badge"><span class="pulse-ring"></span> RESURVEY PROCESS STAGES</span>
+            <span class="stage-cycle-badge font-mono">${h(activeCycleTitle)}</span>
+          </div>
+          <h3 class="ppb-stage-main-title">
+            Number of Villages in Various Stages of Resurvey Process (${totalInCycle} Villages)
+          </h3>
+          <p class="ppb-stage-subtitle">
+            Current operational status and workflow bottleneck tracking for <strong>${h(activeCycleTitle)}</strong> cycle. Click any stage card below to filter the village records.
+          </p>
+        </div>
+        <div class="ppb-stage-header-actions">
+          <button type="button" class="ppb-stage-reset-btn ${!selectedStageKey ? 'active' : ''}" data-action="reset-ppb-stage" title="View all villages across all stages">
+            Show All Stages (${totalInCycle} Villages)
+          </button>
+        </div>
+      </div>
+
+      ${selectedStageObj ? `
+        <div class="ppb-active-stage-banner">
+          <div class="active-stage-banner-left">
+            <span class="active-stage-badge">STAGE FILTER ACTIVE</span>
+            <span>Showing <strong>${selectedStageObj.count}</strong> villages in <strong>${h(selectedStageObj.name)}</strong> (${h(selectedStageObj.telugu)})</span>
+          </div>
+          <button type="button" class="clear-stage-pill" data-action="reset-ppb-stage" title="Clear stage filter">
+            ✕ Clear Stage Filter
+          </button>
+        </div>
+      ` : ''}
+
+      <div class="ppb-stages-cards-grid">
+        ${stageStats.map(st => `
+          <button type="button" 
+                  class="ppb-stage-card ${st.isSelected ? 'is-selected' : ''} ${st.count > 0 ? 'has-villages' : 'is-zero'}" 
+                  data-ppb-stage="${st.key}"
+                  title="Click to view & filter ${st.count} villages in ${st.name}">
+            <div class="ppb-stage-top-strip">
+              <span class="ppb-stage-step-tag font-mono">STAGE ${st.step}</span>
+              <span class="ppb-stage-icon">${st.icon}</span>
+            </div>
+            <div class="ppb-stage-name-block">
+              <span class="ppb-stage-name">${h(st.short)}</span>
+              <small class="ppb-stage-telugu">${st.telugu}</small>
+            </div>
+            <div class="ppb-stage-num-wrap">
+              <strong class="ppb-stage-num-big ${st.count > 0 ? 'text-highlight' : 'text-zero'}" style="color:${st.count > 0 ? st.color : '#94a3b8'};">
+                ${st.count}
+              </strong>
+              <span class="ppb-stage-num-unit">VILLAGES</span>
+            </div>
+            <div class="ppb-stage-card-footer">
+              <span class="ppb-stage-pct-pill ${st.count > 0 ? 'pct-active' : ''}">
+                ${st.pct}% of cycle
+              </span>
+              ${st.count > 0 ? `<span class="ppb-stage-drill-arrow">Filter →</span>` : `<span class="ppb-stage-zero-note">None</span>`}
+            </div>
+          </button>
+        `).join('')}
+      </div>
+    </section>
+  `;
+}
+
 function renderPpbDistribution() {
   const d = state.dashboard || {};
   const has = Boolean(d.hasData);
@@ -4655,6 +4922,15 @@ function renderPpbDistribution() {
     }
     return (v.ppb_cycle === activeCycle || v.target_month === activeCycle);
   });
+
+  const cycleAllVillages = [...cycleVillages];
+
+  if (state.selectedPpbStage) {
+    const targetStageDef = RESURVEY_STAGES_CONFIG.find(s => s.key === state.selectedPpbStage);
+    if (targetStageDef) {
+      cycleVillages = cycleVillages.filter(v => targetStageDef.match(v));
+    }
+  }
 
   if (state.ppbVillageSearch) {
     const q = state.ppbVillageSearch.toLowerCase().trim();
@@ -4858,6 +5134,9 @@ function renderPpbDistribution() {
       </div>
     </section>
 
+    <!-- Resurvey Process Stages Breakdown for Selected PPB Cycle (Big Font Village Numbers) -->
+    ${renderPpbCycleStageBreakdown(cycleAllVillages, activeCycle, state.selectedPpbStage, 'ppb')}
+
     <!-- Cycle-Specific Village Table -->
     <section class="section-card ppb-villages-table-card">
       <div class="section-header">
@@ -4886,6 +5165,7 @@ function renderPpbDistribution() {
               <th>MANDAL</th>
               <th>DIVISION</th>
               <th>PHASE</th>
+              <th>RESURVEY STAGE</th>
               <th>PPB TARGET</th>
               <th>PRINTED</th>
               <th>DISTRIBUTED</th>
@@ -4911,6 +5191,7 @@ function renderPpbDistribution() {
                   <td>${h(v.mandal || '—')}</td>
                   <td>${h(v.division || '—')}</td>
                   <td><span class="phase-card-badge">${h(v.phase || '—')}</span></td>
+                  <td><span class="stage-cell-pill font-mono ${(v.ported_to_webland || v.webland_2_status === 'Ported') ? 'stage-pill-green' : ''}">${h(v.current_stage || (v.ported_to_webland ? 'Webland 2.0 Ported' : '—'))}</span></td>
                   <td class="mono"><strong>${target ? target.toLocaleString() : '—'}</strong></td>
                   <td class="mono text-blue">${target ? target.toLocaleString() : '—'}</td>
                   <td class="mono text-emerald" style="font-weight:800;">${distributed ? distributed.toLocaleString() : '—'}</td>
@@ -5568,12 +5849,23 @@ function renderDashboard() {
   const has = Boolean(d.hasData);
   const filtered = getFilteredHomeVillages();
 
+  const currentHomeCycle = state.homeFilters?.month || 'All months';
+  const homeCycleVillages = state.villages.filter(v => {
+    if (!currentHomeCycle || currentHomeCycle === 'All months' || currentHomeCycle === 'All') return true;
+    const cyc = (v.ppb_cycle || v.target_month || '').toLowerCase();
+    return cyc.includes(currentHomeCycle.toLowerCase());
+  });
+  const currentStageObj = RESURVEY_STAGES_CONFIG.find(s => s.filterVal === state.homeFilters?.stage);
+
   root.innerHTML = `
     <!-- 1. Government Dark Navy Header Banner (Chittoor District) -->
     ${has ? renderReferenceTopHeader(d) : ''}
 
     <!-- 2. Multi-tier Filter Panel (Phase / Mandal / Division / PPB Cycle) -->
     ${has ? renderReferenceFilterPanel(d, filtered) : ''}
+
+    <!-- 2.5 Resurvey Stages Breakdown (Big Font Numbers for Filtered / Selected PPB Cycle) -->
+    ${renderPpbCycleStageBreakdown(homeCycleVillages, currentHomeCycle, currentStageObj?.key, 'dashboard')}
 
     <!-- 3. Overview Section: Strictly Abstract of Resurvey and PPB Distribution Cycle -->
     <div class="overview-two-parts-container" id="home-overview-container">
@@ -6042,6 +6334,17 @@ function renderVillageMonitoring() {
         </button>
       `).join('')}
     </div>
+
+    <!-- PPB Cycle Resurvey Stages Breakdown (Big Font Numbers) when in Cycle Mode -->
+    ${(state.villageFilterMode === 'cycle' || active.ppb_cycle) ? (() => {
+      const activeCyc = active.ppb_cycle || 'all';
+      const cycVillages = state.villages.filter(v => {
+        if (!active.ppb_cycle || active.ppb_cycle === 'all') return true;
+        return (v.ppb_cycle === active.ppb_cycle || v.target_month === active.ppb_cycle);
+      });
+      const stObj = RESURVEY_STAGES_CONFIG.find(s => s.filterVal === active.current_stage);
+      return renderPpbCycleStageBreakdown(cycVillages, activeCyc, stObj?.key, 'villages');
+    })() : ''}
 
     ${renderActiveChips(active)}
 
@@ -7262,7 +7565,7 @@ function exportExcel() {
 
 function exportCsv() { if (!state.villages.length) { toast('No synchronized village records are available to export.', 'error'); return; } const columns = ['village_code', 'village_name', 'mandal', 'division', 'phase', 'ppb_cycle', 'ppb_target', 'extent', 'khatas', 'current_stage', 'gt_status', 'vectorization_status', 'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'ppb_status', 'target_month', 'target_date', 'status']; const out = [columns.join(','), ...state.villages.map(row => columns.map(c => `"${String(row[c] ?? '').replace(/"/g, '""')}"`).join(','))].join('\n'); const blob = new Blob([out], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chittoor-village-monitoring-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href); }
 document.addEventListener('click', async event => {
-  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-overview-stage],[data-inspect-village],[data-gt-perf],[data-dlr-perf],[data-overview-figure]');
+  const el = event.target.closest('[data-view],[data-action],[data-resurvey-tab],[data-kpi-filter],[data-village],[data-home-village],[data-view-link],[data-drill-type],[data-phase],[data-source-sync],[data-source-test],[data-source-edit],[data-resolve-conflict],[data-analysis-tab],[data-quick-filter],[data-filter-phase],[data-filter-stage],[data-clear-chip],[data-officer-toggle],[data-cycle],[data-filter-cycle],[data-toggle-overview-mode],[data-toggle-village-mode],[data-home-filter],[data-kpi-drill],[data-stage-focus],[data-toggle-stage-columns],[data-clear-stage-focus],[data-inspect-param],[data-overview-tab],[data-ppb-cycle],[data-ppb-stage],[data-overview-stage],[data-inspect-village],[data-gt-perf],[data-dlr-perf],[data-overview-figure]');
   if (!el) return;
 
   if (el.dataset.overviewFigure) {
@@ -7282,6 +7585,11 @@ document.addEventListener('click', async event => {
       if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else if (fig.startsWith('ppb_')) {
       state.ppbFigureFilter = fig.replace('ppb_', '');
+      if (fig.startsWith('ppb_cycle_')) {
+        const cName = fig.replace('ppb_cycle_', '');
+        state.homeFilters.month = cName;
+        state.selectedPpbCycle = cName;
+      }
       renderDashboard();
       const sec = document.getElementById('ppb-village-section');
       if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -7483,8 +7791,44 @@ document.addEventListener('click', async event => {
     renderDashboard();
     return;
   }
+  if (el.dataset.ppbStage) {
+    const st = el.dataset.ppbStage;
+    if (state.view === 'ppb') {
+      state.selectedPpbStage = (state.selectedPpbStage === st) ? null : st;
+      renderPpbDistribution();
+    } else if (state.view === 'villages') {
+      const conf = RESURVEY_STAGES_CONFIG.find(s => s.key === st);
+      if (conf) {
+        state.villageFilters.current_stage = (state.villageFilters.current_stage === conf.filterVal) ? '' : conf.filterVal;
+        loadVillages().then(renderVillageMonitoring);
+      }
+    } else if (state.view === 'dashboard') {
+      const conf = RESURVEY_STAGES_CONFIG.find(s => s.key === st);
+      if (conf) {
+        state.homeFilters.stage = (state.homeFilters.stage === conf.filterVal) ? 'All stages' : conf.filterVal;
+        renderDashboard();
+      }
+    }
+    return;
+  }
+
+  if (el.dataset.action === 'reset-ppb-stage') {
+    if (state.view === 'ppb') {
+      state.selectedPpbStage = null;
+      renderPpbDistribution();
+    } else if (state.view === 'villages') {
+      delete state.villageFilters.current_stage;
+      loadVillages().then(renderVillageMonitoring);
+    } else if (state.view === 'dashboard') {
+      state.homeFilters.stage = 'All stages';
+      renderDashboard();
+    }
+    return;
+  }
+
   if (el.dataset.ppbCycle) {
     state.selectedPpbCycle = el.dataset.ppbCycle;
+    state.selectedPpbStage = null;
     renderPpbDistribution();
     return;
   }
