@@ -8230,3 +8230,128 @@ body {
   color: #15803d;
 }
 
+
+
+/* ==========================================================================
+   STRICT FIT-WITHIN-PAGE VILLAGE LIST & TABLE LAYOUT (NO HORIZONTAL SCROLL)
+   ========================================================================== */
+
+/* Remove large min-widths and enforce 100% full-width table fit within container */
+.data-table,
+.ref-dense-data-table,
+.ivw-data-table,
+.home-village-table,
+.gt-exact-table,
+.dlr-exact-table,
+.focused-stage-table {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+  box-sizing: border-box !important;
+  border-collapse: collapse !important;
+}
+
+/* Eliminate horizontal scrollbars on all village list containers */
+.data-table-card,
+.table-wrap,
+.ref-table-scroll-wrap,
+.ivw-table-scroll-wrap,
+.ivw-table-responsive,
+.home-table-wrap,
+.inline-village-wise-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important; /* STRICTLY PREVENTS HORIZONTAL SCROLLING */
+  overflow-y: auto !important;   /* Allows smooth vertical reading of rows */
+}
+
+/* Compact, graceful text formatting within cells so everything fits cleanly */
+.data-table th,
+.data-table td,
+.ref-dense-data-table th,
+.ref-dense-data-table td,
+.ivw-data-table th,
+.ivw-data-table td {
+  padding: 8px 6px !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.data-table th,
+.ref-dense-data-table th,
+.ivw-data-table th {
+  font-size: 10.5px !important;
+  letter-spacing: 0.3px !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+}
+
+/* Allow village names to be readable with ellipsis */
+.village-name-cell,
+.village-name,
+.v-name-main {
+  display: block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Compact pills and badges to fit neatly in table cells */
+.stage-label,
+.stage-cell-pill,
+.ppb-cycle-pill,
+.status-pill,
+.badge-pill-green,
+.phase-card-badge {
+  font-size: 9.5px !important;
+  padding: 2px 5px !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+}
+
+/* Completely hide any lingering officer columns */
+.col-officers-last,
+.officer-last-col-card,
+.ms-last-col-card {
+  display: none !important;
+}
+
+
+/* Sticky Table Headers for Smooth Row Reading */
+.data-table th,
+.ref-dense-data-table th,
+.ivw-data-table th {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: #f8fafc !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Compact Badges & Pills */
+.stage-label,
+.stage-cell-pill,
+.ppb-cycle-pill,
+.status-pill,
+.badge-pill-green,
+.phase-card-badge {
+  font-size: 9px !important;
+  padding: 2px 4px !important;
+  display: inline-block !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  vertical-align: middle !important;
+}

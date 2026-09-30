@@ -150,178 +150,18 @@ function normalizeMandal(val) {
   return MANDAL_ALIASES[key] || String(val).trim();
 }
 
-const MANDAL_SURVEYOR_DIRECTORY = {
-  'Baireddipalle': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006942' },
-  'Bangarupalem': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006930' },
-  'Chittoor': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006921' },
-  'G.D.Nellore': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006925' },
-  'Gangavaram': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006940' },
-  'Gudipala': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006922' },
-  'Gudipalle': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006945' },
-  'Irala': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006924' },
-  'Karvetinagar': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006937' },
-  'Kuppam': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006944' },
-  'Nagari': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006934' },
-  'Nindra': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006935' },
-  'Palamaner': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006939' },
-  'Palasamudram': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006938' },
-  'Peddapanjani': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006941' },
-  'Penumuru': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006931' },
-  'Pulicherla': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006932' },
-  'Puthalapattu': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006933' },
-  'Ramakuppam': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006947' },
-  'Rompicherla': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006929' },
-  'S.R.Puram': { name: 'B. Prasada Rao', role: 'Mandal Surveyor (MS)', phone: '9491006927' },
-  'Santhipuram': { name: 'S. Ravi Chandra', role: 'Mandal Surveyor (MS)', phone: '9491006946' },
-  'Thavanampalli': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006926' },
-  'Vedurukuppam': { name: 'V. Ravi Sekhar', role: 'Mandal Surveyor (MS)', phone: '9491006928' },
-  'Venkatagirikota': { name: 'G. Venkata Ramana Reddy', role: 'Mandal Surveyor (MS)', phone: '9491006943' },
-  'Vijayapuram': { name: 'R.V. Prasad Rao', role: 'Mandal Surveyor (MS)', phone: '9491006936' },
-  'Yadamari': { name: 'M. Krishna Moorthy', role: 'Mandal Surveyor (MS)', phone: '9491006923' }
-};
+const MANDAL_SURVEYOR_DIRECTORY = {};
 
 function getMandalSurveyor(mandalName) {
-  const norm = normalizeMandal(mandalName);
-  const found = MANDAL_SURVEYOR_DIRECTORY[norm];
-  if (found) return found;
-  const k = Object.keys(MANDAL_SURVEYOR_DIRECTORY).find(m => m.toLowerCase() === norm.toLowerCase());
-  if (k) return MANDAL_SURVEYOR_DIRECTORY[k];
-  return { name: 'Concerned Mandal Surveyor', role: 'Mandal Surveyor', phone: '1800 425 5035' };
+  return { name: '', role: '', phone: '' };
 }
 
 function renderVillageOfficerLastColumn(v) {
-  if (!v) return '<div class="officer-last-col-card"><span class="text-muted">—</span></div>';
-
-  const msInfo = getMandalSurveyor(v.mandal);
-  const rawNames = v.gt_team_names || '';
-  const rawMobiles = v.gt_team_mobiles || '';
-  const isPhase6 = (v.phase === 'Phase-VI' || v.phase === 'Phase VI' || /Phase[\s\-_]*6/i.test(v.phase || ''));
-
-  // Parse lines of names and mobiles
-  const names = rawNames ? rawNames.split(/[\n;]+/).map(s => s.replace(/^\s*\d+[\.\)]\s*/, '').replace(/^[–\-•]\s*/, '').trim()).filter(Boolean) : [];
-  const mobiles = (rawMobiles.match(/[6-9]\d{9}/g) || []);
-
-  const hasExplicitTeam = names.length > 0 || mobiles.length > 0;
-
-  // Build team members array
-  let teamMembers = [];
-  if (hasExplicitTeam) {
-    const maxCount = Math.max(names.length, mobiles.length);
-    for (let i = 0; i < maxCount; i++) {
-      const n = names[i] || (i === 0 ? 'Village Surveyor (VS)' : `Team Member ${i + 1}`);
-      const p = mobiles[i] || '';
-      const isVs = /\bVS\b|\(VS\)|,\s*VS/i.test(n) || (i === 0 && !/\bVRO\b|\(VRO\)/i.test(n));
-      const isVro = /\bVRO\b|\(VRO\)/i.test(n);
-      teamMembers.push({ name: n, phone: p, isVs, isVro });
-    }
-  } else {
-    // Standard revenue village default: VS + MLSO / MS
-    teamMembers.push({
-      name: 'Village Surveyor (VS)',
-      phone: msInfo.phone,
-      isVs: true,
-      isFallback: true
-    });
-  }
-
-  return `
-    <div class="officer-last-col-card">
-      <div class="officer-team-section">
-        ${isPhase6 ? '<div class="officer-phase-badge">Phase 6 Team Members</div>' : ''}
-        <div class="officer-members-list">
-          ${teamMembers.map(m => `
-            <div class="officer-member-row">
-              <span class="officer-name-tag ${m.isVs ? 'tag-vs' : m.isVro ? 'tag-vro' : 'tag-member'}">
-                <svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <strong>${h(m.name)}</strong>
-              </span>
-              ${m.phone ? `
-                <a href="tel:${m.phone}" class="officer-phone-chip ${m.isFallback ? 'is-desk' : ''}" title="Call ${h(m.name)}: ${m.phone}">
-                  <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                  ${m.phone}
-                </a>
-              ` : '<span class="officer-phone-na">Desk Ext.</span>'}
-            </div>
-          `).join('')}
-        </div>
-      </div>
-      <div class="officer-mlso-section">
-        <div class="officer-member-row is-mlso">
-          <span class="officer-name-tag tag-ms" title="Mandal Level Survey Officer / Mandal Surveyor">
-            <svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <strong>MLSO/MS: ${h(msInfo.name)}</strong>
-          </span>
-          <a href="tel:${msInfo.phone}" class="officer-phone-chip is-ms" title="Call MLSO / MS: ${msInfo.phone}">
-            <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            ${msInfo.phone}
-          </a>
-        </div>
-      </div>
-    </div>
-  `;
+  return '';
 }
 
 function getVillageOfficerContact(v) {
-  if (!v) return { nameHtml: '—', phoneHtml: '—', rawNames: '', rawMobiles: '' };
-
-  const rawNames = v.gt_team_names || '';
-  const rawMobiles = v.gt_team_mobiles || '';
-
-  let names = [];
-  if (rawNames) {
-    names = rawNames.split(/[\n;]+/)
-      .map(s => s.replace(/^\s*\d+[\.\)]\s*/, '').replace(/^[–\-•]\s*/, '').trim())
-      .filter(Boolean);
-  }
-
-  let mobiles = [];
-  if (rawMobiles) {
-    const cleanStr = rawMobiles.replace(/\s+/g, '');
-    const found = cleanStr.match(/[6-9]\d{9}/g);
-    if (found) mobiles = Array.from(new Set(found));
-  }
-
-  if (names.length > 0 || mobiles.length > 0) {
-    const nameHtml = `
-      <div class="officer-name-cell">
-        ${names.map(n => {
-          const isVs = /\(VS\)|,\s*VS/i.test(n);
-          const isVro = /\(VRO\)|,\s*VRO/i.test(n);
-          return `<span class="officer-name-chip ${isVs ? 'is-vs' : isVro ? 'is-vro' : ''}" title="${h(n)}"><svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> ${h(n)}</span>`;
-        }).join('')}
-      </div>
-    `;
-
-    const phoneHtml = `
-      <div class="officer-phone-cell">
-        ${mobiles.length > 0 ? mobiles.map(m => `
-          <a href="tel:${m}" class="officer-phone-link" title="Call officer: ${m}">
-            <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            ${m}
-          </a>
-        `).join('') : '<span class="officer-phone-na">Desk Ext. Available</span>'}
-      </div>
-    `;
-    return { nameHtml, phoneHtml, rawNames, rawMobiles };
-  }
-
-  // Fallback to designated Mandal Surveyor and Secretariat Resurvey Team
-  const ms = getMandalSurveyor(v.mandal);
-  const nameHtml = `
-    <div class="officer-name-cell">
-      <span class="officer-name-chip is-vs" title="Village Secretariat Resurvey Team"><svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> VS Resurvey Desk</span>
-      <span class="officer-sub-ms">MLSO/MS: ${h(ms.name)}</span>
-    </div>
-  `;
-  const phoneHtml = `
-    <div class="officer-phone-cell">
-      <a href="tel:${ms.phone}" class="officer-phone-link is-ms" title="Call Concerned MLSO / MS: ${ms.phone}">
-        <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        ${ms.phone}
-      </a>
-    </div>
-  `;
-  return { nameHtml, phoneHtml, rawNames: 'Village Secretariat Desk', rawMobiles: ms.phone };
+  return { nameHtml: '', phoneHtml: '', rawNames: '', rawMobiles: '' };
 }
 
 
@@ -1773,22 +1613,7 @@ function renderIndividualVillageProgressCard(village) {
           <p class="iv-sub-meta">
             Mandal: <strong>${h(village.mandal)}</strong> · Division: <strong>${h(village.division)}</strong> · Phase: <strong>${h(village.phase)}</strong> · PPB Cycle: <strong>${h(village.ppb_cycle || '—')}</strong>
           </p>
-          <div class="iv-officer-strip" style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:8px;padding:8px 12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0;">
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;">Surveyor / Team:</span>
-              ${officerContact.nameHtml}
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;">
-              <span style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;">Contact:</span>
-              ${officerContact.phoneHtml}
-            </div>
-            <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
-              <span style="font-size:10px;font-weight:800;color:#64748b;text-transform:uppercase;">Concerned MS:</span>
-              <span class="ms-name-badge"><strong>${h(msInfo.name)}</strong></span>
-              <a href="tel:${msInfo.phone}" class="officer-phone-link is-ms" title="Call Mandal Surveyor">${msInfo.phone}</a>
-            </div>
           </div>
-        </div>
         <div class="iv-header-actions">
           <button type="button" class="iv-action-btn primary" data-action="track-village-modal" data-village-id="${village.id}" title="Open full official record popup for this village">
             ${icon('document')} Full Details Modal ↗
@@ -2129,13 +1954,11 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
         <table class="ivw-data-table">
           <thead>
             <tr>
-              <th style="width:45px;">SL</th>
-              <th style="width:90px;">CODE</th>
-              <th>VILLAGE NAME</th>
-              <th>MANDAL</th>
-              <th>DIVISION</th>
-              <th>OFFICER / SURVEYOR</th>
-              <th>CONTACT NUMBER</th>
+              <th style="width:4%;">SL</th>
+              <th style="width:8%;">CODE</th>
+              <th style="width:20%;">VILLAGE NAME</th>
+              <th style="width:12%;">MANDAL</th>
+              <th style="width:10%;">DIVISION</th>
               ${isGtActive ? `
                 <th class="col-highlight-today">GT EXTENT TODAY (AC)</th>
                 <th class="col-highlight-cum">GT COMPLETED (ACRES)</th>
@@ -2155,7 +1978,7 @@ function renderInlineVillageWiseProgress(filtered, d = {}) {
           <tbody>
             ${list.length === 0 ? `
               <tr>
-                <td colspan="${isGtActive ? 12 : 13}" class="empty-table-row">
+                <td colspan="${isGtActive ? 10 : 11}" class="empty-table-row">
                   No villages match the selected search or mandal filter.
                 </td>
               </tr>
@@ -2464,14 +2287,13 @@ function renderGtVillageTable(filtered, d) {
               <th class="col-highlight-bal">Balance extent</th>
               <th>Total extent</th>
               <th>Status</th>
-              <th style="width: 100px; text-align: center;">Action</th>
-              <th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>
+              <th style="width: 6%; text-align: center;">Action</th>
             </tr>
           </thead>
           <tbody>
             ${list.length === 0 ? `
               <tr>
-                <td colspan="13" class="empty-table-row">No villages match the selected search, mandal, or performance filter.</td>
+                <td colspan="12" class="empty-table-row">No villages match the selected search, mandal, or performance filter.</td>
               </tr>
             ` : list.slice(0, 150).map((v, idx) => {
               const isSelected = state.overviewSelectedVillageId === v.id;
@@ -2515,8 +2337,7 @@ function renderGtVillageTable(filtered, d) {
                       Tracker →
                     </button>
                   </td>
-                  <td>${renderVillageOfficerLastColumn(v)}</td>
-                </tr>
+                  </tr>
               `;
             }).join('')}
           </tbody>
@@ -2861,13 +2682,12 @@ function renderDlrVillageTable(filtered, d) {
               <th class="col-highlight-bal" style="text-align: right;">Balance Pending</th>
               <th>Target Date</th>
               <th>Remarks</th>
-              <th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>
             </tr>
           </thead>
           <tbody>
             ${list.length === 0 ? `
               <tr>
-                <td colspan="17" class="empty-table-row">No records found matching the prompt selection. Choose another Phase, Mandal, or reset filters.</td>
+                <td colspan="16" class="empty-table-row">No records found matching the prompt selection. Choose another Phase, Mandal, or reset filters.</td>
               </tr>
             ` : list.map((r, idx) => {
               const isPoor = r.balance > 0 && r.today === 0;
@@ -2897,21 +2717,6 @@ function renderDlrVillageTable(filtered, d) {
                   <td class="font-mono col-highlight-bal num-bold text-right">${r.balance > 0 ? `<span class="text-amber">${Number(r.balance).toLocaleString('en-IN')}</span>` : '<span class="text-emerald">0</span>'}</td>
                   <td class="font-mono text-nowrap">${h(r.target_date || '—')}</td>
                   <td class="remarks-cell"><small>${h(r.remarks || '—')}</small></td>
-                  <td>
-                    <div class="ms-last-col-card">
-                      <div class="ms-name-line">
-                        <span class="ms-name-badge">
-                          <svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                          <strong>${h(r.dios || msInfo.name)}</strong>
-                        </span>
-                        <span class="ms-role-tag">MLSO / MS</span>
-                      </div>
-                      <a href="tel:${msInfo.phone}" class="officer-phone-chip is-ms" title="Call MLSO / MS: ${msInfo.phone}">
-                        <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        ${msInfo.phone}
-                      </a>
-                    </div>
-                  </td>
                 </tr>
               `;
             }).join('')}
@@ -3489,23 +3294,22 @@ function renderPpbVillageTable(filtered, d) {
         <table class="ref-dense-data-table ivw-data-table">
           <thead>
             <tr>
-              <th style="width:45px;">SL.NO.</th>
-              <th style="width:130px;">MANDAL</th>
-              <th style="min-width:180px;">VILLAGE NAME</th>
-              <th style="width:110px;">DIVISION</th>
-              <th style="width:90px;">PHASE</th>
-              <th style="width:130px;">PPB CYCLE</th>
-              <th style="width:120px;text-align:right;">TARGET PPBs</th>
-              <th style="width:110px;text-align:right;">PRINTED</th>
-              <th style="width:120px;text-align:right;" class="col-highlight-cum">DISTRIBUTED</th>
-              <th style="width:120px;text-align:right;" class="col-highlight-bal">BALANCE</th>
-              <th style="width:120px;text-align:center;">STATUS</th>
-              <th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>
+              <th style="width:4%;">SL</th>
+              <th style="width:12%;">MANDAL</th>
+              <th style="width:18%;">VILLAGE NAME</th>
+              <th style="width:10%;">DIVISION</th>
+              <th style="width:7%;">PHASE</th>
+              <th style="width:9%;">PPB CYCLE</th>
+              <th style="width:8%;text-align:right;">TARGET</th>
+              <th style="width:8%;text-align:right;">PRINTED</th>
+              <th style="width:8%;text-align:right;" class="col-highlight-cum">DISTRIBUTED</th>
+              <th style="width:8%;text-align:right;" class="col-highlight-bal">BALANCE</th>
+              <th style="width:8%;text-align:center;">STATUS</th>
             </tr>
           </thead>
           <tbody>
             ${list.length === 0 ? `
-              <tr><td colspan="12" class="text-center empty-table-cell">No PPB villages match the selected filter.</td></tr>
+              <tr><td colspan="11" class="text-center empty-table-cell">No PPB villages match the selected filter.</td></tr>
             ` : list.map((v, idx) => {
               const target = Number(v.ppb_target) || Number(v.khatas) || 0;
               const isDist = v.ppb_status === 'Distributed' || v.ppb_status === 'Completed';
@@ -3534,8 +3338,7 @@ function renderPpbVillageTable(filtered, d) {
                   <td class="font-mono font-bold text-right text-emerald">${dist.toLocaleString()}</td>
                   <td class="font-mono font-bold text-right text-amber">${bal.toLocaleString()}</td>
                   <td style="text-align:center;">${statusPill}</td>
-                  <td>${renderVillageOfficerLastColumn(v)}</td>
-                </tr>
+                  </tr>
               `;
             }).join('')}
           </tbody>
@@ -4134,18 +3937,18 @@ function renderHomeFilteredVillagesSection() {
         <table class="data-table home-village-table">
           <thead>
             <tr>
-              <th style="width:40px;">#</th>
-              <th>CODE</th>
-              <th>VILLAGE NAME</th>
-              <th>MANDAL</th>
-              <th>DIVISION</th>
-              <th>TARGET MONTH</th>
-              <th>PHASE</th>
-              <th class="mono">EXTENT (AC)</th>
-              <th class="mono">TARGET PPBS</th>
-              <th>CURRENT RESURVEY STAGE</th>
-              <th>OVERALL STATUS</th>
-              <th style="text-align:center;">ACTION</th>
+              <th style="width:3%;">#</th>
+              <th style="width:7%;">CODE</th>
+              <th style="width:18%;">VILLAGE NAME</th>
+              <th style="width:11%;">MANDAL</th>
+              <th style="width:9%;">DIVISION</th>
+              <th style="width:9%;">TARGET MONTH</th>
+              <th style="width:7%;">PHASE</th>
+              <th style="width:8%;" class="mono">EXTENT (AC)</th>
+              <th style="width:8%;" class="mono">TARGET PPBS</th>
+              <th style="width:12%;">CURRENT RESURVEY STAGE</th>
+              <th style="width:5%;">OVERALL STATUS</th>
+              <th style="width:3%;text-align:center;">ACTION</th>
             </tr>
           </thead>
           <tbody id="home-villages-tbody">
@@ -5160,18 +4963,18 @@ function renderPpbDistribution() {
         <table class="data-table">
           <thead>
             <tr>
-              <th>CODE</th>
-              <th>VILLAGE NAME</th>
-              <th>MANDAL</th>
-              <th>DIVISION</th>
-              <th>PHASE</th>
-              <th>RESURVEY STAGE</th>
-              <th>PPB TARGET</th>
-              <th>PRINTED</th>
-              <th>DISTRIBUTED</th>
-              <th>BALANCE</th>
-              <th>STATUS</th>
-              <th>ACTION</th>
+              <th style="width:7%;">CODE</th>
+              <th style="width:16%;">VILLAGE NAME</th>
+              <th style="width:10%;">MANDAL</th>
+              <th style="width:9%;">DIVISION</th>
+              <th style="width:6%;">PHASE</th>
+              <th style="width:13%;">RESURVEY STAGE</th>
+              <th style="width:8%;">PPB TARGET</th>
+              <th style="width:7%;">PRINTED</th>
+              <th style="width:8%;">DISTRIBUTED</th>
+              <th style="width:7%;">BALANCE</th>
+              <th style="width:5%;">STATUS</th>
+              <th style="width:4%;text-align:center;">ACTION</th>
             </tr>
           </thead>
           <tbody>
@@ -5764,12 +5567,11 @@ function renderMandalWiseDailyProformaSection(d, filtered) {
               <th>TODAY</th>
               <th>GT PROGRESS</th>
               <th>VECTORIZATION</th>
-              <th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>
             </tr>
           </thead>
           <tbody>
             ${proformaRows.length === 0 ? `
-              <tr><td colspan="10" class="text-center empty-table-cell">No daily proforma rows yet — hit "Refresh sheets".</td></tr>
+              <tr><td colspan="9" class="text-center empty-table-cell">No daily proforma rows yet — hit "Refresh sheets".</td></tr>
             ` : proformaRows.map(r => {
               const gtPct = r.villages > 0 ? Math.round((r.gtDone / r.villages) * 100) : 0;
               const vecPct = r.villages > 0 ? Math.round((r.vecDone / r.villages) * 100) : 0;
@@ -5792,21 +5594,6 @@ function renderMandalWiseDailyProformaSection(d, filtered) {
                   <td>
                     <div class="proforma-prog-pill font-mono ${vecPct > 70 ? 'pill-green' : 'pill-blue'}">
                       ${vecPct}% (${r.vecDone}/${r.villages})
-                    </div>
-                  </td>
-                  <td>
-                    <div class="ms-last-col-card">
-                      <div class="ms-name-line">
-                        <span class="ms-name-badge">
-                          <svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                          <strong>${h(msInfo.name)}</strong>
-                        </span>
-                        <span class="ms-role-tag">MLSO / MS</span>
-                      </div>
-                      <a href="tel:${msInfo.phone}" class="officer-phone-chip is-ms" title="Call MLSO / MS: ${msInfo.phone}">
-                        <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                        ${msInfo.phone}
-                      </a>
                     </div>
                   </td>
                 </tr>
@@ -6515,8 +6302,7 @@ function villageTable(rows) {
               <th class="col-highlight-bal">BALANCE ENTRIES</th>
               <th>TOTAL ENTRIES</th>
             `}
-            <th>ACTION</th>
-            <th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>
+            <th style="width:5%;text-align:center;">ACTION</th>
           </tr>
         </thead>
         <tbody>
@@ -6588,7 +6374,6 @@ function villageTable(rows) {
                 <td>
                   <button class="inline-link" data-village="${v.id}" style="font-weight:800;">Track →</button>
                 </td>
-                <td>${renderVillageOfficerLastColumn(v)}</td>
               </tr>
             `;
           }).join('')}
@@ -6613,7 +6398,6 @@ function villageTable(rows) {
             <td style="text-align:center;">
               <span class="badge-pill-green">SUM TOTAL</span>
             </td>
-            <td class="text-center font-mono text-muted text-small">—</td>
           </tr>
         </tfoot>
       </table>
@@ -6625,18 +6409,17 @@ function villageTable(rows) {
     <table class="data-table">
       <thead>
         <tr>
-          <th>CODE</th>
-          <th>VILLAGE NAME</th>
-          <th>MANDAL</th>
-          <th>DIVISION</th>
-          <th>PPBS CYCLE</th>
-          <th>PHASE</th>
-          <th>EXTENT (AC)</th>
-          <th>PPBs TARGET</th>
-          <th>CURRENT RESURVEY STAGE</th>
-          <th>OVERALL STATUS</th>
-          <th>ACTION</th>
-          <th class="col-officers-last">SURVEY OFFICERS (VS · MLSO/MS · TEAM)</th>
+          <th style="width:7%;">CODE</th>
+          <th style="width:18%;">VILLAGE NAME</th>
+          <th style="width:11%;">MANDAL</th>
+          <th style="width:9%;">DIVISION</th>
+          <th style="width:9%;">PPBS CYCLE</th>
+          <th style="width:7%;">PHASE</th>
+          <th style="width:8%;">EXTENT (AC)</th>
+          <th style="width:8%;">PPBs TARGET</th>
+          <th style="width:13%;">CURRENT RESURVEY STAGE</th>
+          <th style="width:6%;">OVERALL STATUS</th>
+          <th style="width:4%;text-align:center;">ACTION</th>
         </tr>
       </thead>
       <tbody>
@@ -6668,7 +6451,6 @@ function villageTable(rows) {
                 Track →
               </button>
             </td>
-            <td>${renderVillageOfficerLastColumn(v)}</td>
           </tr>
         `).join('')}
       </tbody>
@@ -7015,8 +6797,7 @@ function renderDivisionAnalysis(d) {
             <th>VECTORIZATION %</th>
             <th>PENDING</th>
             <th>DELAYED</th>
-            <th>ACTION</th>
-            <th class="col-officers-last">CONCERNED MLSO / MS & CONTACT</th>
+            <th style="width:8%;text-align:center;">ACTION</th>
           </tr>
         </thead>
         <tbody>
@@ -7044,22 +6825,7 @@ function renderDivisionAnalysis(d) {
                     Villages →
                   </button>
                 </td>
-                <td>
-                  <div class="ms-last-col-card">
-                    <div class="ms-name-line">
-                      <span class="ms-name-badge">
-                        <svg class="officer-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <strong>${h(msInfo.name)}</strong>
-                      </span>
-                      <span class="ms-role-tag">MLSO / MS</span>
-                    </div>
-                    <a href="tel:${msInfo.phone}" class="officer-phone-chip is-ms" title="Call MLSO / MS: ${msInfo.phone}">
-                      <svg viewBox="0 0 24 24" class="phone-icon"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                      ${msInfo.phone}
-                    </a>
-                  </div>
-                </td>
-              </tr>
+                </tr>
             `;
           }).join('')}
         </tbody>
