@@ -1,4 +1,14 @@
-const fs = require('fs');
+const https = require('https');
+
+function fetchText(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, { headers: { 'User-Agent': 'Mozilla/5.0' } }, res => {
+      let d = '';
+      res.on('data', c => d += c);
+      res.on('end', () => resolve(d));
+    }).on('error', reject);
+  });
+}
 
 const sheetIds = [
   { name: 'Master PPB Action Plan', id: '1hsYJXp32Zfw7N01e_oZLgplHX3yj51xy3k7B-I-2b5k' },
@@ -7,19 +17,13 @@ const sheetIds = [
   { name: 'Phase-IV GT Completed', id: '1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4' },
   { name: 'Phase-V Daily Monitoring', id: '11GdOnP1wt0OrnwhRbn-MgbzuclsYuDfx7ocsUOrAUn8' },
   { name: 'Phase-VI Daily Monitoring', id: '1aSCPTr5O7YP-LgKKpRMJzuhGevfMd4QkBAkJ-AosAfY' },
-  { name: 'Rover Allotment', id: '17YeaDn2_bjXCcoLiSM1wngJBlcqCqRtlFAI9ZXIpfYM' },
-  // Also check if there were any others in seed scripts
-  { name: 'Phase 7 targets from pdfs 1', id: '17M7sj_XzRKkiM9C-GpHernk_EEQnctOD8MOB0fnVr0A' },
-  { name: 'Phase 7 targets from pdfs 2', id: '1bjvwI7f-heRZxahA7JmL8ZweJWGAu5e1sQPztSergBU' },
-  { name: 'Phase 7 targets from pdfs 3', id: '18kcvSTkGP1Vlc5LVGeotVG-3jLr2jx4sLajrouH8dEQ' },
-  { name: 'Phase 7 targets from pdfs 4', id: '16RIo0Z4KPCFMDBG67qKB7nF8ztlUT6DQ5nMIbXYh9KA' }
+  { name: 'Rover Allotment', id: '17YeaDn2_bjXCcoLiSM1wngJBlcqCqRtlFAI9ZXIpfYM' }
 ];
 
 async function inspectAll() {
   for (const s of sheetIds) {
     try {
-      const res = await fetch(`https://docs.google.com/spreadsheets/d/${s.id}/htmlview`);
-      const text = await res.text();
+      const text = await fetchText(`https://docs.google.com/spreadsheets/d/${s.id}/htmlview`);
       console.log(`\n========================================`);
       console.log(`=== ${s.name} (${s.id}) ===`);
       

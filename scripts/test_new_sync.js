@@ -120,10 +120,12 @@ const STAGE_CONFIG = {
   dlr_completed: { key: 'dlr_completed', shortCode: 'COMPLETED', name: 'Final ROR Completed', label: 'Final ROR Completed' }
 };
 
-async function syncAllLiveData(store) {
-  const villages = store.villages || [];
+async function testSync() {
+  const storePath = path.join(__dirname, '../data/store.json');
+  const store = JSON.parse(fs.readFileSync(storePath, 'utf8'));
+  const villages = store.villages;
 
-  // 0. Clean data inconsistencies
+  // Clean data inconsistencies
   const v468 = villages.find(v => Math.abs(parseFloat(v.extent) - 489.41) < 5 && v.phase === 'Phase VI');
   if (v468) {
     v468.village_name = 'Battamdoddi Dasaralapalli';
@@ -146,14 +148,11 @@ async function syncAllLiveData(store) {
     vMuthPanjani.gt_status = 'In Progress';
   }
 
-  // Clear ported and legacy stage flags from Phase 5 and 6
+  // Clear ported flags from Phase 5 and 6
   villages.filter(v => v.phase === 'Phase V' || v.phase === 'Phase VI').forEach(v => {
     v.ported_to_webland = false;
     v.webland_2_status = 'Not Started';
     v.blockchain_status = 'Pending';
-    v.jc_status = 'Pending';
-    v.dlr_active_stage = 'Pending';
-    v.final_ror_status = 'Pending';
   });
 
   const dlrRecords = [];
@@ -477,45 +476,10 @@ async function syncAllLiveData(store) {
     }
   });
 
-  // Ensure all villages with JC login completed or DLR completed are marked as Final ROR, Webland Porting, and Blockchain Tech (Phases 1-4)
-  villages.forEach(v => {
-    if (v.phase !== 'Phase V' && v.phase !== 'Phase VI') {
-      const isJcComplete = v.jc_status === 'Completed' ||
-                           v.dlr_active_stage === 'Completed' ||
-                           (v.dlr_stages_detail && v.dlr_stages_detail.jc_status && v.dlr_stages_detail.jc_status.status === 'Completed');
-      if (isJcComplete) {
-        v.final_ror_status = 'Completed';
-        const cs = (v.current_stage || '').toLowerCase();
-        if (!v.ported_to_webland && !cs.includes('webland') && !cs.includes('blockchain')) {
-          v.current_stage = 'Final ROR Completed';
-        }
-      }
-    }
-    // Ported to Webland and Blockchain Technology Stage assignments (Phase 1-4)
-    if (v.phase !== 'Phase V' && v.phase !== 'Phase VI') {
-      if (v.ported_to_webland || v.webland_2_status === 'Ported') {
-        if ((v.phase || '').includes('2024') || (v.ppb_cycle || '').includes('Prior')) {
-          v.current_stage = 'Block Chain Tech Stage';
-          v.blockchain_status = 'Completed';
-        } else {
-          v.current_stage = 'Webland Porting';
-        }
-      }
-    }
-    if (!v.lpms) {
-      v.lpms = Number(v.khatas) || Number(v.ppb_target) || Math.round((parseFloat(v.extent) || 500) * 1.25) || 850;
-      v.lpms_arrived = v.lpms;
-    }
-    if (!v.chalthas) {
-      v.chalthas = Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75));
-    }
-  });
-
   // 12. Fetch GT Daily Sheets
   console.log('Fetching Google Spreadsheets GT data (Phase 5 & 6)...');
   villages.forEach(v => { v.today_gt_extent = 0.00; });
 
-  let p5TodaySum = 0, p5ActiveCount = 0;
   try {
     const p5Table = await fetchGviz('11GdOnP1wt0OrnwhRbn-MgbzuclsYuDfx7ocsUOrAUn8', '0');
     for (let r = 1; r < p5Table.rows.length; r++) {
@@ -543,8 +507,8 @@ async function syncAllLiveData(store) {
         v.balance_gt_extent = bal;
         if (isComp) v.gt_status = 'Completed';
         else if (today > 0 || cum > 0) v.gt_status = 'In Progress';
-        if (today > 0) { p5ActiveCount++; p5TodaySum += today; }
-
+        
+        // Only set current_stage if village is NOT in DLR and NOT in Vectorization
         const isDlr = dlrMatchedIds.has(v.id || v.village_code);
         const isVec = p5VectorizationCodes.includes(String(v.village_code));
         if (!isDlr && !isVec) {
@@ -555,7 +519,6 @@ async function syncAllLiveData(store) {
     }
   } catch (e) { console.error('Error Phase 5 GT:', e.message); }
 
-  let p6TodaySum = 0, p6ActiveCount = 0;
   try {
     const p6Table = await fetchGviz('1aSCPTr5O7YP-LgKKpRMJzuhGevfMd4QkBAkJ-AosAfY', '0');
     for (let r = 1; r < p6Table.rows.length; r++) {
@@ -587,8 +550,8 @@ async function syncAllLiveData(store) {
         v.balance_gt_extent = bal;
         if (isComp) v.gt_status = 'Completed';
         else if (today > 0 || cum > 0) v.gt_status = 'In Progress';
-        if (today > 0) { p6ActiveCount++; p6TodaySum += today; }
-
+        
+        // Only set current_stage if village is NOT in DLR and NOT in Vectorization
         const isDlr = dlrMatchedIds.has(v.id || v.village_code);
         const isVec = p6VectorizationCodes.includes(String(v.village_code));
         if (!isDlr && !isVec) {
@@ -599,111 +562,28 @@ async function syncAllLiveData(store) {
     }
   } catch (e) { console.error('Error Phase 6 GT:', e.message); }
 
-  // Build DLR Summary
-  const byStage = {};
-  ['vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status'].forEach(key => {
-    const recs = dlrRecords.filter(r => r.login_key === key);
-    const today = recs.reduce((s, r) => s + (Number(r.today) || 0), 0);
-    const cumulative = recs.reduce((s, r) => s + (Number(r.cumulative) || 0), 0);
-    const balance = recs.reduce((s, r) => s + (Number(r.balance) || 0), 0);
-    const total = recs.reduce((s, r) => s + (Number(r.total_entries) || 0), 0);
-    const pct = total > 0 ? ((cumulative / total) * 100).toFixed(1) : '0.0';
-    const names = {
-      vs_status: 'Village Surveyor Login (VS Login)',
-      vro_status: 'VRO Login (Village Revenue Officer)',
-      tahsildar_status: 'Tahsildar Login (Tah Login)',
-      rdo_status: 'RDO Login (Revenue Divisional Officer)',
-      jc_status: 'JC Login (Joint Collector Approval)'
-    };
-    byStage[key] = { name: names[key], today, cumulative, balance, total, pct, villageCount: recs.length };
+  // 13. Audit and verify counts
+  console.log('\n--- VERIFICATION OF STAGE COUNTS ---');
+  const p5Villages = villages.filter(v => v.phase === 'Phase V');
+  const p5StageCounts = {};
+  p5Villages.forEach(v => {
+    p5StageCounts[v.current_stage] = (p5StageCounts[v.current_stage] || 0) + 1;
   });
+  console.log('Phase 5 (Total ' + p5Villages.length + '):', JSON.stringify(p5StageCounts, null, 2));
 
-  const allActive = ['vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status'];
-  const dlrTodayTotal = allActive.reduce((s, k) => s + byStage[k].today, 0);
-  const dlrCumulativeTotal = allActive.reduce((s, k) => s + byStage[k].cumulative, 0);
-  const dlrBalanceTotal = allActive.reduce((s, k) => s + byStage[k].balance, 0);
-  const dlrTotalEntries = allActive.reduce((s, k) => s + byStage[k].total, 0);
-  const dlrBenchmarkDaily = 200;
-  const dlrPacePct = dlrBenchmarkDaily > 0 ? ((dlrTodayTotal / dlrBenchmarkDaily) * 100).toFixed(1) : '0.0';
-  const dlrPctTotal = dlrTotalEntries > 0 ? ((dlrCumulativeTotal / dlrTotalEntries) * 100).toFixed(1) : '0.0';
+  const p6Villages = villages.filter(v => v.phase === 'Phase VI');
+  const p6StageCounts = {};
+  p6Villages.forEach(v => {
+    p6StageCounts[v.current_stage] = (p6StageCounts[v.current_stage] || 0) + 1;
+  });
+  console.log('Phase 6 (Total ' + p6Villages.length + '):', JSON.stringify(p6StageCounts, null, 2));
 
-  store.dlrSummary = {
-    todayTotal: dlrTodayTotal,
-    cumulativeTotal: dlrCumulativeTotal,
-    balanceTotal: dlrBalanceTotal,
-    totalEntries: dlrTotalEntries,
-    benchmarkDaily: dlrBenchmarkDaily,
-    pacePct: dlrPacePct,
-    pctTotal: dlrPctTotal,
-    byStage,
-    lastSynced: new Date().toISOString()
-  };
-
-  const grandTodayGt = Math.round((p5TodaySum + p6TodaySum) * 100) / 100;
-  const grandActiveGt = p5ActiveCount + p6ActiveCount;
-
-  const p5v = villages.filter(v => (v.phase || '').includes('V') && !(v.phase || '').includes('VI'));
-  const p6v = villages.filter(v => (v.phase || '').includes('VI'));
-  const activeGtVillages = [...p5v, ...p6v];
-
-  const cumulativeGtExtent = Math.round(activeGtVillages.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || 0), 0) * 100) / 100;
-  const totalGtExtent = Math.round(activeGtVillages.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) * 100) / 100;
-  const balanceGtExtent = Math.round(Math.max(0, totalGtExtent - cumulativeGtExtent) * 100) / 100;
-  const completionPctGt = totalGtExtent > 0 ? ((cumulativeGtExtent / totalGtExtent) * 100).toFixed(1) : '0.0';
-  const totalRovers = 60;
-  const dailyCapacityAc = totalRovers * 25;
-  const pacePctGt = dailyCapacityAc > 0 ? ((grandTodayGt / dailyCapacityAc) * 100).toFixed(1) : '0.0';
-
-  store.gtSummary = {
-    todayTotal: grandTodayGt,
-    cumulativeTotal: cumulativeGtExtent,
-    balanceTotal: balanceGtExtent,
-    totalExtent: totalGtExtent,
-    benchmarkDaily: 25,
-    rovers: totalRovers,
-    dailyCapacityAc,
-    completionPct: completionPctGt,
-    pacePct: pacePctGt,
-    activeVillagesToday: grandActiveGt,
-    lastSynced: new Date().toISOString()
-  };
-
+  // Write store
   store.dlr_records = dlrRecords;
-
-  store.lastSync = {
-    id: `sync_${Date.now()}`,
-    source: 'Google Spreadsheets Live Sync',
-    status: 'Success',
-    dateTime: new Date().toISOString(),
-    recordsProcessed: villages.length,
-    dlrRecordsCount: dlrRecords.length,
-    gtTodayAc: grandTodayGt,
-    dlrTodayEntries: dlrTodayTotal
-  };
-
-  // Persist to store.json
-  const STORE_PATH = path.join(__dirname, '../data/store.json');
-  try {
-    if (!fs.existsSync(path.dirname(STORE_PATH))) fs.mkdirSync(path.dirname(STORE_PATH), { recursive: true });
-    fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
-  } catch (e) {
-    console.error('Error writing store.json:', e.message);
-  }
-
-  const TMP_STORE = path.join('/tmp', 'store.json');
-  try {
-    fs.writeFileSync(TMP_STORE, JSON.stringify(store, null, 2), 'utf8');
-  } catch (e) {}
-
-  return store;
+  fs.writeFileSync(storePath, JSON.stringify(store, null, 2), 'utf8');
+  console.log('\nSuccessfully saved updated store.json');
 }
 
-module.exports = {
-  syncAllLiveData,
-  fetchGviz,
-  fetchUrl,
-  cleanNum,
-  normalizeMandal,
-  findVillage,
-  STAGE_CONFIG
-};
+testSync().catch(err => {
+  console.error('Fatal error in testSync:', err);
+});

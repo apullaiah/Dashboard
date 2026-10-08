@@ -21,7 +21,6 @@ function fetchUrl(url, retries = 3) {
     req.on('timeout', () => {
       req.abort();
       if (retries > 0) {
-        console.log(`Timeout on ${url}, retrying (${retries} left)...`);
         setTimeout(() => resolve(fetchUrl(url, retries - 1)), 2000);
       } else {
         reject(new Error('Request timed out after retries'));
@@ -29,7 +28,6 @@ function fetchUrl(url, retries = 3) {
     });
     req.on('error', err => {
       if (retries > 0) {
-        console.log(`Error ${err.message} on ${url}, retrying (${retries} left)...`);
         setTimeout(() => resolve(fetchUrl(url, retries - 1)), 2000);
       } else {
         reject(err);
@@ -80,12 +78,16 @@ function normalizeMandal(val) {
   return val.trim();
 }
 
+const CODE_OVERRIDES = {
+  // If code in sheet is swapped or needs override
+};
+
 function findVillage(code, vName, mandal) {
   const c = String(code || '').trim();
-  const cleanName = String(vName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
   const normM = normalizeMandal(mandal);
+  const cleanName = String(vName || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-  // Inverted code correction in Google Sheet for Peddapanjani
+  // Specific known name fixes
   if (c === '1060033' && cleanName.includes('muthukur')) {
     const v = villages.find(v => String(v.village_code) === '1060031');
     if (v) return v;
@@ -121,14 +123,14 @@ const STAGE_CONFIG = {
   dlr_completed: { key: 'dlr_completed', shortCode: 'COMPLETED', name: 'DLR Completed Villages', label: 'DLR Completed Villages' }
 };
 
-async function run() {
-  console.log('=== EXTRACTING DIRECT DLR DATA FROM GOOGLE SPREADSHEETS ===');
+async function syncAllDlrComprehensive() {
+  console.log('=== STARTING COMPREHENSIVE DLR LOGINS SYNC FROM GOOGLE SPREADSHEETS ===');
 
   const dlrRecords = [];
   function addDlrRecord(rec) { dlrRecords.push(rec); }
 
   // 1. Phase-4 DLR Completed (gid 218111872)
-  console.log('Fetching Phase-4 DLR Completed (gid 218111872)...');
+  console.log('[1/8] Fetching Phase-4 DLR Completed (gid 218111872)...');
   try {
     const p4Comp = await fetchGviz('1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4', '218111872');
     for (let r = 0; r < p4Comp.rows.length; r++) {
@@ -149,7 +151,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 4 DLR Completed:', e.message); }
 
   // 2. Phase-4 VS & VRO (gid 1111910402)
-  console.log('Fetching Phase-4 VS & VRO (gid 1111910402)...');
+  console.log('[2/8] Fetching Phase-4 VS & VRO (gid 1111910402)...');
   try {
     const p4Vs = await fetchGviz('1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4', '1111910402');
     for (let r = 0; r < p4Vs.rows.length; r++) {
@@ -171,8 +173,8 @@ async function run() {
     }
   } catch (e) { console.error('Error in Phase 4 VS:', e.message); }
 
-  // 3. Phase-4 Tah, RDO & JC Login (gid 182095482)
-  console.log('Fetching Phase-4 Tah, RDO & JC Login (gid 182095482)...');
+  // 3. Phase-4 Tah, RDO & JC (gid 182095482)
+  console.log('[3/8] Fetching Phase-4 Tah, RDO & JC Login (gid 182095482)...');
   try {
     const p4Tah = await fetchGviz('1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4', '182095482');
     let tier = 'tahsildar';
@@ -199,7 +201,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 4 Tah-RDO-JC:', e.message); }
 
   // 4. Phase-5 DLR Completed (gid 167154929)
-  console.log('Fetching Phase-5 DLR Completed (gid 167154929)...');
+  console.log('[4/8] Fetching Phase-5 DLR Completed (gid 167154929)...');
   try {
     const p5Comp = await fetchGviz('1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0', '167154929');
     for (let r = 0; r < p5Comp.rows.length; r++) {
@@ -220,7 +222,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 5 DLR Completed:', e.message); }
 
   // 5. Phase-5 VS - VRO Login (gid 1329023156)
-  console.log('Fetching Phase-5 VS - VRO Login (gid 1329023156)...');
+  console.log('[5/8] Fetching Phase-5 VS - VRO Login (gid 1329023156)...');
   try {
     const p5Vs = await fetchGviz('1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0', '1329023156');
     let tier = 'vs_status';
@@ -246,7 +248,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 5 VS-VRO:', e.message); }
 
   // 6. Phase-5 Tah-RDO-JC Login (gid 1758823146)
-  console.log('Fetching Phase-5 Tah-RDO-JC Login (gid 1758823146)...');
+  console.log('[6/8] Fetching Phase-5 Tah-RDO-JC Login (gid 1758823146)...');
   try {
     const p5Tah = await fetchGviz('1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0', '1758823146');
     let tier = 'tahsildar_status';
@@ -277,7 +279,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 5 Tah-RDO-JC:', e.message); }
 
   // 7. Phase-6 VS - VRO Login (gid 941359880)
-  console.log('Fetching Phase-6 VS - VRO Login (gid 941359880)...');
+  console.log('[7/8] Fetching Phase-6 VS - VRO Login (gid 941359880)...');
   try {
     const p6Vs = await fetchGviz('10HSEPoUWt61PUgC58TZiMsRa84O1NAyU06OU-l5pSVQ', '941359880');
     let tier = 'vs_status';
@@ -303,7 +305,7 @@ async function run() {
   } catch (e) { console.error('Error in Phase 6 VS-VRO:', e.message); }
 
   // 8. Phase-6 TAH - RDO - JC LOGIN (gid 127310674)
-  console.log('Fetching Phase-6 TAH - RDO - JC LOGIN (gid 127310674)...');
+  console.log('[8/8] Fetching Phase-6 TAH - RDO - JC LOGIN (gid 127310674)...');
   try {
     const p6Tah = await fetchGviz('10HSEPoUWt61PUgC58TZiMsRa84O1NAyU06OU-l5pSVQ', '127310674');
     let tier = 'tahsildar_status';
@@ -328,25 +330,9 @@ async function run() {
     }
   } catch (e) { console.error('Error in Phase 6 Tah-RDO-JC:', e.message); }
 
-  console.log(`\nExtracted ${dlrRecords.length} raw DLR records from Google Spreadsheets.`);
+  console.log(`\nSuccessfully extracted ${dlrRecords.length} verified records from Google Spreadsheets!`);
 
-  // Print summary by login_key
-  const byLogin = {};
-  dlrRecords.forEach(r => {
-    byLogin[r.login_key] = byLogin[r.login_key] || { count: 0, tot: 0, cum: 0, today: 0, bal: 0 };
-    byLogin[r.login_key].count++;
-    byLogin[r.login_key].tot += r.total_entries;
-    byLogin[r.login_key].cum += r.cumulative;
-    byLogin[r.login_key].today += r.today;
-    byLogin[r.login_key].bal += r.balance;
-  });
-  console.log('\n--- Summary By Login ---');
-  Object.keys(byLogin).forEach(k => {
-    const s = byLogin[k];
-    console.log(`${k} (${s.count} villages): Tot: ${s.tot.toLocaleString()}, Cum: ${s.cum.toLocaleString()}, Today: ${s.today}, Bal: ${s.bal.toLocaleString()}`);
-  });
-
-  // Build dlrSummary for dashboard consumption
+  // Build dlrSummary
   const byStage = {};
   ['vs_status', 'vro_status', 'tahsildar_status', 'rdo_status', 'jc_status'].forEach(key => {
     const recs = dlrRecords.filter(r => r.login_key === key);
@@ -374,14 +360,15 @@ async function run() {
   const pacePct = benchmarkDaily > 0 ? ((todayTotal / benchmarkDaily) * 100).toFixed(1) : '0.0';
   const pctTotal = totalEntries > 0 ? ((cumulativeTotal / totalEntries) * 100).toFixed(1) : '0.0';
 
-  store.dlrSummary = { todayTotal, cumulativeTotal, balanceTotal, totalEntries, benchmarkDaily, pacePct, pctTotal, byStage, lastSynced: new Date().toISOString() };
+  store.dlrSummary = {
+    todayTotal, cumulativeTotal, balanceTotal, totalEntries, benchmarkDaily, pacePct, pctTotal, byStage,
+    lastSynced: new Date().toISOString()
+  };
 
-  console.log(`\nDLR Summary: Today=${todayTotal}, Cum=${cumulativeTotal}, Bal=${balanceTotal}, Total=${totalEntries}, Pct=${pctTotal}%`);
-
-  // Attach dlr_stages_detail to villages in store
+  // Reset village-level DLR fields cleanly
   villages.forEach(v => {
     const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
-    const totKhathas = Number(v.khatas) || 1000;
+    const totKhathas = Number(v.khatas) || Number(v.ppb_target) || 1000;
     v.dlr_stages_detail = {
       vs_status: { name: STAGE_CONFIG.vs_status.name, today: 0, tillYesterday: isPorted ? totKhathas : 0, cumulative: isPorted ? totKhathas : 0, balance: isPorted ? 0 : totKhathas, total: totKhathas, status: isPorted ? 'Completed' : 'Pending', targetDate: '' },
       vro_status: { name: STAGE_CONFIG.vro_status.name, today: 0, tillYesterday: isPorted ? totKhathas : 0, cumulative: isPorted ? totKhathas : 0, balance: isPorted ? 0 : totKhathas, total: totKhathas, status: isPorted ? 'Completed' : 'Pending', targetDate: '' },
@@ -391,7 +378,7 @@ async function run() {
     };
   });
 
-  // Apply DLR completed villages first
+  // Apply DLR completed villages first (Phase 4 and Phase 5)
   dlrRecords.filter(r => r.login_key === 'dlr_completed').forEach(r => {
     const v = findVillage(r.village_code, r.village_name, r.mandal);
     if (v) {
@@ -413,11 +400,6 @@ async function run() {
       v.rdo_status = 'Completed';
       v.jc_status = 'Completed';
       v.section13_status = 'Completed';
-      v.final_ror_status = 'Completed';
-      if (!v.ported_to_webland && v.webland_2_status !== 'Ported') {
-        v.current_stage = 'Final ROR Completed';
-      }
-      if (r.lpms) { v.lpms = r.lpms; v.lpms_arrived = r.lpms; }
     }
   });
 
@@ -442,20 +424,7 @@ async function run() {
       };
 
       v[r.login_key] = stageStatus;
-      if (r.login_key === 'jc_status') {
-        if (isStageDone) {
-          v.jc_status = 'Completed';
-          v.final_ror_status = 'Completed';
-          if (!v.ported_to_webland && v.webland_2_status !== 'Ported') {
-            v.current_stage = 'Final ROR Completed';
-          }
-        } else {
-          v.jc_status = 'In Progress';
-          if (!v.ported_to_webland && v.webland_2_status !== 'Ported' && v.current_stage !== 'Final ROR Completed') {
-            v.current_stage = 'Joint Collector Login (JC)';
-          }
-        }
-      } else if (stageStatus === 'In Progress' && v.current_stage !== 'Final ROR Completed' && v.current_stage !== 'Final RoR Completed' && !v.ported_to_webland) {
+      if (stageStatus === 'In Progress' && v.current_stage !== 'Final RoR Completed' && !v.ported_to_webland) {
         v.current_stage = STAGE_CONFIG[r.login_key].name;
       }
       if (r.cumulative > 0) {
@@ -475,31 +444,70 @@ async function run() {
     }
   });
 
-  // Ensure ported and blockchain stage assignments
-  villages.forEach(v => {
-    if (v.ported_to_webland || v.webland_2_status === 'Ported') {
-      if ((v.phase || '').includes('2024') || (v.ppb_cycle || '').includes('Prior')) {
-        v.current_stage = 'Block Chain Tech Stage';
-        v.blockchain_status = 'Completed';
-      } else {
-        v.current_stage = 'Webland Porting';
-      }
+  // Store records
+  store.dlr_records = dlrRecords;
+
+  // Add/Verify Google spreadsheet sources in store.sources
+  const requiredSources = [
+    {
+      id: '59fe49e4-bd1e-413a-9605-7ffc36ec2297',
+      name: 'Phase-VI GT Completed Villages (Vectorization & VS Login)',
+      spreadsheetId: '10HSEPoUWt61PUgC58TZiMsRa84O1NAyU06OU-l5pSVQ',
+      tab: 'Phase-6 Progress',
+      googleSheet: 'https://docs.google.com/spreadsheets/d/10HSEPoUWt61PUgC58TZiMsRa84O1NAyU06OU-l5pSVQ/edit?usp=sharing'
+    },
+    {
+      id: '51b8baba-ee5b-4a46-b999-b539af724ef8',
+      name: 'Phase-V GT Completed Villages (Vectorization & VS Login)',
+      spreadsheetId: '1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0',
+      tab: 'Phase-5 Progress',
+      googleSheet: 'https://docs.google.com/spreadsheets/d/1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0/edit?usp=sharing'
+    },
+    {
+      id: '47183bb0-8e72-4928-a9ff-c0c705f02446',
+      name: 'Phase-IV GT Completed Villages (Vectorization & VS Login)',
+      spreadsheetId: '1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4',
+      tab: 'Phase-4 Progress',
+      googleSheet: 'https://docs.google.com/spreadsheets/d/1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4/edit?usp=sharing'
+    }
+  ];
+
+  requiredSources.forEach(reqSrc => {
+    let s = store.sources.find(src => src.spreadsheetId === reqSrc.spreadsheetId);
+    if (!s) {
+      store.sources.push(reqSrc);
+    } else {
+      s.googleSheet = reqSrc.googleSheet;
+      s.status = 'Connected';
+      s.lastSync = new Date().toISOString();
     }
   });
 
-  // Save dlr_records into store
-  store.dlr_records = dlrRecords;
+  store.lastSync = new Date().toISOString();
 
+  // Save to both data/store.json and dashboard/data/store.json
   fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
-  console.log(`Saved ${dlrRecords.length} records to data/store.json`);
+  console.log(`Saved updated DLR store to ${STORE_PATH}`);
 
   if (fs.existsSync(path.dirname(DASH_STORE))) {
     fs.writeFileSync(DASH_STORE, JSON.stringify(store, null, 2), 'utf8');
-    console.log('Also synced to dashboard/data/store.json');
+    console.log(`Saved updated DLR store to ${DASH_STORE}`);
   }
+
+  console.log('\n--- DLR SYNC REPORT ---');
+  console.log(`Total Extracted DLR Records : ${dlrRecords.length}`);
+  console.log(`Today DLR Total Entries     : ${todayTotal.toLocaleString('en-IN')}`);
+  console.log(`Cumulative DLR Total Entries: ${cumulativeTotal.toLocaleString('en-IN')}`);
+  console.log(`Balance DLR Total Entries   : ${balanceTotal.toLocaleString('en-IN')}`);
+  console.log(`Total DLR Target Entries    : ${totalEntries.toLocaleString('en-IN')} (${pctTotal}%)`);
+  console.log('\n--- By Stage ---');
+  Object.keys(byStage).forEach(k => {
+    const s = byStage[k];
+    console.log(`${s.name} (${s.villageCount} villages): Today=${s.today}, Cum=${s.cumulative.toLocaleString('en-IN')}, Bal=${s.balance.toLocaleString('en-IN')}, Total=${s.total.toLocaleString('en-IN')} (${s.pct}%)`);
+  });
 }
 
-run().catch(err => {
-  console.error('Fatal error:', err);
+syncAllDlrComprehensive().catch(err => {
+  console.error('Error during DLR sync:', err);
   process.exit(1);
 });

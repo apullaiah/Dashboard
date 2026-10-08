@@ -9,7 +9,15 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { syncAllLiveData } = require('./lib/syncService.js');
+const { syncAllLiveData, fetchGviz, fetchUrl } = require('./lib/syncService.js');
+const { generateMandalReportHtml, generateMandalReportPdf } = require('./lib/reportService.js');
+const {
+  verifyWebhook,
+  extractInboundMessages,
+  processWhatsAppQuery,
+  sendWhatsAppCloudMessage,
+  DEFAULT_VERIFY_TOKEN
+} = require('./lib/whatsappService.js');
 
 const PORT = Number(process.env.PORT || 4173);
 const ROOT = __dirname;
@@ -24,10 +32,11 @@ const STAGES = [
   ['tahsildar_status', 'DLR@Tahsildar Login'],
   ['rdo_status', 'DLR@RDO Login'],
   ['jc_status', 'DLR@JC Login'],
-  ['section13_status', '13 Completed'],
+  ['section13_status', '13 Notification'],
   ['draft_ror_status', 'Draft RoR'],
   ['final_ror_status', 'Final RoR'],
-  ['webland_2_status', 'Porting DLR to Webland-2.0']
+  ['webland_2_status', 'Webland Porting'],
+  ['blockchain_status', 'Block Chain Tech Stage']
 ];
 const DEFAULT_MAPPINGS = {
   village_code: 'Village Code', village_name: 'Village Name', mandal: 'Mandal', division: 'Division',
@@ -171,7 +180,7 @@ function id() { return crypto.randomUUID(); }
 function frequencyMs(value) { return ({ '5 minutes': 5 * 60e3, '15 minutes': 15 * 60e3, '30 minutes': 30 * 60e3, '1 hour': 60 * 60e3 })[value] || 15 * 60e3; }
 function clean(v) { return String(v ?? '').trim(); }
 function normalKey(v) { return clean(v).toLowerCase().replace(/\s+/g, ' '); }
-function normalizeMandal(value, store) { const key = normalKey(value); return (store.customMandalAliases || {})[key] || MANDAL_ALIASES[key] || clean(value); }
+function normalizeMandal(value, store) { const key = normalKey(value); return ((store && store.customMandalAliases) || {})[key] || MANDAL_ALIASES[key] || clean(value); }
 function isComplete(value) { return /^(completed|complete|done|yes|y|ported|true|1)$/i.test(clean(value)); }
 function normalStatus(value) {
   const s = normalKey(value);
@@ -210,16 +219,18 @@ function parseDate(v) {
 function normalizeStage(raw) {
   const s = String(raw || '').trim();
   if (!s) return 'Not Started';
-  if (/13\s*completed/i.test(s) || /section\s*13/i.test(s)) return '13 Completed';
-  if (/final\s*ror/i.test(s) || /^completed$/i.test(s) || /ror\s*completed/i.test(s)) return 'Final ROR Completed';
-  if (/draft\s*ror/i.test(s)) return 'Draft RoR';
-  if (/jc\s*login/i.test(s) || /joint\s*collector/i.test(s)) return 'JC Login';
-  if (/rdo\s*login/i.test(s) || /^rdo$/i.test(s)) return 'RDO Login';
-  if (/tah(?:sildar)?\s*login/i.test(s) || /^tah(?:sildar)?$/i.test(s)) return 'Tah Login';
-  if (/vro\s*login/i.test(s) || /^vro$/i.test(s)) return 'VRO Login';
-  if (/vs\s*login/i.test(s) || /village\s*surveyor/i.test(s)) return 'Village Surveyor Login';
+  if (/blockchain|block\s*chain/i.test(s)) return 'Block Chain Tech Stage';
+  if (/webland|ported|porting/i.test(s)) return 'Webland Porting';
+  if (/final\s*ror|^completed$|ror\s*completed/i.test(s)) return 'Final ROR Completed';
+  if (/draft\s*ror|13\s*completed|section\s*13|13\s*notification|13\s*notice/i.test(s)) return 'Draft RoR';
+  if (/^dlr$|^dlr\s*stage/i.test(s)) return 'DLR Stage';
+  if (/jc\s*login|joint\s*collector/i.test(s)) return 'JC Login';
+  if (/rdo\s*login|^rdo$/i.test(s)) return 'RDO Login';
+  if (/tah(?:sildar)?\s*login|^tah(?:sildar)?$/i.test(s)) return 'Tah Login';
+  if (/vro\s*login|^vro$/i.test(s)) return 'VRO Login';
+  if (/vs\s*login|village\s*surveyor/i.test(s)) return 'VS Login';
   if (/vector/i.test(s) || /correlation/i.test(s)) return 'Vectorization';
-  if (/gt\s*ongoing/i.test(s) || /^gt$/i.test(s)) return 'GT Ongoing';
+  if (/gt\s*ongoing|^gt$/i.test(s)) return 'GT Ongoing';
   if (/gt\s*not\s*started/i.test(s)) return 'GT Not Started';
   return s;
 }
@@ -233,25 +244,33 @@ function cascadeStageFlags(rawStage, village = {}) {
   let tah = 'Pending';
   let rdo = 'Pending';
   let jc = 'Pending';
-  let sec13 = 'Pending';
-  let draftRor = 'Pending';
   let finalRor = 'Pending';
-  let ppb = 'Pending';
+  let webland = 'Pending';
+  let blockchain = 'Pending';
   let overall = 'In Progress';
 
-  if (norm === 'Final ROR Completed' || norm === 'Completed' || village.ported_to_webland) {
+  if (norm === 'Block Chain Tech Stage') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
-    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
-    draftRor = 'Completed'; finalRor = 'Completed'; ppb = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    finalRor = 'Completed'; webland = 'Completed'; blockchain = 'Completed';
+    overall = 'Completed';
+  } else if (norm === 'Webland Porting') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    finalRor = 'Completed'; webland = 'Completed'; blockchain = 'Pending';
+    overall = 'Completed';
+  } else if (norm === 'Final ROR Completed' || norm === 'Completed' || village.ported_to_webland) {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    finalRor = 'Completed'; webland = 'Pending'; blockchain = 'Pending';
     overall = 'Completed';
   } else if (norm === 'Draft RoR') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
-    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
-    draftRor = 'In Progress';
-  } else if (norm === '13 Completed') {
-    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
-    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed'; sec13 = 'Completed';
-    draftRor = 'Pending';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    overall = 'In Progress';
+  } else if (norm === 'DLR Stage') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'JC Login') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'Completed'; rdo = 'Completed';
@@ -279,6 +298,8 @@ function cascadeStageFlags(rawStage, village = {}) {
     overall = 'Pending';
   }
 
+  const isDraftOrAbove = norm === 'Draft RoR' || finalRor === 'Completed' || norm === 'Block Chain Tech Stage' || norm === 'Webland Porting';
+
   return {
     current_stage: norm,
     status: overall,
@@ -289,10 +310,11 @@ function cascadeStageFlags(rawStage, village = {}) {
     tahsildar_status: tah,
     rdo_status: rdo,
     jc_status: jc,
-    section13_status: sec13,
-    draft_ror_status: draftRor,
+    section13_status: isDraftOrAbove ? 'Completed' : 'Pending',
+    draft_ror_status: isDraftOrAbove ? (norm === 'Draft RoR' ? 'In Progress' : 'Completed') : 'Pending',
     final_ror_status: finalRor,
-    ppb_status: ppb
+    webland_2_status: webland,
+    blockchain_status: blockchain
   };
 }
 
@@ -386,6 +408,9 @@ function recordView(v, store) {
   const rawStage = v.current_stage || v.stage || '';
   const cascade = cascadeStageFlags(rawStage, v);
 
+  const isJcDone = isComplete(v.jc_status) || cascade.jc_status === 'Completed' || v.dlr_active_stage === 'Completed' || Boolean(v.dlr_stages_detail && v.dlr_stages_detail.jc_status && isComplete(v.dlr_stages_detail.jc_status.status));
+  const isSec13Done = isJcDone || isComplete(v.section13_status) || cascade.section13_status === 'Completed';
+
   const enriched = {
     ...v,
     mandal,
@@ -397,14 +422,17 @@ function recordView(v, store) {
     vro_status: isComplete(v.vro_status) ? 'Completed' : cascade.vro_status,
     tahsildar_status: isComplete(v.tahsildar_status) ? 'Completed' : cascade.tahsildar_status,
     rdo_status: isComplete(v.rdo_status) ? 'Completed' : cascade.rdo_status,
-    jc_status: isComplete(v.jc_status) ? 'Completed' : cascade.jc_status,
-    section13_status: isComplete(v.section13_status) ? 'Completed' : cascade.section13_status,
+    jc_status: isJcDone ? 'Completed' : cascade.jc_status,
+    section13_status: isSec13Done ? 'Completed' : cascade.section13_status,
     draft_ror_status: isComplete(v.draft_ror_status) ? 'Completed' : cascade.draft_ror_status,
     final_ror_status: isComplete(v.final_ror_status) ? 'Completed' : cascade.final_ror_status,
     ppb_status: isComplete(v.ppb_status) ? 'Completed' : cascade.ppb_status
   };
 
-  const determinedStage = rawStage ? cascade.current_stage : currentStage(enriched);
+  let determinedStage = rawStage ? cascade.current_stage : currentStage(enriched);
+  if (isSec13Done && (/jc\s*login/i.test(determinedStage) || /rdo\s*login/i.test(determinedStage) || /tah\s*login/i.test(determinedStage))) {
+    determinedStage = '13 Completed';
+  }
 
   return {
     ...enriched,
@@ -460,6 +488,132 @@ function dataQuality(items) {
     workflowConflicts: items.filter(v => v.workflow_conflict).length
   };
 }
+
+const ROVERS_PER_MANDAL = {
+  'Baireddipalle': 3, 'Bangarupalem': 5, 'Chittoor': 4, 'G.D.Nellore': 8, 'Gangavaram': 5,
+  'Gudipala': 3, 'Gudipalle': 5, 'Irala': 5, 'Karvetinagar': 2, 'Kuppam': 5,
+  'Nagari': 4, 'Nindra': 2, 'Palamaner': 1, 'Palasamudram': 2, 'Peddapanjani': 7,
+  'Penumuru': 5, 'Pulicherla': 5, 'Puthalapattu': 5, 'Ramakuppam': 4, 'Rompicherla': 3,
+  'S.R.Puram': 2, 'Santhipuram': 5, 'Thavanampalli': 5, 'Vedurukuppam': 2, 'Venkatagirikota': 6,
+  'Vijayapuram': 3, 'Yadamari': 2
+};
+
+const VS_PER_MANDAL = {
+  'Baireddipalle': 19, 'Bangarupalem': 27, 'Chittoor': 35, 'G.D.Nellore': 24, 'Gangavaram': 18,
+  'Gudipala': 17, 'Gudipalle': 18, 'Irala': 19, 'Karvetinagar': 15, 'Kuppam': 22,
+  'Nagari': 13, 'Nindra': 11, 'Palamaner': 11, 'Palasamudram': 9, 'Peddapanjani': 19,
+  'Penumuru': 14, 'Pulicherla': 13, 'Puthalapattu': 17, 'Ramakuppam': 18, 'Rompicherla': 8,
+  'S.R.Puram': 18, 'Santhipuram': 20, 'Thavanampalli': 17, 'Vedurukuppam': 13, 'Venkatagirikota': 25,
+  'Vijayapuram': 14, 'Yadamari': 18
+};
+
+function isVillageResurveyCompleted(v) {
+  return Boolean(v.ported_to_webland || v.webland_2_status === 'Ported' || isComplete(v.final_ror_status) || v.status === 'Completed');
+}
+
+function getVillageActiveDlrStage(v) {
+  if (isVillageResurveyCompleted(v)) return 'completed';
+  const cs = (v.current_stage || '').toLowerCase();
+  const ds = (v.dlr_active_stage || '').toLowerCase();
+  if (cs.includes('jc') || ds.includes('jc') || v.jc_status === 'In Progress') return 'jc';
+  if (cs.includes('rdo') || ds.includes('rdo') || v.rdo_status === 'In Progress') return 'rdo';
+  if (cs.includes('tah') || ds.includes('tah') || v.tahsildar_status === 'In Progress') return 'tah';
+  if (cs.includes('vro') || ds.includes('vro') || v.vro_status === 'In Progress') return 'vro';
+  if (cs.includes('vs') || ds.includes('vs') || v.vs_status === 'In Progress') return 'vs';
+  return 'other';
+}
+
+function buildMandalActionPlan(store) {
+  const villages = store.villages || [];
+  const mandalMap = {};
+
+  villages.forEach(v => {
+    const m = normalizeMandal(v.mandal, store);
+    if (!mandalMap[m]) {
+      mandalMap[m] = {
+        mandal: m,
+        division: v.division || '',
+        villages: 0,
+        total_extent: 0,
+        govt_land: 0,
+        patta_land: 0,
+        vs_available: VS_PER_MANDAL[m] || 15,
+        rovers_available: ROVERS_PER_MANDAL[m] || 0,
+        resurvey_completed: 0,
+        balance_villages: 0,
+        dlr_vs: 0,
+        dlr_vro: 0,
+        dlr_tah: 0,
+        dlr_rdo: 0,
+        dlr_jc: 0,
+        sec13_notified: 0,
+        ported_webland2: 0,
+        village_ids: []
+      };
+    }
+
+    const d = mandalMap[m];
+    d.villages++;
+    d.village_ids.push(v.id);
+
+    const totExt = parseFloat(v.extent) || ((parseFloat(v.govt_extent) || 0) + (parseFloat(v.patta_extent) || 0));
+    d.total_extent += totExt;
+    d.govt_land += parseFloat(v.govt_extent) || 0;
+    d.patta_land += parseFloat(v.patta_extent) || 0;
+
+    const completed = isVillageResurveyCompleted(v);
+    if (completed) {
+      d.resurvey_completed++;
+    } else {
+      d.balance_villages++;
+      const stage = getVillageActiveDlrStage(v);
+      if (stage === 'vs') d.dlr_vs++;
+      else if (stage === 'vro') d.dlr_vro++;
+      else if (stage === 'tah') d.dlr_tah++;
+      else if (stage === 'rdo') d.dlr_rdo++;
+      else if (stage === 'jc') d.dlr_jc++;
+    }
+
+    if (isComplete(v.section13_status) || completed) {
+      d.sec13_notified++;
+    }
+
+    if (Boolean(v.ported_to_webland || v.webland_2_status === 'Ported')) {
+      d.ported_webland2++;
+    }
+  });
+
+  const mandalRows = Object.values(mandalMap).map(m => {
+    m.total_extent = Math.round(m.total_extent * 100) / 100;
+    m.govt_land = Math.round(m.govt_land * 100) / 100;
+    m.patta_land = Math.round(m.patta_land * 100) / 100;
+    m.completion_pct = m.villages > 0 ? Math.round((m.resurvey_completed / m.villages) * 1000) / 10 : 0;
+    return m;
+  }).sort((a, b) => a.mandal.localeCompare(b.mandal));
+
+  const summary = {
+    total_mandals: mandalRows.length,
+    villages: mandalRows.reduce((s, r) => s + r.villages, 0),
+    total_extent: Math.round(mandalRows.reduce((s, r) => s + r.total_extent, 0) * 100) / 100,
+    govt_land: Math.round(mandalRows.reduce((s, r) => s + r.govt_land, 0) * 100) / 100,
+    patta_land: Math.round(mandalRows.reduce((s, r) => s + r.patta_land, 0) * 100) / 100,
+    vs_available: mandalRows.reduce((s, r) => s + r.vs_available, 0),
+    rovers_available: mandalRows.reduce((s, r) => s + r.rovers_available, 0),
+    resurvey_completed: mandalRows.reduce((s, r) => s + r.resurvey_completed, 0),
+    balance_villages: mandalRows.reduce((s, r) => s + r.balance_villages, 0),
+    dlr_vs: mandalRows.reduce((s, r) => s + r.dlr_vs, 0),
+    dlr_vro: mandalRows.reduce((s, r) => s + r.dlr_vro, 0),
+    dlr_tah: mandalRows.reduce((s, r) => s + r.dlr_tah, 0),
+    dlr_rdo: mandalRows.reduce((s, r) => s + r.dlr_rdo, 0),
+    dlr_jc: mandalRows.reduce((s, r) => s + r.dlr_jc, 0),
+    sec13_notified: mandalRows.reduce((s, r) => s + r.sec13_notified, 0),
+    ported_webland2: mandalRows.reduce((s, r) => s + r.ported_webland2, 0),
+  };
+  summary.completion_pct = summary.villages > 0 ? Math.round((summary.resurvey_completed / summary.villages) * 1000) / 10 : 0;
+
+  return { mandals: mandalRows, summary };
+}
+
 function dashboard(store) {
   const villages = store.villages.map(v => recordView(v, store));
   const total = villages.length;
@@ -648,7 +802,7 @@ function dashboard(store) {
       tahsildarCompleted: villages.filter(v => isComplete(v.tahsildar_status)).length,
       rdoCompleted: villages.filter(v => isComplete(v.rdo_status)).length,
       jcCompleted: villages.filter(v => isComplete(v.jc_status)).length,
-      section13Completed: villages.filter(v => isComplete(v.section13_status)).length,
+      section13Completed: villages.filter(v => isComplete(v.section13_status) || isComplete(v.jc_status)).length,
       draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
       finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
       webland2Completed: villages.filter(v => isComplete(v.webland_2_status) || v.ported_to_webland).length,
@@ -884,7 +1038,8 @@ function dashboard(store) {
     quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null,
     dlrRecords: store.dlr_records || [],
     gtSummary: store.gtSummary || null,
-    dlrSummary: store.dlrSummary || null
+    dlrSummary: store.dlrSummary || null,
+    mandalActionPlan: buildMandalActionPlan(store)
   };
 }
 function getToken() { return process.env.GOOGLE_SHEETS_ACCESS_TOKEN || ''; }
@@ -915,12 +1070,8 @@ function formatCellVal(cell) {
 
 async function readPublicSheet(source) {
   const sheetId = extractSpreadsheetId(source.spreadsheetId);
-  const gid = source.gid === undefined || source.gid === null || source.gid === '' ? '' : `&gid=${encodeURIComponent(source.gid)}`;
-  const response = await fetch(`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:json${gid}`);
-  if (!response.ok) throw new Error(`Public Google Sheet returned ${response.status}. Check sharing access.`);
-  const content = await response.text(); const match = content.match(/setResponse\((.*)\);\s*$/s);
-  if (!match) throw new Error('The public Google Sheet response could not be read.');
-  const table = JSON.parse(match[1]).table || { cols: [], rows: [] };
+  const gid = source.gid === undefined || source.gid === null || source.gid === '' ? '' : source.gid;
+  const table = await fetchGviz(sheetId, gid);
   return { headers: table.cols.map(column => clean(column.label)), rows: table.rows.map(row => (row.c || []).map(formatCellVal)) };
 }
 async function writeBackToSheet(source, meta, value) {
@@ -1431,6 +1582,7 @@ async function handleApi(req, res, url) {
   if (req.method === 'GET' && pathname === '/api/health') return json(res, 200, { status: 'ok', tokenConfigured: Boolean(getToken()), dashboard: dashboard(store).sourceSummary });
   if (req.method === 'GET' && pathname === '/api/sources') return json(res, 200, { sources: store.sources, defaultMappings: DEFAULT_MAPPINGS });
   if (req.method === 'GET' && pathname === '/api/mandal-aliases') return json(res, 200, { aliases: { ...MANDAL_ALIASES, ...(store.customMandalAliases || {}) } });
+  if (req.method === 'GET' && pathname === '/api/mandal-action-plan') return json(res, 200, buildMandalActionPlan(store));
   if (req.method === 'GET' && pathname === '/api/sync-history') return json(res, 200, { logs: store.syncLogs });
   if (req.method === 'GET' && pathname === '/api/audit') return json(res, 200, { entries: store.auditLog });
   if (req.method === 'GET' && pathname === '/api/conflicts') return json(res, 200, { conflicts: store.conflicts });
@@ -1569,7 +1721,7 @@ async function handleApi(req, res, url) {
   }
   if (req.method === 'PATCH' && villageMatch) {
     const role = requireAuthorized(req, res); if (!role) return; const v = store.villages.find(x => x.id === villageMatch[1]); if (!v) return json(res, 404, { error: 'Village not found.' });
-    const b = await readBody(req); const allowed = new Set([...STAGES.map(s => s[0]), 'ppb_status', 'target_date', 'remarks']); const updates = Object.fromEntries(Object.entries(b.updates || {}).filter(([key]) => allowed.has(key)));
+    const b = await readBody(req); const allowed = new Set([...STAGES.map(s => s[0]), 'ppb_status', 'target_date', 'remarks', 'current_stage']); const updates = Object.fromEntries(Object.entries(b.updates || {}).filter(([key]) => allowed.has(key)));
     if (!Object.keys(updates).length) return json(res, 400, { error: 'No permitted fields supplied.' });
     const changes = [];
     for (const [field, value] of Object.entries(updates)) { if (clean(v[field]) !== clean(value)) { changes.push({ field, oldValue: v[field] || '', newValue: clean(value) }); v[field] = clean(value); } }
@@ -1589,6 +1741,138 @@ async function handleApi(req, res, url) {
     if (!requireAuthorized(req,res)) return; const b = await readBody(req); const conflict = store.conflicts.find(c => c.id === b.id); if (!conflict || conflict.status !== 'Open') return json(res, 404, { error: 'Open conflict not found.' });
     const village = store.villages.find(v => v.id === conflict.villageId); if (b.resolution === 'Keep Google Sheet Value' && village) village[conflict.field] = conflict.sheetValue;
     conflict.status = b.resolution || 'Review Manually'; conflict.resolvedAt = now(); save(store); return json(res, 200, conflict);
+  }
+  if (req.method === 'GET' && (pathname === '/api/reports/mandal-villages-html' || pathname === '/api/reports/mandal-status-html')) {
+    const mandal = url.searchParams.get('mandal') || '';
+    const division = url.searchParams.get('division') || '';
+    const stage = url.searchParams.get('stage') || '';
+    const html = generateMandalReportHtml(store, { mandal, division, stage });
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+    return;
+  }
+  if (req.method === 'GET' && (pathname === '/api/reports/mandal-villages-pdf' || pathname === '/api/reports/mandal-status-pdf')) {
+    const mandal = url.searchParams.get('mandal') || '';
+    const division = url.searchParams.get('division') || '';
+    const stage = url.searchParams.get('stage') || '';
+    try {
+      const pdfBuffer = await generateMandalReportPdf(store, { mandal, division, stage });
+      const safeName = mandal ? `Chittoor_${mandal.replace(/[^a-zA-Z0-9]/g, '_')}_Village_Status_Report.pdf` : 'Chittoor_District_Mandal_Wise_Village_Status_Report.pdf';
+      res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename="${safeName}"`,
+        'Content-Length': pdfBuffer.length
+      });
+      res.end(pdfBuffer);
+    } catch (pdfErr) {
+      console.error('PDF Generation Error:', pdfErr.message);
+      return json(res, 500, { error: `PDF Generation Failed: ${pdfErr.message}` });
+    }
+    return;
+  }
+
+  // --- Meta WhatsApp Cloud API Webhook Integration ---
+  // Webhook Verification (GET)
+  if (req.method === 'GET' && pathname === '/api/whatsapp/webhook') {
+    const query = Object.fromEntries(url.searchParams.entries());
+    const config = store.whatsappConfig || {};
+    const result = verifyWebhook(query, config);
+    if (result.verified) {
+      console.log('WhatsApp Webhook Verified Successfully with Meta challenge.');
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end(result.challenge);
+    } else {
+      console.warn('WhatsApp Webhook Verification Failed:', result.error);
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('Verification failed');
+    }
+  }
+
+  // Incoming Webhook Message Notifications (POST)
+  if (req.method === 'POST' && pathname === '/api/whatsapp/webhook') {
+    const body = await readBody(req);
+    const messages = extractInboundMessages(body);
+    const config = store.whatsappConfig || {};
+    const baseUrl = `${url.protocol}//${url.host}`;
+
+    if (!store.whatsappLogs) store.whatsappLogs = [];
+
+    const responses = [];
+    for (const msg of messages) {
+      const queryResult = processWhatsAppQuery(msg.text, store, baseUrl);
+      console.log(`WhatsApp Query from ${msg.from} (${msg.senderName}): "${msg.text}" -> [${queryResult.type}]`);
+
+      // Dispatch reply via Meta WhatsApp Cloud API
+      const sendResult = await sendWhatsAppCloudMessage(msg.from, queryResult.reply, config);
+
+      const logEntry = {
+        id: id(),
+        timestamp: new Date().toISOString(),
+        from: msg.from,
+        senderName: msg.senderName,
+        query: msg.text,
+        responseType: queryResult.type,
+        replyPreview: queryResult.reply.slice(0, 160),
+        status: sendResult.success ? 'Delivered' : (sendResult.simulated ? 'Simulated' : 'Failed'),
+        error: sendResult.error || null
+      };
+
+      store.whatsappLogs.unshift(logEntry);
+      if (store.whatsappLogs.length > 200) store.whatsappLogs.pop();
+      responses.push({ messageId: msg.messageId, queryResult, sendResult });
+    }
+
+    save(store);
+    return json(res, 200, { status: 'ok', processed: messages.length, responses });
+  }
+
+  // WhatsApp Configuration Status & Webhook Credentials
+  if (req.method === 'GET' && pathname === '/api/whatsapp/config') {
+    const config = store.whatsappConfig || {
+      enabled: true,
+      verifyToken: DEFAULT_VERIFY_TOKEN,
+      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
+      accessTokenConfigured: Boolean(process.env.WHATSAPP_ACCESS_TOKEN || (store.whatsappConfig && store.whatsappConfig.accessToken)),
+      wabaId: process.env.WHATSAPP_WABA_ID || '',
+      webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`
+    };
+    return json(res, 200, {
+      config: {
+        ...config,
+        webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`,
+        accessToken: config.accessToken ? '••••••••' + config.accessToken.slice(-4) : ''
+      },
+      stats: {
+        totalInteractions: (store.whatsappLogs || []).length,
+        lastInteraction: (store.whatsappLogs || [])[0] || null
+      }
+    });
+  }
+
+  if (req.method === 'POST' && pathname === '/api/whatsapp/config') {
+    const b = await readBody(req);
+    store.whatsappConfig = {
+      enabled: b.enabled !== false,
+      verifyToken: clean(b.verifyToken) || DEFAULT_VERIFY_TOKEN,
+      phoneNumberId: clean(b.phoneNumberId),
+      accessToken: b.accessToken && !b.accessToken.includes('••••') ? clean(b.accessToken) : (store.whatsappConfig?.accessToken || ''),
+      wabaId: clean(b.wabaId),
+      updatedAt: now()
+    };
+    save(store);
+    return json(res, 200, { success: true, config: store.whatsappConfig });
+  }
+
+  if (req.method === 'GET' && pathname === '/api/whatsapp/logs') {
+    return json(res, 200, { logs: (store.whatsappLogs || []).slice(0, 50) });
+  }
+
+  if (req.method === 'POST' && pathname === '/api/whatsapp/test') {
+    const b = await readBody(req);
+    const query = clean(b.query || 'Bangarupalem');
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const result = processWhatsAppQuery(query, store, baseUrl);
+    return json(res, 200, { query, result });
   }
   return json(res, 404, { error: 'Endpoint not found.' });
 }
@@ -1660,6 +1944,16 @@ async function requestHandler(req, res) {
   }
 
   try {
+    if (url.pathname === '/report/mandal-villages' || url.pathname === '/reports/mandal-villages') {
+      const store = load();
+      const mandal = url.searchParams.get('mandal') || '';
+      const division = url.searchParams.get('division') || '';
+      const stage = url.searchParams.get('stage') || '';
+      const html = generateMandalReportHtml(store, { mandal, division, stage });
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+      res.end(html);
+      return;
+    }
     if (url.pathname.startsWith('/api/') || url.pathname === '/api') {
       await handleApi(req, res, url);
     } else {
@@ -1690,4 +1984,5 @@ module.exports.dashboard = dashboard;
 module.exports.STAGES = STAGES;
 module.exports.DEFAULT_MAPPINGS = DEFAULT_MAPPINGS;
 module.exports.MANDAL_ALIASES = MANDAL_ALIASES;
+module.exports.buildMandalActionPlan = buildMandalActionPlan;
 
