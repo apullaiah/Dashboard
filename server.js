@@ -1380,7 +1380,7 @@ async function syncSource(store, source) {
 }
 function setSecurityHeaders(res) {
   if (typeof res.setHeader === 'function') {
-    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   }
@@ -1398,7 +1398,7 @@ function json(res, status, body) {
       res.writeHead(status, {
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'X-Frame-Options': 'DENY',
+        'X-Frame-Options': 'SAMEORIGIN',
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'strict-origin-when-cross-origin'
       });
@@ -1417,7 +1417,7 @@ function text(res, status, body, type = 'text/plain; charset=utf-8') {
     try {
       res.writeHead(status, {
         'Content-Type': type,
-        'X-Frame-Options': 'DENY',
+        'X-Frame-Options': 'SAMEORIGIN',
         'X-Content-Type-Options': 'nosniff',
         'Referrer-Policy': 'strict-origin-when-cross-origin'
       });
@@ -1757,16 +1757,47 @@ async function handleApi(req, res, url) {
     const village = store.villages.find(v => v.id === conflict.villageId); if (b.resolution === 'Keep Google Sheet Value' && village) village[conflict.field] = conflict.sheetValue;
     conflict.status = b.resolution || 'Review Manually'; conflict.resolvedAt = now(); save(store); return json(res, 200, conflict);
   }
-  if (req.method === 'GET' && (pathname === '/api/reports/mandal-villages-html' || pathname === '/api/reports/mandal-status-html')) {
+  // Mandal Report HTML Route (Supports all path variations for full page, new tab, and iframe preview)
+  const isReportHtml = (
+    pathname === '/report/mandal-villages' ||
+    pathname === '/reports/mandal-villages' ||
+    pathname === '/api/report/mandal-villages' ||
+    pathname === '/api/reports/mandal-villages' ||
+    pathname === '/api/report/mandal-villages-html' ||
+    pathname === '/api/reports/mandal-villages-html' ||
+    pathname === '/api/reports/mandal-status-html' ||
+    pathname === '/api/report/mandal-status-html' ||
+    pathname === '/report' ||
+    pathname === '/reports'
+  );
+  if (req.method === 'GET' && isReportHtml) {
     const mandal = url.searchParams.get('mandal') || '';
     const division = url.searchParams.get('division') || '';
     const stage = url.searchParams.get('stage') || '';
     const html = generateMandalReportHtml(store, { mandal, division, stage });
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'X-Frame-Options': 'SAMEORIGIN',
+      'Content-Security-Policy': "frame-ancestors 'self'"
+    });
     res.end(html);
     return;
   }
-  if (req.method === 'GET' && (pathname === '/api/reports/mandal-villages-pdf' || pathname === '/api/reports/mandal-status-pdf')) {
+
+  // Mandal Report PDF Route (Direct binary download)
+  const isReportPdf = (
+    pathname === '/api/reports/mandal-villages-pdf' ||
+    pathname === '/api/report/mandal-villages-pdf' ||
+    pathname === '/api/reports/mandal-status-pdf' ||
+    pathname === '/api/report/mandal-status-pdf' ||
+    pathname === '/report/mandal-villages-pdf' ||
+    pathname === '/reports/mandal-villages-pdf' ||
+    pathname === '/report/mandal-villages.pdf' ||
+    pathname === '/reports/mandal-villages.pdf' ||
+    pathname === '/api/reports/mandal-villages.pdf' ||
+    pathname === '/api/report/mandal-villages.pdf'
+  );
+  if (req.method === 'GET' && isReportPdf) {
     const mandal = url.searchParams.get('mandal') || '';
     const division = url.searchParams.get('division') || '';
     const stage = url.searchParams.get('stage') || '';
@@ -1776,7 +1807,8 @@ async function handleApi(req, res, url) {
       res.writeHead(200, {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${safeName}"`,
-        'Content-Length': pdfBuffer.length
+        'Content-Length': pdfBuffer.length,
+        'X-Frame-Options': 'SAMEORIGIN'
       });
       res.end(pdfBuffer);
     } catch (pdfErr) {
@@ -2228,14 +2260,8 @@ async function requestHandler(req, res) {
   }
 
   try {
-    if (url.pathname === '/report/mandal-villages' || url.pathname === '/reports/mandal-villages') {
-      const store = load();
-      const mandal = url.searchParams.get('mandal') || '';
-      const division = url.searchParams.get('division') || '';
-      const stage = url.searchParams.get('stage') || '';
-      const html = generateMandalReportHtml(store, { mandal, division, stage });
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      res.end(html);
+    if (url.pathname.startsWith('/report') || url.pathname.startsWith('/reports')) {
+      await handleApi(req, res, url);
       return;
     }
     if (url.pathname.startsWith('/api/') || url.pathname === '/api') {

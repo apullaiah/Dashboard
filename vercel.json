@@ -11,11 +11,23 @@
       "schedule": "30 0 * * *"
     }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/api/cron/daily-whatsapp-alerts", "destination": "/api?route=cron/daily-whatsapp-alerts" },
     { "source": "/api/(.*)", "destination": "/api?route=$1" },
     { "source": "/api", "destination": "/api" },
     { "source": "/report/(.*)", "destination": "/api?route=report/$1" },
+    { "source": "/reports/(.*)", "destination": "/api?route=reports/$1" },
+    { "source": "/report", "destination": "/api?route=report/mandal-villages" },
+    { "source": "/reports", "destination": "/api?route=reports/mandal-villages" },
     { "source": "/", "destination": "/index.html" }
   ]
 }

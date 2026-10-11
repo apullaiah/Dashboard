@@ -8038,11 +8038,19 @@ function openMandalPdfModal(selectedMandal = 'All') {
           }, 2500);
         } catch (err) {
           console.error('Download PDF error:', err);
-          window.location.href = pdfUrl;
+          // Reliable direct anchor download fallback without navigating window
+          const a = document.createElement('a');
+          a.href = pdfUrl;
+          const safeM = m && m !== 'All' ? m.replace(/[^a-zA-Z0-9]/g, '_') : 'District_Mandal_Wise';
+          a.download = `Chittoor_${safeM}_Village_Status_Report.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          dlBtn.innerHTML = `<span>✓ Downloading...</span>`;
           setTimeout(() => {
             dlBtn.innerHTML = origText;
             dlBtn.disabled = false;
-          }, 3000);
+          }, 2500);
         }
       };
     }
@@ -8079,8 +8087,11 @@ function renderReports() {
         <p>Generate certified district records with standardized Mandal data, colourful PDF layouts, and traceable audit trails.</p>
       </div>
       <div class="content-actions">
-        <button class="primary-button" data-action="open-mandal-pdf-modal" style="background:linear-gradient(135deg, #1e3a8a, #2563eb);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
-          ${icon('document')} Download Mandal-Wise Village Status PDF
+        <button class="primary-button" data-action="download-direct-pdf" style="background:linear-gradient(135deg, #1e3a8a, #2563eb);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,0.25);">
+          ${icon('download')} Download District PDF (736 Villages)
+        </button>
+        <button class="outline-button" data-action="open-mandal-pdf-modal">
+          ${icon('document')} Preview &amp; Filter by Mandal
         </button>
       </div>
     </div>
@@ -8099,12 +8110,12 @@ function renderReports() {
             Download the official high-resolution statutory report showing every single village in Chittoor District (736 Villages across 29 Mandals) with attractive Plus Jakarta Sans typography, colourful stage badges (GT, Vectorization, DLR @ VS/VRO/Tah/RDO/JC, Draft RoR, Final RoR, Webland 2.0 Ported), extent, and delivery milestones.
           </p>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-            <button type="button" class="primary-button" data-action="open-mandal-pdf-modal" style="background:linear-gradient(135deg, #2563eb, #1d4ed8);color:#fff;padding:9px 18px;font-size:12.5px;">
-              ${icon('download')} Open PDF Viewer &amp; Download
-            </button>
-            <a href="/api/reports/mandal-villages-pdf" class="outline-button" download style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;">
-              ${icon('download')} Direct PDF (All 736 Villages)
+            <a href="/api/reports/mandal-villages-pdf" class="primary-button" download style="background:linear-gradient(135deg, #2563eb, #1d4ed8);color:#fff;padding:9px 18px;font-size:12.5px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
+              ${icon('download')} Download PDF (All 736 Villages)
             </a>
+            <button type="button" class="outline-button" data-action="open-mandal-pdf-modal" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:12px;font-weight:600;">
+              ${icon('document')} Preview &amp; Select Mandal
+            </button>
             <a href="/report/mandal-villages" target="_blank" class="outline-button" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;">
               ${icon('external')} Live Colourful Web View ↗
             </a>
@@ -10614,6 +10625,16 @@ document.addEventListener('click', async event => {
       return navigate('villages', { filters: { gt_status: 'Completed' } });
     }
     return navigate('villages');
+  }
+  if (el.dataset.action === 'download-direct-pdf' || el.closest('[data-action="download-direct-pdf"]')) {
+    const a = document.createElement('a');
+    a.href = '/api/reports/mandal-villages-pdf';
+    a.download = 'Chittoor_District_Mandal_Wise_Village_Status_Report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast('Downloading complete Chittoor District Mandal-Wise PDF report...');
+    return;
   }
   if (el.dataset.action === 'print-pdf' || el.dataset.action === 'open-mandal-pdf-modal' || el.closest('[data-action="open-mandal-pdf-modal"]')) {
     const btn = el.dataset.action ? el : el.closest('[data-action="open-mandal-pdf-modal"]');

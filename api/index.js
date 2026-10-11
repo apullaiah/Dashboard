@@ -58,7 +58,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    if (url.pathname.startsWith('/api/') || url.pathname === '/api') {
+    if (url.pathname.startsWith('/api/') || url.pathname === '/api' || url.pathname.startsWith('/report') || url.pathname.startsWith('/reports')) {
       await handleApi(req, res, url);
     } else {
       await serveStatic(req, res, url);
