@@ -1974,7 +1974,7 @@ async function handleApi(req, res, url) {
     return json(res, 200, { success: true, village: v.village_name, dispatches: dispatchResults });
   }
 
-  // Multi-tier Poor Performing Officers monitoring: VS (Village Surveyors), MS (Mandal Surveyors), DIOS (District Inspectors)
+  // Multi-tier Poor Performing Officers monitoring: VS (Village Surveyors), MS (Mandal Surveyors), DIOS (Deputy Inspectors)
   if (req.method === 'GET' && pathname === '/api/whatsapp/poor-officers') {
     const tier = clean(url.searchParams.get('tier') || 'vs').toLowerCase();
     const senderName = store.whatsappConfig?.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
@@ -2005,14 +2005,21 @@ async function handleApi(req, res, url) {
     const officer = officers.find(o => o.id === officerId || o.phone === officerId || o.name.toLowerCase() === officerId.toLowerCase());
     if (!officer) return json(res, 404, { error: `Officer not found in tier ${tier}` });
 
+    const targetPhone = b.phoneOverride ? String(b.phoneOverride).replace(/\D/g, '') : (officer.phone ? String(officer.phone).replace(/\D/g, '') : '');
+    if (!targetPhone) {
+      return json(res, 400, {
+        error: `Phone number for ${officer.name} (${officer.role}) is not present in the Google Spreadsheet link. Policy: Phone numbers are strictly taken from the Google Spreadsheet link. Please update the Google Spreadsheet or provide a verified number.`
+      });
+    }
+
     const baseUrl = `${url.protocol}//${url.host}`;
     const config = store.whatsappConfig || {};
     const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
 
     const noticeText = formatOfficerNotice(officer, tier, baseUrl, effectiveSender);
     const sendResult = b.dryRun 
-      ? { simulated: true, delivered: true, to: officer.phone, preview: noticeText.slice(0, 140) }
-      : await sendWhatsAppCloudMessage(officer.phone, noticeText, config);
+      ? { simulated: true, delivered: true, to: targetPhone, preview: noticeText.slice(0, 140) }
+      : await sendWhatsAppCloudMessage(targetPhone, noticeText, config);
 
     const status = sendResult.success ? 'Delivered' : (sendResult.simulated ? 'Simulated' : 'Failed');
     const logEntry = {
@@ -2020,7 +2027,7 @@ async function handleApi(req, res, url) {
       timestamp: now(),
       direction: 'OUTBOUND_NOTICE',
       from: effectiveSender,
-      to: officer.phone,
+      to: targetPhone,
       senderName: effectiveSender,
       recipientName: officer.name,
       recipientRole: officer.role,
@@ -2044,7 +2051,7 @@ async function handleApi(req, res, url) {
     return json(res, 200, {
       success: true,
       officer: officer.name,
-      phone: officer.phone,
+      phone: targetPhone,
       tier,
       status,
       noticePreview: noticeText.slice(0, 240),
