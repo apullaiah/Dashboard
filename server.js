@@ -18,12 +18,19 @@ const {
   sendWhatsAppCloudMessage,
   DEFAULT_VERIFY_TOKEN,
   MANDAL_SURVEYOR_DIRECTORY,
+  DIOS_DIRECTORY,
   getMandalSurveyor,
   getVillageSurveyorContacts,
   isVillagePoorPerforming,
   getPoorPerformingVillages,
+  getPoorVS,
+  getPoorMS,
+  getPoorDIOS,
+  getPoorOfficersByTier,
   formatPoorVillageNotice,
-  sendPoorVillagesNotices
+  formatOfficerNotice,
+  sendPoorVillagesNotices,
+  sendOfficerNotices
 } = require('./lib/whatsappService.js');
 
 const PORT = Number(process.env.PORT || 4173);
@@ -1965,6 +1972,100 @@ async function handleApi(req, res, url) {
 
     save(store);
     return json(res, 200, { success: true, village: v.village_name, dispatches: dispatchResults });
+  }
+
+  // Multi-tier Poor Performing Officers monitoring: VS (Village Surveyors), MS (Mandal Surveyors), DIOS (District Inspectors)
+  if (req.method === 'GET' && pathname === '/api/whatsapp/poor-officers') {
+    const tier = clean(url.searchParams.get('tier') || 'vs').toLowerCase();
+    const senderName = store.whatsappConfig?.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+    const officers = getPoorOfficersByTier(tier, store);
+    const vsCount = getPoorVS(store).length;
+    const msCount = getPoorMS(store).length;
+    const diosCount = getPoorDIOS(store).length;
+
+    return json(res, 200, {
+      tier,
+      count: officers.length,
+      counts: {
+        vs: vsCount,
+        ms: msCount,
+        dios: diosCount
+      },
+      senderName,
+      officers
+    });
+  }
+
+  // Single officer notice dispatch (tailored to VS, MS, or DIOS tier)
+  if (req.method === 'POST' && pathname === '/api/whatsapp/send-officer-notice') {
+    const b = await readBody(req);
+    const tier = clean(b.tier || 'vs').toLowerCase();
+    const officerId = clean(b.officerId || b.id || b.phone);
+    const officers = getPoorOfficersByTier(tier, store);
+    const officer = officers.find(o => o.id === officerId || o.phone === officerId || o.name.toLowerCase() === officerId.toLowerCase());
+    if (!officer) return json(res, 404, { error: `Officer not found in tier ${tier}` });
+
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const config = store.whatsappConfig || {};
+    const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+
+    const noticeText = formatOfficerNotice(officer, tier, baseUrl, effectiveSender);
+    const sendResult = b.dryRun 
+      ? { simulated: true, delivered: true, to: officer.phone, preview: noticeText.slice(0, 140) }
+      : await sendWhatsAppCloudMessage(officer.phone, noticeText, config);
+
+    const status = sendResult.success ? 'Delivered' : (sendResult.simulated ? 'Simulated' : 'Failed');
+    const logEntry = {
+      id: id(),
+      timestamp: now(),
+      direction: 'OUTBOUND_NOTICE',
+      from: effectiveSender,
+      to: officer.phone,
+      senderName: effectiveSender,
+      recipientName: officer.name,
+      recipientRole: officer.role,
+      officerTier: tier.toUpperCase(),
+      jurisdiction: officer.jurisdictionText,
+      mandal: officer.mandal || (officer.assignedMandals ? officer.assignedMandals.join(', ') : 'Chittoor'),
+      sender: effectiveSender,
+      noticeType: `${tier.toUpperCase()}_PERFORMANCE_NOTICE`,
+      query: `Official Notice: ${officer.name} (${officer.role})`,
+      replyPreview: noticeText.slice(0, 160),
+      fullText: noticeText,
+      status,
+      error: sendResult.error || null
+    };
+
+    if (!store.whatsappLogs) store.whatsappLogs = [];
+    store.whatsappLogs.unshift(logEntry);
+    if (store.whatsappLogs.length > 300) store.whatsappLogs.pop();
+    save(store);
+
+    return json(res, 200, {
+      success: true,
+      officer: officer.name,
+      phone: officer.phone,
+      tier,
+      status,
+      noticePreview: noticeText.slice(0, 240),
+      fullNotice: noticeText,
+      sendResult
+    });
+  }
+
+  // Bulk tier notices broadcast (alerts all flagged VS, MS, or DIOS)
+  if (req.method === 'POST' && pathname === '/api/whatsapp/broadcast-tier-notices') {
+    const b = await readBody(req);
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const tier = clean(b.tier || 'vs').toLowerCase();
+    const report = await sendOfficerNotices({
+      tier,
+      officerIds: b.officerIds,
+      senderTitle: clean(b.senderTitle),
+      dryRun: Boolean(b.dryRun)
+    }, store, baseUrl);
+    save(store);
+    return json(res, 200, { success: true, report });
   }
 
   if (req.method === 'GET' && pathname === '/api/whatsapp/logs') {
