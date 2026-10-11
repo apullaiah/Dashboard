@@ -5,7 +5,14 @@
       "includeFiles": "{data/store.json,lib/**}"
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/daily-whatsapp-alerts",
+      "schedule": "30 0 * * *"
+    }
+  ],
   "rewrites": [
+    { "source": "/api/cron/daily-whatsapp-alerts", "destination": "/api?route=cron/daily-whatsapp-alerts" },
     { "source": "/api/(.*)", "destination": "/api?route=$1" },
     { "source": "/api", "destination": "/api" },
     { "source": "/report/(.*)", "destination": "/api?route=report/$1" },

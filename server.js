@@ -25,12 +25,18 @@ const {
   getPoorPerformingVillages,
   getPoorVS,
   getPoorMS,
+  getPoorMLSO,
   getPoorDIOS,
+  getPoorVRO,
+  getPoorTahsildars,
+  getPoorRDOs,
   getPoorOfficersByTier,
+  getDefaultSenderForTier,
   formatPoorVillageNotice,
   formatOfficerNotice,
   sendPoorVillagesNotices,
-  sendOfficerNotices
+  sendOfficerNotices,
+  executeDaily6AMWhatsAppBroadcast
 } = require('./lib/whatsappService.js');
 
 const PORT = Number(process.env.PORT || 4173);
@@ -1927,7 +1933,7 @@ async function handleApi(req, res, url) {
 
     const baseUrl = `${url.protocol}//${url.host}`;
     const config = store.whatsappConfig || {};
-    const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+    const effectiveSender = clean(b.senderTitle) || getDefaultSenderForTier(tier);
     const contacts = getVillageSurveyorContacts(v, store);
 
     if (!contacts.length) {
@@ -1974,24 +1980,60 @@ async function handleApi(req, res, url) {
     return json(res, 200, { success: true, village: v.village_name, dispatches: dispatchResults });
   }
 
-  // Multi-tier Poor Performing Officers monitoring: VS (Village Surveyors), MS (Mandal Surveyors), DIOS (Deputy Inspectors)
+  // Multi-tier & Cadre Poor Performing Officers monitoring:
+  // Survey Cadre: VS (Village Surveyors), MLSO (Mandal Level Survey Officers), DIOS (Deputy Inspectors) -> Sender: DSLRO, Chittoor
+  // Revenue Cadre: VRO (Village Revenue Officers), Tahsildars, RDOs -> Sender: Joint Collector, Chittoor
   if (req.method === 'GET' && pathname === '/api/whatsapp/poor-officers') {
     const tier = clean(url.searchParams.get('tier') || 'vs').toLowerCase();
-    const senderName = store.whatsappConfig?.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+    const defaultSender = getDefaultSenderForTier(tier);
+    const senderName = clean(url.searchParams.get('sender')) || defaultSender;
     const officers = getPoorOfficersByTier(tier, store);
+
     const vsCount = getPoorVS(store).length;
-    const msCount = getPoorMS(store).length;
+    const mlsoCount = getPoorMLSO(store).length;
     const diosCount = getPoorDIOS(store).length;
+    const vroCount = getPoorVRO(store).length;
+    const tahCount = getPoorTahsildars(store).length;
+    const rdoCount = getPoorRDOs(store).length;
 
     return json(res, 200, {
       tier,
       count: officers.length,
       counts: {
         vs: vsCount,
-        ms: msCount,
-        dios: diosCount
+        mlso: mlsoCount,
+        ms: mlsoCount,
+        dios: diosCount,
+        vro: vroCount,
+        tahsildar: tahCount,
+        tah: tahCount,
+        rdo: rdoCount
+      },
+      cadres: {
+        survey: {
+          title: 'Survey Cadre',
+          officialSender: 'DSLRO, Chittoor',
+          vs: vsCount,
+          mlso: mlsoCount,
+          dios: diosCount
+        },
+        revenue: {
+          title: 'Revenue Cadre',
+          officialSender: 'Joint Collector, Chittoor',
+          vro: vroCount,
+          tahsildar: tahCount,
+          rdo: rdoCount
+        }
+      },
+      schedule: store.whatsappScheduleStatus || {
+        active: true,
+        scheduledCron: '30 0 * * * (Daily 06:00 AM IST)',
+        nextRun: 'Tomorrow at 06:00 AM IST',
+        surveyCadreSender: 'DSLRO, Chittoor',
+        revenueCadreSender: 'Joint Collector, Chittoor'
       },
       senderName,
+      defaultSender,
       officers
     });
   }
@@ -2060,19 +2102,48 @@ async function handleApi(req, res, url) {
     });
   }
 
-  // Bulk tier notices broadcast (alerts all flagged VS, MS, or DIOS)
+  // Bulk tier notices broadcast (alerts all flagged officers in specified cadre tier)
   if (req.method === 'POST' && pathname === '/api/whatsapp/broadcast-tier-notices') {
     const b = await readBody(req);
     const baseUrl = `${url.protocol}//${url.host}`;
     const tier = clean(b.tier || 'vs').toLowerCase();
+    const senderTitle = clean(b.senderTitle) || getDefaultSenderForTier(tier);
     const report = await sendOfficerNotices({
       tier,
       officerIds: b.officerIds,
-      senderTitle: clean(b.senderTitle),
+      senderTitle,
       dryRun: Boolean(b.dryRun)
     }, store, baseUrl);
     save(store);
     return json(res, 200, { success: true, report });
+  }
+
+  // Automated Daily 6:00 AM WhatsApp Alerts Endpoint (Vercel Cron & Manual Trigger)
+  // Cadre A: VS, MLSO, DIOS -> Dispatched by DSLRO, Chittoor
+  // Cadre B: VRO, Tahsildar, RDO -> Dispatched by Joint Collector, Chittoor
+  if ((req.method === 'GET' || req.method === 'POST') && (pathname === '/api/cron/daily-whatsapp-alerts' || pathname === '/api/whatsapp/trigger-daily-alerts')) {
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const summary = await executeDaily6AMWhatsAppBroadcast(store, baseUrl);
+    save(store);
+    return json(res, 200, {
+      success: true,
+      message: 'Automated daily 6:00 AM WhatsApp alerts broadcast completed successfully.',
+      schedule: store.whatsappScheduleStatus,
+      summary
+    });
+  }
+
+  // Schedule status query endpoint
+  if (req.method === 'GET' && pathname === '/api/whatsapp/schedule-status') {
+    return json(res, 200, {
+      schedule: store.whatsappScheduleStatus || {
+        active: true,
+        scheduledCron: '30 0 * * * (Daily 06:00 AM IST)',
+        nextRun: 'Tomorrow at 06:00 AM IST',
+        surveyCadreSender: 'DSLRO, Chittoor',
+        revenueCadreSender: 'Joint Collector, Chittoor'
+      }
+    });
   }
 
   if (req.method === 'GET' && pathname === '/api/whatsapp/logs') {

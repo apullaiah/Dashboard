@@ -8158,28 +8158,48 @@ async function renderWhatsApp() {
   root.innerHTML = `<div class="empty-block"><div>${icon('refresh')}<strong>Loading WhatsApp Resurvey Monitoring &amp; Notice Engine...</strong></div></div>`;
   let cfgData = { config: {}, stats: {} };
   let logsData = { logs: [] };
-  let tierData = { vs: [], ms: [], dios: [] };
-  let counts = { vs: 0, ms: 0, dios: 0 };
-  let defaultSender = 'AD, Chittoor';
+  let tierData = { vs: [], mlso: [], ms: [], dios: [], vro: [], tahsildar: [], rdo: [] };
+  let counts = { vs: 0, mlso: 0, ms: 0, dios: 0, vro: 0, tahsildar: 0, rdo: 0 };
+  let scheduleData = {
+    active: true,
+    scheduledCron: '30 0 * * * (Daily 06:00 AM IST)',
+    nextRun: 'Tomorrow at 06:00 AM IST',
+    surveyCadreSender: 'DSLRO, Chittoor',
+    revenueCadreSender: 'Joint Collector, Chittoor'
+  };
 
   try {
-    const [cfg, logs, vsRes, msRes, diosRes] = await Promise.all([
+    const [cfg, logs, vsRes, mlsoRes, diosRes, vroRes, tahRes, rdoRes, schedRes] = await Promise.all([
       api('/api/whatsapp/config').catch(() => ({ config: {}, stats: {} })),
       api('/api/whatsapp/logs').catch(() => ({ logs: [] })),
       api('/api/whatsapp/poor-officers?tier=vs').catch(() => ({ officers: [], count: 0 })),
-      api('/api/whatsapp/poor-officers?tier=ms').catch(() => ({ officers: [], count: 0 })),
-      api('/api/whatsapp/poor-officers?tier=dios').catch(() => ({ officers: [], count: 0 }))
+      api('/api/whatsapp/poor-officers?tier=mlso').catch(() => ({ officers: [], count: 0 })),
+      api('/api/whatsapp/poor-officers?tier=dios').catch(() => ({ officers: [], count: 0 })),
+      api('/api/whatsapp/poor-officers?tier=vro').catch(() => ({ officers: [], count: 0 })),
+      api('/api/whatsapp/poor-officers?tier=tahsildar').catch(() => ({ officers: [], count: 0 })),
+      api('/api/whatsapp/poor-officers?tier=rdo').catch(() => ({ officers: [], count: 0 })),
+      api('/api/whatsapp/schedule-status').catch(() => ({ schedule: {} }))
     ]);
 
     cfgData = cfg || {};
     logsData = logs || {};
     tierData.vs = vsRes.officers || [];
-    tierData.ms = msRes.officers || [];
+    tierData.mlso = mlsoRes.officers || [];
+    tierData.ms = mlsoRes.officers || [];
     tierData.dios = diosRes.officers || [];
+    tierData.vro = vroRes.officers || [];
+    tierData.tahsildar = tahRes.officers || [];
+    tierData.rdo = rdoRes.officers || [];
+
     counts.vs = vsRes.count || tierData.vs.length;
-    counts.ms = msRes.count || tierData.ms.length;
+    counts.mlso = mlsoRes.count || tierData.mlso.length;
+    counts.ms = counts.mlso;
     counts.dios = diosRes.count || tierData.dios.length;
-    defaultSender = vsRes.senderName || cfgData.config?.senderName || 'AD, Chittoor';
+    counts.vro = vroRes.count || tierData.vro.length;
+    counts.tahsildar = tahRes.count || tierData.tahsildar.length;
+    counts.rdo = rdoRes.count || tierData.rdo.length;
+
+    if (schedRes && schedRes.schedule) scheduleData = schedRes.schedule;
   } catch (e) {
     console.error('Error fetching initial WhatsApp officer data:', e);
   }
@@ -8190,8 +8210,10 @@ async function renderWhatsApp() {
   const verifyToken = c.verifyToken || 'CTR_RESURVEY_WA_2026';
   const isLiveMode = c.mode === 'LIVE';
 
+  let currentCadre = 'survey'; // 'survey' | 'revenue'
   let currentTier = 'vs';
   let currentCategory = 'all';
+  let currentBulkMode = 'individual';
   let searchQuery = '';
 
   function getActiveOfficers() {
@@ -8214,7 +8236,7 @@ async function renderWhatsApp() {
         const q = searchQuery.toLowerCase().trim();
         const nm = (o.name || '').toLowerCase();
         const ph = (o.phone || '').toLowerCase();
-        const md = (o.mandal || (o.assignedMandals ? o.assignedMandals.join(' ') : '')).toLowerCase();
+        const md = (o.mandal || (o.assignedMandals ? o.assignedMandals.join(' ') : '') || o.division || '').toLowerCase();
         const jur = (o.jurisdictionText || '').toLowerCase();
         const vNames = (o.assignedVillages || []).map(v => (v.name || v.village_name || '').toLowerCase()).join(' ');
         return nm.includes(q) || ph.includes(q) || md.includes(q) || jur.includes(q) || vNames.includes(q);
@@ -8228,23 +8250,74 @@ async function renderWhatsApp() {
       return {
         title: 'Deputy Inspectors of Survey (DIOS)',
         short: 'DIOS',
+        cadre: 'survey',
+        cadreTitle: 'Survey Cadre',
+        defaultSender: 'DSLRO, Chittoor',
+        senderDesignation: 'District Survey & Land Records Officer',
         unit: 'Mandals Assigned',
         scopeText: '6 DIOS Officers assigned across all 27 Mandals in Chittoor district',
         broadcastBtn: '⚡ Broadcast Notices to All Flagged Deputy Inspectors (DIOS)'
       };
     }
-    if (currentTier === 'ms') {
+    if (currentTier === 'mlso' || currentTier === 'ms') {
       return {
-        title: 'Mandal Surveyors (MS)',
-        short: 'MS',
+        title: 'Mandal Level Survey Officers (MLSO)',
+        short: 'MLSO',
+        cadre: 'survey',
+        cadreTitle: 'Survey Cadre',
+        defaultSender: 'DSLRO, Chittoor',
+        senderDesignation: 'District Survey & Land Records Officer',
         unit: 'Revenue Villages in Mandal',
-        scopeText: '27 Mandals (Mandal Surveyors monitoring assigned revenue villages)',
-        broadcastBtn: '⚡ Broadcast Notices to All Flagged Mandal Surveyors (MS)'
+        scopeText: '27 Mandals (Mandal Level Survey Officers monitoring assigned revenue villages)',
+        broadcastBtn: '⚡ Broadcast Notices to All Flagged Mandal Level Survey Officers (MLSO)'
+      };
+    }
+    if (currentTier === 'vro') {
+      return {
+        title: 'Village Revenue Officers (VRO)',
+        short: 'VRO',
+        cadre: 'revenue',
+        cadreTitle: 'Revenue Cadre',
+        defaultSender: 'Joint Collector, Chittoor',
+        senderDesignation: 'Joint Collector & Additional District Magistrate',
+        unit: 'Assigned Revenue Villages',
+        scopeText: 'Village Revenue Officers responsible for door-to-door khata verification & DLR clearances',
+        broadcastBtn: '⚡ Broadcast Directives to All Flagged Village Revenue Officers (VRO)'
+      };
+    }
+    if (currentTier === 'tahsildar' || currentTier === 'tah') {
+      return {
+        title: 'Tahsildars (Mandal Revenue Executives)',
+        short: 'Tahsildar',
+        cadre: 'revenue',
+        cadreTitle: 'Revenue Cadre',
+        defaultSender: 'Joint Collector, Chittoor',
+        senderDesignation: 'Joint Collector & Additional District Magistrate',
+        unit: 'Revenue Villages in Mandal',
+        scopeText: '27 Mandals (Tahsildars responsible for Mandal revenue administration & DLR clearance)',
+        broadcastBtn: '⚡ Broadcast Directives to All Flagged Tahsildars'
+      };
+    }
+    if (currentTier === 'rdo') {
+      return {
+        title: 'Revenue Divisional Officers (RDO)',
+        short: 'RDO',
+        cadre: 'revenue',
+        cadreTitle: 'Revenue Cadre',
+        defaultSender: 'Joint Collector, Chittoor',
+        senderDesignation: 'Joint Collector & Additional District Magistrate',
+        unit: 'Mandals in Division',
+        scopeText: '4 Revenue Divisions (Chittoor, Palamaner, Kuppam, Nagari)',
+        broadcastBtn: '⚡ Broadcast Directives to All Flagged Revenue Divisional Officers (RDO)'
       };
     }
     return {
       title: 'Village Surveyors (VS)',
       short: 'VS',
+      cadre: 'survey',
+      cadreTitle: 'Survey Cadre',
+      defaultSender: 'DSLRO, Chittoor',
+      senderDesignation: 'District Survey & Land Records Officer',
       unit: 'Revenue Villages Assigned',
       scopeText: 'Village Surveyors mapped to their designated revenue villages',
       broadcastBtn: '⚡ Broadcast Notices to All Flagged Village Surveyors (VS)'
@@ -8292,7 +8365,7 @@ async function renderWhatsApp() {
           <thead>
             <tr>
               <th style="width:40px;">#</th>
-              <th>OFFICER &amp; ROLE</th>
+              <th>OFFICER &amp; CADRE ROLE</th>
               <th>ASSIGNED JURISDICTION</th>
               <th>TODAY'S EXTRACTED PROGRESS</th>
               <th>PENDING BALANCE</th>
@@ -8305,7 +8378,14 @@ async function renderWhatsApp() {
               const isZeroToday = (parseFloat(o.today_gt_extent) || 0) === 0;
 
               let jurisdictionRender = '';
-              if (currentTier === 'dios') {
+              if (currentTier === 'rdo') {
+                const mandals = o.assignedMandals || [];
+                jurisdictionRender = `
+                  <div class="wa-jurisdiction-chip" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">⚖️ <b>${o.division} Division</b></div>
+                  <div style="font-size:11.5px;color:#0f172a;font-weight:700;margin-top:2px;">${o.assignedMandalsCount || mandals.length} Mandals Assigned</div>
+                  <div style="font-size:10.5px;color:#64748b;margin-top:1px;">Universe: <b>${o.totalVillagesInDivision || 0} Villages</b></div>
+                `;
+              } else if (currentTier === 'dios') {
                 const mandals = o.assignedMandals || [];
                 jurisdictionRender = `
                   <div class="wa-jurisdiction-chip">⭐ <b>${o.assignedMandalsCount || mandals.length} Mandals Assigned</b></div>
@@ -8314,10 +8394,25 @@ async function renderWhatsApp() {
                   </div>
                   <div style="font-size:11px;color:#64748b;margin-top:2px;">Universe: <b>${o.totalVillagesInDivision || 0} Villages</b></div>
                 `;
-              } else if (currentTier === 'ms') {
+              } else if (currentTier === 'tahsildar') {
+                jurisdictionRender = `
+                  <div class="wa-jurisdiction-chip" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">🏢 <b>${h(o.mandal)} Mandal</b></div>
+                  <div style="font-size:11px;color:#0f172a;font-weight:700;margin-top:2px;">${o.jurisdictionCount} Revenue Villages in Mandal</div>
+                `;
+              } else if (currentTier === 'mlso' || currentTier === 'ms') {
                 jurisdictionRender = `
                   <div class="wa-jurisdiction-chip">🏛️ <b>${o.jurisdictionCount} Revenue Villages</b></div>
                   <div style="font-weight:700;color:#0f172a;margin-top:2px;">${h(o.mandal)} Mandal</div>
+                `;
+              } else if (currentTier === 'vro') {
+                const vCount = o.jurisdictionCount || (o.assignedVillages || []).length;
+                const sampleV = (o.assignedVillages || []).slice(0, 2).map(v => v.name || v.village_name).join(', ');
+                jurisdictionRender = `
+                  <div class="wa-jurisdiction-chip" style="background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;">✍️ <b>${vCount} Revenue Village(s)</b></div>
+                  <div style="font-size:11px;color:#475569;margin-top:2px;max-width:240px;line-height:1.3;">
+                    ${h(sampleV)}${vCount > 2 ? ` <span class="mono" style="color:#0284c7;">+${vCount - 2} more</span>` : ''}
+                  </div>
+                  <div style="font-size:10.5px;color:#64748b;margin-top:1px;">Mandal: <b>${h(o.mandal || 'Chittoor')}</b></div>
                 `;
               } else {
                 const vCount = o.jurisdictionCount || (o.assignedVillages || []).length;
@@ -8336,7 +8431,7 @@ async function renderWhatsApp() {
                   <td class="mono font-bold" style="color:#64748b;">${idx + 1}</td>
                   <td>
                     <div style="font-weight:800;color:#0f172a;font-size:13px;">${h(o.name)}</div>
-                    <div style="font-size:11px;color:#0284c7;font-weight:700;margin:1px 0;">
+                    <div style="font-size:11px;color:${meta.cadre === 'revenue' ? '#ea580c' : '#0284c7'};font-weight:700;margin:1px 0;">
                       ${h(o.role || meta.title)}
                     </div>
                     ${o.phone ? `
@@ -8386,7 +8481,7 @@ async function renderWhatsApp() {
                     `).join('')}
                   </td>
                   <td style="text-align:right;white-space:nowrap;">
-                    <button type="button" class="wa-preview-pill" data-action="preview-officer" data-oid="${o.id}" title="Preview formatted WhatsApp notice from AD, Chittoor">
+                    <button type="button" class="wa-preview-pill" data-action="preview-officer" data-oid="${o.id}" title="Preview formatted official notice">
                       👁️ Preview
                     </button>
                     <button type="button" class="wa-single-send-btn" data-action="send-officer" data-oid="${o.id}" title="Send notice to ${h(o.name)} via WhatsApp">
@@ -8402,7 +8497,12 @@ async function renderWhatsApp() {
     `;
   }
 
+  const initialMeta = getTierMeta();
+  const surveyTotalFlagged = counts.vs + counts.mlso + counts.dios;
+  const revenueTotalFlagged = counts.vro + counts.tahsildar + counts.rdo;
+
   root.innerHTML = `
+    <!-- POLISHED HEADER -->
     <div class="content-heading wa-header-polished">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
         <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 12px rgba(16,185,129,0.25);">
@@ -8416,7 +8516,7 @@ async function renderWhatsApp() {
             </span>
           </div>
           <p style="margin:2px 0 0;font-size:12px;color:#64748b;">
-            Direct Monitoring &amp; Notice Engine · Official Directives Issued by <b>${h(defaultSender)}</b>.
+            Direct Monitoring Engine · Survey Cadre alerts by <b>DSLRO, Chittoor</b> · Revenue Cadre alerts by <b>Joint Collector, Chittoor</b>.
           </p>
         </div>
       </div>
@@ -8427,41 +8527,127 @@ async function renderWhatsApp() {
       </div>
     </div>
 
-    <!-- 🔘 JURISDICTION TIER RADIO BUTTONS (VS / MS / DIOS) -->
-    <div class="wa-tier-radio-container">
-      <div class="wa-tier-radio-title">
-        <span>🔘</span> SELECT OFFICER JURISDICTION TIER TO MONITOR &amp; ALERT:
+    <!-- ⏰ AUTOMATED DAILY 6:00 AM SCHEDULE BANNER CARD -->
+    <div class="wa-schedule-banner-card">
+      <div class="wa-sched-left">
+        <div class="wa-sched-icon">⏰</div>
+        <div>
+          <div class="wa-sched-title">
+            <b>Automated Daily 06:00 AM IST WhatsApp Dispatch Engine</b>
+            <span class="wa-sched-live-pill">● ACTIVE CRON (30 0 * * * UTC / 06:00 IST)</span>
+          </div>
+          <div class="wa-sched-subtitle">
+            Scheduled alerts automatically broadcast to all officers with poor progress of GT &amp; DLR logins up to VS and VRO every morning.
+          </div>
+          <div class="wa-sched-routing-chips">
+            <span class="wa-route-chip survey">📐 <b>Survey Cadre</b> (VS, MLSO, DIOS) ➔ Official Sender: <b>DSLRO, Chittoor</b></span>
+            <span class="wa-route-chip revenue">🏛️ <b>Revenue Cadre</b> (VRO, Tahsildars, RDOs) ➔ Official Sender: <b>Joint Collector, Chittoor</b></span>
+          </div>
+        </div>
       </div>
-      <div class="wa-tier-radio-group">
-        <label class="wa-tier-radio-card active" data-tier-radio="vs">
-          <input type="radio" name="wa-tier-selector" value="vs" checked />
-          <div class="wa-radio-indicator"></div>
-          <div class="wa-radio-info">
-            <div class="wa-radio-name">👤 Village Surveyors (VS)</div>
-            <div class="wa-radio-sub">Jurisdiction fixed by assigned revenue villages</div>
-          </div>
-          <span class="wa-radio-pill" id="wa-pill-vs">${counts.vs} Flagged</span>
-        </label>
+      <div class="wa-sched-right">
+        <button type="button" class="wa-trigger-sched-btn" id="wa-trigger-schedule-btn">
+          ▶ Trigger Scheduled 06:00 AM Dispatch Now
+        </button>
+        <div class="wa-sched-last-run" id="wa-sched-last-run-label">
+          Next Scheduled Run: Tomorrow at 06:00 AM IST
+        </div>
+      </div>
+    </div>
 
-        <label class="wa-tier-radio-card" data-tier-radio="ms">
-          <input type="radio" name="wa-tier-selector" value="ms" />
-          <div class="wa-radio-indicator"></div>
-          <div class="wa-radio-info">
-            <div class="wa-radio-name">🏛️ Mandal Surveyors (MS)</div>
-            <div class="wa-radio-sub">Jurisdiction fixed across all 27 Mandals</div>
+    <!-- 🏛️ CADRE SWITCHER & TIER SELECTOR CARDS -->
+    <div class="wa-cadres-container">
+      <div class="wa-cadre-nav-tabs">
+        <button type="button" class="wa-cadre-nav-btn active survey-tab" data-cadre-tab="survey">
+          <div>
+            <span style="font-size:15px;">📐</span> <b>SURVEY CADRE</b>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">Issued by <b>DSLRO, Chittoor</b></div>
           </div>
-          <span class="wa-radio-pill" id="wa-pill-ms">${counts.ms} Flagged</span>
-        </label>
+          <span class="wa-cadre-badge-count" id="wa-survey-total-badge">${surveyTotalFlagged} Flagged</span>
+        </button>
+        <button type="button" class="wa-cadre-nav-btn revenue-tab" data-cadre-tab="revenue">
+          <div>
+            <span style="font-size:15px;">🏛️</span> <b>REVENUE CADRE</b>
+            <div style="font-size:11px;color:#64748b;margin-top:2px;">Issued by <b>Joint Collector, Chittoor</b></div>
+          </div>
+          <span class="wa-cadre-badge-count revenue" id="wa-revenue-total-badge">${revenueTotalFlagged} Flagged</span>
+        </button>
+      </div>
 
-        <label class="wa-tier-radio-card" data-tier-radio="dios">
-          <input type="radio" name="wa-tier-selector" value="dios" />
-          <div class="wa-radio-indicator"></div>
-          <div class="wa-radio-info">
-            <div class="wa-radio-name">⭐ Deputy Inspectors (DIOS)</div>
-            <div class="wa-radio-sub">Jurisdiction fixed by assigned Mandals (6 DIOS · 27 Mandals)</div>
-          </div>
-          <span class="wa-radio-pill" id="wa-pill-dios">${counts.dios} Flagged</span>
-        </label>
+      <!-- SURVEY CADRE RADIO GROUP (VS / MLSO / DIOS) -->
+      <div class="wa-tier-radio-container" id="wa-survey-radio-group">
+        <div class="wa-tier-radio-title">
+          <span>🔘</span> SELECT SURVEY CADRE TIER (Official Directives Issued by <b>DSLRO, Chittoor</b>):
+        </div>
+        <div class="wa-tier-radio-group">
+          <label class="wa-tier-radio-card active" data-tier-radio="vs">
+            <input type="radio" name="wa-tier-selector" value="vs" checked />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">👤 Village Surveyors (VS)</div>
+              <div class="wa-radio-sub">Jurisdiction fixed by assigned revenue villages</div>
+            </div>
+            <span class="wa-radio-pill" id="wa-pill-vs">${counts.vs} Flagged</span>
+          </label>
+
+          <label class="wa-tier-radio-card" data-tier-radio="mlso">
+            <input type="radio" name="wa-tier-selector" value="mlso" />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">🏛️ Mandal Level Survey Officers (MLSO)</div>
+              <div class="wa-radio-sub">Monitoring assigned villages across 27 Mandals</div>
+            </div>
+            <span class="wa-radio-pill" id="wa-pill-mlso">${counts.mlso} Flagged</span>
+          </label>
+
+          <label class="wa-tier-radio-card" data-tier-radio="dios">
+            <input type="radio" name="wa-tier-selector" value="dios" />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">⭐ Deputy Inspectors of Survey (DIOS)</div>
+              <div class="wa-radio-sub">6 DIOS Officers monitoring all 27 Mandals</div>
+            </div>
+            <span class="wa-radio-pill" id="wa-pill-dios">${counts.dios} Flagged</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- REVENUE CADRE RADIO GROUP (VRO / TAHSILDAR / RDO) -->
+      <div class="wa-tier-radio-container" id="wa-revenue-radio-group" style="display:none;">
+        <div class="wa-tier-radio-title" style="color:#9a3412;">
+          <span>🔘</span> SELECT REVENUE CADRE TIER (Official Directives Issued by <b>Joint Collector, Chittoor</b>):
+        </div>
+        <div class="wa-tier-radio-group">
+          <label class="wa-tier-radio-card revenue-card" data-tier-radio="vro">
+            <input type="radio" name="wa-tier-selector" value="vro" />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">✍️ Village Revenue Officers (VRO)</div>
+              <div class="wa-radio-sub">Door-to-door khata verification &amp; DLR clearance</div>
+            </div>
+            <span class="wa-radio-pill revenue" id="wa-pill-vro">${counts.vro} Flagged</span>
+          </label>
+
+          <label class="wa-tier-radio-card revenue-card" data-tier-radio="tahsildar">
+            <input type="radio" name="wa-tier-selector" value="tahsildar" />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">🏢 Tahsildars (Mandal Level)</div>
+              <div class="wa-radio-sub">Mandal revenue executives across 27 Mandals</div>
+            </div>
+            <span class="wa-radio-pill revenue" id="wa-pill-tahsildar">${counts.tahsildar} Flagged</span>
+          </label>
+
+          <label class="wa-tier-radio-card revenue-card" data-tier-radio="rdo">
+            <input type="radio" name="wa-tier-selector" value="rdo" />
+            <div class="wa-radio-indicator"></div>
+            <div class="wa-radio-info">
+              <div class="wa-radio-name">⚖️ Revenue Divisional Officers (RDO)</div>
+              <div class="wa-radio-sub">4 Revenue Divisions (Chittoor, Palamaner, Kuppam, Nagari)</div>
+            </div>
+            <span class="wa-radio-pill revenue" id="wa-pill-rdo">${counts.rdo} Flagged</span>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -8473,7 +8659,7 @@ async function renderWhatsApp() {
           <div>
             <h3 id="wa-card-main-title">Poor Performing Village Surveyors (VS) Progress Notice</h3>
             <p style="font-size:12px;color:#64748b;margin:2px 0 0;" id="wa-card-sub-title">
-              Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(defaultSender)}</b>.
+              Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(initialMeta.defaultSender)}</b>.
             </p>
           </div>
         </div>
@@ -8544,7 +8730,7 @@ async function renderWhatsApp() {
               ⚡ Ready to broadcast official WhatsApp notices
             </div>
             <div class="wa-bulk-panel-desc" id="wa-bulk-panel-desc">
-              Notices will be issued signed by <b>AD, Chittoor</b> to officers with phone numbers strictly verified in Google Spreadsheet.
+              Notices will be issued signed by <b>${h(initialMeta.defaultSender)}</b> to officers with phone numbers verified in Google Spreadsheet.
             </div>
           </div>
           <button type="button" class="wa-bulk-send-btn-active" id="wa-bulk-send-btn">
@@ -8569,7 +8755,7 @@ async function renderWhatsApp() {
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
           <div style="display:flex;align-items:center;gap:6px;">
             <label style="font-size:11.5px;font-weight:700;color:#0f172a;white-space:nowrap;">Sender Title:</label>
-            <input type="text" id="wa-sender-override-input" value="${h(defaultSender)}" style="padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-weight:700;width:150px;" />
+            <input type="text" id="wa-sender-override-input" value="${h(initialMeta.defaultSender)}" style="padding:5px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;font-weight:700;width:170px;" />
           </div>
           <input type="text" id="wa-officer-search-input" placeholder="Search officer, mandal, village..." style="padding:6px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:12px;width:220px;" />
         </div>
@@ -8622,70 +8808,63 @@ async function renderWhatsApp() {
         </div>
       </section>
 
-      <!-- RIGHT: META CLOUD API CONFIGURATION -->
-      <section class="section-card">
-        <div class="section-header">
+      <!-- RIGHT: WEBHOOK CREDENTIALS & GRAPH API CONFIG -->
+      <section class="section-card" style="padding:16px;">
+        <div class="section-header" style="margin-bottom:12px;">
           <div>
-            <h3>Webhook Configuration (Vercel)</h3>
-            <p>Paste these settings into Meta Developer Portal under WhatsApp &gt; Configuration.</p>
+            <h3 style="font-size:15px;">Meta Cloud API &amp; Webhook Credentials</h3>
+            <p style="font-size:12px;">Settings saved to secure persistent configuration.</p>
           </div>
+          <span class="tiny-status completed">Config Valid</span>
         </div>
 
-        <form id="wa-config-form" style="display:flex;flex-direction:column;gap:13px;">
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);display:flex;justify-content:space-between;">
-              <span>Callback URL (HTTPS Webhook)</span>
-              <button type="button" class="copy-badge-btn" data-copy="${webhookUrl}">Copy URL 📋</button>
+        <div class="form-grid" style="display:grid;gap:10px;">
+          <label class="form-field">
+            <span style="font-size:11px;font-weight:700;">Callback Webhook URL (Public Vercel HTTPS)</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" readonly value="${h(webhookUrl)}" id="wa-webhook-url-input" style="font-family:var(--mono);font-size:11px;background:#f8fafc;" />
+              <button type="button" class="table-action-button copy-badge-btn" data-copy="${h(webhookUrl)}">Copy</button>
+            </div>
+          </label>
+
+          <label class="form-field">
+            <span style="font-size:11px;font-weight:700;">Verify Token</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" value="${h(verifyToken)}" id="wa-verify-token-input" style="font-family:var(--mono);font-size:11px;" />
+              <button type="button" class="table-action-button copy-badge-btn" data-copy="${h(verifyToken)}">Copy</button>
+            </div>
+          </label>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+            <label class="form-field">
+              <span style="font-size:11px;font-weight:700;">Phone Number ID</span>
+              <input type="text" value="${h(c.phoneNumberId || '')}" id="wa-phone-id-input" placeholder="e.g. 104829104928" style="font-family:var(--mono);font-size:11px;" />
             </label>
-            <input type="text" readonly value="${webhookUrl}" style="background:#f8fafc;font-family:var(--mono);font-size:12px;" />
-            <small style="color:var(--muted);font-size:11px;">Configure this as the Webhook Callback URL in Meta Developer Dashboard.</small>
-          </div>
-
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);display:flex;justify-content:space-between;">
-              <span>Verify Token</span>
-              <button type="button" class="copy-badge-btn" data-copy="${verifyToken}">Copy Token 📋</button>
+            <label class="form-field">
+              <span style="font-size:11px;font-weight:700;">WABA Business Account ID</span>
+              <input type="text" value="${h(c.wabaId || '')}" id="wa-waba-input" placeholder="e.g. 91823901923" style="font-family:var(--mono);font-size:11px;" />
             </label>
-            <input type="text" id="wa-verify-token-input" value="${verifyToken}" style="font-family:var(--mono);font-size:12px;" />
-            <small style="color:var(--muted);font-size:11px;">Used by Meta to verify webhook challenge (GET request).</small>
           </div>
 
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);">Meta Phone Number ID</label>
-            <input type="text" id="wa-phone-id-input" value="${h(c.phoneNumberId || '')}" placeholder="e.g. 109283746592019" />
-            <small style="color:var(--muted);font-size:11px;">From Meta WhatsApp Getting Started section.</small>
-          </div>
+          <label class="form-field">
+            <span style="font-size:11px;font-weight:700;">Permanent System Access Token</span>
+            <input type="password" value="${h(c.accessToken || '')}" id="wa-token-input" placeholder="EAAB..." style="font-family:var(--mono);font-size:11px;" />
+          </label>
 
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);">System User Access Token (Permanent)</label>
-            <input type="password" id="wa-token-input" value="${h(c.accessToken || '')}" placeholder="Bearer token from Meta System User" />
-            <small style="color:var(--muted);font-size:11px;">Required to dispatch outgoing WhatsApp replies via Graph API.</small>
-          </div>
-
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);">WhatsApp Business Account ID (WABA)</label>
-            <input type="text" id="wa-waba-input" value="${h(c.wabaId || '')}" placeholder="e.g. 293847561029384" />
-          </div>
-
-          <div class="form-field">
-            <label style="font-size:12px;font-weight:700;color:var(--navy);">Official Sender Identity / Designation</label>
-            <input type="text" id="wa-sender-name-input" value="${h(c.senderName || 'AD, Chittoor')}" placeholder="e.g. AD, Chittoor" />
-            <small style="color:var(--muted);font-size:11px;">Displayed on all official WhatsApp progress notices issued to Surveyors &amp; Inspectors.</small>
-          </div>
-
-          <div style="padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:11.5px;color:#166534;line-height:1.5;">
-            ✅ <b>Jurisdiction Coverage:</b> All 6 DIOS officers, 27 Mandal Surveyors (MS), and Village Surveyors (VS) across all 736 villages are strictly audited with daily extracted performance figures.
-          </div>
-        </form>
+          <label class="form-field">
+            <span style="font-size:11px;font-weight:700;">Official Notice Header Sender Title</span>
+            <input type="text" value="${h(c.senderName || initialMeta.defaultSender)}" id="wa-sender-name-input" style="font-size:12px;font-weight:700;" />
+          </label>
+        </div>
       </section>
     </div>
 
-    <!-- RECENT AUDIT LOGS -->
-    <section class="section-card">
+    <!-- LOGS OF RECENT WHATSAPP DISPATCHES -->
+    <section class="section-card" style="margin-top:16px;">
       <div class="section-header">
         <div>
-          <h3>WhatsApp Outbound Notices &amp; Inbound Queries (${logs.length})</h3>
-          <p>Real-time audit trail of official notices dispatched by <b>${h(defaultSender)}</b> and inbound queries processed.</p>
+          <h3>Live WhatsApp Inbound &amp; Outbound Notice Logs</h3>
+          <p>Real-time audit record of WhatsApp notices dispatched to officers across Chittoor district.</p>
         </div>
       </div>
       <div id="wa-logs-table-container">
@@ -8694,84 +8873,86 @@ async function renderWhatsApp() {
     </section>
 
     <!-- NOTICE PREVIEW MODAL -->
-    <div id="wa-preview-modal-backdrop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
-      <div style="background:#ffffff;border-radius:16px;max-width:540px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.3);border:1px solid #e2e8f0;">
-        <div style="background:#0f172a;color:#ffffff;padding:16px 20px;border-top-left-radius:16px;border-top-right-radius:16px;display:flex;align-items:center;justify-content:space-between;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span style="font-size:20px;">📱</span>
-            <strong style="font-size:15px;">WhatsApp Notice Preview · ${h(defaultSender)}</strong>
+    <div id="wa-preview-modal-backdrop" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:16px;">
+      <div style="background:#ffffff;border-radius:12px;max-width:560px;width:100%;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 20px 25px -5px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #e2e8f0;background:#f8fafc;">
+          <div style="font-weight:800;font-size:14px;color:#0f172a;display:flex;align-items:center;gap:8px;">
+            <span>📱</span> WhatsApp Notice Preview
           </div>
-          <button type="button" id="wa-close-preview-btn" style="background:transparent;border:none;color:#ffffff;font-size:20px;cursor:pointer;">✕</button>
+          <button type="button" id="wa-close-preview-btn" style="border:none;background:transparent;font-size:18px;cursor:pointer;color:#64748b;">✕</button>
         </div>
-        <div style="padding:20px;background:#f8fafc;">
-          <div id="wa-modal-notice-content" style="background:#0b141a;color:#e9edef;padding:18px;border-radius:12px;font-family:inherit;font-size:12.5px;line-height:1.6;white-space:pre-wrap;box-shadow:inset 0 2px 8px rgba(0,0,0,0.4);border:1px solid #222e35;"></div>
+        <div style="padding:16px;overflow-y:auto;flex:1;background:#efeae2;">
+          <div id="wa-modal-notice-content" style="background:#ffffff;padding:14px;border-radius:8px;font-family:sans-serif;font-size:12.5px;line-height:1.5;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,0.1);color:#111b21;"></div>
         </div>
-        <div style="padding:14px 20px;background:#ffffff;border-top:1px solid #e2e8f0;display:flex;align-items:center;justify-content:flex-end;gap:10px;">
-          <button type="button" class="outline-button" id="wa-modal-cancel-btn">Close</button>
-          <button type="button" class="primary-button" id="wa-modal-send-btn" style="background:#25d366;color:#ffffff;border:none;">
-            ➤ Send WhatsApp Notice Now
-          </button>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e2e8f0;background:#f8fafc;">
+          <button type="button" id="wa-modal-cancel-btn" style="padding:7px 14px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">Cancel</button>
+          <button type="button" id="wa-modal-send-btn" class="wa-single-send-btn" style="margin:0;">➤ Send WhatsApp Notice Now</button>
         </div>
       </div>
     </div>
   `;
 
-  function renderLogsTable(logsList) {
-    if (!logsList || !logsList.length) {
-      return emptyBlock('No WhatsApp interactions recorded yet', 'Outbound notices and inbound queries will appear here.', 'message');
+  function renderLogsTable(logList) {
+    if (!logList || !logList.length) {
+      return emptyBlock('No notices dispatched yet', 'All incoming queries and outgoing official notices will be logged here.', 'refresh');
     }
     return `
-      <table class="performance-table">
-        <thead>
-          <tr>
-            <th>TIMESTAMP</th>
-            <th>DIRECTION / TYPE</th>
-            <th>OFFICER / RECIPIENT</th>
-            <th>PHONE NUMBER</th>
-            <th>JURISDICTION / QUERY</th>
-            <th>SENDER</th>
-            <th>STATUS</th>
-            <th>NOTICE PREVIEW</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${logsList.map(l => {
-            const isNotice = l.direction === 'OUTBOUND_NOTICE' || (l.noticeType && l.noticeType.includes('NOTICE'));
-            return `
+      <div style="overflow-x:auto;">
+        <table class="performance-table" style="font-size:11.5px;">
+          <thead>
+            <tr>
+              <th>TIME</th>
+              <th>DIRECTION</th>
+              <th>OFFICER &amp; TIER</th>
+              <th>JURISDICTION</th>
+              <th>PHONE</th>
+              <th>OFFICIAL SENDER</th>
+              <th>NOTICE PREVIEW</th>
+              <th>STATUS</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${logList.slice(0, 50).map(l => `
               <tr>
-                <td class="mono" style="font-size:11px;">${h(formatDate(l.timestamp))}</td>
+                <td class="mono" style="white-space:nowrap;font-size:11px;">${formatDate(l.timestamp)}</td>
                 <td>
-                  <span class="badge-status ${isNotice ? 'badge-poor-pill' : 'badge-completed'}">
-                    ${isNotice ? '🚨 NOTICE OUT' : '📥 INBOUND'}
+                  <span class="tiny-status ${l.direction === 'INBOUND' ? 'completed' : 'pending'}" style="font-size:10px;">
+                    ${l.direction === 'INBOUND' ? '📥 INBOUND' : '📤 DIRECTIVE'}
                   </span>
                 </td>
-                <td class="font-bold">${h(l.recipientName || l.senderName || 'Officer')}</td>
-                <td class="mono font-bold">${h(l.to || l.from || '—')}</td>
-                <td><span class="mandal-div-chip font-bold">${h(l.jurisdiction || (l.villageName ? `${l.villageName} (${l.mandal})` : (l.query || '—')))}</span></td>
-                <td style="font-size:11px;font-weight:700;color:var(--navy);">${h(l.sender || defaultSender)}</td>
-                <td><span class="tiny-status ${l.status === 'Delivered' ? 'status-completed' : (l.status === 'Simulated' ? 'status-progress' : 'status-pending')}">${h(l.status)}</span></td>
-                <td style="font-size:11px;color:var(--muted);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${h(l.replyPreview || l.fullText)}">
-                  ${h(l.replyPreview || '—')}
+                <td style="font-weight:700;">
+                  ${h(l.recipientName || l.from || 'Officer')}
+                  <div style="font-size:10.5px;color:#64748b;">${h(l.recipientRole || l.officerTier || '')}</div>
+                </td>
+                <td>${h(l.jurisdiction || l.mandal || '')}</td>
+                <td class="mono font-bold" style="color:#0369a1;">${h(l.to || l.from || '')}</td>
+                <td style="font-weight:800;color:${l.sender && l.sender.includes('Joint Collector') ? '#c2410c' : '#047857'};">${h(l.sender || l.senderName || defaultSender)}</td>
+                <td style="max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px;" title="${h(l.fullText || l.replyPreview)}">
+                  ${h(l.replyPreview || l.query || '')}
+                </td>
+                <td>
+                  <span class="status-pill ${l.status === 'Delivered' ? 'active' : (l.status === 'Simulated' ? 'draft' : 'delayed')}" style="font-size:10.5px;">
+                    ${l.status === 'Delivered' ? '✓ Delivered' : (l.status === 'Simulated' ? '🟡 Simulated' : '⚠️ Failed')}
+                  </span>
                 </td>
               </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
     `;
   }
 
-  // DOM Elements
-  const tableContainer = document.getElementById('wa-officers-table-wrap');
   const statsContainer = document.getElementById('wa-stats-container');
+  const tableContainer = document.getElementById('wa-officers-table-wrap');
   const searchInput = document.getElementById('wa-officer-search-input');
   const senderOverride = document.getElementById('wa-sender-override-input');
+  const saveBtn = document.getElementById('wa-save-config-btn');
   const mainTitle = document.getElementById('wa-card-main-title');
   const subTitle = document.getElementById('wa-card-sub-title');
   const cardBadge = document.getElementById('wa-card-badge');
   const bulkSendBtn = document.getElementById('wa-bulk-send-btn');
-
-  let currentBulkMode = 'individual';
+  const triggerScheduleBtn = document.getElementById('wa-trigger-schedule-btn');
 
   function updateView() {
     const meta = getTierMeta();
@@ -8790,7 +8971,7 @@ async function renderWhatsApp() {
     if (radioDlrCount) radioDlrCount.textContent = `${dlrPending.length} Officers`;
 
     if (mainTitle) mainTitle.textContent = `Poor Performing ${meta.title} Progress Notice`;
-    if (subTitle) subTitle.innerHTML = `Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(senderOverride?.value.trim() || defaultSender)}</b>.`;
+    if (subTitle) subTitle.innerHTML = `Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(senderOverride?.value.trim() || meta.defaultSender)}</b>.`;
     if (cardBadge) cardBadge.textContent = `${active.length} Flagged`;
 
     const bulkPanel = document.getElementById('wa-bulk-execute-panel');
@@ -8818,7 +8999,7 @@ async function renderWhatsApp() {
         bulkPanelMain.textContent = `⚡ Bulk WhatsApp Broadcast Queue: ${targetLabel} (${targetList.length} Flagged)`;
       }
       if (bulkPanelDesc) {
-        bulkPanelDesc.innerHTML = `Directives issued from <b>${h(senderOverride?.value.trim() || defaultSender)}</b>. <b>${withPhone.length}</b> verified with Spreadsheet phones. ${withoutPhone.length > 0 ? `<span style="color:#b91c1c;">(${withoutPhone.length} lacking sheet phone will be skipped)</span>` : ''}`;
+        bulkPanelDesc.innerHTML = `Directives issued from <b>${h(senderOverride?.value.trim() || meta.defaultSender)}</b>. <b>${withPhone.length}</b> verified with Spreadsheet phones. ${withoutPhone.length > 0 ? `<span style="color:#b91c1c;">(${withoutPhone.length} lacking sheet phone will be skipped)</span>` : ''}`;
       }
       if (bulkSendBtn) {
         bulkSendBtn.textContent = `⚡ Broadcast Notices to ${withPhone.length} Verified ${meta.short}`;
@@ -8832,6 +9013,42 @@ async function renderWhatsApp() {
       attachTableActions();
     }
   }
+
+  // Cadre Tab Navigation (Survey Cadre vs Revenue Cadre)
+  document.querySelectorAll('[data-cadre-tab]').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('[data-cadre-tab]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCadre = btn.dataset.cadreTab;
+
+      const surveyGroup = document.getElementById('wa-survey-radio-group');
+      const revenueGroup = document.getElementById('wa-revenue-radio-group');
+
+      if (currentCadre === 'survey') {
+        if (surveyGroup) surveyGroup.style.display = 'block';
+        if (revenueGroup) revenueGroup.style.display = 'none';
+        currentTier = 'vs';
+      } else {
+        if (surveyGroup) surveyGroup.style.display = 'none';
+        if (revenueGroup) revenueGroup.style.display = 'block';
+        currentTier = 'vro';
+      }
+
+      // Sync active tier radio card
+      document.querySelectorAll('[data-tier-radio]').forEach(c => {
+        c.classList.toggle('active', c.dataset.tierRadio === currentTier);
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = (c.dataset.tierRadio === currentTier);
+      });
+
+      const meta = getTierMeta();
+      if (senderOverride) senderOverride.value = meta.defaultSender;
+      currentCategory = 'all';
+      document.querySelectorAll('[data-tab-cat]').forEach(b => b.classList.toggle('active', b.dataset.tabCat === 'all'));
+
+      updateView();
+    };
+  });
 
   // Bulk Message Sending Radio Button click handlers
   document.querySelectorAll('[data-bulk-radio]').forEach(card => {
@@ -8858,7 +9075,7 @@ async function renderWhatsApp() {
     };
   });
 
-  // Radio button click handlers
+  // Tier Radio button click handlers (VS, MLSO, DIOS, VRO, Tahsildar, RDO)
   document.querySelectorAll('[data-tier-radio]').forEach(card => {
     card.onclick = () => {
       document.querySelectorAll('[data-tier-radio]').forEach(c => c.classList.remove('active'));
@@ -8866,6 +9083,10 @@ async function renderWhatsApp() {
       const radio = card.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
       currentTier = card.dataset.tierRadio;
+
+      const meta = getTierMeta();
+      if (senderOverride) senderOverride.value = meta.defaultSender;
+
       currentCategory = 'all';
       document.querySelectorAll('[data-tab-cat]').forEach(b => b.classList.remove('active'));
       const allBtn = document.querySelector('[data-tab-cat="all"]');
@@ -8895,6 +9116,46 @@ async function renderWhatsApp() {
     };
   }
 
+  // Trigger Scheduled Daily 6:00 AM broadcast immediately
+  if (triggerScheduleBtn) {
+    triggerScheduleBtn.onclick = async () => {
+      const confirmRun = confirm(
+        '⏰ TRIGGER DAILY 06:00 AM WHATSAPP BROADCAST\n\n' +
+        'This will immediately execute the automated morning dispatch across all 6 cadres:\n' +
+        '• Survey Cadre (VS, MLSO, DIOS) ➔ Signed by DSLRO, Chittoor\n' +
+        '• Revenue Cadre (VRO, Tahsildars, RDOs) ➔ Signed by Joint Collector, Chittoor\n\n' +
+        'Strict Spreadsheet Phone Policy will be applied.\n\n' +
+        'Proceed with dispatch now?'
+      );
+
+      if (!confirmRun) return;
+
+      triggerScheduleBtn.disabled = true;
+      triggerScheduleBtn.innerHTML = '⏳ <span>Dispatching 06:00 AM Broadcast...</span>';
+
+      try {
+        const res = await api('/api/cron/daily-whatsapp-alerts', { method: 'POST' });
+        const sum = res.summary || {};
+        toast(`Daily 06:00 AM Broadcast completed! Targeted: ${sum.totalTargeted || 0}, Dispatched: ${sum.totalDispatched || 0}`, 'success');
+        triggerScheduleBtn.innerHTML = '✓ Broadcast Executed';
+        triggerScheduleBtn.style.background = '#059669';
+
+        const lastLabel = document.getElementById('wa-sched-last-run-label');
+        if (lastLabel) {
+          lastLabel.textContent = `Last Executed: Today at ${new Date().toLocaleTimeString()} · Next: Tomorrow at 06:00 AM IST`;
+        }
+
+        const freshLogs = await api('/api/whatsapp/logs');
+        const logsWrap = document.getElementById('wa-logs-table-container');
+        if (logsWrap) logsWrap.innerHTML = renderLogsTable(freshLogs.logs || []);
+      } catch (err) {
+        toast(`Failed to execute daily broadcast: ${err.message}`, 'error');
+        triggerScheduleBtn.disabled = false;
+        triggerScheduleBtn.innerHTML = '▶ Trigger Scheduled 06:00 AM Dispatch Now';
+      }
+    };
+  }
+
   // Notice preview modal logic
   const modalBackdrop = document.getElementById('wa-preview-modal-backdrop');
   const modalNoticeBody = document.getElementById('wa-modal-notice-content');
@@ -8917,8 +9178,10 @@ async function renderWhatsApp() {
   }
 
   function formatModalNoticeText(officer, tier, senderTitle) {
-    const effectiveSender = senderTitle || defaultSender;
+    const meta = getTierMeta();
+    const effectiveSender = senderTitle || meta.defaultSender;
 
+    // 1. DIOS Notice (Survey Cadre)
     if (tier === 'dios') {
       const mandalsStr = (officer.assignedMandals || []).join(', ') || officer.mandal;
       const laggingMandalsStr = (officer.laggingMandals || []).join(', ') || 'None';
@@ -8928,7 +9191,7 @@ async function renderWhatsApp() {
       }).join('\n');
 
       return `🚨 *DIVISION RESURVEY MONITORING DIRECTIVE*
-🏛️ *OFFICE OF THE ASSISTANT DIRECTOR*
+🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 To: *${officer.name}* (Deputy Inspector of Survey - DIOS)
@@ -8948,7 +9211,7 @@ In your assigned jurisdiction of ${officer.assignedMandalsCount || (officer.assi
 📋 *MANDAL PROGRESS BREAKDOWN IN YOUR CHARGE:*
 ${breakdownLines}
 
-⚠️ *URGENT DIRECTIVE FROM AD, CHITTOOR:*
+⚠️ *URGENT DIRECTIVE FROM DSLRO, CHITTOOR:*
 As Deputy Inspector of Survey (DIOS), you are instructed to conduct immediate physical field inspections across lagging Mandals in your jurisdiction. Review all Mandal Surveyors and Village Surveyors without delay and submit action taken report.
 
 🌐 *Live District Resurvey Dashboard:*
@@ -8956,21 +9219,22 @@ ${window.location.origin}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
-Assistant Director of Survey & Land Records
+District Survey & Land Records Officer
 Chittoor District, Government of Andhra Pradesh`;
     }
 
-    if (tier === 'ms') {
+    // 2. MLSO Notice (Survey Cadre)
+    if (tier === 'mlso' || tier === 'ms') {
       const zeroVillages = (officer.laggingVillages || []).filter(v => (v.today_gt_extent || 0) === 0).length;
       const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
         `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, Bal: ${formatExtent(v.balance_gt_extent)} Ac`
       ).join('\n');
 
-      return `🚨 *MANDAL RESURVEY PROGRESS NOTICE*
-🏛️ *OFFICE OF THE ASSISTANT DIRECTOR*
+      return `🚨 *MANDAL LEVEL SURVEY OFFICER (MLSO) DIRECTIVE*
+🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
-To: *${officer.name}* (Mandal Surveyor - MS)
+To: *${officer.name}* (Mandal Level Survey Officer - MLSO)
 Jurisdiction: *${officer.mandal} Mandal* (${officer.jurisdictionCount} Revenue Villages)
 
 ⚠️ *FLAGGED: POOR RESURVEY PERFORMANCE IN MANDAL*
@@ -8986,7 +9250,7 @@ Resurvey progress in *${officer.mandal} Mandal* is lagging behind the target sch
 ⚠️ *KEY LAGGING REVENUE VILLAGES:*
 ${sampleVillages}
 
-⚠️ *DIRECTIVE FOR MANDAL SURVEYOR:*
+⚠️ *DIRECTIVE FOR MANDAL LEVEL SURVEY OFFICER (MLSO):*
 Convene an immediate review with all Village Surveyors in ${officer.mandal} Mandal. Inspect rover ground positions, resolve boundary conflicts, and ensure daily out-turn benchmark is met.
 
 🌐 *Live Mandal Village Dashboard:*
@@ -8994,18 +9258,129 @@ ${window.location.origin}/report/mandal-villages?mandal=${encodeURIComponent(off
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
-Assistant Director of Survey & Land Records
+District Survey & Land Records Officer
 Chittoor District, Government of Andhra Pradesh`;
     }
 
-    // VS Notice
+    // 3. VRO Notice (Revenue Cadre)
+    if (tier === 'vro') {
+      const mandalNames = Array.from(officer.mandals || []).join(', ') || officer.mandal || 'Chittoor';
+      const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
+        `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, DLR Bal: ${v.dlr_entries_balance || 0} Khatas`
+      ).join('\n');
+
+      return `🚨 *VILLAGE REVENUE OFFICER (VRO) DLR & RESURVEY DIRECTIVE*
+🏛️ *COLLECTORATE & REVENUE ADMINISTRATION*
+*Chittoor District, Government of Andhra Pradesh*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+To: *${officer.name}* (Village Revenue Officer - VRO)
+Jurisdiction: *${officer.jurisdictionCount} Revenue Village(s) Assigned*
+Mandal: *${mandalNames}*
+
+⚠️ *FLAGGED: DLR KHATA CLEARANCE & RESURVEY PROGRESS LAG*
+You are hereby instructed regarding resurvey milestones in your assigned revenue villages. As Village Revenue Officer, door-to-door khata verification, title record scrutiny, and clearing pending khatas in DLR @ VRO Login is your primary official responsibility.
+
+📊 *DAILY EXTRACTED PERFORMANCE (TODAY):*
+• Today's GT Extent: *${formatExtent(officer.today_gt_extent)} Acres*
+• Total Pending GT Balance: *${formatExtent(officer.balance_gt_extent)} Acres*
+• DLR Pending Khatas: *${officer.dlr_entries_balance || 0} Khatas*
+• DLR Entries Cleared Today: *${officer.dlr_entries_today || 0} Entries*
+
+⚠️ *ASSIGNED REVENUE VILLAGES:*
+${sampleVillages}
+
+⚠️ *URGENT DIRECTIVE FROM JOINT COLLECTOR:*
+Immediately clear all pending Khatas in DLR @ VRO Login. Coordinate closely with Village Surveyors in field ground truthing, resolve land dispute objections on the ground, and submit action taken report by evening.
+
+🌐 *Live District Resurvey Dashboard:*
+${window.location.origin}/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+*${effectiveSender}*
+Joint Collector & Additional District Magistrate
+Chittoor District, Government of Andhra Pradesh`;
+    }
+
+    // 4. Tahsildar Notice (Revenue Cadre)
+    if (tier === 'tahsildar' || tier === 'tah') {
+      const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
+        `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, DLR Bal: ${v.dlr_entries_balance || 0} Khatas`
+      ).join('\n');
+
+      return `🚨 *TAHSILDAR RESURVEY & DLR MONITORING DIRECTIVE*
+🏛️ *COLLECTORATE & REVENUE ADMINISTRATION*
+*Chittoor District, Government of Andhra Pradesh*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+To: *${officer.name}* (Tahsildar - Mandal Revenue Executive)
+Jurisdiction: *${officer.mandal} Mandal* (${officer.jurisdictionCount} Revenue Villages)
+
+⚠️ *FLAGGED: MANDAL DLR CLEARANCE & RESURVEY REVIEW*
+Performance review for *${officer.mandal} Mandal* indicates lagging progress in digital land record verification and ground truthing milestones.
+
+📊 *MANDAL DAILY PERFORMANCE:*
+• Today's GT Out-turn: *${formatExtent(officer.today_gt_extent)} Acres*
+• Pending GT Balance: *${formatExtent(officer.balance_gt_extent)} Acres*
+• Mandal DLR Pending Khatas: *${officer.dlr_entries_balance || 0} Khatas*
+• DLR Clearances Today: *${officer.dlr_entries_today || 0} Khatas*
+• Severe Lagging Villages: *${officer.laggingCount} Villages*
+
+⚠️ *KEY LAGGING REVENUE VILLAGES:*
+${sampleVillages}
+
+⚠️ *EXECUTIVE DIRECTIVE FROM JOINT COLLECTOR:*
+As Tahsildar, convene immediate coordination review with all VROs and MLSOs in ${officer.mandal} Mandal. Ensure zero pendency at Tahsildar login, issue Section 13 notices on schedule, and clear bottleneck disputes.
+
+🌐 *Live Mandal Dashboard:*
+${window.location.origin}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+*${effectiveSender}*
+Joint Collector & Additional District Magistrate
+Chittoor District, Government of Andhra Pradesh`;
+    }
+
+    // 5. RDO Notice (Revenue Cadre)
+    if (tier === 'rdo') {
+      const mandalsStr = (officer.assignedMandals || []).join(', ') || officer.division;
+      const laggingMandalsStr = (officer.laggingMandals || []).join(', ') || 'None';
+
+      return `🚨 *REVENUE DIVISIONAL OFFICER (RDO) RESURVEY DIRECTIVE*
+🏛️ *COLLECTORATE & REVENUE ADMINISTRATION*
+*Chittoor District, Government of Andhra Pradesh*
+━━━━━━━━━━━━━━━━━━━━━━━━━
+To: *${officer.name}* (Revenue Divisional Officer - RDO)
+Jurisdiction: *${officer.division} Division* (${officer.jurisdictionCount} Mandals · ${officer.totalVillagesInDivision} Villages)
+Mandals: ${mandalsStr}
+
+⚠️ *FLAGGED: DIVISION RESURVEY & DLR PENDENCY ALERT*
+In *${officer.division} Division*, *${officer.laggingMandalsCount || 0} Mandals* and *${officer.laggingCount} Villages* are lagging behind target schedules for Ground Truthing and DLR logins.
+
+📊 *DIVISION EXTRACTED PERFORMANCE:*
+• Today's Division GT Progress: *${formatExtent(officer.today_gt_extent)} Acres*
+• Division Balance GT Extent: *${formatExtent(officer.balance_gt_extent)} Acres*
+• Division DLR Pending Khatas: *${officer.dlr_entries_balance || 0} Khatas*
+• Critical Lagging Mandals: *${laggingMandalsStr}*
+
+⚠️ *DIRECTIVE FROM JOINT COLLECTOR:*
+Conduct an immediate divisional review with Tahsildars, MLSOs, and DIOS in your jurisdiction. Inspect rover field operations in lagging villages and ensure target milestones are met without fail.
+
+🌐 *Live District Resurvey Dashboard:*
+${window.location.origin}/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+*${effectiveSender}*
+Joint Collector & Additional District Magistrate
+Chittoor District, Government of Andhra Pradesh`;
+    }
+
+    // 6. VS Notice (Survey Cadre)
     const mandalNames = Array.from(officer.mandals || []).join(', ') || officer.mandal || 'Chittoor';
     const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
       `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, Bal: ${formatExtent(v.balance_gt_extent)} Ac`
     ).join('\n');
 
-    return `🚨 *VILLAGE SURVEYOR PERFORMANCE NOTICE*
-🏛️ *OFFICE OF THE ASSISTANT DIRECTOR*
+    return `🚨 *VILLAGE SURVEYOR (VS) PERFORMANCE NOTICE*
+🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 To: *${officer.name}* (Village Surveyor - VS)
@@ -9032,7 +9407,7 @@ ${window.location.origin}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
-Assistant Director of Survey & Land Records
+District Survey & Land Records Officer
 Chittoor District, Government of Andhra Pradesh`;
   }
 
@@ -9043,7 +9418,8 @@ Chittoor District, Government of Andhra Pradesh`;
         const officer = getActiveOfficers().find(x => x.id === oid);
         if (!officer) return;
         currentModalOfficer = officer;
-        const sender = senderOverride?.value.trim() || defaultSender;
+        const meta = getTierMeta();
+        const sender = senderOverride?.value.trim() || meta.defaultSender;
         const text = formatModalNoticeText(officer, currentTier, sender);
         if (modalNoticeBody) modalNoticeBody.textContent = text;
         if (modalBackdrop) modalBackdrop.style.display = 'flex';
@@ -9070,7 +9446,8 @@ Chittoor District, Government of Andhra Pradesh`;
           }
         }
 
-        const senderTitle = senderOverride?.value.trim() || defaultSender;
+        const meta = getTierMeta();
+        const senderTitle = senderOverride?.value.trim() || meta.defaultSender;
         btn.disabled = true;
         btn.textContent = '⏳ Sending...';
 
@@ -9098,7 +9475,8 @@ Chittoor District, Government of Andhra Pradesh`;
     modalSendBtn.onclick = async () => {
       if (!currentModalOfficer) return;
       const officer = currentModalOfficer;
-      const senderTitle = senderOverride?.value.trim() || defaultSender;
+      const meta = getTierMeta();
+      const senderTitle = senderOverride?.value.trim() || meta.defaultSender;
 
       let phoneOverride = '';
       if (!officer.phone) {
@@ -9148,14 +9526,15 @@ Chittoor District, Government of Andhra Pradesh`;
       }
 
       const meta = getTierMeta();
-      const senderTitle = senderOverride?.value.trim() || defaultSender;
+      const senderTitle = senderOverride?.value.trim() || meta.defaultSender;
       const count = targetList.length;
 
       const withPhone = targetList.filter(o => o.phone && o.phone.trim().length >= 10);
       const withoutPhone = targetList.filter(o => !o.phone || o.phone.trim().length < 10);
 
       let confirmMsg = `Are you sure you want to broadcast official resurvey directives to ${count} flagged ${meta.title}?\n\n` +
-        `• Directives will be issued from: "${senderTitle}"\n` +
+        `• Cadre Hierarchy: ${meta.cadreTitle}\n` +
+        `• Official Directives issued from: "${senderTitle}"\n` +
         `• Live monitoring links will be attached to each officer notice.\n`;
 
       if (withoutPhone.length > 0) {
@@ -9225,10 +9604,9 @@ Chittoor District, Government of Andhra Pradesh`;
         method: 'POST',
         body: JSON.stringify({ query })
       });
-      const rep = res.result?.reply || 'No response returned';
-      botLoading.innerHTML = `${rep.replace(/\n/g, '<br>').replace(/\*([^*]+)\*/g, '<b>$1</b>').replace(/_([^_]+)_/g, '<i>$1</i>')}<div class="wa-bubble-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
-    } catch (e) {
-      botLoading.innerHTML = `❌ Error: ${h(e.message)}<div class="wa-bubble-time">System</div>`;
+      botLoading.innerHTML = `${res.result ? res.result.replace(/\n/g, '<br>') : 'Query processed successfully.'}<div class="wa-bubble-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
+    } catch (err) {
+      botLoading.innerHTML = `<span style="color:#ef4444;">Error: ${h(err.message)}</span><div class="wa-bubble-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>`;
     }
     chatWindow.scrollTop = chatWindow.scrollHeight;
   }
@@ -9250,13 +9628,11 @@ Chittoor District, Government of Andhra Pradesh`;
 
   document.querySelectorAll('[data-wa-chip]').forEach(chip => {
     chip.onclick = () => {
-      const val = chip.dataset.waChip;
-      sendSimQuery(val);
+      sendSimQuery(chip.dataset.waChip);
     };
   });
 
   // Save Webhook Settings button
-  const saveBtn = document.getElementById('wa-save-config-btn');
   if (saveBtn) {
     saveBtn.onclick = async () => {
       saveBtn.disabled = true;
@@ -9302,7 +9678,6 @@ Chittoor District, Government of Andhra Pradesh`;
     };
   });
 }
-
 
 function render() {
   if (state.view === 'dashboard') renderDashboard();
