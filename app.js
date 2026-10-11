@@ -8012,20 +8012,38 @@ function openMandalPdfModal(selectedMandal = 'All') {
     if (iframe) iframe.src = reportUrl;
     if (openTabBtn) openTabBtn.href = reportUrl;
     if (dlBtn) {
-      dlBtn.onclick = () => {
+      dlBtn.onclick = async () => {
         const origText = dlBtn.innerHTML;
-        dlBtn.innerHTML = `<span>⏳ Preparing PDF...</span>`;
+        dlBtn.innerHTML = `<span>⏳ Generating Official PDF...</span>`;
         dlBtn.disabled = true;
-        const a = document.createElement('a');
-        a.href = pdfUrl;
-        a.download = m !== 'All' ? `Chittoor_${m}_Village_Status_Report.pdf` : 'Chittoor_District_Mandal_Wise_Village_Status_Report.pdf';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(() => {
-          dlBtn.innerHTML = origText;
-          dlBtn.disabled = false;
-        }, 3500);
+        try {
+          const res = await fetch(pdfUrl);
+          if (!res.ok) {
+            throw new Error(`PDF generation responded with HTTP ${res.status}`);
+          }
+          const blob = await res.blob();
+          const blobUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          const safeM = m && m !== 'All' ? m.replace(/[^a-zA-Z0-9]/g, '_') : 'District_Mandal_Wise';
+          a.download = `Chittoor_${safeM}_Village_Status_Report.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 15000);
+          dlBtn.innerHTML = `<span>✓ PDF Downloaded!</span>`;
+          setTimeout(() => {
+            dlBtn.innerHTML = origText;
+            dlBtn.disabled = false;
+          }, 2500);
+        } catch (err) {
+          console.error('Download PDF error:', err);
+          window.location.href = pdfUrl;
+          setTimeout(() => {
+            dlBtn.innerHTML = origText;
+            dlBtn.disabled = false;
+          }, 3000);
+        }
       };
     }
   }
