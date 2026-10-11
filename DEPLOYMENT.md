@@ -17,25 +17,17 @@ If visitors to your Vercel link (`*.vercel.app`) see a password screen from Verc
 Vercel provides free, high-speed worldwide cloud hosting with automatic HTTPS and zero maintenance.
 
 ### Option A: Via GitHub (Fastest & Auto-updates)
-1. Initialize git and push this project folder to your GitHub account:
+1. Push code to your connected GitHub repository:
    ```bash
-   git init
    git add .
-   git commit -m "Chittoor Resurvey Monitoring Production Release"
-   git branch -M main
-   git remote add origin https://github.com/YOUR_USERNAME/chittoor-resurvey-monitoring.git
-   git push -u origin main
+   git commit -m "feat: add WhatsApp poor performing village notices from AD Chittoor and Vercel webhook updates"
+   git push origin main
    ```
-2. Log into [vercel.com](https://vercel.com) using your GitHub account.
-3. Click **"Add New..."** -> **"Project"**.
-4. Import your repository `chittoor-resurvey-monitoring`.
-5. Leave all settings at default:
-   - **Framework Preset**: Other
-   - **Root Directory**: `./`
-   - **Build Command**: *(leave empty)*
-   - **Output Directory**: *(leave empty)*
-6. Click **Deploy**.
-7. In ~20 seconds, your application will be live at `https://chittoor-resurvey-monitoring.vercel.app` (or your chosen project name).
+2. Vercel automatically detects the push to `main` on [https://github.com/apullaiah/Dashboard](https://github.com/apullaiah/Dashboard) and redeploys the updated build in ~20 seconds.
+3. Your live application is accessible at:
+   ```
+   https://chittoor-resurvey.vercel.app
+   ```
 
 ### Option B: Direct Terminal Deploy via Vercel CLI
 1. Open PowerShell or Command Prompt in this folder.
@@ -70,3 +62,37 @@ To run directly inside the Collectorate or district office network:
    http://10.101.85.247:4173
    ```
    *(or substitute your machine's local IP address)*
+
+---
+
+## 4. WhatsApp Cloud API & Webhook Configuration (Vercel)
+
+### A. Vercel Environment Variables
+Under your project settings in [vercel.com](https://vercel.com) -> **Settings** -> **Environment Variables**, add the following keys:
+
+| Environment Variable | Description | Example / Recommended Value |
+|----------------------|-------------|-----------------------------|
+| `WHATSAPP_PHONE_NUMBER_ID` | Meta Phone Number ID from WhatsApp Getting Started | `109283746592019` |
+| `WHATSAPP_ACCESS_TOKEN` | System User Permanent Access Token with `whatsapp_business_messaging` permissions | `EAAG...` |
+| `WHATSAPP_VERIFY_TOKEN` | Verification token for Meta Webhook challenge | `CTR_RESURVEY_WA_2026` |
+| `WHATSAPP_WABA_ID` | WhatsApp Business Account ID | `293847561029384` |
+| `WHATSAPP_SENDER_NAME` | Official sender designation displayed on notices | `AD, Chittoor` |
+
+*(Note: You can also update these directly in the dashboard UI under the **WhatsApp Webhook** tab).*
+
+### B. Meta Developer Portal Webhook Settings
+1. Open [developers.facebook.com](https://developers.facebook.com) -> Your WhatsApp App -> **WhatsApp** -> **Configuration**.
+2. Click **Edit** under **Webhook**:
+   - **Callback URL**: `https://<your-vercel-domain>.vercel.app/api/whatsapp/webhook`
+   - **Verify Token**: `CTR_RESURVEY_WA_2026`
+3. Click **Verify and save**. Meta will verify the URL immediately with HTTP 200.
+4. Under **Webhook fields**, click **Manage** and subscribe to **`messages`**.
+
+### C. Sending Poor Performing Village Notices to Concerned VS
+- In the Web Dashboard: Open the **WhatsApp Webhook** tab -> review the **🚨 Poor Performing Villages & VS Progress Broadcast (AD, Chittoor)** section -> Click **"⚡ Broadcast Notices to All Concerned VS (AD, Chittoor)"** or click **"Send Notice"** for an individual village.
+- Via CLI script:
+  ```bash
+  node scripts/send_poor_villages_notices.js
+  ```
+  *(Or with `--dry-run` to preview all 322 notices safely before sending).*
+

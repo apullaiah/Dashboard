@@ -16,7 +16,14 @@ const {
   extractInboundMessages,
   processWhatsAppQuery,
   sendWhatsAppCloudMessage,
-  DEFAULT_VERIFY_TOKEN
+  DEFAULT_VERIFY_TOKEN,
+  MANDAL_SURVEYOR_DIRECTORY,
+  getMandalSurveyor,
+  getVillageSurveyorContacts,
+  isVillagePoorPerforming,
+  getPoorPerformingVillages,
+  formatPoorVillageNotice,
+  sendPoorVillagesNotices
 } = require('./lib/whatsappService.js');
 
 const PORT = Number(process.env.PORT || 4173);
@@ -62,11 +69,6 @@ const MANDAL_ALIASES = {
   's.r.puram': 'S.R.Puram', 's r puram': 'S.R.Puram', srpuram: 'S.R.Puram', srirangarajapuram: 'S.R.Puram'
 };
 
-const MANDAL_SURVEYOR_DIRECTORY = {};
-
-function getMandalSurveyor(mandalName) {
-  return { name: '', role: '', phone: '' };
-}
 
 
 const PHASE_ORDER = ['Phase I', 'Phase II', 'Phase III', 'Phase IV', 'Phase V', 'Phase VI', 'Phase VII', 'Yet to be Scheduled', 'Before 2024'];
@@ -1828,19 +1830,25 @@ async function handleApi(req, res, url) {
 
   // WhatsApp Configuration Status & Webhook Credentials
   if (req.method === 'GET' && pathname === '/api/whatsapp/config') {
-    const config = store.whatsappConfig || {
-      enabled: true,
-      verifyToken: DEFAULT_VERIFY_TOKEN,
-      phoneNumberId: process.env.WHATSAPP_PHONE_NUMBER_ID || '',
-      accessTokenConfigured: Boolean(process.env.WHATSAPP_ACCESS_TOKEN || (store.whatsappConfig && store.whatsappConfig.accessToken)),
-      wabaId: process.env.WHATSAPP_WABA_ID || '',
-      webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`
-    };
+    const rawConfig = store.whatsappConfig || {};
+    const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN || rawConfig.verifyToken || DEFAULT_VERIFY_TOKEN;
+    const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || rawConfig.phoneNumberId || '';
+    const accessToken = process.env.WHATSAPP_ACCESS_TOKEN || rawConfig.accessToken || '';
+    const wabaId = process.env.WHATSAPP_WABA_ID || rawConfig.wabaId || '';
+    const senderName = process.env.WHATSAPP_SENDER_NAME || rawConfig.senderName || 'AD, Chittoor';
+    const isLive = Boolean(phoneNumberId && accessToken);
+
     return json(res, 200, {
       config: {
-        ...config,
+        enabled: rawConfig.enabled !== false,
+        verifyToken,
+        phoneNumberId,
+        accessTokenConfigured: Boolean(accessToken),
+        wabaId,
+        senderName,
         webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`,
-        accessToken: config.accessToken ? '••••••••' + config.accessToken.slice(-4) : ''
+        accessToken: accessToken ? '••••••••' + accessToken.slice(-4) : '',
+        mode: isLive ? 'LIVE' : 'SIMULATION'
       },
       stats: {
         totalInteractions: (store.whatsappLogs || []).length,
@@ -1851,20 +1859,116 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'POST' && pathname === '/api/whatsapp/config') {
     const b = await readBody(req);
+    const existing = store.whatsappConfig || {};
     store.whatsappConfig = {
       enabled: b.enabled !== false,
-      verifyToken: clean(b.verifyToken) || DEFAULT_VERIFY_TOKEN,
-      phoneNumberId: clean(b.phoneNumberId),
-      accessToken: b.accessToken && !b.accessToken.includes('••••') ? clean(b.accessToken) : (store.whatsappConfig?.accessToken || ''),
-      wabaId: clean(b.wabaId),
+      verifyToken: clean(b.verifyToken) || existing.verifyToken || DEFAULT_VERIFY_TOKEN,
+      phoneNumberId: clean(b.phoneNumberId) || existing.phoneNumberId || '',
+      accessToken: b.accessToken && !b.accessToken.includes('••••') ? clean(b.accessToken) : (existing.accessToken || process.env.WHATSAPP_ACCESS_TOKEN || ''),
+      wabaId: clean(b.wabaId) || existing.wabaId || '',
+      senderName: clean(b.senderName) || existing.senderName || 'AD, Chittoor',
       updatedAt: now()
     };
     save(store);
     return json(res, 200, { success: true, config: store.whatsappConfig });
   }
 
+  // List all poor performing villages with progress snapshot and mapped VS contacts
+  if (req.method === 'GET' && pathname === '/api/whatsapp/poor-villages') {
+    const poorVillages = getPoorPerformingVillages(store);
+    const senderName = store.whatsappConfig?.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+    return json(res, 200, {
+      count: poorVillages.length,
+      senderName,
+      poorVillages: poorVillages.map(pv => ({
+        id: pv.id,
+        village_code: pv.village_code,
+        village_name: pv.village_name,
+        mandal: pv.mandal,
+        division: pv.division,
+        extent: pv.extent,
+        current_stage: pv.current_stage,
+        today_gt_extent: pv.today_gt_extent,
+        cumulative_gt_extent: pv.cumulative_gt_extent,
+        balance_gt_extent: pv.balance_gt_extent,
+        dlr_active_stage: pv.dlr_active_stage,
+        dlr_balance: pv.dlr_balance,
+        days_delayed: pv.days_delayed,
+        primaryLag: pv.primaryLag,
+        lagTypes: pv.lagTypes,
+        lagReasons: pv.lagReasons,
+        surveyors: pv.surveyors
+      }))
+    });
+  }
+
+  // Bulk dispatch notices to Village Surveyors of poor performing villages
+  if (req.method === 'POST' && pathname === '/api/whatsapp/send-poor-notices') {
+    const b = await readBody(req);
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const report = await sendPoorVillagesNotices(b, store, baseUrl);
+    save(store);
+    return json(res, 200, { success: true, report });
+  }
+
+  // Single village notice dispatch to concerned VS
+  if (req.method === 'POST' && pathname === '/api/whatsapp/send-village-notice') {
+    const b = await readBody(req);
+    const villageId = clean(b.villageId || b.id);
+    const v = store.villages.find(x => x.id === villageId || x.village_code === villageId);
+    if (!v) return json(res, 404, { error: 'Village not found' });
+
+    const baseUrl = `${url.protocol}//${url.host}`;
+    const config = store.whatsappConfig || {};
+    const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
+    const contacts = getVillageSurveyorContacts(v, store);
+
+    if (!contacts.length) {
+      return json(res, 400, { error: 'No surveyor contact mapped for this village' });
+    }
+
+    if (!store.whatsappLogs) store.whatsappLogs = [];
+    const dispatchResults = [];
+
+    for (const contact of contacts) {
+      const noticeText = formatPoorVillageNotice(v, contact, baseUrl, effectiveSender);
+      const sendResult = b.dryRun 
+        ? { simulated: true, delivered: true, to: contact.phone, preview: noticeText.slice(0, 140) }
+        : await sendWhatsAppCloudMessage(contact.phone, noticeText, config);
+
+      const status = sendResult.success ? 'Delivered' : (sendResult.simulated ? 'Simulated' : 'Failed');
+      const logEntry = {
+        id: id(),
+        timestamp: now(),
+        direction: 'OUTBOUND_NOTICE',
+        from: effectiveSender,
+        to: contact.phone,
+        senderName: effectiveSender,
+        recipientName: contact.name,
+        recipientRole: contact.role,
+        villageName: v.village_name,
+        villageCode: v.village_code,
+        mandal: v.mandal,
+        sender: effectiveSender,
+        noticeType: 'POOR_PERFORMANCE_NOTICE',
+        query: `Official Notice: ${v.village_name}`,
+        replyPreview: noticeText.slice(0, 160),
+        fullText: noticeText,
+        status,
+        error: sendResult.error || null
+      };
+
+      store.whatsappLogs.unshift(logEntry);
+      if (store.whatsappLogs.length > 300) store.whatsappLogs.pop();
+      dispatchResults.push({ contact, status, sendResult, noticePreview: noticeText.slice(0, 200) });
+    }
+
+    save(store);
+    return json(res, 200, { success: true, village: v.village_name, dispatches: dispatchResults });
+  }
+
   if (req.method === 'GET' && pathname === '/api/whatsapp/logs') {
-    return json(res, 200, { logs: (store.whatsappLogs || []).slice(0, 50) });
+    return json(res, 200, { logs: (store.whatsappLogs || []).slice(0, 100) });
   }
 
   if (req.method === 'POST' && pathname === '/api/whatsapp/test') {
@@ -1874,6 +1978,7 @@ async function handleApi(req, res, url) {
     const result = processWhatsAppQuery(query, store, baseUrl);
     return json(res, 200, { query, result });
   }
+
   return json(res, 404, { error: 'Endpoint not found.' });
 }
 function serveStatic(req, res, url) {
