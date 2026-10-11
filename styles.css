@@ -11137,3 +11137,197 @@ body {
   font-weight: 800;
   white-space: nowrap;
 }
+
+
+/* ==========================================================================
+   POLISHED WHATSAPP WEBHOOK & BULK SENDING RADIO BUTTON STYLES
+   ========================================================================== */
+
+.wa-header-polished {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.wa-bulk-radio-strip {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.wa-bulk-strip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.wa-bulk-strip-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.01em;
+}
+
+.wa-bulk-radios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.wa-bulk-radio-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.wa-bulk-radio-card:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.wa-bulk-radio-card.active {
+  background: #eff6ff;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 1px #0284c7;
+}
+
+.wa-bulk-radio-card input[type="radio"] {
+  display: none;
+}
+
+.wa-bulk-radio-indicator {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.wa-bulk-radio-card.active .wa-bulk-radio-indicator {
+  border-color: #0284c7;
+  background: #0284c7;
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+.wa-bulk-radio-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.wa-bulk-radio-heading {
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.wa-bulk-radio-subtext {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 1px;
+}
+
+.wa-bulk-radio-pill {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  white-space: nowrap;
+}
+
+.wa-bulk-radio-pill.bulk {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+.wa-bulk-radio-pill.zero-gt {
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.wa-bulk-radio-pill.dlr {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-color: #bae6fd;
+}
+
+.wa-bulk-execute-panel {
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fef2f2 0%, #fff1f2 100%);
+  border: 1.5px solid #fecdd3;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.wa-bulk-panel-main {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #991b1b;
+}
+
+.wa-bulk-panel-desc {
+  font-size: 11.5px;
+  color: #7f1d1d;
+  margin-top: 2px;
+}
+
+.wa-bulk-send-btn-active {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  border: none;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  transition: all 0.15s ease;
+}
+
+.wa-bulk-send-btn-active:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-1px);
+}
+
+.wa-bulk-send-btn-active:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

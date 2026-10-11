@@ -8403,10 +8403,22 @@ async function renderWhatsApp() {
   }
 
   root.innerHTML = `
-    <div class="content-heading">
-      <div>
-        <h3>Meta WhatsApp Cloud API &amp; Resurvey Accountability Hub</h3>
-        <p>Direct Monitoring &amp; Notice Engine · Official Directives Issued by <b>AD, Chittoor</b>.</p>
+    <div class="content-heading wa-header-polished">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#059669,#10b981);display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;box-shadow:0 4px 12px rgba(16,185,129,0.25);">
+          📱
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <h3 style="margin:0;font-size:18px;font-weight:800;color:var(--navy);">Meta WhatsApp Cloud API &amp; Resurvey Accountability Hub</h3>
+            <span class="arch-badge-live ${isLiveMode ? 'is-live' : 'is-sim'}" style="background:${isLiveMode ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)'};border:1px solid ${isLiveMode ? '#10b981' : '#eab308'};color:${isLiveMode ? '#059669' : '#b45309'};font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;">
+              ${isLiveMode ? '🟢 Meta Cloud API: LIVE GRAPH API' : '🟡 Simulation Mode: Webhook Online · Verified'}
+            </span>
+          </div>
+          <p style="margin:2px 0 0;font-size:12px;color:#64748b;">
+            Direct Monitoring &amp; Notice Engine · Official Directives Issued by <b>${h(defaultSender)}</b>.
+          </p>
+        </div>
       </div>
       <div class="content-actions">
         <button class="primary-button" id="wa-save-config-btn" style="background:linear-gradient(135deg, #059669, #10b981);color:#fff;">
@@ -8414,48 +8426,6 @@ async function renderWhatsApp() {
         </button>
       </div>
     </div>
-
-    <!-- ARCHITECTURE BANNER -->
-    <section class="whatsapp-arch-card">
-      <div class="arch-header">
-        <h3><span>📱</span> Architecture: WhatsApp Cloud API &amp; Webhook Service</h3>
-        <span class="arch-badge-live">${isLiveMode ? '🟢 Meta Cloud API: LIVE GRAPH API' : '🟡 Simulation Mode: Webhook Online · Verified'}</span>
-      </div>
-      <div class="arch-diagram-flow">
-        <div class="arch-node wa-node">
-          <div class="arch-node-icon">📱</div>
-          <div class="arch-node-title">WhatsApp User</div>
-          <div class="arch-node-sub">VS / MS / DIOS / Citizen</div>
-        </div>
-        <div class="arch-arrow">
-          <span class="arch-arrow-line">⇄</span>
-          <span class="arch-arrow-label">Query / Notice</span>
-        </div>
-        <div class="arch-node">
-          <div class="arch-node-icon">☁️</div>
-          <div class="arch-node-title">Meta WhatsApp Cloud API</div>
-          <div class="arch-node-sub">Graph API v19.0</div>
-        </div>
-        <div class="arch-arrow">
-          <span class="arch-arrow-line">⇄</span>
-          <span class="arch-arrow-label">HTTPS Webhook</span>
-        </div>
-        <div class="arch-node active-node">
-          <div class="arch-node-icon">🏛️</div>
-          <div class="arch-node-title">Vercel Serverless Function</div>
-          <div class="arch-node-sub">/api/whatsapp/webhook</div>
-        </div>
-        <div class="arch-arrow">
-          <span class="arch-arrow-line">⇄</span>
-          <span class="arch-arrow-label">JSON Sync</span>
-        </div>
-        <div class="arch-node">
-          <div class="arch-node-icon">📊</div>
-          <div class="arch-node-title">Monitoring Core</div>
-          <div class="arch-node-sub">736 Villages · AD Chittoor</div>
-        </div>
-      </div>
-    </section>
 
     <!-- 🔘 JURISDICTION TIER RADIO BUTTONS (VS / MS / DIOS) -->
     <div class="wa-tier-radio-container">
@@ -8503,14 +8473,82 @@ async function renderWhatsApp() {
           <div>
             <h3 id="wa-card-main-title">Poor Performing Village Surveyors (VS) Progress Notice</h3>
             <p style="font-size:12px;color:#64748b;margin:2px 0 0;" id="wa-card-sub-title">
-              Daily performance extracted from Ground Truthing (GT) and DLR entry registers. Direct alerts dispatched via WhatsApp signed by <b>${h(defaultSender)}</b>.
+              Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(defaultSender)}</b>.
             </p>
           </div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
           <span class="wa-broadcast-badge" id="wa-card-badge">${counts.vs} Flagged</span>
-          <button type="button" class="wa-dispatch-btn-primary" id="wa-bulk-send-btn">
-            ⚡ Broadcast Notices to All Flagged Village Surveyors (VS)
+        </div>
+      </div>
+
+      <!-- 🔘 BULK MESSAGE SENDING RADIO BUTTON SELECTOR -->
+      <div class="wa-bulk-radio-strip">
+        <div class="wa-bulk-strip-header">
+          <div class="wa-bulk-strip-title">
+            <span>🔘</span> <b>MESSAGE DISPATCH &amp; BULK BROADCAST MODE:</b>
+          </div>
+          <span style="font-size:11.5px;color:#64748b;">Select radio option to trigger single or bulk WhatsApp notice broadcast</span>
+        </div>
+
+        <div class="wa-bulk-radios-grid">
+          <!-- Radio 1: Individual Row-by-Row Mode -->
+          <label class="wa-bulk-radio-card active" data-bulk-radio="individual">
+            <input type="radio" name="wa-dispatch-type-selector" value="individual" checked />
+            <div class="wa-bulk-radio-indicator"></div>
+            <div class="wa-bulk-radio-text">
+              <div class="wa-bulk-radio-heading">👤 Individual Send Mode</div>
+              <div class="wa-bulk-radio-subtext">Review officer &amp; dispatch single notice</div>
+            </div>
+            <span class="wa-bulk-radio-pill individual">Single Dispatch</span>
+          </label>
+
+          <!-- Radio 2: Bulk Send to All Flagged Officers in Tier -->
+          <label class="wa-bulk-radio-card" data-bulk-radio="bulk-all">
+            <input type="radio" name="wa-dispatch-type-selector" value="bulk-all" />
+            <div class="wa-bulk-radio-indicator"></div>
+            <div class="wa-bulk-radio-text">
+              <div class="wa-bulk-radio-heading">⚡ Bulk Send: All Flagged in Tier</div>
+              <div class="wa-bulk-radio-subtext">Broadcast notices to all flagged officers in tier</div>
+            </div>
+            <span class="wa-bulk-radio-pill bulk" id="wa-radio-all-count">${counts.vs} Officers</span>
+          </label>
+
+          <!-- Radio 3: Bulk Send to Zero GT Today -->
+          <label class="wa-bulk-radio-card" data-bulk-radio="bulk-zero-gt">
+            <input type="radio" name="wa-dispatch-type-selector" value="bulk-zero-gt" />
+            <div class="wa-bulk-radio-indicator"></div>
+            <div class="wa-bulk-radio-text">
+              <div class="wa-bulk-radio-heading">⚠️ Bulk Send: Zero GT Today</div>
+              <div class="wa-bulk-radio-subtext">Broadcast to officers with 0.00 Ac progress</div>
+            </div>
+            <span class="wa-bulk-radio-pill zero-gt" id="wa-radio-gt-count">0 Officers</span>
+          </label>
+
+          <!-- Radio 4: Bulk Send to DLR Pending -->
+          <label class="wa-bulk-radio-card" data-bulk-radio="bulk-dlr">
+            <input type="radio" name="wa-dispatch-type-selector" value="bulk-dlr" />
+            <div class="wa-bulk-radio-indicator"></div>
+            <div class="wa-bulk-radio-text">
+              <div class="wa-bulk-radio-heading">🔒 Bulk Send: DLR Pending</div>
+              <div class="wa-bulk-radio-subtext">Broadcast to officers with pending DLR entries</div>
+            </div>
+            <span class="wa-bulk-radio-pill dlr" id="wa-radio-dlr-count">0 Officers</span>
+          </label>
+        </div>
+
+        <!-- DYNAMIC BULK BROADCAST ACTION BAR (Visible when any Bulk Radio is selected) -->
+        <div class="wa-bulk-execute-panel" id="wa-bulk-execute-panel" style="display:none;">
+          <div class="wa-bulk-panel-message">
+            <div class="wa-bulk-panel-main" id="wa-bulk-panel-main">
+              ⚡ Ready to broadcast official WhatsApp notices
+            </div>
+            <div class="wa-bulk-panel-desc" id="wa-bulk-panel-desc">
+              Notices will be issued signed by <b>AD, Chittoor</b> to officers with phone numbers strictly verified in Google Spreadsheet.
+            </div>
+          </div>
+          <button type="button" class="wa-bulk-send-btn-active" id="wa-bulk-send-btn">
+            ⚡ Execute Bulk Broadcast Now
           </button>
         </div>
       </div>
@@ -8733,18 +8771,59 @@ async function renderWhatsApp() {
   const cardBadge = document.getElementById('wa-card-badge');
   const bulkSendBtn = document.getElementById('wa-bulk-send-btn');
 
+  let currentBulkMode = 'individual';
+
   function updateView() {
     const meta = getTierMeta();
     const filtered = getFilteredOfficers();
     const active = getActiveOfficers();
 
+    const zeroToday = active.filter(o => (parseFloat(o.today_gt_extent) || 0) === 0 && (parseFloat(o.balance_gt_extent) || 0) > 0);
+    const dlrPending = active.filter(o => (o.dlr_entries_balance || 0) > 0);
+
+    const radioAllCount = document.getElementById('wa-radio-all-count');
+    const radioGtCount = document.getElementById('wa-radio-gt-count');
+    const radioDlrCount = document.getElementById('wa-radio-dlr-count');
+
+    if (radioAllCount) radioAllCount.textContent = `${active.length} Officers`;
+    if (radioGtCount) radioGtCount.textContent = `${zeroToday.length} Officers`;
+    if (radioDlrCount) radioDlrCount.textContent = `${dlrPending.length} Officers`;
+
     if (mainTitle) mainTitle.textContent = `Poor Performing ${meta.title} Progress Notice`;
     if (subTitle) subTitle.innerHTML = `Daily performance extracted from Ground Truthing (GT) and DLR registers. Direct alerts dispatched via WhatsApp signed by <b>${h(senderOverride?.value.trim() || defaultSender)}</b>.`;
     if (cardBadge) cardBadge.textContent = `${active.length} Flagged`;
-    if (bulkSendBtn) {
-      bulkSendBtn.textContent = meta.broadcastBtn;
-      bulkSendBtn.disabled = false;
-      bulkSendBtn.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
+
+    const bulkPanel = document.getElementById('wa-bulk-execute-panel');
+    const bulkPanelMain = document.getElementById('wa-bulk-panel-main');
+    const bulkPanelDesc = document.getElementById('wa-bulk-panel-desc');
+
+    if (currentBulkMode === 'individual') {
+      if (bulkPanel) bulkPanel.style.display = 'none';
+    } else {
+      if (bulkPanel) bulkPanel.style.display = 'flex';
+      let targetList = active;
+      let targetLabel = `All ${meta.title}`;
+      if (currentBulkMode === 'bulk-zero-gt') {
+        targetList = zeroToday;
+        targetLabel = `Zero GT Progress Today (${meta.short})`;
+      } else if (currentBulkMode === 'bulk-dlr') {
+        targetList = dlrPending;
+        targetLabel = `DLR Pending Clearance (${meta.short})`;
+      }
+
+      const withPhone = targetList.filter(o => o.phone && o.phone.trim().length >= 10);
+      const withoutPhone = targetList.filter(o => !o.phone || o.phone.trim().length < 10);
+
+      if (bulkPanelMain) {
+        bulkPanelMain.textContent = `⚡ Bulk WhatsApp Broadcast Queue: ${targetLabel} (${targetList.length} Flagged)`;
+      }
+      if (bulkPanelDesc) {
+        bulkPanelDesc.innerHTML = `Directives issued from <b>${h(senderOverride?.value.trim() || defaultSender)}</b>. <b>${withPhone.length}</b> verified with Spreadsheet phones. ${withoutPhone.length > 0 ? `<span style="color:#b91c1c;">(${withoutPhone.length} lacking sheet phone will be skipped)</span>` : ''}`;
+      }
+      if (bulkSendBtn) {
+        bulkSendBtn.textContent = `⚡ Broadcast Notices to ${withPhone.length} Verified ${meta.short}`;
+        bulkSendBtn.disabled = withPhone.length === 0;
+      }
     }
 
     if (statsContainer) statsContainer.innerHTML = renderStatsHtml();
@@ -8753,6 +8832,31 @@ async function renderWhatsApp() {
       attachTableActions();
     }
   }
+
+  // Bulk Message Sending Radio Button click handlers
+  document.querySelectorAll('[data-bulk-radio]').forEach(card => {
+    card.onclick = () => {
+      document.querySelectorAll('[data-bulk-radio]').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const radio = card.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      currentBulkMode = card.dataset.bulkRadio;
+
+      if (currentBulkMode === 'bulk-zero-gt') {
+        currentCategory = 'GT';
+      } else if (currentBulkMode === 'bulk-dlr') {
+        currentCategory = 'DLR';
+      } else {
+        currentCategory = 'all';
+      }
+
+      document.querySelectorAll('[data-tab-cat]').forEach(b => {
+        b.classList.toggle('active', b.dataset.tabCat === currentCategory);
+      });
+
+      updateView();
+    };
+  });
 
   // Radio button click handlers
   document.querySelectorAll('[data-tier-radio]').forEach(card => {
@@ -9032,37 +9136,56 @@ Chittoor District, Government of Andhra Pradesh`;
     };
   }
 
-  // Bulk Tier Broadcast Button
+  // Bulk Tier Broadcast Button (Controlled by Radio Button)
   if (bulkSendBtn) {
     bulkSendBtn.onclick = async () => {
-      const activeList = getFilteredOfficers();
+      const active = getActiveOfficers();
+      let targetList = active;
+      if (currentBulkMode === 'bulk-zero-gt') {
+        targetList = active.filter(o => (parseFloat(o.today_gt_extent) || 0) === 0 && (parseFloat(o.balance_gt_extent) || 0) > 0);
+      } else if (currentBulkMode === 'bulk-dlr') {
+        targetList = active.filter(o => (o.dlr_entries_balance || 0) > 0);
+      }
+
       const meta = getTierMeta();
       const senderTitle = senderOverride?.value.trim() || defaultSender;
-      const count = activeList.length;
+      const count = targetList.length;
 
-      const confirmed = confirm(
-        `🏛️ BROADCAST CONFIRMATION\n\n` +
-        `Sender Designation: ${senderTitle}\n` +
-        `Jurisdiction Tier: ${meta.title}\n` +
-        `Target Officers: ${count} flagged officers\n\n` +
-        `Do you want to dispatch official WhatsApp notices to all ${count} flagged ${meta.short}?`
-      );
+      const withPhone = targetList.filter(o => o.phone && o.phone.trim().length >= 10);
+      const withoutPhone = targetList.filter(o => !o.phone || o.phone.trim().length < 10);
 
-      if (!confirmed) return;
+      let confirmMsg = `Are you sure you want to broadcast official resurvey directives to ${count} flagged ${meta.title}?\n\n` +
+        `• Directives will be issued from: "${senderTitle}"\n` +
+        `• Live monitoring links will be attached to each officer notice.\n`;
+
+      if (withoutPhone.length > 0) {
+        confirmMsg += `\n⚠️ STRICT SPREADSHEET POLICY:\n` +
+          `• ${withPhone.length} officers have phone numbers verified from Google Spreadsheets.\n` +
+          `• ${withoutPhone.length} officers do NOT have phone numbers in the linked spreadsheets and will be skipped until updated in the Google Spreadsheet.\n`;
+      }
+
+      confirmMsg += `\nClick OK to proceed with dispatch.`;
+
+      if (!confirm(confirmMsg)) return;
+
+      if (withPhone.length === 0) {
+        toast(`Cannot broadcast: None of the ${count} officers in this tier have phone numbers in the Google Spreadsheet link. Please update the Google Spreadsheet.`, 'error');
+        return;
+      }
 
       bulkSendBtn.disabled = true;
-      bulkSendBtn.innerHTML = `⏳ <span>Dispatching notices to all ${meta.short}...</span>`;
+      bulkSendBtn.innerHTML = `⏳ <span>Dispatching notices to ${withPhone.length} ${meta.short}...</span>`;
 
       try {
-        const oids = activeList.map(o => o.id);
+        const oids = withPhone.map(o => o.id);
         const res = await api('/api/whatsapp/broadcast-tier-notices', {
           method: 'POST',
           body: JSON.stringify({ tier: currentTier, officerIds: oids, senderTitle })
         });
 
         const rep = res.report || {};
-        toast(`Broadcast complete! Dispatched ${rep.totalDispatches || count} notices from ${senderTitle}.`, 'success');
-        bulkSendBtn.innerHTML = `✓ Dispatched (${rep.totalDispatches || count})`;
+        toast(`Broadcast complete! Dispatched ${rep.sentCount || rep.totalDispatches || withPhone.length} notices from ${senderTitle}.`, 'success');
+        bulkSendBtn.innerHTML = `✓ Dispatched (${rep.sentCount || rep.totalDispatches || withPhone.length})`;
         bulkSendBtn.style.background = '#059669';
 
         const freshLogs = await api('/api/whatsapp/logs');
@@ -9071,7 +9194,7 @@ Chittoor District, Government of Andhra Pradesh`;
       } catch (err) {
         toast(`Broadcast failed: ${err.message}`, 'error');
         bulkSendBtn.disabled = false;
-        bulkSendBtn.textContent = meta.broadcastBtn;
+        bulkSendBtn.textContent = `⚡ Broadcast Notices to ${withPhone.length} Verified ${meta.short}`;
       }
     };
   }
