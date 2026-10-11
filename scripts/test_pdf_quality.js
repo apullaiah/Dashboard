@@ -144,7 +144,7 @@ function generatePureMandalPdf(store, options = {}) {
         ? `MANDAL RESURVEY STATUS REPORT: ${selectedMandal.toUpperCase()} MANDAL`
         : 'DISTRICT MANDAL-WISE VILLAGE RESURVEY STATUS REPORT';
       drawText(titleText, marginLeft + 245, curY - 14, '/F2', 9.5, 0.984, 0.796, 0.196); // Gold #facc15
-      drawText(`Certified Data · Generated: ${nowStr} · Universe: ${totalVillages} Villages across ${mandalNames.length} Mandals`, marginLeft + 245, curY - 26, '/F1', 7.5, 0.8, 0.85, 0.92);
+      drawText(`A.P. Resurvey Project 2.0 · Generated: ${nowStr} · Universe: ${totalVillages} Villages across ${mandalNames.length} Mandals`, marginLeft + 245, curY - 26, '/F1', 7.5, 0.8, 0.85, 0.92);
 
       curY -= (bannerH + 8);
 
