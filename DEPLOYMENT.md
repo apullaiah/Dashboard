@@ -24,10 +24,9 @@ Vercel provides free, high-speed worldwide cloud hosting with automatic HTTPS an
    git push origin main
    ```
 2. Vercel automatically detects the push to `main` on [https://github.com/apullaiah/Dashboard](https://github.com/apullaiah/Dashboard) and redeploys the updated build in ~20 seconds.
-3. Your live application is accessible at:
-   ```
-   https://chittoor-resurvey.vercel.app
-   ```
+3. Access your Vercel project dashboard at:
+   [https://vercel.com/apullaiah/dashboard](https://vercel.com/apullaiah/dashboard)
+4. Your live application is accessible at your assigned Vercel domain (e.g. `https://chittoor-resurvey.vercel.app` or your customized project domain in Vercel settings).
 
 ### Option B: Direct Terminal Deploy via Vercel CLI
 1. Open PowerShell or Command Prompt in this folder.

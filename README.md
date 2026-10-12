@@ -1,6 +1,13 @@
 # Chittoor District — AP Resurvey Monitoring & Analytics
 
-An officer-focused monitoring application for village-level AP Resurvey progress. The dashboard intentionally starts without demo data: until sources are connected it displays **Not available** rather than fabricated counts.
+An officer-focused monitoring application for village-level AP Resurvey progress.
+
+## 🔗 Live Links & Repository
+
+* **GitHub Repository**: [https://github.com/apullaiah/Dashboard](https://github.com/apullaiah/Dashboard)
+* **Vercel Deployment Dashboard**: [https://vercel.com/apullaiah/dashboard](https://vercel.com/apullaiah/dashboard)
+* **Live Deployment**: Connected automatically to GitHub `main` branch. Any push to `main` automatically triggers a zero-downtime production deployment on Vercel.
+
 
 ## Run locally
 
