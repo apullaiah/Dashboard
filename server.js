@@ -141,7 +141,18 @@ let inMemoryStore = null;
 
 function blankStore() {
   return { sources: [], villages: [], syncLogs: [], auditLog: [], conflicts: [], changeFeed: [],
-    sourceSummaries: {}, settings: { noProgressDays: 5, timezone: 'Asia/Kolkata' }, customMandalAliases: {} };
+    sourceSummaries: {}, settings: { noProgressDays: 5, timezone: 'Asia/Kolkata' }, customMandalAliases: {},
+    whatsappConfig: {
+      enabled: true,
+      verifyToken: DEFAULT_VERIFY_TOKEN,
+      phoneNumberId: '',
+      accessToken: '',
+      wabaId: '',
+      senderName: 'DSLRO, Chittoor',
+      surveySenderName: 'DSLRO, Chittoor',
+      revenueSenderName: 'Joint Collector, Chittoor'
+    }
+  };
 }
 function ensureStore() {
   if (inMemoryStore) return;
@@ -1880,7 +1891,9 @@ async function handleApi(req, res, url) {
     const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || rawConfig.phoneNumberId || '';
     const accessToken = process.env.WHATSAPP_ACCESS_TOKEN || rawConfig.accessToken || '';
     const wabaId = process.env.WHATSAPP_WABA_ID || rawConfig.wabaId || '';
-    const senderName = process.env.WHATSAPP_SENDER_NAME || rawConfig.senderName || 'AD, Chittoor';
+    const senderName = process.env.WHATSAPP_SENDER_NAME || rawConfig.senderName || 'DSLRO, Chittoor';
+    const surveySenderName = rawConfig.surveySenderName || rawConfig.senderName || 'DSLRO, Chittoor';
+    const revenueSenderName = rawConfig.revenueSenderName || 'Joint Collector, Chittoor';
     const isLive = Boolean(phoneNumberId && accessToken);
 
     return json(res, 200, {
@@ -1891,8 +1904,11 @@ async function handleApi(req, res, url) {
         accessTokenConfigured: Boolean(accessToken),
         wabaId,
         senderName,
+        surveySenderName,
+        revenueSenderName,
         webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`,
-        accessToken: accessToken ? '••••••••' + accessToken.slice(-4) : '',
+        accessToken: accessToken || '',
+        maskedAccessToken: accessToken ? '••••••••' + accessToken.slice(-4) : '',
         mode: isLive ? 'LIVE' : 'SIMULATION'
       },
       stats: {
@@ -1911,7 +1927,9 @@ async function handleApi(req, res, url) {
       phoneNumberId: clean(b.phoneNumberId) || existing.phoneNumberId || '',
       accessToken: b.accessToken && !b.accessToken.includes('••••') ? clean(b.accessToken) : (existing.accessToken || process.env.WHATSAPP_ACCESS_TOKEN || ''),
       wabaId: clean(b.wabaId) || existing.wabaId || '',
-      senderName: clean(b.senderName) || existing.senderName || 'AD, Chittoor',
+      senderName: clean(b.senderName) || clean(b.surveySenderName) || existing.senderName || 'DSLRO, Chittoor',
+      surveySenderName: clean(b.surveySenderName) || clean(b.senderName) || existing.surveySenderName || 'DSLRO, Chittoor',
+      revenueSenderName: clean(b.revenueSenderName) || existing.revenueSenderName || 'Joint Collector, Chittoor',
       updatedAt: now()
     };
     save(store);

@@ -11527,3 +11527,28 @@ body {
   border-color: #ea580c;
   background: #ea580c;
 }
+
+/* WhatsApp Webhook Settings Radio Card Styles */
+.wa-tier-radio-card.settings-card {
+  border-color: #10b981;
+  background: #ffffff;
+}
+.wa-tier-radio-card.settings-card:hover {
+  border-color: #059669;
+  background: #f0fdf4;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+.wa-tier-radio-card.settings-card.active,
+.wa-tier-radio-card.settings-card:has(input:checked) {
+  border-color: #059669;
+  background: #ecfdf5;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.22);
+}
+.wa-tier-radio-card.settings-card .wa-radio-indicator {
+  border-color: #059669;
+}
+.wa-tier-radio-card.settings-card.active .wa-radio-indicator::after,
+.wa-tier-radio-card.settings-card:has(input:checked) .wa-radio-indicator::after {
+  background: #059669;
+  transform: scale(1);
+}
