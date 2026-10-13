@@ -27,7 +27,7 @@ async function testAll() {
   });
   console.log(`✓ getPoorDIOS returns ${diosOfficers.length} officers with role "Deputy Inspector of Survey (DIOS)"`);
 
-  const sampleNotice = formatOfficerNotice(diosOfficers[0], 'dios', 'https://chittoor-resurvey.vercel.app', 'AD, Chittoor');
+  const sampleNotice = formatOfficerNotice(diosOfficers[0], 'dios', 'https://chittor-resurvey-dashboard.vercel.app', 'AD, Chittoor');
   assert(sampleNotice.includes('To: *' + diosOfficers[0].name + '* (Deputy Inspector of Survey - DIOS)'), 'Notice must have Deputy Inspector of Survey - DIOS');
   assert(sampleNotice.includes('As Deputy Inspector of Survey (DIOS), you are instructed'), 'Notice directive must have Deputy Inspector of Survey (DIOS)');
   console.log('✓ Notice text properly addresses Deputy Inspector of Survey (DIOS)');

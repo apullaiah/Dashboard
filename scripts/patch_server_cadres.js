@@ -201,7 +201,7 @@ setInterval(async () => {
     if (hours === 6 && minutes >= 0 && minutes <= 5 && lastDailyRunDate !== todayStr) {
       lastDailyRunDate = todayStr;
       console.log(\`⏰ [Automated Scheduler] Firing Daily 06:00 AM IST WhatsApp Alerts for \${todayStr}...\`);
-      const baseUrl = process.env.VERCEL_URL ? \`https://\${process.env.VERCEL_URL}\` : 'https://chittoor-resurvey.vercel.app';
+      const baseUrl = process.env.VERCEL_URL ? \`https://\${process.env.VERCEL_URL}\` : 'https://chittor-resurvey-dashboard.vercel.app';
       const storeObj = load();
       await executeDaily6AMWhatsAppBroadcast(storeObj, baseUrl);
       save(storeObj);

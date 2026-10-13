@@ -87,7 +87,7 @@ function getSurveyorContacts(v) {
   return [{ name: ms.name, phone: ms.phone, role: ms.role, isVS: true, isMS: true }];
 }
 
-function formatPoorNotice(v, contact, hostUrl = 'https://chittoor-resurvey.vercel.app', senderTitle = 'AD, Chittoor') {
+function formatPoorNotice(v, contact, hostUrl = 'https://chittor-resurvey-dashboard.vercel.app', senderTitle = 'AD, Chittoor') {
   const extent = formatExtent(v.extent);
   const cumGt = formatExtent(v.cumulative_gt_extent || 0);
   const balGt = formatExtent(v.balance_gt_extent !== undefined ? v.balance_gt_extent : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0)));

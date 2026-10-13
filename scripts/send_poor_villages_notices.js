@@ -51,7 +51,7 @@ async function main() {
   console.log('------------------------------------------------------------------------\n');
 
   console.log('🚀 Dispatching official notices to concerned Village Surveyors (VS)...');
-  const baseUrl = process.env.BASE_URL || 'https://chittoor-resurvey.vercel.app';
+  const baseUrl = process.env.BASE_URL || 'https://chittor-resurvey-dashboard.vercel.app';
 
   const report = await sendPoorVillagesNotices({
     filterType,

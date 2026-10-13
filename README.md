@@ -4,8 +4,9 @@ An officer-focused monitoring application for village-level AP Resurvey progress
 
 ## 🔗 Live Links & Repository
 
+* **Live Application**: [https://chittor-resurvey-dashboard.vercel.app](https://chittor-resurvey-dashboard.vercel.app)
 * **GitHub Repository**: [https://github.com/apullaiah/Dashboard](https://github.com/apullaiah/Dashboard)
-* **Vercel Deployment Dashboard**: [https://vercel.com/apullaiah/dashboard](https://vercel.com/apullaiah/dashboard)
+* **Vercel Project Dashboard**: [https://vercel.com/apullaiah/dashboard](https://vercel.com/apullaiah/dashboard)
 * **Live Deployment**: Connected automatically to GitHub `main` branch. Any push to `main` automatically triggers a zero-downtime production deployment on Vercel.
 
 

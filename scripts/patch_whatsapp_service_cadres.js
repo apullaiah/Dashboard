@@ -374,7 +374,7 @@ function getPoorRDOs(store) {
  * Survey Cadre (VS, MLSO, DIOS) -> Dispatched by DSLRO, Chittoor
  * Revenue Cadre (VRO, Tahsildars, RDOs) -> Dispatched by Joint Collector, Chittoor
  */
-async function executeDaily6AMWhatsAppBroadcast(store, baseUrl = 'https://chittoor-resurvey.vercel.app') {
+async function executeDaily6AMWhatsAppBroadcast(store, baseUrl = 'https://chittor-resurvey-dashboard.vercel.app') {
   console.log('⏰ [Daily 6:00 AM Scheduler] Initiating official WhatsApp alerts broadcast...');
   const startTime = new Date().toISOString();
   const summary = {

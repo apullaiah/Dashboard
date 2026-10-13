@@ -26,7 +26,8 @@ Vercel provides free, high-speed worldwide cloud hosting with automatic HTTPS an
 2. Vercel automatically detects the push to `main` on [https://github.com/apullaiah/Dashboard](https://github.com/apullaiah/Dashboard) and redeploys the updated build in ~20 seconds.
 3. Access your Vercel project dashboard at:
    [https://vercel.com/apullaiah/dashboard](https://vercel.com/apullaiah/dashboard)
-4. Your live application is accessible at your assigned Vercel domain (e.g. `https://chittoor-resurvey.vercel.app` or your customized project domain in Vercel settings).
+4. Your live application is accessible at:
+   [https://chittor-resurvey-dashboard.vercel.app](https://chittor-resurvey-dashboard.vercel.app)
 
 ### Option B: Direct Terminal Deploy via Vercel CLI
 1. Open PowerShell or Command Prompt in this folder.
@@ -82,7 +83,7 @@ Under your project settings in [vercel.com](https://vercel.com) -> **Settings** 
 ### B. Meta Developer Portal Webhook Settings
 1. Open [developers.facebook.com](https://developers.facebook.com) -> Your WhatsApp App -> **WhatsApp** -> **Configuration**.
 2. Click **Edit** under **Webhook**:
-   - **Callback URL**: `https://<your-vercel-domain>.vercel.app/api/whatsapp/webhook`
+   - **Callback URL**: `https://chittor-resurvey-dashboard.vercel.app/api/whatsapp/webhook`
    - **Verify Token**: `CTR_RESURVEY_WA_2026`
 3. Click **Verify and save**. Meta will verify the URL immediately with HTTP 200.
 4. Under **Webhook fields**, click **Manage** and subscribe to **`messages`**.
