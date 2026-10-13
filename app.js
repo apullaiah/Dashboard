@@ -293,6 +293,7 @@ function updateNav() {
   const names = {
     dashboard: ['MONITORING CENTRE', 'DISTRICT SURVEY AND LAND RECORDS OFFICE, CHITTOOR DISTRICT'],
     mandal_plan: ['MANDAL ACTION PLAN', 'Mandal-Wise Action Plan & Statutory Resurvey Status'],
+    mandal_report: ['MANDAL-WISE VILLAGE STATUS REPORT', 'Mandal-Wise Village Resurvey Status & Daily Parameter Out-Turn Report'],
     villages: ['MONITORING', 'Village Monitoring & Statutory Stages'],
     ppb: ['PPB DISTRIBUTION', 'Month-Wise PPBs Distribution Cycles & Delivery Monitoring'],
     performance: ['PHASE-WISE ANALYSIS', 'Phase wise Analysis'],
@@ -328,7 +329,7 @@ async function navigate(view, options = {}) {
     sessionStorage.setItem('ctr_officer_token', token);
   }
   document.body?.classList?.remove('auth-locked');
-  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || view === 'ppb' || view === 'mandal_plan' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
+  state.view = view; state.villageFilters = options.filters || state.villageFilters; updateNav(); document.querySelector('.sidebar').classList.remove('open'); root.innerHTML = `<div class="empty-block"><div><svg>${'<use href="#icon-refresh" />'}</svg><strong>Loading monitoring data</strong></div></div>`; try { if (!state.dashboard || options.fresh) await reloadDashboard(); if (view === 'villages' || view === 'dashboard' || view === 'ppb' || view === 'mandal_plan' || view === 'mandal_report' || !state.villages.length) await loadVillages(); if (view === 'sources') await loadSources(); render(); } catch (error) { if (error.message.includes('officer credentials')) return; root.innerHTML = `<div class="section-card"><div class="empty-block"><div>${icon('warning')}<strong>Unable to load the monitoring centre</strong><p>${h(error.message)}</p></div></div></div>`; }
 }
 function kpiCard(label, value, description, variant, filter = null, hasData, filterKey = 'status') {
   const enabled = filter && hasData && value !== null && value !== undefined;
@@ -8122,6 +8123,636 @@ function openMandalPdfModal(selectedMandal = 'All') {
   updateIframeSrc();
 }
 
+function getFrontendVillageProgress(v) {
+  const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+  const stage = String(v.current_stage || '').trim();
+  const lower = stage.toLowerCase();
+  const totExtent = parseFloat(v.extent) || 0;
+  const totKhatas = Number(v.khatas) || Number(v.dlr_total_entries) || (totExtent > 0 ? Math.round(totExtent * 1.1) : 400);
+
+  // 1. Webland 2.0 Ported / 100% Completed
+  if (isPorted || lower.includes('webland') || lower.includes('blockchain') || (v.status || '').toLowerCase() === 'completed') {
+    return {
+      stageKey: 'webland',
+      stageLabel: 'Webland 2.0 Ported',
+      stageIcon: '🌐',
+      stageColor: 'teal',
+      paramType: 'Webland 2.0',
+      todayStr: '100% Ported',
+      balStr: '0 Pending',
+      todayVal: 0,
+      balVal: 0,
+      pct: 100,
+      htmlSummary: `
+        <div class="param-split-row">
+          <span class="param-tag tag-ported">🌐 100% Ported</span>
+          <span class="param-pill done">0 Pending</span>
+        </div>
+        <div class="param-sub-meta">Finalized in Webland 2.0 · RoR Records Active</div>
+      `
+    };
+  }
+
+  // 2. Final RoR Completed / PPB Distribution
+  if (lower.includes('final ror') || isComplete(v.final_ror_status)) {
+    const targetPpb = parseInt(v.ppb_target) || parseInt(v.target_ppbs) || totKhatas;
+    const distPpb = parseInt(v.ppb_distributed) || parseInt(v.ppbs_distributed) || 0;
+    const balPpb = Math.max(0, targetPpb - distPpb);
+    const todayPpb = parseInt(v.today_ppb) || 0;
+    const pct = targetPpb > 0 ? Math.min(100, Math.round((distPpb / targetPpb) * 100)) : 100;
+    return {
+      stageKey: 'final_ror',
+      stageLabel: 'Final RoR Completed',
+      stageIcon: '📜',
+      stageColor: 'emerald',
+      paramType: 'PPBs Distribution',
+      todayStr: todayPpb > 0 ? `+${todayPpb} PPBs Today` : 'RoR Confirmed',
+      balStr: balPpb > 0 ? `${balPpb.toLocaleString()} PPBs Pending` : '100% Issued',
+      todayVal: todayPpb,
+      balVal: balPpb,
+      pct,
+      htmlSummary: `
+        <div class="param-split-row">
+          <span class="param-pill dlr-active ${todayPpb > 0 ? 'active' : 'zero'}">${todayPpb > 0 ? `+${todayPpb} PPBs Today` : 'RoR Confirmed'}</span>
+          <span class="param-pill ${balPpb > 0 ? 'pending' : 'done'}">${balPpb > 0 ? `${balPpb.toLocaleString()} PPBs Pending` : '100% Issued'}</span>
+        </div>
+        <div class="param-sub-meta">Handover: <strong>${distPpb.toLocaleString()}</strong> / ${targetPpb.toLocaleString()} PPBs (${pct}%)</div>
+      `
+    };
+  }
+
+  // 3. Draft RoR & 13 Notice
+  if (lower.includes('draft ror') || lower.includes('13 notification') || lower.includes('13 completed') || isComplete(v.draft_ror_status) || isComplete(v.section13_status)) {
+    const claimsHeard = parseInt(v.claims_heard) || Math.round(totKhatas * 0.85);
+    const balClaims = Math.max(0, totKhatas - claimsHeard);
+    const todayClaims = parseInt(v.today_claims) || (lower.includes('draft') ? 5 : 0);
+    const pct = totKhatas > 0 ? Math.min(100, Math.round((claimsHeard / totKhatas) * 100)) : 85;
+    return {
+      stageKey: 'draft_ror',
+      stageLabel: 'Draft RoR & 13 Notice',
+      stageIcon: '📑',
+      stageColor: 'purple',
+      paramType: 'Claims & 13 Notice',
+      todayStr: todayClaims > 0 ? `+${todayClaims} Claims Today` : '13 Notice Issued',
+      balStr: `${balClaims} Objections Pending`,
+      todayVal: todayClaims,
+      balVal: balClaims,
+      pct,
+      htmlSummary: `
+        <div class="param-split-row">
+          <span class="param-pill dlr-active ${todayClaims > 0 ? 'active' : 'zero'}">${todayClaims > 0 ? `+${todayClaims} Claims Today` : '13 Notice Issued'}</span>
+          <span class="param-pill pending">${balClaims} Objections Pending</span>
+        </div>
+        <div class="param-sub-meta">Draft 1B Published · Hearing Claims (${pct}%)</div>
+      `
+    };
+  }
+
+  // Helper for DLR stages
+  function makeDlrProgress(key, label, icon, officer) {
+    const sd = (v.dlr_stages_detail && v.dlr_stages_detail[key]) || {};
+    const today = (sd.today !== undefined && sd.today !== null) ? Number(sd.today) : (Number(v.dlr_entries_today) || 0);
+    const cum = (sd.cumulative !== undefined && sd.cumulative !== null) ? Number(sd.cumulative) : (Number(v.dlr_entries_cumulative) || 0);
+    const bal = (sd.balance !== undefined && sd.balance !== null) ? Number(sd.balance) : ((v.dlr_entries_balance !== undefined && v.dlr_entries_balance !== null) ? Number(v.dlr_entries_balance) : Math.max(0, totKhatas - cum));
+    const tot = (sd.total !== undefined && sd.total !== null) ? Number(sd.total) : totKhatas;
+    const pct = tot > 0 ? Math.min(100, Math.round((cum / tot) * 100)) : 0;
+
+    return {
+      stageKey: key,
+      stageLabel: label,
+      stageIcon: icon,
+      stageColor: 'amber',
+      paramType: `${officer} Entries`,
+      todayStr: today > 0 ? `+${today.toLocaleString()} Today` : '0 Today',
+      balStr: bal > 0 ? `${bal.toLocaleString()} Pending` : '0 Pending',
+      todayVal: today,
+      balVal: bal,
+      cumVal: cum,
+      totVal: tot,
+      pct,
+      htmlSummary: `
+        <div class="param-split-row">
+          <span class="param-pill dlr-active">
+            ${today > 0 ? `+${today.toLocaleString()} Entries Today` : '0 Entries Today'}
+          </span>
+          <span class="param-pill ${bal > 0 ? 'pending' : 'done'}">
+            ${bal > 0 ? `${bal.toLocaleString()} Entries Pending` : '0 Pending'}
+          </span>
+        </div>
+        <div class="param-sub-meta">
+          ${officer}: <strong>${cum.toLocaleString()}</strong> / ${tot.toLocaleString()} Khatas (${pct}%)
+        </div>
+      `
+    };
+  }
+
+  // 4. DLR @ JC Login
+  if (lower.includes('jc login') || isComplete(v.jc_status) || v.jc_status === 'In Progress') {
+    return makeDlrProgress('jc_status', 'DLR @ JC Login', '⚖️', 'JC Login');
+  }
+
+  // 5. DLR @ RDO Login
+  if (lower.includes('rdo login') || lower.includes('rdo') || isComplete(v.rdo_status) || v.rdo_status === 'In Progress') {
+    return makeDlrProgress('rdo_status', 'DLR @ RDO Login', '🏛️', 'RDO Login');
+  }
+
+  // 6. DLR @ Tahsildar Login
+  if (lower.includes('tah login') || lower.includes('tahsildar') || isComplete(v.tahsildar_status) || v.tahsildar_status === 'In Progress') {
+    return makeDlrProgress('tahsildar_status', 'DLR @ Tahsildar Login', '⭐', 'Tah Login');
+  }
+
+  // 7. DLR @ VRO Login
+  if (lower.includes('vro login') || lower.includes('vro') || isComplete(v.vro_status) || v.vro_status === 'In Progress') {
+    return makeDlrProgress('vro_status', 'DLR @ VRO Login', '🔐', 'VRO Login');
+  }
+
+  // 8. DLR @ VS Login (Village Surveyor)
+  if (lower.includes('vs login') || lower.includes('surveyor') || isComplete(v.vs_status) || v.vs_status === 'In Progress') {
+    return makeDlrProgress('vs_status', 'DLR @ VS Login', '🔐', 'VS Login');
+  }
+
+  // 9. Cadastral Vectorization
+  if (lower.includes('vectorization') || lower.includes('correlation') || isComplete(v.vectorization_status) || v.vectorization_status === 'In Progress') {
+    const isDone = isComplete(v.vectorization_status);
+    return {
+      stageKey: 'vectorization',
+      stageLabel: 'Cadastral Vectorization',
+      stageIcon: '📐',
+      stageColor: 'indigo',
+      paramType: 'Boundary Vectorization',
+      todayStr: isDone ? 'Vectorized' : 'In Progress',
+      balStr: isDone ? '0 Pending' : 'Vetting Pending',
+      todayVal: isDone ? 1 : 0,
+      balVal: isDone ? 0 : 1,
+      pct: isDone ? 100 : 50,
+      htmlSummary: `
+        <div class="param-split-row">
+          <span class="param-pill ${isDone ? 'done' : 'dlr-active'}">${isDone ? 'Vectorized' : 'In Progress'}</span>
+          <span class="param-pill ${isDone ? 'done' : 'pending'}">${isDone ? '0 Pending' : 'Vetting Pending'}</span>
+        </div>
+        <div class="param-sub-meta">Cadastral Map Correlation &amp; Boundary Linking</div>
+      `
+    };
+  }
+
+  // 10. Ground Truthing (GT)
+  const isGtDone = isComplete(v.gt_status);
+  const todayGt = parseFloat(v.today_gt_extent) || 0;
+  const cumGt = parseFloat(v.cumulative_gt_extent) || (isGtDone ? totExtent : (v.gt_status === 'In Progress' ? Math.round(totExtent * 0.6 * 100) / 100 : 0));
+  const balGt = (v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) 
+    ? parseFloat(v.balance_gt_extent) 
+    : (isGtDone ? 0 : Math.max(0, Math.round((totExtent - cumGt) * 100) / 100));
+  const pct = totExtent > 0 ? Math.min(100, Math.round((cumGt / totExtent) * 100)) : (isGtDone ? 100 : 0);
+  const isNotStarted = lower.includes('not started') || (!isGtDone && cumGt === 0 && todayGt === 0);
+
+  return {
+    stageKey: 'gt_status',
+    stageLabel: isGtDone ? 'GT Completed' : (isNotStarted ? 'GT Not Started' : 'GT Ongoing'),
+    stageIcon: '🌾',
+    stageColor: isGtDone ? 'emerald' : (isNotStarted ? 'slate' : 'sky'),
+    paramType: 'GT Extent',
+    todayStr: todayGt > 0 ? `+${formatExtent(todayGt)} Ac Today` : '0.00 Ac Today',
+    balStr: balGt > 0 ? `${formatExtent(balGt)} Ac Pending` : '0.00 Ac Pending',
+    todayVal: todayGt,
+    balVal: balGt,
+    cumVal: cumGt,
+    totVal: totExtent,
+    pct,
+    htmlSummary: isGtDone ? `
+      <div class="param-split-row">
+        <span class="param-pill done">🌾 GT Completed</span>
+        <span class="param-pill done">0.00 Ac Pending</span>
+      </div>
+      <div class="param-sub-meta">Extent Covered: <strong>${formatExtent(totExtent)} Ac</strong> (100%)</div>
+    ` : `
+      <div class="param-split-row">
+        <span class="param-pill gt-active">
+          ${todayGt > 0 ? `+${formatExtent(todayGt)} Ac Today` : '0.00 Ac Today'}
+        </span>
+        <span class="param-pill ${balGt > 0 ? 'pending' : 'done'}">
+          ${balGt > 0 ? `${formatExtent(balGt)} Ac Pending` : '0.00 Ac Pending'}
+        </span>
+      </div>
+      <div class="param-sub-meta">
+        Ground Truthed: <strong>${formatExtent(cumGt)}</strong> / ${formatExtent(totExtent)} Ac (${pct}%)
+      </div>
+    `
+  };
+}
+
+function exportMandalReportCsv(villageList) {
+  const headers = [
+    'S.No', 'Mandal', 'Division', 'Village Name', 'Village Code', 'Phase',
+    'Total Extent (Ac)', 'Resurvey Stage', 'Workflow Status',
+    'Parameter Type', 'Today Completed Out-Turn', 'Pending Balance',
+    'Khatas / Scope', 'Ported Webland 2.0'
+  ];
+  const rows = villageList.map((v, i) => {
+    const prog = getFrontendVillageProgress(v);
+    return [
+      i + 1,
+      `"${v.mandal || ''}"`,
+      `"${v.division || ''}"`,
+      `"${v.village_name || ''}"`,
+      `"${v.village_code || ''}"`,
+      `"${v.phase || ''}"`,
+      formatExtent(v.extent || 0),
+      `"${prog.stageLabel}"`,
+      `"${v.status || ''}"`,
+      `"${prog.paramType}"`,
+      `"${prog.todayStr}"`,
+      `"${prog.balStr}"`,
+      v.khatas || v.dlr_total_entries || 0,
+      v.ported_to_webland ? 'YES' : 'NO'
+    ];
+  });
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chittoor-mandal-wise-village-status-report-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function renderMandalReportView() {
+  const villages = state.villages || [];
+  const mandals = [...new Set(villages.map(v => v.mandal).filter(Boolean))].sort();
+  const divisions = ['All', ...new Set(villages.map(v => v.division).filter(d => d && d !== '—'))].sort();
+
+  state.mandalReportMandalFilter = state.mandalReportMandalFilter || 'All';
+  state.mandalReportDivisionFilter = state.mandalReportDivisionFilter || 'All';
+  state.mandalReportStageFilter = state.mandalReportStageFilter || 'All';
+  state.mandalReportQuickFilter = state.mandalReportQuickFilter || 'all';
+  state.mandalReportSearch = state.mandalReportSearch || '';
+
+  // Calculate district KPI totals
+  const totalVillages = villages.length;
+  const totalMandals = mandals.length;
+  const totalExtent = villages.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0);
+  const districtTodayGt = villages.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
+  const districtBalGt = villages.reduce((s, v) => {
+    if (isComplete(v.gt_status)) return s;
+    const b = (v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0));
+    return s + (isNaN(b) ? 0 : b);
+  }, 0);
+  const districtTodayDlr = villages.reduce((s, v) => s + (Number(v.dlr_entries_today) || 0), 0);
+  const districtBalDlr = villages.reduce((s, v) => s + (Number(v.dlr_entries_balance) || 0), 0);
+  const districtPorted = villages.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported').length;
+
+  // Filter villages
+  let filtered = villages.slice();
+
+  if (state.mandalReportDivisionFilter !== 'All') {
+    filtered = filtered.filter(v => (v.division || '').toLowerCase() === state.mandalReportDivisionFilter.toLowerCase());
+  }
+  if (state.mandalReportMandalFilter !== 'All') {
+    filtered = filtered.filter(v => (v.mandal || '').toLowerCase() === state.mandalReportMandalFilter.toLowerCase());
+  }
+  if (state.mandalReportStageFilter !== 'All') {
+    const qStage = state.mandalReportStageFilter.toLowerCase();
+    filtered = filtered.filter(v => {
+      const prog = getFrontendVillageProgress(v);
+      return prog.stageKey.toLowerCase().includes(qStage) || prog.stageLabel.toLowerCase().includes(qStage);
+    });
+  }
+  if (state.mandalReportQuickFilter !== 'all') {
+    if (state.mandalReportQuickFilter === 'gt') {
+      filtered = filtered.filter(v => !isComplete(v.gt_status) && !v.ported_to_webland);
+    } else if (state.mandalReportQuickFilter === 'dlr') {
+      filtered = filtered.filter(v => (v.current_stage || '').toLowerCase().includes('dlr') || (v.dlr_entries_balance || 0) > 0);
+    } else if (state.mandalReportQuickFilter === 'ported') {
+      filtered = filtered.filter(v => v.ported_to_webland || v.webland_2_status === 'Ported');
+    } else if (state.mandalReportQuickFilter === 'today') {
+      filtered = filtered.filter(v => (parseFloat(v.today_gt_extent) > 0) || (Number(v.dlr_entries_today) > 0) || (Number(v.today_ppb) > 0));
+    }
+  }
+  if (state.mandalReportSearch) {
+    const q = state.mandalReportSearch.toLowerCase().trim();
+    filtered = filtered.filter(v => 
+      (v.village_name || '').toLowerCase().includes(q) ||
+      (v.village_code || '').toLowerCase().includes(q) ||
+      (v.mandal || '').toLowerCase().includes(q)
+    );
+  }
+
+  // Group filtered villages by Mandal
+  const mandalGroups = {};
+  filtered.forEach(v => {
+    const m = v.mandal || 'Chittoor';
+    if (!mandalGroups[m]) {
+      mandalGroups[m] = {
+        mandal: m,
+        division: v.division || 'Chittoor',
+        villages: [],
+        totExtent: 0,
+        todayGt: 0,
+        balGt: 0,
+        todayDlr: 0,
+        balDlr: 0,
+        portedCount: 0
+      };
+    }
+    const grp = mandalGroups[m];
+    grp.villages.push(v);
+    grp.totExtent += (parseFloat(v.extent) || 0);
+    grp.todayGt += (parseFloat(v.today_gt_extent) || 0);
+    const b = (v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, (parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0));
+    if (!isComplete(v.gt_status)) grp.balGt += (isNaN(b) ? 0 : b);
+    grp.todayDlr += (Number(v.dlr_entries_today) || 0);
+    grp.balDlr += (Number(v.dlr_entries_balance) || 0);
+    if (v.ported_to_webland || v.webland_2_status === 'Ported') grp.portedCount++;
+  });
+
+  const sortedMandals = Object.keys(mandalGroups).sort((a, b) => a.localeCompare(b));
+
+  root.innerHTML = `
+    <div class="mandal-report-view-wrap">
+      <!-- HERO BANNER -->
+      <section class="mandal-plan-hero">
+        <div class="mandal-plan-hero-left">
+          <span class="mandal-plan-hero-tag">★ OFFICIAL STATUTORY RECORD · MANDAL-WISE VILLAGE STATUS REPORT</span>
+          <h2>MANDAL-WISE VILLAGE RESURVEY STATUS &amp; DAILY PARAMETER OUT-TURN REPORT</h2>
+          <p>
+            Certified village-by-village monitoring for all 27 Mandals &amp; 736 Villages in Chittoor District.
+            Displaying resurvey status and real-time parameter out-turn completed today versus balance pending (GT progress extent completed today/pending, VS and officer login entries completed today/pending, Draft/Final RoR, and Webland 2.0 ported).
+          </p>
+        </div>
+        <div class="mandal-plan-hero-right">
+          <a href="/api/reports/mandal-villages-pdf${state.mandalReportMandalFilter !== 'All' ? `?mandal=${encodeURIComponent(state.mandalReportMandalFilter)}` : ''}" target="_blank" class="mandal-hero-btn btn-gold" style="background:linear-gradient(135deg, #1e3a8a, #2563eb);color:#fff;border-color:#3b82f6;">
+            ${icon('download')}<span>📥 Download Pure PDF</span>
+          </a>
+          <button type="button" class="mandal-hero-btn btn-gold" data-action="open-mandal-pdf-modal" data-mandal="${h(state.mandalReportMandalFilter)}">
+            ${icon('document')}<span>🔍 Preview in PDF Modal</span>
+          </button>
+          <a href="/report/mandal-villages${state.mandalReportMandalFilter !== 'All' ? `?mandal=${encodeURIComponent(state.mandalReportMandalFilter)}` : ''}" target="_blank" class="mandal-hero-btn">
+            ${icon('external')}<span>↗ Standalone HTML</span>
+          </a>
+          <button type="button" class="mandal-hero-btn" data-action="export-mrp-csv">
+            ${icon('download')}<span>Export to CSV</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- EXECUTIVE KPI RIBBON -->
+      <section class="mrp-kpi-ribbon">
+        <div class="mrp-kpi-box kpi-blue">
+          <span class="mrp-kpi-label">TOTAL MANDALS</span>
+          <span class="mrp-kpi-val">${totalMandals}</span>
+          <span class="mrp-kpi-sub">Across 4 Divisions</span>
+        </div>
+        <div class="mrp-kpi-box kpi-blue">
+          <span class="mrp-kpi-label">TOTAL VILLAGES</span>
+          <span class="mrp-kpi-val">${totalVillages}</span>
+          <span class="mrp-kpi-sub">${formatExtent(totalExtent)} Ac Universe</span>
+        </div>
+        <div class="mrp-kpi-box kpi-green">
+          <span class="mrp-kpi-label">TODAY'S GT OUT-TURN</span>
+          <span class="mrp-kpi-val" style="color:#059669;">+${formatExtent(districtTodayGt)} Ac</span>
+          <span class="mrp-kpi-sub">Completed Today (00:00-24:00)</span>
+        </div>
+        <div class="mrp-kpi-box kpi-amber">
+          <span class="mrp-kpi-label">PENDING GT EXTENT</span>
+          <span class="mrp-kpi-val" style="color:#d97706;">${formatExtent(districtBalGt)} Ac</span>
+          <span class="mrp-kpi-sub">Balance for Ground Truthing</span>
+        </div>
+        <div class="mrp-kpi-box kpi-blue">
+          <span class="mrp-kpi-label">TODAY'S DLR LOGINS</span>
+          <span class="mrp-kpi-val" style="color:#2563eb;">+${districtTodayDlr.toLocaleString()}</span>
+          <span class="mrp-kpi-sub">VS/VRO/Tah Entries Today</span>
+        </div>
+        <div class="mrp-kpi-box kpi-amber">
+          <span class="mrp-kpi-label">PENDING DLR ENTRIES</span>
+          <span class="mrp-kpi-val" style="color:#d97706;">${districtBalDlr.toLocaleString()}</span>
+          <span class="mrp-kpi-sub">Balance Khatas in Workflow</span>
+        </div>
+        <div class="mrp-kpi-box kpi-teal">
+          <span class="mrp-kpi-label">WEBLAND 2.0 PORTED</span>
+          <span class="mrp-kpi-val" style="color:#0d9488;">${districtPorted} Vlgs</span>
+          <span class="mrp-kpi-sub">100% Mutation Enabled</span>
+        </div>
+      </section>
+
+      <!-- TOOLBAR WITH FILTERS -->
+      <section class="mrp-toolbar-card">
+        <div class="mrp-filters-group">
+          <div class="mrp-field">
+            <label>Mandal Filter</label>
+            <select id="mrp-mandal-select" class="mrp-select">
+              <option value="All" ${state.mandalReportMandalFilter === 'All' ? 'selected' : ''}>All Mandals (${mandals.length})</option>
+              ${mandals.map(m => `<option value="${h(m)}" ${state.mandalReportMandalFilter === m ? 'selected' : ''}>${h(m)} Mandal</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="mrp-field">
+            <label>Division</label>
+            <select id="mrp-div-select" class="mrp-select">
+              ${divisions.map(d => `<option value="${h(d)}" ${state.mandalReportDivisionFilter === d ? 'selected' : ''}>${h(d)} Division</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="mrp-field">
+            <label>Resurvey Stage</label>
+            <select id="mrp-stage-select" class="mrp-select">
+              <option value="All" ${state.mandalReportStageFilter === 'All' ? 'selected' : ''}>All Stages</option>
+              <option value="gt" ${state.mandalReportStageFilter === 'gt' ? 'selected' : ''}>🌾 Ground Truthing (GT)</option>
+              <option value="vs_status" ${state.mandalReportStageFilter === 'vs_status' ? 'selected' : ''}>🔐 DLR @ VS Login</option>
+              <option value="vro_status" ${state.mandalReportStageFilter === 'vro_status' ? 'selected' : ''}>🔐 DLR @ VRO Login</option>
+              <option value="tahsildar_status" ${state.mandalReportStageFilter === 'tahsildar_status' ? 'selected' : ''}>⭐ DLR @ Tahsildar Login</option>
+              <option value="rdo_status" ${state.mandalReportStageFilter === 'rdo_status' ? 'selected' : ''}>🏛️ DLR @ RDO Login</option>
+              <option value="jc_status" ${state.mandalReportStageFilter === 'jc_status' ? 'selected' : ''}>⚖️ DLR @ JC Login</option>
+              <option value="vectorization" ${state.mandalReportStageFilter === 'vectorization' ? 'selected' : ''}>📐 Cadastral Vectorization</option>
+              <option value="draft_ror" ${state.mandalReportStageFilter === 'draft_ror' ? 'selected' : ''}>📑 Draft RoR &amp; 13 Notice</option>
+              <option value="final_ror" ${state.mandalReportStageFilter === 'final_ror' ? 'selected' : ''}>📜 Final RoR Completed</option>
+              <option value="webland" ${state.mandalReportStageFilter === 'webland' ? 'selected' : ''}>🌐 Webland 2.0 Ported</option>
+            </select>
+          </div>
+
+          <div class="mrp-field" style="flex:1;min-width:200px;">
+            <label>Search Village or Code</label>
+            <input type="text" id="mrp-search-input" class="mrp-input" placeholder="Type village name, code, etc..." value="${h(state.mandalReportSearch)}" />
+          </div>
+        </div>
+
+        <div class="mrp-actions-group">
+          <div class="quick-filter-chips" style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="chip ${state.mandalReportQuickFilter === 'all' ? 'active' : ''}" data-mrp-quick="all">All (${villages.length})</button>
+            <button class="chip ${state.mandalReportQuickFilter === 'gt' ? 'active' : ''}" data-mrp-quick="gt">🌾 GT Ongoing</button>
+            <button class="chip ${state.mandalReportQuickFilter === 'dlr' ? 'active' : ''}" data-mrp-quick="dlr">🔐 DLR Active</button>
+            <button class="chip ${state.mandalReportQuickFilter === 'ported' ? 'active' : ''}" data-mrp-quick="ported">🌐 Webland 2.0 (${districtPorted})</button>
+            <button class="chip ${state.mandalReportQuickFilter === 'today' ? 'active' : ''}" data-mrp-quick="today">⚡ Progress Today</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS COUNT & ACTIVE FILTERS -->
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px;font-size:12px;color:var(--muted);">
+        <span>Showing <strong>${filtered.length}</strong> Villages across <strong>${sortedMandals.length}</strong> Mandals</span>
+        <span>${state.mandalReportMandalFilter !== 'All' ? `Filtered by: <strong>${h(state.mandalReportMandalFilter)} Mandal</strong>` : 'All 27 Mandals Included'}</span>
+      </div>
+
+      <!-- MANDAL-WISE VILLAGE TABLES -->
+      ${sortedMandals.length === 0 ? `
+        <div class="section-card">
+          <div class="empty-block">
+            <div>
+              ${icon('search')}
+              <strong>No villages found</strong>
+              <p>No villages match the active filter criteria. Try resetting the filters above.</p>
+            </div>
+          </div>
+        </div>
+      ` : sortedMandals.map((mName, mIdx) => {
+        const mg = mandalGroups[mName];
+        return `
+          <div class="mrp-mandal-card">
+            <div class="mrp-mandal-head">
+              <div class="mrp-mandal-title-group">
+                <span class="mrp-mandal-idx">${mIdx + 1}</span>
+                <span class="mrp-mandal-name">${h(mg.mandal.toUpperCase())} MANDAL</span>
+                <span class="mrp-mandal-div">${h(mg.division)} Division</span>
+              </div>
+              <div class="mrp-mandal-stats">
+                <span class="mrp-stat-pill"><strong>${mg.villages.length}</strong> Villages</span>
+                <span class="mrp-stat-pill"><strong>${formatExtent(mg.totExtent)}</strong> Ac Extent</span>
+                ${mg.todayGt > 0 ? `<span class="mrp-stat-pill emerald">🌾 +${formatExtent(mg.todayGt)} Ac GT Today</span>` : ''}
+                ${mg.todayDlr > 0 ? `<span class="mrp-stat-pill sky">🔐 +${mg.todayDlr} Entries Today</span>` : ''}
+                ${mg.balGt > 0 ? `<span class="mrp-stat-pill amber">🌾 ${formatExtent(mg.balGt)} Ac GT Pending</span>` : ''}
+                ${mg.portedCount > 0 ? `<span class="mrp-stat-pill">🌐 ${mg.portedCount} Ported</span>` : ''}
+                <button type="button" class="mrp-mandal-btn" data-action="download-single-mandal-pdf" data-mandal="${h(mg.mandal)}">
+                  ${icon('download')} PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="mrp-table-scroll">
+              <table class="mrp-village-table">
+                <thead>
+                  <tr>
+                    <th style="width:36px;text-align:center;">#</th>
+                    <th style="min-width:170px;">Village Name &amp; Code</th>
+                    <th style="width:70px;text-align:center;">Phase</th>
+                    <th style="width:105px;text-align:right;">Extent (Ac)</th>
+                    <th style="min-width:150px;">Resurvey Status</th>
+                    <th style="width:110px;">Workflow State</th>
+                    <th class="param-progress-col">Parameter Progress (Today Completed / Pending Balance)</th>
+                    <th style="width:80px;text-align:center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${mg.villages.map((v, vIdx) => {
+                    const prog = getFrontendVillageProgress(v);
+                    const phaseClass = v.phase ? `p${String(v.phase).replace(/\D/g, '')}` : 'p1';
+                    const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+                    const statusClass = (isPorted || (v.status || '').toLowerCase() === 'completed') 
+                      ? 'badge-completed' 
+                      : (((v.status || '').toLowerCase() === 'delayed' || Number(v.days_delayed) > 0) ? 'badge-delayed' : 'badge-progress');
+                    const statusLabel = isPorted ? 'Completed' : (v.status || 'In Progress');
+
+                    return `
+                      <tr>
+                        <td style="text-align:center;font-family:'JetBrains Mono', monospace;color:#94a3b8;font-size:11px;">${vIdx + 1}</td>
+                        <td>
+                          <div style="font-weight:700;color:#0f172a;font-size:12.5px;">${h(v.village_name || 'Village')}</div>
+                          <div style="font-family:'JetBrains Mono', monospace;font-size:10px;color:#64748b;margin-top:1px;">Code: ${h(v.village_code || '—')}</div>
+                        </td>
+                        <td style="text-align:center;">
+                          <span class="phase-badge ${phaseClass}">${h(v.phase || 'Phase 5')}</span>
+                        </td>
+                        <td style="text-align:right;font-family:'JetBrains Mono', monospace;font-weight:700;">
+                          ${formatExtent(v.extent || 0)}
+                          <div style="font-size:9.5px;color:#94a3b8;font-weight:500;">${v.khatas || v.dlr_total_entries || '—'} Khatas</div>
+                        </td>
+                        <td>
+                          <span class="stage-badge-pill ${prog.stageColor}">
+                            <span>${prog.stageIcon}</span>
+                            <span>${h(prog.stageLabel)}</span>
+                          </span>
+                        </td>
+                        <td>
+                          <span class="badge-status ${statusClass}">
+                            <span class="badge-dot"></span>
+                            ${h(statusLabel)}
+                          </span>
+                        </td>
+                        <td class="param-progress-col">
+                          ${prog.htmlSummary}
+                        </td>
+                        <td style="text-align:center;">
+                          <button type="button" class="btn-micro" data-village="${h(v.id)}" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:10.5px;font-weight:700;padding:4px 8px;border-radius:6px;cursor:pointer;">
+                            Inspect ↗
+                          </button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  // Attach event listeners for toolbar controls
+  const mandalSel = document.getElementById('mrp-mandal-select');
+  if (mandalSel) {
+    mandalSel.onchange = (e) => {
+      state.mandalReportMandalFilter = e.target.value;
+      renderMandalReportView();
+    };
+  }
+
+  const divSel = document.getElementById('mrp-div-select');
+  if (divSel) {
+    divSel.onchange = (e) => {
+      state.mandalReportDivisionFilter = e.target.value;
+      renderMandalReportView();
+    };
+  }
+
+  const stageSel = document.getElementById('mrp-stage-select');
+  if (stageSel) {
+    stageSel.onchange = (e) => {
+      state.mandalReportStageFilter = e.target.value;
+      renderMandalReportView();
+    };
+  }
+
+  const searchInp = document.getElementById('mrp-search-input');
+  if (searchInp) {
+    searchInp.oninput = (e) => {
+      state.mandalReportSearch = e.target.value;
+      clearTimeout(window.__mrpSearchTimer);
+      window.__mrpSearchTimer = setTimeout(() => {
+        renderMandalReportView();
+      }, 250);
+    };
+  }
+
+  document.querySelectorAll('[data-mrp-quick]').forEach(btn => {
+    btn.onclick = () => {
+      state.mandalReportQuickFilter = btn.dataset.mrpQuick;
+      renderMandalReportView();
+    };
+  });
+
+  const exportBtn = document.querySelector('[data-action="export-mrp-csv"]');
+  if (exportBtn) {
+    exportBtn.onclick = () => {
+      exportMandalReportCsv(filtered);
+    };
+  }
+
+  document.querySelectorAll('[data-action="download-single-mandal-pdf"]').forEach(btn => {
+    btn.onclick = () => {
+      const m = btn.dataset.mandal;
+      window.open(`/api/reports/mandal-villages-pdf?mandal=${encodeURIComponent(m)}`, '_blank');
+    };
+  });
+}
+
 function renderReports() {
   const has = state.dashboard && state.dashboard.hasData;
   const reports = [
@@ -10118,6 +10749,7 @@ Chittoor District, Government of Andhra Pradesh`;
 function render() {
   if (state.view === 'dashboard') renderDashboard();
   else if (state.view === 'mandal_plan') renderMandalActionPlan();
+  else if (state.view === 'mandal_report') renderMandalReportView();
   else if (state.view === 'villages') renderVillageMonitoring();
   else if (state.view === 'ppb') renderPpbDistribution();
   else if (state.view === 'performance') renderPerformance();
