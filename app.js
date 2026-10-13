@@ -10775,21 +10775,45 @@ function closeModal() {
   if (rInp) rInp.checked = false;
   if (rCard) rCard.classList.remove('active');
 }
+function getSourceHelpGuide(type) {
+  if (type === 'phase_targets') {
+    return `<b>🎯 Target Dates Sheet Format:</b><br>
+    • <b>Key Columns:</b> <code>Mandal</code>, <code>Village Name</code>, <code>Village Code</code><br>
+    • <b>Stage Target Date Columns:</b> <code>GT Target</code>, <code>Vectorization Target</code>, <code>VS Login Target</code>, <code>VRO Login Target</code>, <code>Tahsildar Login Target</code>, <code>RDO Login Target</code>, <code>JC Login Target</code>, <code>13 Notification Target</code>, <code>Draft RoR Target</code>, <code>Final RoR Target</code>, <code>Webland 2.0 Target</code>.<br>
+    <small style="color:var(--text-muted)">The system matches by Village Code or Village Name within Mandal and automatically populates stage timelines.</small>`;
+  }
+  if (type === 'officer_contacts') {
+    return `<b>📞 Officer Contacts Sheet Format:</b><br>
+    • <b>Standard Rows (1 officer per row):</b> <code>Mandal</code>, <code>Village Name</code> (optional for Mandal officers), <code>Designation / Role</code> (e.g. VS, VRO, Tahsildar, MS / MLSO, RDO), <code>Officer Name</code>, <code>Mobile Number</code> (10 digits).<br>
+    • <b>Wide Columns:</b> <code>Mandal</code>, <code>Village Name</code>, <code>VS Name</code>, <code>VS Mobile</code>, <code>VRO Mobile</code>, <code>MS Mobile</code>, <code>Tahsildar Mobile</code>, <code>RDO Mobile</code>.<br>
+    <small style="color:var(--text-muted)">Contacts are immediately linked to WhatsApp alerts, daily notices, and village supervisory teams.</small>`;
+  }
+  if (type === 'action_plan') {
+    return `<b>📋 PPBs Action Plan Sheet Format:</b><br>
+    • Columns: <code>Target Month</code>, <code>Mandal</code>, <code>Village Name</code>, <code>Village Code</code>, <code>Govt Extent</code>, <code>Patta Extent</code>, <code>Total Extent</code>, <code>Total Khatas</code>, <code>Phase</code>.`;
+  }
+  if (type === 'village_progress') {
+    return `<b>📊 Village Workflow Progress Sheet Format:</b><br>
+    • Columns: <code>Village Code</code>, <code>Village Name</code>, <code>Mandal</code>, <code>Division</code>, <code>Extent</code>, <code>Khatas</code>, <code>GT Status</code>, <code>Vectorization Status</code>, <code>VS Status</code>, <code>VRO Status</code>, <code>Tahsildar Status</code>, <code>RDO Status</code>, <code>JC Status</code>, <code>13 Notification</code>, <code>Draft RoR</code>, <code>Final RoR</code>, <code>Webland 2.0</code>.`;
+  }
+  return `<b>Standard Mappings:</b> Standard columns (Village Code, Village Name, Mandal, Division, GT, Vectorization, VS, VRO, RoR, PPB) are mapped automatically.`;
+}
 function sourceModal(source = null) {
-  const s = source || { direction: 'READ ONLY', refreshFrequency: '15 minutes', accessMode: 'PUBLIC', tab: 'Sheet1', mappings: state.defaultMappings || {} };
+  const s = source || { direction: 'READ ONLY', refreshFrequency: '15 minutes', accessMode: 'PUBLIC', tab: 'Sheet1', recordType: 'phase_targets', mappings: state.defaultMappings || {} };
   modal(source ? 'Edit data source' : 'Connect Google Sheet source', 'Connect a live Google Sheet. Ensure the spreadsheet is shared with "Anyone with the link can view".', `
     <form id="source-form">
       <div class="form-grid">
         <label class="form-field">
           <span>Source name *</span>
-          <input required name="name" value="${h(s.name || '')}" placeholder="e.g. Village Progress or Resurvey Targets" />
+          <input required name="name" value="${h(s.name || '')}" placeholder="e.g. Resurvey Stage Target Dates or Officer Contacts" />
         </label>
         <label class="form-field">
-          <span>Data category</span>
-          <select name="recordType">
-            <option value="village_progress" ${s.recordType === 'village_progress' ? 'selected' : ''}>Village Workflow Progress</option>
+          <span>Data category *</span>
+          <select name="recordType" id="source-record-type-select">
+            <option value="phase_targets" ${s.recordType === 'phase_targets' ? 'selected' : ''}>Resurvey Stage Target Dates & Timelines (All 11 Stages)</option>
+            <option value="officer_contacts" ${s.recordType === 'officer_contacts' ? 'selected' : ''}>Officer Contact Numbers Directory (VS, VRO, Tahsildars, MS, RDO)</option>
+            <option value="village_progress" ${s.recordType === 'village_progress' ? 'selected' : ''}>Village Workflow Progress & Daily Entries</option>
             <option value="action_plan" ${s.recordType === 'action_plan' ? 'selected' : ''}>PPBs Action Plan / Cycles</option>
-            <option value="phase_targets" ${s.recordType === 'phase_targets' ? 'selected' : ''}>Phase Targets & Timelines</option>
             <option value="summary" ${s.recordType === 'summary' ? 'selected' : ''}>Daily Monitoring Summary</option>
             <option value="village_master" ${s.recordType === 'village_master' ? 'selected' : ''}>Village Master (774 Universe)</option>
           </select>
@@ -10797,7 +10821,7 @@ function sourceModal(source = null) {
         <label class="form-field full">
           <span>Google Sheet URL or Spreadsheet ID *</span>
           <input required name="spreadsheetId" value="${h(s.spreadsheetId || s.googleSheet || '')}" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit..." />
-          <small>Paste the full Google Sheet URL here. It will not close when you click or paste.</small>
+          <small>Paste the full Google Sheet URL here. Ensure the spreadsheet is shared as "Anyone with the link can view".</small>
         </label>
         <label class="form-field">
           <span>Sheet / Tab name *</span>
@@ -10828,13 +10852,22 @@ function sourceModal(source = null) {
           <textarea name="mappings" rows="3" placeholder='{"village_code":"Village Code"}'>${s.mappings && source ? h(JSON.stringify(s.mappings, null, 2)) : ''}</textarea>
         </label>
       </div>
-      <div class="mapping-note">
-        <b>Standard Mappings:</b> Standard columns (Village Code, Village Name, Mandal, Division, GT, Vectorization, VS, VRO, RoR, PPB) are mapped automatically.
+      <div class="mapping-note" id="source-format-guide" style="font-size:12px;line-height:1.6;">
+        ${getSourceHelpGuide(s.recordType || 'phase_targets')}
       </div>
     </form>`, `
       <button type="button" class="soft-button" data-action="close-modal">Cancel</button>
       <button type="button" class="primary-button" data-action="save-source" data-source-id="${s.id || ''}">${source ? 'Save changes' : 'Add source'}</button>
     `);
+  setTimeout(() => {
+    const sel = document.getElementById('source-record-type-select');
+    const guide = document.getElementById('source-format-guide');
+    if (sel && guide) {
+      sel.addEventListener('change', () => {
+        guide.innerHTML = getSourceHelpGuide(sel.value);
+      });
+    }
+  }, 50);
 }
 function aliasModal() { modal('Add Mandal alias', 'The alias will normalize to the official Mandal name throughout the application.', `<form id="alias-form"><div class="form-grid"><label class="form-field"><span>Source spelling / alias</span><input required name="alias" placeholder="e.g. Palamaneru" /></label><label class="form-field"><span>Standardized Mandal name</span><input required name="standard" placeholder="e.g. Palamaner" /></label></div><div class="mapping-note">Only add aliases that refer to the same Mandal. Do not merge distinct Mandals based solely on similar spelling.</div></form>`, `<button class="soft-button" data-action="close-modal">Cancel</button><button class="primary-button" data-action="save-alias">Save alias</button>`); }
 async function openVillage(id) {

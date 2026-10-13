@@ -1237,6 +1237,216 @@ async function syncSource(store, source) {
     const phaseMatch = (source.name || '').match(/Phase\s*([0-9IVX]+)/i);
     const inferredPhase = phaseMatch ? normalizePhase(phaseMatch[1]) : '';
 
+    if (source.recordType === 'officer_contacts' || (headers.some(h => /designation|role|officer.*name|officer.*mobile/i.test(h)) && !headers.some(h => /workflow|extent|khatas|target\s*month/i.test(h)))) {
+      store.officersDirectory = store.officersDirectory || [];
+      store.mandalSurveyors = store.mandalSurveyors || {};
+      store.tahsildars = store.tahsildars || {};
+      store.rdos = store.rdos || {};
+      store.dios = store.dios || {};
+
+      const divIdx = headers.findIndex(h => /division/i.test(h));
+      const manIdx = headers.findIndex(h => /mandal/i.test(h));
+      const vilIdx = headers.findIndex(h => /village\s*name/i.test(h) || /^village$/i.test(h.trim()));
+      const vcIdx = headers.findIndex(h => /village\s*code/i.test(h) || /^code$/i.test(h.trim()));
+      const roleIdx = headers.findIndex(h => /designation|role|cadre|post|tier/i.test(h));
+      const nameIdx = headers.findIndex(h => /officer\s*name|employee\s*name|^name$|officer$/i.test(h.trim()));
+      const phoneIdx = headers.findIndex(h => /mobile|phone|contact|cell|whatsapp/i.test(h));
+
+      const vsNameIdx = headers.findIndex(h => /vs.*name|village.*surveyor.*name/i.test(h));
+      const vsPhoneIdx = headers.findIndex(h => /vs.*(mobile|phone|contact)|village.*surveyor.*(mobile|phone|contact)/i.test(h));
+      const vroNameIdx = headers.findIndex(h => /vro.*name|village.*revenue.*name/i.test(h));
+      const vroPhoneIdx = headers.findIndex(h => /vro.*(mobile|phone|contact)|village.*revenue.*(mobile|phone|contact)/i.test(h));
+      const msNameIdx = headers.findIndex(h => /ms.*name|mandal.*surveyor.*name|mlso.*name/i.test(h));
+      const msPhoneIdx = headers.findIndex(h => /ms.*(mobile|phone|contact)|mandal.*surveyor.*(mobile|phone|contact)|mlso.*(mobile|phone|contact)/i.test(h));
+      const tahNameIdx = headers.findIndex(h => /tah.*name|mro.*name/i.test(h));
+      const tahPhoneIdx = headers.findIndex(h => /tah.*(mobile|phone|contact)|mro.*(mobile|phone|contact)/i.test(h));
+      const rdoNameIdx = headers.findIndex(h => /rdo.*name/i.test(h));
+      const rdoPhoneIdx = headers.findIndex(h => /rdo.*(mobile|phone|contact)/i.test(h));
+
+      const isWide = (vsPhoneIdx >= 0 || vroPhoneIdx >= 0 || msPhoneIdx >= 0 || tahPhoneIdx >= 0 || rdoPhoneIdx >= 0);
+
+      rows.forEach(row => {
+        const divVal = divIdx >= 0 ? clean(row[divIdx]) : '';
+        const manVal = manIdx >= 0 ? clean(row[manIdx]) : '';
+        if (divVal) carryDivision = divVal;
+        if (manVal) carryMandal = manVal;
+
+        const effectiveMandal = normalizeMandal(manVal || carryMandal, store);
+        const effectiveDivision = divVal || carryDivision;
+        const vilVal = vilIdx >= 0 ? clean(row[vilIdx]) : '';
+        const codeVal = vcIdx >= 0 ? clean(row[vcIdx]) : '';
+
+        function matchVillage() {
+          if (codeVal) {
+            const byCode = store.villages.find(v => clean(v.village_code) === codeVal);
+            if (byCode) return byCode;
+          }
+          if (vilVal) {
+            return findVillageMatch({ village_name: vilVal, mandal: effectiveMandal, village_code: codeVal }, store.villages, store);
+          }
+          return null;
+        }
+
+        if (isWide) {
+          const v = matchVillage();
+          if (vsPhoneIdx >= 0 && row[vsPhoneIdx]) {
+            const ph = clean(row[vsPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = vsNameIdx >= 0 ? clean(row[vsNameIdx]) : 'Village Surveyor';
+            if (v && ph.length >= 10) {
+              v.vs_name = nm;
+              v.vs_phone = ph;
+              v.gt_team_names = nm;
+              v.gt_team_mobiles = ph;
+              updated++;
+            }
+          }
+          if (vroPhoneIdx >= 0 && row[vroPhoneIdx]) {
+            const ph = clean(row[vroPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = vroNameIdx >= 0 ? clean(row[vroNameIdx]) : 'Village Revenue Officer';
+            if (v && ph.length >= 10) {
+              v.vro_name = nm;
+              v.vro_phone = ph;
+              const names = (v.gt_team_names || '').split(/[\r\n]+/).filter(Boolean);
+              const mobiles = (v.gt_team_mobiles || '').split(/[\r\n]+/).filter(Boolean);
+              if (!names.some(n => /vro/i.test(n))) {
+                names.push(`${nm} (VRO)`);
+                mobiles.push(ph);
+                v.gt_team_names = names.join('\n');
+                v.gt_team_mobiles = mobiles.join('\n');
+              }
+              updated++;
+            }
+          }
+          if (msPhoneIdx >= 0 && row[msPhoneIdx] && effectiveMandal) {
+            const ph = clean(row[msPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = msNameIdx >= 0 ? clean(row[msNameIdx]) : `${effectiveMandal} Mandal Surveyor`;
+            if (ph.length >= 10) {
+              store.mandalSurveyors[effectiveMandal] = { name: nm, role: 'Mandal Surveyor (MS)', phone: ph, mandal: effectiveMandal, hasSheetPhone: true };
+              MANDAL_SURVEYOR_DIRECTORY[effectiveMandal] = store.mandalSurveyors[effectiveMandal];
+              updated++;
+            }
+          }
+          if (tahPhoneIdx >= 0 && row[tahPhoneIdx] && effectiveMandal) {
+            const ph = clean(row[tahPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = tahNameIdx >= 0 ? clean(row[tahNameIdx]) : `Tahsildar, ${effectiveMandal}`;
+            if (ph.length >= 10) {
+              store.tahsildars[effectiveMandal] = { name: nm, role: 'Tahsildar (Mandal Executive Magistrate)', phone: ph, mandal: effectiveMandal, hasSheetPhone: true };
+              updated++;
+            }
+          }
+          if (rdoPhoneIdx >= 0 && row[rdoPhoneIdx] && effectiveDivision) {
+            const ph = clean(row[rdoPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = rdoNameIdx >= 0 ? clean(row[rdoNameIdx]) : `RDO, ${effectiveDivision}`;
+            if (ph.length >= 10) {
+              store.rdos[effectiveDivision] = { name: nm, role: 'Revenue Divisional Officer (RDO)', phone: ph, division: effectiveDivision, hasSheetPhone: true };
+              updated++;
+            }
+          }
+        } else {
+          const rawRole = roleIdx >= 0 ? clean(row[roleIdx]) : '';
+          const rawName = nameIdx >= 0 ? clean(row[nameIdx]) : '';
+          const rawPhone = phoneIdx >= 0 ? clean(row[phoneIdx]) : '';
+          const ph = rawPhone.replace(/\D/g, '').slice(-10);
+          if (!rawName && !ph) return;
+
+          const roleLower = rawRole.toLowerCase();
+          const isVro = /vro|village\s*revenue/i.test(roleLower);
+          const isVs = /village\s*surveyor|\bvs\b/i.test(roleLower);
+          const isMs = /mandal\s*surveyor|\bms\b|\bmlso\b/i.test(roleLower);
+          const isTah = /tahsildar|\bmro\b/i.test(roleLower);
+          const isRdo = /rdo|revenue\s*divisional|sub\s*collector/i.test(roleLower);
+          const isDios = /dios|deputy\s*inspector/i.test(roleLower);
+
+          if (isVro) {
+            const v = matchVillage();
+            if (v) {
+              v.vro_name = rawName || 'Village Revenue Officer';
+              v.vro_phone = ph;
+              const nList = (v.gt_team_names || '').split(/[\r\n]+/).filter(Boolean);
+              const mList = (v.gt_team_mobiles || '').split(/[\r\n]+/).filter(Boolean);
+              if (!nList.some(n => /vro/i.test(n))) {
+                nList.push(`${rawName || 'VRO'} (VRO)`);
+                mList.push(ph);
+                v.gt_team_names = nList.join('\n');
+                v.gt_team_mobiles = mList.join('\n');
+              }
+              updated++;
+            }
+          } else if (isVs || (!isMs && !isTah && !isRdo && !isDios && (vilVal || codeVal))) {
+            const v = matchVillage();
+            if (v) {
+              v.vs_name = rawName || 'Village Surveyor';
+              v.vs_phone = ph;
+              v.gt_team_names = rawName || v.gt_team_names || 'Village Surveyor';
+              v.gt_team_mobiles = ph || v.gt_team_mobiles;
+              updated++;
+            }
+          } else if (isMs) {
+            if (effectiveMandal) {
+              store.mandalSurveyors[effectiveMandal] = {
+                name: rawName || `${effectiveMandal} Mandal Surveyor`,
+                role: 'Mandal Surveyor (MS)',
+                phone: ph,
+                mandal: effectiveMandal,
+                hasSheetPhone: Boolean(ph && ph.length >= 10)
+              };
+              MANDAL_SURVEYOR_DIRECTORY[effectiveMandal] = store.mandalSurveyors[effectiveMandal];
+              updated++;
+            }
+          } else if (isTah) {
+            if (effectiveMandal) {
+              store.tahsildars[effectiveMandal] = {
+                name: rawName || `Tahsildar, ${effectiveMandal}`,
+                role: 'Tahsildar (Mandal Executive Magistrate)',
+                phone: ph,
+                mandal: effectiveMandal,
+                hasSheetPhone: Boolean(ph && ph.length >= 10)
+              };
+              updated++;
+            }
+          } else if (isRdo) {
+            const divKey = effectiveDivision || effectiveMandal;
+            if (divKey) {
+              store.rdos[divKey] = {
+                name: rawName || `RDO, ${divKey}`,
+                role: 'Revenue Divisional Officer (RDO)',
+                phone: ph,
+                division: divKey,
+                hasSheetPhone: Boolean(ph && ph.length >= 10)
+              };
+              updated++;
+            }
+          } else if (isDios) {
+            const dKey = effectiveDivision || effectiveMandal;
+            if (dKey) {
+              store.dios[dKey] = {
+                name: rawName || `DIOS, ${dKey}`,
+                role: 'Deputy Inspector of Survey (DIOS)',
+                phone: ph,
+                hasSheetPhone: Boolean(ph && ph.length >= 10)
+              };
+              updated++;
+            }
+          }
+
+          store.officersDirectory.push({
+            name: rawName,
+            role: rawRole || (isVro ? 'VRO' : isVs ? 'VS' : isMs ? 'MS' : isTah ? 'Tahsildar' : isRdo ? 'RDO' : 'Officer'),
+            phone: ph,
+            mandal: effectiveMandal,
+            village: vilVal,
+            division: effectiveDivision,
+            syncedAt: now()
+          });
+        }
+      });
+
+      source.status = 'Connected';
+      source.lastSync = now();
+      source.nextSync = new Date(Date.now() + frequencyMs(source.refreshFrequency)).toISOString();
+      return { id: id(), dateTime: started, source: source.name, recordsRead: rows.length, recordsAdded: added, recordsUpdated: updated, recordsChanged: changed, errors: 0, status: 'Success' };
+    }
+
     rows.forEach((row, index) => {
       if (source.recordType === 'summary') return;
       let incoming;
@@ -1267,21 +1477,29 @@ async function syncSource(store, source) {
           current_stage: csIdx >= 0 ? clean(row[csIdx]) : '',
           days_delayed: ddIdx >= 0 ? (parseInt(clean(row[ddIdx]), 10) || 0) : 0
         };
-      } else if (source.recordType === 'phase_targets' || headers.some(h => /targets.*timelines/i.test(h) || /present\s*stage/i.test(h) || /jc\s*login/i.test(h))) {
+      } else if (source.recordType === 'phase_targets' || headers.some(h => /targets.*timelines/i.test(h) || /present\s*stage/i.test(h) || /jc\s*login/i.test(h) || /13\s*notif/i.test(h))) {
         const divIdx = headers.findIndex(h => /division/i.test(h));
         const manIdx = headers.findIndex(h => /mandal/i.test(h));
-        const vilIdx = headers.findIndex(h => /village/i.test(h));
+        const vilIdx = headers.findIndex(h => /village/i.test(h) && !/code/i.test(h));
+        const vcIdx = headers.findIndex(h => /village\s*code/i.test(h) || /^code$/i.test(h.trim()));
         const extIdx = headers.findIndex(h => /extent/i.test(h));
         const stgIdx = headers.findIndex(h => /present\s*stage/i.test(h) || /^stage$/i.test(h.trim()));
         const remIdx = headers.findIndex(h => /remark/i.test(h));
 
         const gtIdx = headers.findIndex(h => /^gt/i.test(h.trim()) || /ground\s*truth/i.test(h));
         const vecIdx = headers.findIndex(h => /vectoriz/i.test(h));
+        const vsIdx = headers.findIndex(h => /vs\s*login/i.test(h) || /\bvs\b/i.test(h) || /secretariat/i.test(h) || /dlr.*vs/i.test(h));
         const dlrIdx = headers.findIndex(h => /dlr/i.test(h));
         const vroIdx = headers.findIndex(h => /vro/i.test(h));
-        const tahIdx = headers.findIndex(h => /tah/i.test(h));
+        const tahIdx = headers.findIndex(h => /tah/i.test(h) || /mro/i.test(h));
         const rdoIdx = headers.findIndex(h => /rdo/i.test(h));
         const jcIdx = headers.findIndex(h => /jc/i.test(h));
+        const sec13Idx = headers.findIndex(h => /section\s*13/i.test(h) || /13\s*notif/i.test(h) || /13\s*notice/i.test(h));
+        const draftRorIdx = headers.findIndex(h => /draft\s*ror/i.test(h) || /6\s*\(\s*1\s*\)/i.test(h));
+        const finalRorIdx = headers.findIndex(h => /final\s*ror/i.test(h) || /13\s*\(\s*1\s*\)/i.test(h));
+        const weblandIdx = headers.findIndex(h => /webland/i.test(h) || /porting/i.test(h) || /handover/i.test(h));
+        const ppbIdx = headers.findIndex(h => /ppb/i.test(h));
+        const targetDateIdx = headers.findIndex(h => /target\s*date/i.test(h) || /completion\s*date/i.test(h) || /timeline/i.test(h));
 
         const divVal = divIdx >= 0 ? clean(row[divIdx]) : '';
         const manVal = manIdx >= 0 ? clean(row[manIdx]) : '';
@@ -1289,18 +1507,24 @@ async function syncSource(store, source) {
         if (manVal) carryMandal = manVal;
 
         const vilVal = vilIdx >= 0 ? clean(row[vilIdx]) : '';
-        if (!vilVal) return;
+        const codeVal = vcIdx >= 0 ? clean(row[vcIdx]) : '';
+        if (!vilVal && !codeVal) return;
 
         const dates = [];
         const stageTargets = {};
         [
           { key: 'gt', idx: gtIdx },
           { key: 'vectorization', idx: vecIdx },
-          { key: 'dlr', idx: dlrIdx },
+          { key: 'vs', idx: vsIdx >= 0 ? vsIdx : dlrIdx },
           { key: 'vro', idx: vroIdx },
           { key: 'tahsildar', idx: tahIdx },
           { key: 'rdo', idx: rdoIdx },
-          { key: 'jc', idx: jcIdx }
+          { key: 'jc', idx: jcIdx },
+          { key: 'section13', idx: sec13Idx },
+          { key: 'draft_ror', idx: draftRorIdx },
+          { key: 'final_ror', idx: finalRorIdx },
+          { key: 'webland_2', idx: weblandIdx },
+          { key: 'ppb', idx: ppbIdx }
         ].forEach(sc => {
           if (sc.idx >= 0 && row[sc.idx]) {
             const val = clean(row[sc.idx]);
@@ -1312,17 +1536,19 @@ async function syncSource(store, source) {
         });
 
         const jcVal = jcIdx >= 0 && row[jcIdx] ? clean(row[jcIdx]) : '';
-        const targetDate = jcVal && !jcVal.toLowerCase().includes('stop') ? jcVal : (dates.length ? dates[dates.length - 1] : '');
+        const explicitTarget = targetDateIdx >= 0 && row[targetDateIdx] ? clean(row[targetDateIdx]) : '';
+        const finalTarget = explicitTarget || (stageTargets.webland_2 || stageTargets.final_ror || stageTargets.draft_ror || (jcVal && !jcVal.toLowerCase().includes('stop') ? jcVal : (dates.length ? dates[dates.length - 1] : '')));
         const presentStageRaw = stgIdx >= 0 && row[stgIdx] ? clean(row[stgIdx]) : '';
 
         incoming = {
+          village_code: codeVal,
           division: carryDivision,
           mandal: carryMandal,
           village_name: vilVal,
           phase: inferredPhase || 'Yet to be Scheduled',
           extent: extIdx >= 0 && row[extIdx] ? clean(row[extIdx]) : '',
           current_stage: presentStageRaw || (inferredPhase === 'Phase VII' ? 'GT' : ''),
-          target_date: targetDate,
+          target_date: finalTarget,
           stage_targets: {
             phase: inferredPhase,
             dates,
@@ -1350,7 +1576,7 @@ async function syncSource(store, source) {
           if (incoming.target_date && existing.target_date !== incoming.target_date) { existing.target_date = incoming.target_date; changed++; }
           if (incoming.extent && !existing.extent) { existing.extent = incoming.extent; changed++; }
           if (incoming.current_stage && existing.current_stage !== incoming.current_stage) { existing.current_stage = incoming.current_stage; changed++; }
-          if (incoming.stage_targets) { existing.stage_targets = incoming.stage_targets; }
+          if (incoming.stage_targets) { existing.stage_targets = Object.assign(existing.stage_targets || {}, incoming.stage_targets); changed++; }
           if (incoming.remarks) { existing.remarks = incoming.remarks; }
           if (existing.status === 'Not Updated' || !existing.status) {
             existing.status = incoming.current_stage && incoming.current_stage !== 'GT' ? 'In Progress' : 'Pending';
