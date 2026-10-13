@@ -11167,17 +11167,17 @@ async function openVillage(id) {
     const statusOptions = ['Completed', 'In Progress', 'Pending', 'Delayed', 'Not Started', 'Not Updated'];
 
     const citizenSteps = [
-      { key: 'gt_status', num: 1, title: 'GT', desc: 'DGPS ground truthing & preliminary perimeter survey by survey team.', tier: 'Survey Field Team (RSDT / MLSO)' },
-      { key: 'vectorization_status', num: 2, title: 'Vectorization/Correlation', desc: 'Computerized boundary digitization, GIS shapefile correlation, and parcel map generation.', tier: 'GIS Vectorization Team' },
-      { key: 'vs_status', num: 3, title: 'DLR@VS Login', desc: 'Secretariat data synchronization, Grama Sabha review, and landholder record linking.', tier: 'Village Secretariat Staff' },
-      { key: 'vro_status', num: 4, title: 'DLR@VRO Login', desc: 'Village Revenue Officer field inspection, ownership cross-check with 1B Webland register.', tier: 'Village Revenue Officer (VRO)' },
-      { key: 'tahsildar_status', num: 5, title: 'DLR@Tahsildar Login', desc: 'Mandal Revenue Officer statutory scrutiny, discrepancy resolution, and sign-off.', tier: 'Tahsildar Office' },
-      { key: 'rdo_status', num: 6, title: 'DLR@RDO Login', desc: 'Sub-divisional revenue officer validation of survey boundaries and records.', tier: 'Revenue Divisional Officer (RDO)' },
-      { key: 'jc_status', num: 7, title: 'DLR@JC Login', desc: 'District Joint Collectorate final administrative sanction and clearance.', tier: 'Joint Collectorate' },
-      { key: 'section13_status', num: 8, title: '13 Notification', desc: 'Statutory district gazette notification published for public claims & objections.', tier: 'Revenue Notification Cell' },
-      { key: 'draft_ror_status', num: 9, title: 'Draft RoR', desc: 'Draft Record of Rights (1B) published for public scrutiny and objection hearing.', tier: 'Tahsildar & VRO Field Unit' },
-      { key: 'final_ror_status', num: 10, title: 'Final RoR', desc: 'Final Record of Rights confirmed and permanent land title validated.', tier: 'Collectorate SSLR Wing' },
-      { key: 'webland_2_status', num: 11, title: 'Porting DLR to Webland-2.0', desc: 'Porting digital land records to Webland-2.0 portal for official mutation & registry.', tier: 'District SSLR & Webland Portal Wing' }
+      { key: 'gt_status', stageKey: 'gt', num: 1, title: 'GT', desc: 'DGPS ground truthing & preliminary perimeter survey by survey team.', tier: 'Survey Field Team (RSDT / MLSO)' },
+      { key: 'vectorization_status', stageKey: 'vectorization', num: 2, title: 'Vectorization/Correlation', desc: 'Computerized boundary digitization, GIS shapefile correlation, and parcel map generation.', tier: 'GIS Vectorization Team' },
+      { key: 'vs_status', stageKey: 'vs', num: 3, title: 'DLR@VS Login', desc: 'Secretariat data synchronization, Grama Sabha review, and landholder record linking.', tier: 'Village Secretariat Staff' },
+      { key: 'vro_status', stageKey: 'vro', num: 4, title: 'DLR@VRO Login', desc: 'Village Revenue Officer field inspection, ownership cross-check with 1B Webland register.', tier: 'Village Revenue Officer (VRO)' },
+      { key: 'tahsildar_status', stageKey: 'tahsildar', num: 5, title: 'DLR@Tahsildar Login', desc: 'Mandal Revenue Officer statutory scrutiny, discrepancy resolution, and sign-off.', tier: 'Tahsildar Office' },
+      { key: 'rdo_status', stageKey: 'rdo', num: 6, title: 'DLR@RDO Login', desc: 'Sub-divisional revenue officer validation of survey boundaries and records.', tier: 'Revenue Divisional Officer (RDO)' },
+      { key: 'jc_status', stageKey: 'jc', num: 7, title: 'DLR@JC Login', desc: 'District Joint Collectorate final administrative sanction and clearance.', tier: 'Joint Collectorate' },
+      { key: 'section13_status', stageKey: 'section13', num: 8, title: '13 Notification', desc: 'Statutory district gazette notification published for public claims & objections.', tier: 'Revenue Notification Cell' },
+      { key: 'draft_ror_status', stageKey: 'draft_ror', num: 9, title: 'Draft RoR', desc: 'Draft Record of Rights (1B) published for public scrutiny and objection hearing.', tier: 'Tahsildar & VRO Field Unit' },
+      { key: 'final_ror_status', stageKey: 'final_ror', num: 10, title: 'Final RoR', desc: 'Final Record of Rights confirmed and permanent land title validated.', tier: 'Collectorate SSLR Wing' },
+      { key: 'webland_2_status', stageKey: 'webland_2', num: 11, title: 'Porting DLR to Webland-2.0', desc: 'Porting digital land records to Webland-2.0 portal for official mutation & registry.', tier: 'District SSLR & Webland Portal Wing' }
     ];
 
     const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
@@ -11378,9 +11378,14 @@ async function openVillage(id) {
                     </span>
                   </div>
                   <p class="citizen-step-desc">${h(step.desc)}</p>
-                  <div class="citizen-step-meta">
                     <span>Accountable Tier: <b>${h(step.tier)}</b></span>
-                    ${v.target_date ? `<span>Target: <b>${h(v.target_date)}</b></span>` : ''}
+                    ${(() => {
+                      const stTarget = (v.stage_targets && v.stage_targets[step.stageKey]) || (step.num === 11 ? (v.target_date || v.stage_targets?.ppb) : '');
+                      if (stTarget) {
+                        return `<span>Stage Target: <b style="color:#b45309;background:#fef3c7;padding:1px 6px;border-radius:3px;font-family:monospace;">📅 ${h(stTarget)}</b></span>`;
+                      }
+                      return v.target_date ? `<span>Target: <b>${h(v.target_date)}</b></span>` : '';
+                    })()}
                     ${isDel && v.days_delayed ? `<span style="color:var(--red);font-weight:700;">${icon('warning')} ${v.days_delayed} days overdue</span>` : ''}
                   </div>
                 </div>
