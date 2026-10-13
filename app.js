@@ -12545,7 +12545,7 @@ function getActiveDlrStage(v) {
   return 'other';
 }
 
-const RESURVEY_STAGES_CONFIG = [
+const MANDAL_PLAN_STAGES_CONFIG = [
   { key: 'gt', label: 'GT', fullName: 'Ground Truth (GT)', badge: 'Stage 1' },
   { key: 'vectorization', label: 'Vectorization', fullName: 'Vectorization & Correlation', badge: 'Stage 2' },
   { key: 'vs', label: 'VS Login', fullName: 'Village Surveyor / Secretariat Login', badge: 'Stage 3' },
@@ -12613,7 +12613,7 @@ function getVillagesForMetric(villages, mandal, metric) {
     if (metric.startsWith('trailed_')) {
       const stageKey = metric.replace('trailed_', '');
       if (stageKey === 'any') {
-        return RESURVEY_STAGES_CONFIG.some(sc => isVillageTrailingStage(v, sc.key));
+        return MANDAL_PLAN_STAGES_CONFIG.some(sc => isVillageTrailingStage(v, sc.key));
       }
       return isVillageTrailingStage(v, stageKey);
     }
@@ -12645,7 +12645,7 @@ function calculateMandalActionPlan(villages) {
   const stageTargetsDist = {};
 
   // Compute prevailing target date for each stage across uploaded villages
-  RESURVEY_STAGES_CONFIG.forEach(sc => {
+  MANDAL_PLAN_STAGES_CONFIG.forEach(sc => {
     const dates = villages.map(v => v.stage_targets?.[sc.key]).filter(Boolean);
     if (dates.length > 0) {
       stageTargetsDist[sc.key] = dates[0];
@@ -12681,7 +12681,7 @@ function calculateMandalActionPlan(villages) {
         stage_trailed: {},
         stage_target_dates: {}
       };
-      RESURVEY_STAGES_CONFIG.forEach(sc => {
+      MANDAL_PLAN_STAGES_CONFIG.forEach(sc => {
         mandalMap[m].stage_completed[sc.key] = 0;
         mandalMap[m].stage_trailed[sc.key] = 0;
         mandalMap[m].stage_target_dates[sc.key] = stageTargetsDist[sc.key] || '';
@@ -12719,7 +12719,7 @@ function calculateMandalActionPlan(villages) {
     }
 
     // Per-stage completion and trailing tracking
-    RESURVEY_STAGES_CONFIG.forEach(sc => {
+    MANDAL_PLAN_STAGES_CONFIG.forEach(sc => {
       const vTarget = getVillageStageTargetDate(v, sc.key);
       if (vTarget && !d.stage_target_dates[sc.key]) {
         d.stage_target_dates[sc.key] = vTarget;
@@ -12760,7 +12760,7 @@ function calculateMandalActionPlan(villages) {
     stage_target_dates: stageTargetsDist,
     stage_completed: {},
     stage_trailed: {},
-    stages: RESURVEY_STAGES_CONFIG.map(sc => {
+    stages: MANDAL_PLAN_STAGES_CONFIG.map(sc => {
       const completedCount = mandalRows.reduce((s, r) => s + (r.stage_completed[sc.key] || 0), 0);
       const trailedCount = mandalRows.reduce((s, r) => s + (r.stage_trailed[sc.key] || 0), 0);
       const targetDate = stageTargetsDist[sc.key] || '';
@@ -12774,7 +12774,7 @@ function calculateMandalActionPlan(villages) {
     })
   };
   summary.completion_pct = summary.villages > 0 ? Math.round((summary.resurvey_completed / summary.villages) * 1000) / 10 : 0;
-  RESURVEY_STAGES_CONFIG.forEach(sc => {
+  MANDAL_PLAN_STAGES_CONFIG.forEach(sc => {
     summary.stage_completed[sc.key] = mandalRows.reduce((s, r) => s + (r.stage_completed[sc.key] || 0), 0);
     summary.stage_trailed[sc.key] = mandalRows.reduce((s, r) => s + (r.stage_trailed[sc.key] || 0), 0);
   });
@@ -13841,7 +13841,7 @@ function exportModalVillagesCsv() {
 function getMetricLabel(metricKey) {
   if (metricKey.startsWith('trailed_')) {
     const stageKey = metricKey.replace('trailed_', '');
-    const sc = RESURVEY_STAGES_CONFIG.find(s => s.key === stageKey);
+    const sc = MANDAL_PLAN_STAGES_CONFIG.find(s => s.key === stageKey);
     return sc ? `Villages Trailed Target Date for ${sc.fullName}` : 'Villages Trailed Statutory Target Date';
   }
   const metricLabels = {
