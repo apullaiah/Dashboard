@@ -121,6 +121,7 @@ const state = {
   modalActiveMetric: null,
   modalSearchQuery: '',
   modalFilterPhase: 'All',
+  modalTrailingFilter: 'All',
 };
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
@@ -8872,6 +8873,7 @@ async function renderWhatsApp() {
   let logsData = { logs: [] };
   let tierData = { vs: [], mlso: [], ms: [], dios: [], vro: [], tahsildar: [], rdo: [] };
   let counts = { vs: 0, mlso: 0, ms: 0, dios: 0, vro: 0, tahsildar: 0, rdo: 0 };
+  let directoryData = { vs: [], ms: [], dios: [], summary: {} };
   let scheduleData = {
     active: true,
     scheduledCron: '30 0 * * * (Daily 06:00 AM IST)',
@@ -8881,7 +8883,7 @@ async function renderWhatsApp() {
   };
 
   try {
-    const [cfg, logs, vsRes, mlsoRes, diosRes, vroRes, tahRes, rdoRes, schedRes] = await Promise.all([
+    const [cfg, logs, vsRes, mlsoRes, diosRes, vroRes, tahRes, rdoRes, schedRes, dirRes] = await Promise.all([
       api('/api/whatsapp/config').catch(() => ({ config: {}, stats: {} })),
       api('/api/whatsapp/logs').catch(() => ({ logs: [] })),
       api('/api/whatsapp/poor-officers?tier=vs').catch(() => ({ officers: [], count: 0 })),
@@ -8890,11 +8892,13 @@ async function renderWhatsApp() {
       api('/api/whatsapp/poor-officers?tier=vro').catch(() => ({ officers: [], count: 0 })),
       api('/api/whatsapp/poor-officers?tier=tahsildar').catch(() => ({ officers: [], count: 0 })),
       api('/api/whatsapp/poor-officers?tier=rdo').catch(() => ({ officers: [], count: 0 })),
-      api('/api/whatsapp/schedule-status').catch(() => ({ schedule: {} }))
+      api('/api/whatsapp/schedule-status').catch(() => ({ schedule: {} })),
+      api('/api/whatsapp/officers-directory').catch(() => ({ vs: [], ms: [], dios: [], summary: {} }))
     ]);
 
     cfgData = cfg || {};
     logsData = logs || {};
+    directoryData = dirRes || directoryData;
     tierData.vs = vsRes.officers || [];
     tierData.mlso = mlsoRes.officers || [];
     tierData.ms = mlsoRes.officers || [];
@@ -9308,6 +9312,83 @@ async function renderWhatsApp() {
         </div>
       </div>
     </div>
+
+    <!-- 📲 WHATSAPP MESSAGE DELIVERY TEST CONSOLE (MS · VS · DIOS) -->
+    <section class="wa-test-console-card" id="wa-delivery-test-console">
+      <div class="wa-test-console-header">
+        <div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">📲</span>
+            <div>
+              <h3 style="margin:0;font-size:16px;font-weight:800;color:var(--navy);">WhatsApp Message Delivery Test Console (MS · VS · DIOS)</h3>
+              <p style="margin:3px 0 0 0;font-size:12px;color:#64748b;">
+                Interactive test bench to verify real-time WhatsApp delivery to <strong>Mandal Surveyors (MS / MLSO)</strong>, <strong>Village Surveyors (VS)</strong>, and <strong>Deputy Inspectors of Survey (DIOS)</strong> using verified phone numbers updated from Google Spreadsheets.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div id="wa-test-sync-summary-chip" style="font-size:11px;font-weight:700;color:#047857;background:#ecfdf5;border:1px solid #a7f3d0;padding:6px 14px;border-radius:20px;white-space:nowrap;">
+          🔄 Checking Synced Contacts...
+        </div>
+      </div>
+
+      <div class="wa-test-grid">
+        <!-- Cadre Picker -->
+        <div class="wa-test-input-group">
+          <label for="wa-test-cadre-select">1. Survey Officer Cadre</label>
+          <select id="wa-test-cadre-select" class="wa-test-input font-bold">
+            <option value="ms">🏛️ Mandal Surveyors (MS / MLSO) — 27 Mandals</option>
+            <option value="dios">⭐ Deputy Inspectors of Survey (DIOS) — 6 Officers</option>
+            <option value="vs">👤 Village Surveyors (VS) — Secretariats</option>
+          </select>
+        </div>
+
+        <!-- Officer Picker -->
+        <div class="wa-test-input-group">
+          <label for="wa-test-officer-select">2. Select Officer &amp; Jurisdiction</label>
+          <select id="wa-test-officer-select" class="wa-test-input">
+            <option value="">-- Choose an Officer --</option>
+          </select>
+        </div>
+
+        <!-- Contact Number -->
+        <div class="wa-test-input-group">
+          <label for="wa-test-phone-input">3. Recipient Mobile Number (+91)</label>
+          <input type="text" id="wa-test-phone-input" class="wa-test-input font-mono font-bold" placeholder="10-digit mobile number" maxlength="10" />
+        </div>
+
+        <!-- Official Authority Sender -->
+        <div class="wa-test-input-group">
+          <label for="wa-test-sender-input">4. Dispatching Authority</label>
+          <input type="text" id="wa-test-sender-input" class="wa-test-input" value="DSLRO, Chittoor" readonly />
+        </div>
+      </div>
+
+      <!-- Message Composer -->
+      <div class="wa-test-input-group" style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label for="wa-test-message-body">5. Test Message Body (Official Notification Preview)</label>
+          <button type="button" id="wa-test-reset-template-btn" style="background:none;border:none;color:#2563eb;font-size:11px;font-weight:700;cursor:pointer;text-decoration:underline;">Reset Official Template</button>
+        </div>
+        <textarea id="wa-test-message-body" class="wa-test-textarea" rows="4"></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="wa-test-actions">
+        <button type="button" class="btn-wa-send-test" id="wa-test-send-btn">
+          <span>🚀 Send Test Message via WhatsApp Cloud API</span>
+        </button>
+        <a id="wa-test-direct-link" href="#" target="_blank" rel="noopener noreferrer" class="btn-wa-direct-link" style="opacity:0.5;pointer-events:none;">
+          <span>💬 Test Direct on WhatsApp Web (wa.me)</span>
+        </a>
+        <span style="font-size:11px;color:#64748b;margin-left:auto;">
+          ℹ️ Direct link opens WhatsApp Web or Mobile App with message pre-filled.
+        </span>
+      </div>
+
+      <!-- Live Delivery Status Banner -->
+      <div id="wa-test-status-banner" class="wa-test-status-banner"></div>
+    </section>
 
     <!-- 🏛️ CADRE SWITCHER & TIER SELECTOR CARDS -->
     <div class="wa-cadres-container">
@@ -10732,6 +10813,216 @@ Chittoor District, Government of Andhra Pradesh`;
     };
   }
 
+  // --- WHATSAPP MESSAGE DELIVERY TEST CONSOLE CONTROLLER ---
+  const testCadreSelect = document.getElementById('wa-test-cadre-select');
+  const testOfficerSelect = document.getElementById('wa-test-officer-select');
+  const testPhoneInput = document.getElementById('wa-test-phone-input');
+  const testSenderInput = document.getElementById('wa-test-sender-input');
+  const testMessageBody = document.getElementById('wa-test-message-body');
+  const testSendBtn = document.getElementById('wa-test-send-btn');
+  const testDirectLink = document.getElementById('wa-test-direct-link');
+  const testResetBtn = document.getElementById('wa-test-reset-template-btn');
+  const testStatusBanner = document.getElementById('wa-test-status-banner');
+  const testSyncChip = document.getElementById('wa-test-sync-summary-chip');
+
+  if (testSyncChip && directoryData.summary) {
+    const s = directoryData.summary;
+    testSyncChip.innerHTML = `🟢 <b>MS:</b> ${s.msWithPhone || 0}/${s.totalMs || 0} Synced &nbsp;·&nbsp; <b>DIOS:</b> ${s.diosWithPhone || 0}/${s.totalDios || 0} Synced &nbsp;·&nbsp; <b>VS:</b> ${s.vsWithPhone || 0}/${s.totalVs || 0} Synced`;
+  }
+
+  function getTestDirectoryList(cadre) {
+    if (cadre === 'dios') return directoryData.dios || [];
+    if (cadre === 'vs') return directoryData.vs || [];
+    return directoryData.ms || [];
+  }
+
+  function populateTestOfficerDropdown(cadre) {
+    if (!testOfficerSelect) return;
+    const list = getTestDirectoryList(cadre);
+    let html = `<option value="">-- Choose an Officer (${list.length} available) --</option>`;
+
+    if (cadre === 'ms') {
+      const sorted = list.slice().sort((a, b) => (a.mandal || '').localeCompare(b.mandal || ''));
+      html += sorted.map(o => {
+        const phText = o.phone ? `+91 ${o.phone}` : 'No phone in sheet';
+        const badge = o.hasSheetPhone ? '🟢' : '⚠️';
+        return `<option value="${h(o.id)}" data-phone="${h(o.phone || '')}" data-name="${h(o.name)}" data-juris="${h(o.mandal)} Mandal" data-role="${h(o.role)}">${badge} ${h(o.mandal)}: ${h(o.name)} (${phText})</option>`;
+      }).join('');
+    } else if (cadre === 'dios') {
+      html += list.map(o => {
+        const phText = o.phone ? `+91 ${o.phone}` : 'No phone in sheet';
+        const badge = o.hasSheetPhone ? '🟢' : '⚠️';
+        const mCount = (o.mandals || []).length;
+        return `<option value="${h(o.id)}" data-phone="${h(o.phone || '')}" data-name="${h(o.name)}" data-juris="${h((o.mandals || []).join(', '))}" data-role="${h(o.role)}">${badge} ${h(o.name)} (${mCount} Mandals · ${phText})</option>`;
+      }).join('');
+    } else {
+      const sorted = list.slice().sort((a, b) => (a.mandal || '').localeCompare(b.mandal || '') || (a.village || '').localeCompare(b.village || ''));
+      html += sorted.map(o => {
+        const phText = o.phone ? `+91 ${o.phone}` : 'No phone in sheet';
+        const badge = o.hasSheetPhone ? '🟢' : '⚠️';
+        return `<option value="${h(o.id)}" data-phone="${h(o.phone || '')}" data-name="${h(o.name)}" data-juris="${h(o.village)} Village (${h(o.mandal)})" data-role="${h(o.role)}">${badge} ${h(o.mandal)} - ${h(o.village)}: ${h(o.name)} (${phText})</option>`;
+      }).join('');
+    }
+
+    testOfficerSelect.innerHTML = html;
+  }
+
+  function generateOfficialTestMessage(name, role, juris, phone, sender) {
+    const timeNow = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    return `*OFFICIAL RESURVEY DIRECTIVE · TEST MESSAGE DISPATCH*\n` +
+      `🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*\n` +
+      `*Chittoor District, Government of Andhra Pradesh*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `To: *${name || 'Survey Officer'}* (${role || 'Cadre'})\n` +
+      `Jurisdiction: *${juris || 'Chittoor District'}*\n` +
+      `Contact Mobile: *+91 ${phone || '—'}*\n` +
+      `Dispatching Authority: *${sender || 'DSLRO, Chittoor'}*\n` +
+      `Purpose: Resurvey Target Compliance & WhatsApp Delivery Test\n` +
+      `Date & Time: ${timeNow}\n\n` +
+      `⚠️ *TEST VERIFICATION NOTICE:*\n` +
+      `This is an authorized test message dispatch from the A.P. Land Resurvey Project 2.0 Chittoor Monitoring Dashboard. Kindly acknowledge receipt of this test transmission.\n\n` +
+      `🌐 *Monitoring Portal:* ${window.location.origin}/\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `*${sender || 'DSLRO, Chittoor'}*\n` +
+      `District Survey & Land Records Officer`;
+  }
+
+  function updateDirectLink() {
+    if (!testDirectLink || !testPhoneInput || !testMessageBody) return;
+    const cleanPhone = testPhoneInput.value.replace(/\D/g, '').slice(-10);
+    const msg = testMessageBody.value;
+    if (cleanPhone.length === 10) {
+      testDirectLink.href = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`;
+      testDirectLink.style.opacity = '1';
+      testDirectLink.style.pointerEvents = 'auto';
+    } else {
+      testDirectLink.href = '#';
+      testDirectLink.style.opacity = '0.5';
+      testDirectLink.style.pointerEvents = 'none';
+    }
+  }
+
+  function handleTestOfficerChange() {
+    if (!testOfficerSelect || !testPhoneInput || !testMessageBody) return;
+    const opt = testOfficerSelect.selectedOptions[0];
+    if (!opt || !opt.value) {
+      testPhoneInput.value = '';
+      testMessageBody.value = '';
+      updateDirectLink();
+      return;
+    }
+    const phone = opt.dataset.phone || '';
+    const name = opt.dataset.name || 'Officer';
+    const role = opt.dataset.role || 'Survey Officer';
+    const juris = opt.dataset.juris || '';
+    const sender = testSenderInput ? testSenderInput.value : 'DSLRO, Chittoor';
+
+    testPhoneInput.value = phone;
+    testMessageBody.value = generateOfficialTestMessage(name, role, juris, phone, sender);
+    updateDirectLink();
+    if (testStatusBanner) testStatusBanner.style.display = 'none';
+  }
+
+  if (testCadreSelect) {
+    testCadreSelect.onchange = () => {
+      populateTestOfficerDropdown(testCadreSelect.value);
+      if (testOfficerSelect && testOfficerSelect.options.length > 1) {
+        testOfficerSelect.selectedIndex = 1;
+        handleTestOfficerChange();
+      } else {
+        if (testPhoneInput) testPhoneInput.value = '';
+        if (testMessageBody) testMessageBody.value = '';
+        updateDirectLink();
+      }
+      if (testStatusBanner) testStatusBanner.style.display = 'none';
+    };
+    populateTestOfficerDropdown(testCadreSelect.value);
+    if (testOfficerSelect && testOfficerSelect.options.length > 1) {
+      testOfficerSelect.selectedIndex = 1;
+      handleTestOfficerChange();
+    }
+  }
+
+  if (testOfficerSelect) {
+    testOfficerSelect.onchange = handleTestOfficerChange;
+  }
+
+  if (testPhoneInput) {
+    testPhoneInput.oninput = () => {
+      testPhoneInput.value = testPhoneInput.value.replace(/\D/g, '').slice(0, 10);
+      updateDirectLink();
+    };
+  }
+
+  if (testMessageBody) {
+    testMessageBody.oninput = updateDirectLink;
+  }
+
+  if (testResetBtn) {
+    testResetBtn.onclick = handleTestOfficerChange;
+  }
+
+  if (testSendBtn) {
+    testSendBtn.onclick = async () => {
+      const phone = (testPhoneInput ? testPhoneInput.value : '').replace(/\D/g, '').slice(-10);
+      if (!phone || phone.length < 10) {
+        toast('Please enter a valid 10-digit mobile number for test dispatch.', 'error');
+        if (testStatusBanner) {
+          testStatusBanner.className = 'wa-test-status-banner is-error';
+          testStatusBanner.innerHTML = '❌ <b>Invalid Mobile Number:</b> Please provide a valid 10-digit mobile number to send the test message.';
+        }
+        return;
+      }
+
+      const opt = testOfficerSelect?.selectedOptions[0];
+      const officerName = opt?.dataset?.name || 'Survey Officer';
+      const role = opt?.dataset?.role || testCadreSelect?.value?.toUpperCase() || 'Survey Officer';
+      const senderTitle = testSenderInput?.value || 'DSLRO, Chittoor';
+      const message = testMessageBody?.value || '';
+
+      testSendBtn.disabled = true;
+      testSendBtn.innerHTML = '⏳ <span>Sending Test Message...</span>';
+      if (testStatusBanner) testStatusBanner.style.display = 'none';
+
+      try {
+        const res = await api('/api/whatsapp/test-message', {
+          method: 'POST',
+          body: JSON.stringify({ phone, officerName, role, senderTitle, message })
+        });
+
+        toast(`Test message sent to +91 ${phone} (${officerName})!`, 'success');
+        if (testStatusBanner) {
+          testStatusBanner.className = 'wa-test-status-banner is-success';
+          testStatusBanner.innerHTML = `
+            <div style="font-weight:800;font-size:13px;margin-bottom:4px;">
+              ✅ Test Message Dispatched Successfully!
+            </div>
+            <div>
+              • <b>Status:</b> ${h(res.status)} (${res.simulated ? 'Simulation Audit' : 'Live WhatsApp Graph API'})<br/>
+              • <b>Recipient:</b> +91 ${h(phone)} (${h(officerName)} · ${h(role)})<br/>
+              • <b>Sender Authority:</b> ${h(senderTitle)}<br/>
+              • <b>Direct WhatsApp Link:</b> <a href="${h(res.waLink)}" target="_blank" rel="noopener noreferrer" style="color:#047857;text-decoration:underline;font-weight:700;">Open Direct in WhatsApp (wa.me)</a>
+            </div>
+          `;
+        }
+
+        // Refresh WhatsApp logs table
+        const freshLogs = await api('/api/whatsapp/logs');
+        const logsWrap = document.getElementById('wa-logs-table-container');
+        if (logsWrap) logsWrap.innerHTML = renderLogsTable(freshLogs.logs || []);
+      } catch (err) {
+        toast(`Failed to send test message: ${err.message}`, 'error');
+        if (testStatusBanner) {
+          testStatusBanner.className = 'wa-test-status-banner is-error';
+          testStatusBanner.innerHTML = `❌ <b>Message Delivery Test Failed:</b> ${h(err.message)}`;
+        }
+      } finally {
+        testSendBtn.disabled = false;
+        testSendBtn.innerHTML = '<span>🚀 Send Test Message via WhatsApp Cloud API</span>';
+      }
+    };
+  }
+
   // Copy badges
   document.querySelectorAll('.copy-badge-btn').forEach(btn => {
     btn.onclick = () => {
@@ -12134,8 +12425,12 @@ document.addEventListener('change', event => {
   } else if (event.target.id === 'ap-status-select') {
     state.mandalPlanStatusFilter = event.target.value;
     renderMandalActionPlan();
-  } else if (event.target.id === 'modal-phase-filter') {
-    state.modalFilterPhase = event.target.value;
+  } else if (event.target.id === 'modal-phase-filter' || event.target.id === 'modal-trailing-filter') {
+    if (event.target.id === 'modal-trailing-filter') {
+      state.modalTrailingFilter = event.target.value;
+    } else {
+      state.modalFilterPhase = event.target.value;
+    }
     const vList = getVillagesForMetric(state.villages || [], state.modalActiveMandal, state.modalActiveMetric);
     const mTitle = state.modalActiveMandal === '__ALL__' ? 'Chittoor District (All 27 Mandals)' : `${h(state.modalActiveMandal)} Mandal`;
     const mLabel = getMetricLabel(state.modalActiveMetric);
@@ -12250,9 +12545,82 @@ function getActiveDlrStage(v) {
   return 'other';
 }
 
+const RESURVEY_STAGES_CONFIG = [
+  { key: 'gt', label: 'GT', fullName: 'Ground Truth (GT)', badge: 'Stage 1' },
+  { key: 'vectorization', label: 'Vectorization', fullName: 'Vectorization & Correlation', badge: 'Stage 2' },
+  { key: 'vs', label: 'VS Login', fullName: 'Village Surveyor / Secretariat Login', badge: 'Stage 3' },
+  { key: 'vro', label: 'VRO Login', fullName: 'VRO Login (DLR)', badge: 'Stage 4' },
+  { key: 'tahsildar', label: 'Tahsildar', fullName: 'Tahsildar (MRO) Login', badge: 'Stage 5' },
+  { key: 'rdo', label: 'RDO Login', fullName: 'RDO Login', badge: 'Stage 6' },
+  { key: 'jc', label: 'JC Login', fullName: 'JC Login', badge: 'Stage 7' },
+  { key: 'section13', label: 'Sec 13', fullName: 'Section 13 Notification', badge: 'Stage 8' },
+  { key: 'draft_ror', label: 'Draft RoR', fullName: 'Draft RoR [6(1)]', badge: 'Stage 9' },
+  { key: 'final_ror', label: 'Final RoR', fullName: 'Final RoR [13(1)]', badge: 'Stage 10' },
+  { key: 'webland_2', label: 'Webland-2', fullName: 'Webland-2 Porting / Handover', badge: 'Stage 11' }
+];
+
+function isVillageStageCompleted(v, stageKey) {
+  if (isResurveyCompleted(v)) return true;
+  switch (stageKey) {
+    case 'gt':
+      return isComplete(v.gt_status) || (parseFloat(v.balance_gt_extent) === 0 && parseFloat(v.cumulative_gt_extent) > 0);
+    case 'vectorization':
+      return isComplete(v.vectorization_status);
+    case 'vs':
+      return isComplete(v.vs_status) || !['Pending', 'In Progress'].includes(v.vs_status || '');
+    case 'vro':
+      return isComplete(v.vro_status);
+    case 'tahsildar':
+      return isComplete(v.tahsildar_status);
+    case 'rdo':
+      return isComplete(v.rdo_status);
+    case 'jc':
+      return isComplete(v.jc_status);
+    case 'section13':
+      return isComplete(v.section13_status);
+    case 'draft_ror':
+      return isComplete(v.draft_ror_status);
+    case 'final_ror':
+      return isComplete(v.final_ror_status);
+    case 'webland_2':
+      return Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
+    default:
+      return false;
+  }
+}
+
+function getVillageStageTargetDate(v, stageKey) {
+  if (v.stage_targets && v.stage_targets[stageKey]) return v.stage_targets[stageKey];
+  return v.target_date || '';
+}
+
+function isVillageTrailingStage(v, stageKey) {
+  if (isVillageStageCompleted(v, stageKey)) return false;
+  const targetDateStr = getVillageStageTargetDate(v, stageKey);
+  if (targetDateStr) {
+    const parsed = new Date(targetDateStr);
+    if (!isNaN(parsed.getTime())) {
+      const today = new Date();
+      if (parsed < today) return true;
+    }
+  }
+  return v.status === 'Delayed' || (v.days_delayed && Number(v.days_delayed) > 0);
+}
+
 function getVillagesForMetric(villages, mandal, metric) {
   return villages.filter(v => {
     if (mandal !== '__ALL__' && normalizeMandal(v.mandal) !== mandal) return false;
+    if (metric.startsWith('trailed_')) {
+      const stageKey = metric.replace('trailed_', '');
+      if (stageKey === 'any') {
+        return RESURVEY_STAGES_CONFIG.some(sc => isVillageTrailingStage(v, sc.key));
+      }
+      return isVillageTrailingStage(v, stageKey);
+    }
+    if (metric.startsWith('stage_')) {
+      const stageKey = metric.replace('stage_', '');
+      return isVillageStageCompleted(v, stageKey);
+    }
     switch (metric) {
       case 'villages': return true;
       case 'extent': return true;
@@ -12274,6 +12642,18 @@ function getVillagesForMetric(villages, mandal, metric) {
 
 function calculateMandalActionPlan(villages) {
   const mandalMap = {};
+  const stageTargetsDist = {};
+
+  // Compute prevailing target date for each stage across uploaded villages
+  RESURVEY_STAGES_CONFIG.forEach(sc => {
+    const dates = villages.map(v => v.stage_targets?.[sc.key]).filter(Boolean);
+    if (dates.length > 0) {
+      stageTargetsDist[sc.key] = dates[0];
+    } else {
+      const allDates = villages.map(v => v.target_date).filter(Boolean);
+      stageTargetsDist[sc.key] = allDates[0] || 'As Scheduled';
+    }
+  });
 
   villages.forEach(v => {
     const m = normalizeMandal(v.mandal);
@@ -12296,8 +12676,16 @@ function calculateMandalActionPlan(villages) {
         dlr_jc: 0,
         sec13_notified: 0,
         ported_webland2: 0,
-        village_ids: []
+        village_ids: [],
+        stage_completed: {},
+        stage_trailed: {},
+        stage_target_dates: {}
       };
+      RESURVEY_STAGES_CONFIG.forEach(sc => {
+        mandalMap[m].stage_completed[sc.key] = 0;
+        mandalMap[m].stage_trailed[sc.key] = 0;
+        mandalMap[m].stage_target_dates[sc.key] = stageTargetsDist[sc.key] || '';
+      });
     }
 
     const d = mandalMap[m];
@@ -12329,6 +12717,19 @@ function calculateMandalActionPlan(villages) {
     if (Boolean(v.ported_to_webland || v.webland_2_status === 'Ported')) {
       d.ported_webland2++;
     }
+
+    // Per-stage completion and trailing tracking
+    RESURVEY_STAGES_CONFIG.forEach(sc => {
+      const vTarget = getVillageStageTargetDate(v, sc.key);
+      if (vTarget && !d.stage_target_dates[sc.key]) {
+        d.stage_target_dates[sc.key] = vTarget;
+      }
+      if (isVillageStageCompleted(v, sc.key)) {
+        d.stage_completed[sc.key]++;
+      } else if (isVillageTrailingStage(v, sc.key)) {
+        d.stage_trailed[sc.key]++;
+      }
+    });
   });
 
   const mandalRows = Object.values(mandalMap).map(m => {
@@ -12356,8 +12757,27 @@ function calculateMandalActionPlan(villages) {
     dlr_jc: mandalRows.reduce((s, r) => s + r.dlr_jc, 0),
     sec13_notified: mandalRows.reduce((s, r) => s + r.sec13_notified, 0),
     ported_webland2: mandalRows.reduce((s, r) => s + r.ported_webland2, 0),
+    stage_target_dates: stageTargetsDist,
+    stage_completed: {},
+    stage_trailed: {},
+    stages: RESURVEY_STAGES_CONFIG.map(sc => {
+      const completedCount = mandalRows.reduce((s, r) => s + (r.stage_completed[sc.key] || 0), 0);
+      const trailedCount = mandalRows.reduce((s, r) => s + (r.stage_trailed[sc.key] || 0), 0);
+      const targetDate = stageTargetsDist[sc.key] || '';
+      return {
+        ...sc,
+        target_date: targetDate,
+        completed: completedCount,
+        trailed: trailedCount,
+        pending: Math.max(0, (villages.length || 0) - completedCount)
+      };
+    })
   };
   summary.completion_pct = summary.villages > 0 ? Math.round((summary.resurvey_completed / summary.villages) * 1000) / 10 : 0;
+  RESURVEY_STAGES_CONFIG.forEach(sc => {
+    summary.stage_completed[sc.key] = mandalRows.reduce((s, r) => s + (r.stage_completed[sc.key] || 0), 0);
+    summary.stage_trailed[sc.key] = mandalRows.reduce((s, r) => s + (r.stage_trailed[sc.key] || 0), 0);
+  });
 
   return { mandalRows, summary };
 }
@@ -12555,6 +12975,74 @@ function renderMandalActionPlan() {
         </div>
       </section>
 
+      <!-- ⏱️ RESURVEY STAGES STATUTORY TIMELINES & TARGET DATE COMPLIANCE TRACKER (11 STAGES) -->
+      <section class="mandal-plan-stages-timeline">
+        <div class="mandal-stages-timeline-header">
+          <div class="mandal-stages-timeline-title">
+            <span style="font-size:22px;">⏱️</span>
+            <div>
+              <h3 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-0.2px;">
+                RESURVEY STAGES STATUTORY TIMELINES &amp; TARGET DATE COMPLIANCE (11 STAGES)
+              </h3>
+              <p style="margin:2px 0 0;font-size:11.5px;color:#64748b;">
+                Target dates mapped from uploaded Google Spreadsheet (<b>stage_targets</b>). Villages trailing their statutory stage target dates are highlighted for administrative intervention. Click any trailed badge to inspect villages.
+              </p>
+            </div>
+          </div>
+          <div class="mandal-stages-timeline-badge">
+            <span class="badge-total-trailed ${summary.stages.reduce((s, x) => s + x.trailed, 0) > 0 ? 'is-warning' : 'is-success'}">
+              ⚠️ Total Trailed Occurrences: <strong>${summary.stages.reduce((s, x) => s + x.trailed, 0)}</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="mandal-stages-timeline-scroll">
+          <div class="mandal-stages-cards-grid">
+            ${summary.stages.map(stg => {
+              const pct = summary.villages > 0 ? Math.round((stg.completed / summary.villages) * 100) : 0;
+              return `
+                <div class="stage-timeline-card ${stg.trailed > 0 ? 'has-trailed' : 'is-clean'}">
+                  <div class="stage-card-top">
+                    <span class="stage-step-tag">${stg.badge}</span>
+                    <span class="stage-status-chip ${stg.completed > 0 ? 'is-active' : ''}">${pct}% Done</span>
+                  </div>
+                  <div class="stage-card-name" title="${h(stg.fullName)}">${h(stg.fullName)}</div>
+                  
+                  <div class="stage-card-target-box">
+                    <span class="stage-target-icon">📅</span>
+                    <div>
+                      <div class="stage-target-label">Target Date:</div>
+                      <div class="stage-target-val">${h(stg.target_date || 'As Scheduled')}</div>
+                    </div>
+                  </div>
+
+                  <div class="stage-card-metrics">
+                    <div class="stage-metric-row">
+                      <span class="stage-metric-label">Completed:</span>
+                      <span class="stage-metric-val is-comp">${stg.completed} Vlgs</span>
+                    </div>
+                    <div class="stage-metric-row">
+                      <span class="stage-metric-label">Pending / WIP:</span>
+                      <span class="stage-metric-val is-pending">${stg.pending} Vlgs</span>
+                    </div>
+                  </div>
+
+                  <div class="stage-card-footer">
+                    ${stg.trailed > 0 ? `
+                      <button type="button" class="stage-trailed-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_${stg.key}" title="Click to inspect all ${stg.trailed} villages trailing target date for ${h(stg.label)}">
+                        ⚠️ <b>${stg.trailed}</b> Trailed Target Date ↗
+                      </button>
+                    ` : `
+                      <div class="stage-trailed-zero">✓ 0 Trailed (On Track)</div>
+                    `}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </section>
+
       <!-- TOOLBAR & FILTERS -->
       <section class="action-plan-toolbar">
         <div class="ap-toolbar-left">
@@ -12607,16 +13095,44 @@ function renderMandalActionPlan() {
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'resurvey_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="resurvey_completed">RESURVEY COMPLETED ⇅</th>
                 <th rowspan="2" style="width:90px;" class="sortable ${col === 'balance_villages' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="balance_villages">BALANCE VILLAGES ⇅</th>
                 <th colspan="5" class="group-dlr">NUMBER OF VILLAGES IN DLR LOGINS (5 WORKFLOW STAGES)</th>
-                <th rowspan="2" style="width:85px;" class="sortable ${col === 'sec13_notified' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="sec13_notified">13 NOTIFIED VILLAGES ⇅</th>
-                <th rowspan="2" style="width:95px;" class="sortable ${col === 'ported_webland2' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="ported_webland2">PORTED TO WEBLAND-2 ⇅</th>
+                <th rowspan="2" style="width:95px;" class="sortable ${col === 'sec13_notified' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="sec13_notified">
+                  13 NOTIFIED VILLAGES
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.section13 || '—')}</div>
+                  ⇅
+                </th>
+                <th rowspan="2" style="width:105px;" class="sortable ${col === 'ported_webland2' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="ported_webland2">
+                  PORTED TO WEBLAND-2
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.webland_2 || '—')}</div>
+                  ⇅
+                </th>
                 <th rowspan="2" style="width:130px;" class="sortable ${col === 'completion_pct' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="completion_pct">PROGRESS % ⇅</th>
               </tr>
               <tr>
-                <th style="width:58px;" class="sortable ${col === 'dlr_vs' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vs">VS ⇅</th>
-                <th style="width:58px;" class="sortable ${col === 'dlr_vro' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vro">VRO ⇅</th>
-                <th style="width:58px;" class="sortable ${col === 'dlr_tah' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_tah">TAH ⇅</th>
-                <th style="width:58px;" class="sortable ${col === 'dlr_rdo' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_rdo">RDO ⇅</th>
-                <th style="width:58px;" class="sortable ${col === 'dlr_jc' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_jc">JC ⇅</th>
+                <th style="width:72px;" class="sortable ${col === 'dlr_vs' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vs">
+                  VS
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.vs || '—')}</div>
+                  ⇅
+                </th>
+                <th style="width:72px;" class="sortable ${col === 'dlr_vro' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vro">
+                  VRO
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.vro || '—')}</div>
+                  ⇅
+                </th>
+                <th style="width:72px;" class="sortable ${col === 'dlr_tah' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_tah">
+                  TAH
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.tahsildar || '—')}</div>
+                  ⇅
+                </th>
+                <th style="width:72px;" class="sortable ${col === 'dlr_rdo' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_rdo">
+                  RDO
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.rdo || '—')}</div>
+                  ⇅
+                </th>
+                <th style="width:72px;" class="sortable ${col === 'dlr_jc' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_jc">
+                  JC
+                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.jc || '—')}</div>
+                  ⇅
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -12675,42 +13191,77 @@ function renderMandalActionPlan() {
                       ${m.balance_villages}
                     </button>
                   </td>
-                  <!-- DLR Stages -->
+                  <!-- DLR Stages with Trailed Badges -->
                   <td>
                     <button class="fig-btn ${m.dlr_vs > 0 ? 'fig-btn-cyan' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_vs" title="Click to view ${m.dlr_vs} villages in DLR Village Surveyor login for ${h(m.mandal)}">
                       ${m.dlr_vs}
                     </button>
+                    ${m.stage_trailed.vs > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_vs" title="${m.stage_trailed.vs} villages trailed VS target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.vs}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_vro > 0 ? 'fig-btn-cyan' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_vro" title="Click to view ${m.dlr_vro} villages in DLR VRO login for ${h(m.mandal)}">
                       ${m.dlr_vro}
                     </button>
+                    ${m.stage_trailed.vro > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_vro" title="${m.stage_trailed.vro} villages trailed VRO target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.vro}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_tah > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_tah" title="Click to view ${m.dlr_tah} villages in DLR Tahsildar login for ${h(m.mandal)}">
                       ${m.dlr_tah}
                     </button>
+                    ${m.stage_trailed.tahsildar > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_tahsildar" title="${m.stage_trailed.tahsildar} villages trailed Tahsildar target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.tahsildar}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_rdo > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_rdo" title="Click to view ${m.dlr_rdo} villages in DLR RDO login for ${h(m.mandal)}">
                       ${m.dlr_rdo}
                     </button>
+                    ${m.stage_trailed.rdo > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_rdo" title="${m.stage_trailed.rdo} villages trailed RDO target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.rdo}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_jc > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_jc" title="Click to view ${m.dlr_jc} villages in DLR JC login for ${h(m.mandal)}">
                       ${m.dlr_jc}
                     </button>
+                    ${m.stage_trailed.jc > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_jc" title="${m.stage_trailed.jc} villages trailed JC target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.jc}
+                      </button>
+                    ` : ''}
                   </td>
-                  <!-- Notified & Webland -->
+                  <!-- Notified & Webland with Trailed Badges -->
                   <td>
                     <button class="fig-btn fig-btn-emerald" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="sec13_notified" title="Click to view ${m.sec13_notified} section 13 notified villages of ${h(m.mandal)}">
                       ${m.sec13_notified}
                     </button>
+                    ${m.stage_trailed.section13 > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_section13" title="${m.stage_trailed.section13} villages trailed Sec 13 target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.section13}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn fig-btn-emerald" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="ported_webland2" title="Click to view ${m.ported_webland2} Webland-2 ported villages of ${h(m.mandal)}">
                       ${m.ported_webland2}
                     </button>
+                    ${m.stage_trailed.webland_2 > 0 ? `
+                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_webland_2" title="${m.stage_trailed.webland_2} villages trailed Webland-2 target date in ${h(m.mandal)}">
+                        ⚠️ ${m.stage_trailed.webland_2}
+                      </button>
+                    ` : ''}
                   </td>
                   <td>
                     <div style="display:flex;align-items:center;gap:6px;">
@@ -12771,42 +13322,77 @@ function renderMandalActionPlan() {
                     ${summary.balance_villages}
                   </button>
                 </td>
-                <!-- Total DLR Stages -->
+                <!-- Total DLR Stages with District Trailed Counts -->
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_vs" title="Click to view all ${summary.dlr_vs} villages in VS login">
                     ${summary.dlr_vs}
                   </button>
+                  ${summary.stage_trailed.vs > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_vs" title="${summary.stage_trailed.vs} villages across district trailed VS target date">
+                      ⚠️ ${summary.stage_trailed.vs}
+                    </button>
+                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_vro" title="Click to view all ${summary.dlr_vro} villages in VRO login">
                     ${summary.dlr_vro}
                   </button>
+                  ${summary.stage_trailed.vro > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_vro" title="${summary.stage_trailed.vro} villages across district trailed VRO target date">
+                      ⚠️ ${summary.stage_trailed.vro}
+                    </button>
+                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_tah" title="Click to view all ${summary.dlr_tah} villages in Tahsildar login">
                     ${summary.dlr_tah}
                   </button>
+                  ${summary.stage_trailed.tahsildar > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_tahsildar" title="${summary.stage_trailed.tahsildar} villages across district trailed Tahsildar target date">
+                      ⚠️ ${summary.stage_trailed.tahsildar}
+                    </button>
+                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_rdo" title="Click to view all ${summary.dlr_rdo} villages in RDO login">
                     ${summary.dlr_rdo}
                   </button>
+                  ${summary.stage_trailed.rdo > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_rdo" title="${summary.stage_trailed.rdo} villages across district trailed RDO target date">
+                      ⚠️ ${summary.stage_trailed.rdo}
+                    </button>
+                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_jc" title="Click to view all ${summary.dlr_jc} villages in JC login">
                     ${summary.dlr_jc}
                   </button>
+                  ${summary.stage_trailed.jc > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_jc" title="${summary.stage_trailed.jc} villages across district trailed JC target date">
+                      ⚠️ ${summary.stage_trailed.jc}
+                    </button>
+                  ` : ''}
                 </td>
-                <!-- Total Notified & Webland -->
+                <!-- Total Notified & Webland with District Trailed Counts -->
                 <td>
                   <button class="fig-total-btn btn-total-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="sec13_notified" title="Click to view all ${summary.sec13_notified} section 13 notified villages">
                     ${summary.sec13_notified}
                   </button>
+                  ${summary.stage_trailed.section13 > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_section13" title="${summary.stage_trailed.section13} villages across district trailed Sec 13 target date">
+                      ⚠️ ${summary.stage_trailed.section13}
+                    </button>
+                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn btn-total-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="ported_webland2" title="Click to view all ${summary.ported_webland2} Webland-2 ported villages">
                     ${summary.ported_webland2}
                   </button>
+                  ${summary.stage_trailed.webland_2 > 0 ? `
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_webland_2" title="${summary.stage_trailed.webland_2} villages across district trailed Webland-2 target date">
+                      ⚠️ ${summary.stage_trailed.webland_2}
+                    </button>
+                  ` : ''}
                 </td>
                 <td style="font-family:'DM Mono',monospace;font-weight:800;color:#facc15;">${summary.completion_pct}%</td>
               </tr>
@@ -12825,6 +13411,7 @@ function openMandalFigureModal(mandalName, metricKey) {
   state.modalActiveMetric = metricKey;
   state.modalSearchQuery = '';
   state.modalFilterPhase = 'All';
+  state.modalTrailingFilter = metricKey.startsWith('trailed_') ? 'trailed_only' : 'All';
 
   const mandalTitle = mandalName === '__ALL__' ? 'Chittoor District (All 27 Mandals)' : `${h(mandalName)} Mandal`;
 
@@ -12967,10 +13554,21 @@ function openMandalFigureModal(mandalName, metricKey) {
 }
 
 function renderVillageDetailsModalContent(mandalName, metricKey, villages, metricLabel, mandalTitle) {
-  // Apply search and phase filters if present
+  const stageKey = metricKey.startsWith('trailed_') ? metricKey.replace('trailed_', '') : (metricKey.startsWith('dlr_') ? metricKey.replace('dlr_', '') : '');
+
+  // Apply search, phase, and trailing compliance filters if present
   let filtered = villages.slice();
   if (state.modalFilterPhase && state.modalFilterPhase !== 'All') {
     filtered = filtered.filter(v => normalizePhase(v.phase) === state.modalFilterPhase);
+  }
+  if (state.modalTrailingFilter && state.modalTrailingFilter !== 'All') {
+    if (state.modalTrailingFilter === 'trailed_only') {
+      filtered = filtered.filter(v => isVillageTrailingStage(v, stageKey || 'gt'));
+    } else if (state.modalTrailingFilter === 'completed_only') {
+      filtered = filtered.filter(v => isResurveyCompleted(v) || (stageKey ? isVillageStageCompleted(v, stageKey) : false));
+    } else if (state.modalTrailingFilter === 'on_track_only') {
+      filtered = filtered.filter(v => !isResurveyCompleted(v) && !isVillageTrailingStage(v, stageKey || 'gt'));
+    }
   }
   if (state.modalSearchQuery) {
     const q = state.modalSearchQuery.toLowerCase();
@@ -13000,6 +13598,14 @@ function renderVillageDetailsModalContent(mandalName, metricKey, villages, metri
         <select id="modal-phase-filter" class="ap-select">
           ${phases.map(p => `<option value="${h(p)}" ${state.modalFilterPhase === p ? 'selected' : ''}>${h(p === 'All' ? 'All Phases' : p)}</option>`).join('')}
         </select>
+
+        <label style="font-size:11px;font-weight:700;color:var(--muted);">Target Compliance:</label>
+        <select id="modal-trailing-filter" class="ap-select">
+          <option value="All" ${(!state.modalTrailingFilter || state.modalTrailingFilter === 'All') ? 'selected' : ''}>All Villages in Scope</option>
+          <option value="trailed_only" ${state.modalTrailingFilter === 'trailed_only' ? 'selected' : ''}>⚠️ Trailed Target Date Only</option>
+          <option value="completed_only" ${state.modalTrailingFilter === 'completed_only' ? 'selected' : ''}>✅ Stage Completed Only</option>
+          <option value="on_track_only" ${state.modalTrailingFilter === 'on_track_only' ? 'selected' : ''}>⏱️ On Track Only</option>
+        </select>
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;">
@@ -13020,9 +13626,9 @@ function renderVillageDetailsModalContent(mandalName, metricKey, villages, metri
             <th>DIVISION</th>
             <th>PHASE</th>
             <th style="text-align:right;">TOTAL EXTENT (AC)</th>
-            <th style="text-align:right;">GOVT LAND (AC)</th>
-            <th style="text-align:right;">PATTA LAND (AC)</th>
             <th>CURRENT STAGE</th>
+            <th>STAGE TARGET DATE</th>
+            <th>COMPLIANCE / TRAILING STATUS</th>
             <th>OVERALL STATUS</th>
             <th>DLR LOGIN STATUS</th>
             <th>13 NOTIFIED</th>
@@ -13032,12 +13638,15 @@ function renderVillageDetailsModalContent(mandalName, metricKey, villages, metri
         </thead>
         <tbody>
           ${filtered.length === 0 ? `
-            <tr><td colspan="15" class="text-center empty-table-cell" style="padding:32px;">No villages match the active search/phase filter.</td></tr>
+            <tr><td colspan="15" class="text-center empty-table-cell" style="padding:32px;">No villages match the active search/compliance filter.</td></tr>
           ` : filtered.map((v, idx) => {
             const isComp = isResurveyCompleted(v);
             const isSec13 = isComplete(v.section13_status) || isComp;
             const isPorted = Boolean(v.ported_to_webland || v.webland_2_status === 'Ported');
             const activeStage = getActiveDlrStage(v);
+            const targetDate = getVillageStageTargetDate(v, stageKey || 'gt') || v.target_date || '—';
+            const isTrailed = isVillageTrailingStage(v, stageKey || 'gt');
+
             return `
               <tr>
                 <td class="font-mono text-muted">${idx + 1}</td>
@@ -13051,10 +13660,28 @@ function renderVillageDetailsModalContent(mandalName, metricKey, villages, metri
                 <td class="text-muted">${h(v.division)}</td>
                 <td><span class="phase-chip">${h(v.phase || '—')}</span></td>
                 <td style="text-align:right;" class="font-mono font-bold">${formatExtent(v.extent)}</td>
-                <td style="text-align:right;" class="font-mono text-muted">${formatExtent(v.govt_extent)}</td>
-                <td style="text-align:right;" class="font-mono text-muted">${formatExtent(v.patta_extent)}</td>
                 <td>
                   <span class="stage-cell-pill">${h(v.current_stage || '—')}</span>
+                </td>
+                <td>
+                  <span class="font-mono font-bold" style="font-size:11px;color:#b45309;background:#fef3c7;padding:2px 6px;border-radius:4px;">
+                    📅 ${h(targetDate)}
+                  </span>
+                </td>
+                <td>
+                  ${isComp ? `
+                    <span class="status-pill completed" style="background:#ecfdf5;color:#047857;border:1px solid #a7f3d0;font-weight:700;">
+                      ✅ Done On-Time
+                    </span>
+                  ` : (isTrailed ? `
+                    <span class="status-pill delayed" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;font-weight:700;">
+                      ⚠️ Trailed Target Date ${v.days_delayed ? `(${v.days_delayed}d late)` : ''}
+                    </span>
+                  ` : `
+                    <span class="status-pill in-progress" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;font-weight:700;">
+                      ⏱️ On Track
+                    </span>
+                  `)}
                 </td>
                 <td>
                   <span class="status-pill ${isComp ? 'completed' : (v.status === 'In Progress' ? 'in-progress' : 'pending')}">
@@ -13089,7 +13716,7 @@ function renderVillageDetailsModalContent(mandalName, metricKey, villages, metri
     </div>
   `;
 
-  modal(`${metricLabel} — ${mandalTitle}`, 'Full village-by-village statutory resurvey records & live workflow tracking', body, `
+  modal(`${metricLabel} — ${mandalTitle}`, 'Full village-by-village statutory resurvey records, stage target dates & compliance tracking', body, `
     <button type="button" class="primary-button" data-action="close-modal">Close</button>
   `);
   document.querySelector('.modal')?.classList?.add('modal-extra-wide');
@@ -13212,6 +13839,11 @@ function exportModalVillagesCsv() {
 
 
 function getMetricLabel(metricKey) {
+  if (metricKey.startsWith('trailed_')) {
+    const stageKey = metricKey.replace('trailed_', '');
+    const sc = RESURVEY_STAGES_CONFIG.find(s => s.key === stageKey);
+    return sc ? `Villages Trailed Target Date for ${sc.fullName}` : 'Villages Trailed Statutory Target Date';
+  }
   const metricLabels = {
     villages: 'All Survey Villages',
     extent: 'Total Extent Breakdown',

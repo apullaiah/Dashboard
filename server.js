@@ -1262,8 +1262,10 @@ async function syncSource(store, source) {
       const tahPhoneIdx = headers.findIndex(h => /tah.*(mobile|phone|contact)|mro.*(mobile|phone|contact)/i.test(h));
       const rdoNameIdx = headers.findIndex(h => /rdo.*name/i.test(h));
       const rdoPhoneIdx = headers.findIndex(h => /rdo.*(mobile|phone|contact)/i.test(h));
+      const diosNameIdx = headers.findIndex(h => /dios.*name|deputy.*inspector.*name/i.test(h));
+      const diosPhoneIdx = headers.findIndex(h => /dios.*(mobile|phone|contact)|deputy.*inspector.*(mobile|phone|contact)/i.test(h));
 
-      const isWide = (vsPhoneIdx >= 0 || vroPhoneIdx >= 0 || msPhoneIdx >= 0 || tahPhoneIdx >= 0 || rdoPhoneIdx >= 0);
+      const isWide = (vsPhoneIdx >= 0 || vroPhoneIdx >= 0 || msPhoneIdx >= 0 || tahPhoneIdx >= 0 || rdoPhoneIdx >= 0 || diosPhoneIdx >= 0);
 
       rows.forEach(row => {
         const divVal = divIdx >= 0 ? clean(row[divIdx]) : '';
@@ -1297,6 +1299,15 @@ async function syncSource(store, source) {
               v.vs_phone = ph;
               v.gt_team_names = nm;
               v.gt_team_mobiles = ph;
+              store.villageSurveyors = store.villageSurveyors || {};
+              store.villageSurveyors[v.village_code || v.id] = {
+                name: nm,
+                phone: ph,
+                village: v.village_name,
+                mandal: v.mandal,
+                division: v.division,
+                hasSheetPhone: true
+              };
               updated++;
             }
           }
@@ -1323,6 +1334,12 @@ async function syncSource(store, source) {
             if (ph.length >= 10) {
               store.mandalSurveyors[effectiveMandal] = { name: nm, role: 'Mandal Surveyor (MS)', phone: ph, mandal: effectiveMandal, hasSheetPhone: true };
               MANDAL_SURVEYOR_DIRECTORY[effectiveMandal] = store.mandalSurveyors[effectiveMandal];
+              (store.villages || []).forEach(vil => {
+                if (normalizeMandal(vil.mandal, store) === effectiveMandal) {
+                  vil.ms_name = nm;
+                  vil.ms_phone = ph;
+                }
+              });
               updated++;
             }
           }
@@ -1339,6 +1356,28 @@ async function syncSource(store, source) {
             const nm = rdoNameIdx >= 0 ? clean(row[rdoNameIdx]) : `RDO, ${effectiveDivision}`;
             if (ph.length >= 10) {
               store.rdos[effectiveDivision] = { name: nm, role: 'Revenue Divisional Officer (RDO)', phone: ph, division: effectiveDivision, hasSheetPhone: true };
+              updated++;
+            }
+          }
+          if (diosPhoneIdx >= 0 && row[diosPhoneIdx]) {
+            const ph = clean(row[diosPhoneIdx]).replace(/\D/g, '').slice(-10);
+            const nm = diosNameIdx >= 0 ? clean(row[diosNameIdx]) : '';
+            if (ph.length >= 10) {
+              const matchedKey = Object.keys(DIOS_DIRECTORY).find(k => 
+                (nm && (normalKey(k) === normalKey(nm) || normalKey(nm).includes(normalKey(k)) || normalKey(k).includes(normalKey(nm)))) ||
+                (effectiveMandal && DIOS_DIRECTORY[k].mandals.some(m => normalizeMandal(m, store) === effectiveMandal))
+              );
+              const targetKey = matchedKey || nm || effectiveDivision || 'DIOS';
+              store.dios[targetKey] = {
+                name: matchedKey || nm || `DIOS, ${targetKey}`,
+                role: 'Deputy Inspector of Survey (DIOS)',
+                phone: ph,
+                mandals: matchedKey ? DIOS_DIRECTORY[matchedKey].mandals : [],
+                hasSheetPhone: true
+              };
+              if (matchedKey && DIOS_DIRECTORY[matchedKey]) {
+                DIOS_DIRECTORY[matchedKey].phone = ph;
+              }
               updated++;
             }
           }
@@ -1379,6 +1418,15 @@ async function syncSource(store, source) {
               v.vs_phone = ph;
               v.gt_team_names = rawName || v.gt_team_names || 'Village Surveyor';
               v.gt_team_mobiles = ph || v.gt_team_mobiles;
+              store.villageSurveyors = store.villageSurveyors || {};
+              store.villageSurveyors[v.village_code || v.id] = {
+                name: rawName || v.vs_name || 'Village Surveyor',
+                phone: ph,
+                village: v.village_name,
+                mandal: v.mandal,
+                division: v.division,
+                hasSheetPhone: Boolean(ph && ph.length >= 10)
+              };
               updated++;
             }
           } else if (isMs) {
@@ -1391,6 +1439,12 @@ async function syncSource(store, source) {
                 hasSheetPhone: Boolean(ph && ph.length >= 10)
               };
               MANDAL_SURVEYOR_DIRECTORY[effectiveMandal] = store.mandalSurveyors[effectiveMandal];
+              (store.villages || []).forEach(vil => {
+                if (normalizeMandal(vil.mandal, store) === effectiveMandal) {
+                  vil.ms_name = rawName || vil.ms_name;
+                  vil.ms_phone = ph || vil.ms_phone;
+                }
+              });
               updated++;
             }
           } else if (isTah) {
@@ -1417,12 +1471,37 @@ async function syncSource(store, source) {
               updated++;
             }
           } else if (isDios) {
-            const dKey = effectiveDivision || effectiveMandal;
-            if (dKey) {
-              store.dios[dKey] = {
-                name: rawName || `DIOS, ${dKey}`,
+            const dMatch = Object.keys(DIOS_DIRECTORY).find(k =>
+              normalKey(k) === normalKey(rawName) ||
+              normalKey(rawName).includes(normalKey(k)) ||
+              normalKey(k).includes(normalKey(rawName)) ||
+              (effectiveMandal && DIOS_DIRECTORY[k].mandals.some(m => normalizeMandal(m, store) === effectiveMandal))
+            );
+            const targetKey = dMatch || rawName || effectiveDivision || effectiveMandal || 'DIOS';
+            store.dios[targetKey] = {
+              name: dMatch || rawName || `DIOS, ${targetKey}`,
+              role: 'Deputy Inspector of Survey (DIOS)',
+              phone: ph,
+              mandals: dMatch ? DIOS_DIRECTORY[dMatch].mandals : [],
+              hasSheetPhone: Boolean(ph && ph.length >= 10)
+            };
+            if (dMatch && DIOS_DIRECTORY[dMatch] && ph) {
+              DIOS_DIRECTORY[dMatch].phone = ph;
+            }
+            updated++;
+          } else {
+            // Check if rawName matches any known DIOS officer
+            const diosNameDirectMatch = Object.keys(DIOS_DIRECTORY).find(k =>
+              normalKey(k) === normalKey(rawName) ||
+              (rawName && rawName.length > 4 && (normalKey(rawName).includes(normalKey(k)) || normalKey(k).includes(normalKey(rawName))))
+            );
+            if (diosNameDirectMatch && ph) {
+              DIOS_DIRECTORY[diosNameDirectMatch].phone = ph;
+              store.dios[diosNameDirectMatch] = {
+                name: diosNameDirectMatch,
                 role: 'Deputy Inspector of Survey (DIOS)',
                 phone: ph,
+                mandals: DIOS_DIRECTORY[diosNameDirectMatch].mandals,
                 hasSheetPhone: Boolean(ph && ph.length >= 10)
               };
               updated++;
@@ -2424,6 +2503,134 @@ async function handleApi(req, res, url) {
 
   if (req.method === 'GET' && pathname === '/api/whatsapp/logs') {
     return json(res, 200, { logs: (store.whatsappLogs || []).slice(0, 100) });
+  }
+
+  // Complete directory of VS, MS/MLSO, and DIOS officers with synced Google Sheet contacts
+  if (req.method === 'GET' && pathname === '/api/whatsapp/officers-directory') {
+    const vsMap = new Map();
+    (store.villages || []).forEach(v => {
+      const contacts = getVillageSurveyorContacts(v, store);
+      contacts.forEach(c => {
+        const ph = clean(c.phone).replace(/\D/g, '').slice(-10);
+        const key = `${v.mandal}_${v.village_name}_${c.name}_${ph}`;
+        if (!vsMap.has(key)) {
+          vsMap.set(key, {
+            id: 'vs_' + (v.village_code || v.id),
+            name: c.name || 'Village Surveyor',
+            role: c.role || 'Village Surveyor (VS)',
+            phone: ph,
+            village: v.village_name,
+            villageCode: v.village_code,
+            mandal: v.mandal,
+            division: v.division,
+            hasSheetPhone: Boolean(ph && ph.length >= 10),
+            source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
+          });
+        }
+      });
+    });
+
+    const msList = [];
+    const mandalKeys = Object.keys(MANDAL_SURVEYOR_DIRECTORY);
+    mandalKeys.forEach(m => {
+      const norm = normalizeMandal(m, store);
+      const storeMs = (store.mandalSurveyors && (store.mandalSurveyors[norm] || store.mandalSurveyors[m])) || null;
+      const ph = storeMs?.phone || MANDAL_SURVEYOR_DIRECTORY[m]?.phone || '';
+      const nm = storeMs?.name || MANDAL_SURVEYOR_DIRECTORY[m]?.name || `${norm} Mandal Surveyor`;
+      msList.push({
+        id: 'ms_' + norm.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+        name: nm,
+        role: 'Mandal Surveyor (MS / MLSO)',
+        phone: ph,
+        mandal: norm,
+        hasSheetPhone: Boolean(ph && ph.length >= 10),
+        source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
+      });
+    });
+
+    const diosList = [];
+    Object.values(DIOS_DIRECTORY).forEach(d => {
+      const storeDios = (store.dios && (store.dios[d.name] || Object.values(store.dios || {}).find(x => normalKey(x.name) === normalKey(d.name)))) || null;
+      const ph = storeDios?.phone || DIOS_DIRECTORY[d.name]?.phone || d.phone || '';
+      diosList.push({
+        id: 'dios_' + d.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+        name: d.name,
+        role: 'Deputy Inspector of Survey (DIOS)',
+        phone: ph,
+        mandals: d.mandals,
+        hasSheetPhone: Boolean(ph && ph.length >= 10),
+        source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
+      });
+    });
+
+    const vsList = Array.from(vsMap.values());
+    return json(res, 200, {
+      vs: vsList,
+      ms: msList,
+      dios: diosList,
+      summary: {
+        totalVs: vsList.length,
+        vsWithPhone: vsList.filter(x => x.hasSheetPhone).length,
+        totalMs: msList.length,
+        msWithPhone: msList.filter(x => x.hasSheetPhone).length,
+        totalDios: diosList.length,
+        diosWithPhone: diosList.filter(x => x.hasSheetPhone).length
+      }
+    });
+  }
+
+  // Test Message Delivery to MS, VS, or DIOS contact numbers
+  if (req.method === 'POST' && pathname === '/api/whatsapp/test-message') {
+    const b = await readBody(req);
+    const rawPhone = clean(b.phone || b.to);
+    const phone = rawPhone.replace(/\D/g, '').slice(-10);
+    if (!phone || phone.length < 10) {
+      return json(res, 400, { error: 'Please provide a valid 10-digit mobile number for testing.' });
+    }
+    const officerName = clean(b.officerName || b.name || 'Survey Officer');
+    const role = clean(b.role || b.tier?.toUpperCase() || 'Survey Officer');
+    const senderTitle = clean(b.senderTitle) || store.whatsappConfig?.senderName || 'DSLRO, Chittoor';
+    const message = clean(b.message) || `*OFFICIAL RESURVEY DIRECTIVE · TEST DISPATCH*\n\nTo: *${officerName}* (${role})\nFrom: *${senderTitle}*\nStatus: Resurvey WhatsApp Webhook & Message Delivery Test\nDate: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}\n\nThis is a verified test dispatch from the A.P. Resurvey Project 2.0 Chittoor Monitoring Dashboard. Please acknowledge receipt.`;
+
+    const config = store.whatsappConfig || {};
+    const sendResult = await sendWhatsAppCloudMessage(phone, message, config);
+    const status = sendResult.success ? 'Delivered' : (sendResult.simulated ? 'Simulated' : 'Failed');
+
+    if (!store.whatsappLogs) store.whatsappLogs = [];
+    const logEntry = {
+      id: id(),
+      timestamp: now(),
+      direction: 'OUTBOUND_TEST',
+      from: senderTitle,
+      to: phone,
+      senderName: senderTitle,
+      recipientName: officerName,
+      recipientRole: role,
+      query: `Test Dispatch to ${officerName}`,
+      replyPreview: message.slice(0, 160),
+      fullText: message,
+      status,
+      error: sendResult.error || null,
+      mode: sendResult.simulated ? 'Simulation' : 'Live Graph API'
+    };
+    store.whatsappLogs.unshift(logEntry);
+    if (store.whatsappLogs.length > 300) store.whatsappLogs.pop();
+    save(store);
+
+    const waLink = `https://wa.me/91${phone}?text=${encodeURIComponent(message)}`;
+    return json(res, 200, {
+      success: true,
+      delivered: sendResult.success,
+      simulated: sendResult.simulated,
+      status,
+      phone,
+      officerName,
+      role,
+      waLink,
+      error: sendResult.error || null,
+      messagePreview: message.slice(0, 140),
+      logEntry
+    });
   }
 
   if (req.method === 'POST' && pathname === '/api/whatsapp/test') {
