@@ -52,7 +52,7 @@ function saveStoredWhatsAppConfig(cfg) {
 
 const STAGES = [
   ['gt_status', 'GT'],
-  ['vectorization_status', 'Vectorization/Correlation'],
+  ['vectorization_status', 'Vectorization & Correlation'],
   ['vs_status', 'Village Surveyor Login'],
   ['vro_status', 'DLR@VRO Login'],
   ['tahsildar_status', 'DLR@Tahsildar Login'],
@@ -221,11 +221,40 @@ function getMandalSurveyor(mandalName) {
 }
 
 function renderVillageOfficerLastColumn(v) {
-  return '';
+  const contact = getVillageOfficerContact(v);
+  if (!contact.vsName && !contact.rawNames) return '<span class="text-muted">—</span>';
+  return `
+    <div class="officer-cell-wrap">
+      <div class="officer-name">${contact.nameHtml}</div>
+      <div class="officer-phone">${contact.phoneHtml}</div>
+      ${contact.jurisdiction ? `<div class="officer-jur font-mono" title="${h(contact.jurisdiction)}">📍 ${h(contact.jurisdiction.length > 35 ? contact.jurisdiction.slice(0, 32) + '...' : contact.jurisdiction)}</div>` : ''}
+    </div>
+  `;
 }
 
 function getVillageOfficerContact(v) {
-  return { nameHtml: '', phoneHtml: '', rawNames: '', rawMobiles: '' };
+  if (!v) return { nameHtml: '', phoneHtml: '', rawNames: '', rawMobiles: '', vsName: '', vsPhone: '', secretariat: '', jurisdiction: '', jurisdictionVillages: [] };
+  const vsName = v.vs_name || '';
+  const vsPhone = v.vs_phone || '';
+  const sec = v.secretariat || '';
+  const jur = v.vs_jurisdiction || (v.vs_jurisdiction_villages ? v.vs_jurisdiction_villages.join(', ') : '');
+  const gtName = v.gt_team_names || '';
+  const gtPhone = v.gt_team_mobiles || '';
+  
+  const nameHtml = vsName ? `<strong>${h(vsName)}</strong>${sec ? ` <small class="text-muted">(${h(sec)})</small>` : ''}` : (gtName ? `<strong>${h(gtName)}</strong>` : '<span class="text-muted">—</span>');
+  const phoneHtml = vsPhone ? `<a href="tel:${h(vsPhone)}" class="officer-phone-link">📞 ${h(vsPhone)}</a>` : (gtPhone ? `<a href="tel:${h(gtPhone)}" class="officer-phone-link">📞 ${h(gtPhone)}</a>` : '<span class="text-muted">—</span>');
+
+  return {
+    nameHtml,
+    phoneHtml,
+    rawNames: vsName || gtName,
+    rawMobiles: vsPhone || gtPhone,
+    vsName,
+    vsPhone,
+    secretariat: sec,
+    jurisdiction: jur,
+    jurisdictionVillages: v.vs_jurisdiction_villages || []
+  };
 }
 
 
@@ -610,7 +639,7 @@ function renderPhaseStagePendencySection(d, has) {
 
   const shortHeaders = [
     ['gt_status', '1. GT'],
-    ['vectorization_status', '2. Vect'],
+    ['vectorization_status', '2. Vec & Corr'],
     ['vs_status', '3. VS'],
     ['vro_status', '4. VRO'],
     ['tahsildar_status', '5. Tah'],
@@ -1065,7 +1094,7 @@ function renderFilterChipPanel(d) {
   const monthsList = ['Aug-26', 'Sep-26', 'Oct-26', 'Nov-26', 'Dec-26', 'Jan-27', 'Feb-27', 'Mar-27'];
   const stagesList = [
     'All stages', 'Final ROR Completed', '13 Completed', 'JC Login', 'RDO Login',
-    'Tah Login', 'VRO Login', 'Village Surveyor Login', 'Vectorization', 'GT Ongoing', 'GT Not Started', 'Completed'
+    'Tah Login', 'VRO Login', 'Village Surveyor Login', 'Vectorization & Correlation', 'GT Ongoing', 'GT Not Started', 'Completed'
   ];
   const zonesList = [
     { val: 'All', label: 'All', dot: null },
@@ -1483,7 +1512,7 @@ function calculateStageAbstractMetrics(filtered, f = {}) {
       step: 2,
       name: 'Vectorization & Correlation',
       authority: 'Cadastral GIS Mapping Team',
-      filterVal: 'Vectorization',
+      filterVal: 'Vectorization & Correlation',
       count: filtered.filter(v => (v.current_stage || '').toLowerCase().includes('vector') || (v.current_stage || '').toLowerCase().includes('corr')).length,
       cleared: filtered.filter(v => isComplete(v.vectorization_status)).length
     },
@@ -1624,7 +1653,7 @@ function renderIndividualVillageProgressCard(village) {
 
   const citizenSteps = [
     { num: 1, name: 'GT', unit: 'Acres', done: isPorted || isComplete(village.gt_status) },
-    { num: 2, name: 'Vectorization', unit: 'Correlation', done: isPorted || isComplete(village.vectorization_status) },
+    { num: 2, name: 'Vectorization & Correlation', unit: 'Correlation', done: isPorted || isComplete(village.vectorization_status) },
     { num: 3, name: 'VS Login', unit: 'Entries', done: isPorted || isComplete(village.vs_status) },
     { num: 4, name: 'VRO Login', unit: 'Entries', done: isPorted || isComplete(village.vro_status) },
     { num: 5, name: 'Tahsildar Login', unit: 'Entries', done: isPorted || isComplete(village.tahsildar_status), highlight: true },
@@ -1652,7 +1681,25 @@ function renderIndividualVillageProgressCard(village) {
           <p class="iv-sub-meta">
             Mandal: <strong>${h(village.mandal)}</strong> · Division: <strong>${h(village.division)}</strong> · Phase: <strong>${h(village.phase)}</strong> · PPB Cycle: <strong>${h(village.ppb_cycle || '—')}</strong>
           </p>
+          <div class="iv-officer-strip" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">
+            <span class="iv-officer-pill" style="display:inline-flex;align-items:center;gap:5px;background:#f8fafc;padding:3px 10px;border-radius:4px;border:1px solid #e2e8f0;font-size:12px;">
+              👤 <strong>Village Surveyor:</strong> ${h(officerContact.vsName || village.vs_name || 'Assigned via Secretariat')}
+            </span>
+            ${(officerContact.vsPhone || village.vs_phone) ? `
+              <span class="iv-officer-pill" style="display:inline-flex;align-items:center;gap:5px;background:#f0fdf4;padding:3px 10px;border-radius:4px;border:1px solid #bbf7d0;font-size:12px;">
+                📞 <a href="tel:${h(officerContact.vsPhone || village.vs_phone)}" class="officer-phone-link" style="color:#16a34a;font-weight:700;">${h(officerContact.vsPhone || village.vs_phone)}</a>
+              </span>
+            ` : ''}
+            <span class="iv-officer-pill" style="display:inline-flex;align-items:center;gap:5px;background:#f8fafc;padding:3px 10px;border-radius:4px;border:1px solid #e2e8f0;font-size:12px;">
+              🏛️ <strong>Secretariat:</strong> ${h(officerContact.secretariat || village.secretariat || 'Grama Sachivalayam')}
+            </span>
+            ${officerContact.jurisdiction ? `
+              <span class="iv-officer-pill" style="display:inline-flex;align-items:center;gap:5px;background:#eff6ff;padding:3px 10px;border-radius:4px;border:1px solid #bfdbfe;font-size:12px;color:#1e40af;" title="Jurisdiction Villages from Google Spreadsheet: ${h(officerContact.jurisdiction)}">
+                📍 <strong>Jurisdiction Villages (from Google Spreadsheet):</strong> ${h(officerContact.jurisdiction)}
+              </span>
+            ` : ''}
           </div>
+        </div>
         <div class="iv-header-actions">
           <button type="button" class="iv-action-btn primary" data-action="track-village-modal" data-village-id="${village.id}" title="Open full official record popup for this village">
             ${icon('document')} Full Details Modal ↗
@@ -4070,7 +4117,7 @@ function getStagePerformanceDetails(stageKey, villageList = []) {
 
   const stageMeta = {
     gt_status: { name: 'Ground Truthing (GT)', short: 'GT', num: 1, telugu: 'భూ సరిచూపు & విస్తీర్ణ నిర్ధారణ', tier: 'Survey Field Team (RSDT / MLSO)', benchmarkRule: '25 Ac / Rover / Day (District Capacity: 1,775 Ac/day for 71 rovers)', dailyTarget: 1775, unit: 'Acres', isExtent: true },
-    vectorization_status: { name: 'Cadastral Vectorization', short: 'Vectorization', num: 2, telugu: 'కడస్ట్రల్ చాల్తాల వెక్టరైజేషన్', tier: 'GIS Vectorization Team', benchmarkRule: '120 Chalthas / Day correlation & mapping target', dailyTarget: 120, unit: 'Chalthas', isChalthas: true },
+    vectorization_status: { name: 'Vectorization & Correlation', short: 'Vectorization & Correlation', num: 2, telugu: 'కడస్ట్రల్ చాల్తాల వెక్టరైజేషన్ & కోరిలేషన్', tier: 'GIS Vectorization Team', benchmarkRule: '120 Chalthas / Day correlation & mapping target', dailyTarget: 120, unit: 'Chalthas', isChalthas: true },
     vs_status: { name: 'DLR@Village Surveyor Login', short: 'VS Login', num: 3, telugu: 'గ్రామ సర్వేయర్ లాగిన్ నమోదులు', tier: 'Village Surveyor (Secretariat)', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200, unit: 'Entries', isEntries: true },
     vro_status: { name: 'DLR@VRO Login', short: 'VRO Login', num: 4, telugu: 'గ్రామ రెవెన్యూ అధికారి (VRO) లాగిన్ నమోదులు', tier: 'Village Revenue Officer', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200, unit: 'Entries', isEntries: true },
     tahsildar_status: { name: 'DLR@Tahsildar Login', short: 'Tahsildar Login', num: 5, telugu: 'తహసీల్దార్ లాగిన్ ఆమోద నమోదులు', tier: 'Tahsildar / Mandal Revenue Officer (MRO)', benchmarkRule: '200 Entries / Day statutory benchmark', dailyTarget: 200, unit: 'Entries', isEntries: true },
@@ -4094,50 +4141,74 @@ function getStagePerformanceDetails(stageKey, villageList = []) {
   let totalFormatted = '';
 
   if (meta.isExtent) {
-    // 1. GT: STRICTLY EXTENT IN ACRES (ZERO VILLAGE COUNTS)
-    today = vList.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
-    cumulative = vList.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : (v.gt_status === 'In Progress' ? Math.round((parseFloat(v.extent) || 0) * 0.6 * 100) / 100 : 0))), 0) || 57690.08;
-    total = vList.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) || 130882.07;
-    balance = vList.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, Math.round(((parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0)) * 100) / 100)), 0) || 94632.24;
+    // 1. GT: EXTENT IN ACRES DIRECT FROM GOOGLE SPREADSHEETS
+    const gtSum = state.dashboard?.gtSummary;
+    if (gtSum && vList.length >= totalVillages - 20) {
+      today = Number(gtSum.todayTotal) || 0;
+      cumulative = Number(gtSum.cumulativeTotal) || 0;
+      balance = Number(gtSum.balanceTotal) || 0;
+      total = Number(gtSum.totalExtent) || (cumulative + balance);
+    } else {
+      today = vList.reduce((s, v) => s + (parseFloat(v.today_gt_extent) || 0), 0);
+      cumulative = vList.reduce((s, v) => s + (parseFloat(v.cumulative_gt_extent) || (isComplete(v.gt_status) ? (parseFloat(v.extent) || 0) : (v.gt_status === 'In Progress' ? Math.round((parseFloat(v.extent) || 0) * 0.6 * 100) / 100 : 0))), 0) || 57690.08;
+      total = vList.reduce((s, v) => s + (parseFloat(v.extent) || 0), 0) || 130882.07;
+      balance = vList.reduce((s, v) => s + ((v.balance_gt_extent !== undefined && v.balance_gt_extent !== null) ? parseFloat(v.balance_gt_extent) : Math.max(0, Math.round(((parseFloat(v.extent) || 0) - (parseFloat(v.cumulative_gt_extent) || 0)) * 100) / 100)), 0) || 94632.24;
+    }
 
     todayFormatted = '+' + formatExtent(today) + ' Ac';
     cumulativeFormatted = formatExtent(cumulative) + ' Ac';
     balanceFormatted = formatExtent(balance) + ' Ac';
     totalFormatted = formatExtent(total) + ' Ac';
   } else if (meta.isChalthas) {
-    // 2. VECTORIZATION: STRICTLY NUMBER OF CHALTHAS (ZERO VILLAGE COUNTS)
-    total = vList.reduce((s, v) => s + (v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75))), 0);
-    cumulative = vList.reduce((s, v) => {
-      const totCh = v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75));
-      return s + (isComplete(v.vectorization_status) ? totCh : (v.vectorization_status === 'In Progress' ? Math.round(totCh * 0.65) : 0));
-    }, 0);
-    balance = Math.max(0, total - cumulative);
-    today = vList.reduce((s, v) => {
-      const totCh = v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75));
-      const compCh = isComplete(v.vectorization_status) ? totCh : (v.vectorization_status === 'In Progress' ? Math.round(totCh * 0.65) : 0);
-      return s + (isComplete(v.vectorization_status) && ((v.id && v.id.charCodeAt(0) % 7 === 0) || (parseFloat(v.today_gt_extent) || 0) > 0) ? Math.min(compCh, Math.max(1, Math.round(totCh * 0.3))) : 0);
-    }, 0) || 145;
+    // 2. VECTORIZATION & CORRELATION: DIRECT TELEMETRY FROM GOOGLE SPREADSHEETS
+    const vecSum = state.dashboard?.vectorizationSummary;
+    if (vecSum && vList.length >= totalVillages - 20) {
+      today = Number(vecSum.todayTotal) || 0;
+      cumulative = Number(vecSum.cumulativeTotal) || 0;
+      balance = Number(vecSum.balanceTotal) || 0;
+      total = Number(vecSum.totalEntries) || (cumulative + balance);
+    } else {
+      total = vList.reduce((s, v) => s + (v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75))), 0);
+      cumulative = vList.reduce((s, v) => {
+        const totCh = v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75));
+        return s + (isComplete(v.vectorization_status) ? totCh : (v.vectorization_status === 'In Progress' ? Math.round(totCh * 0.65) : 0));
+      }, 0);
+      balance = Math.max(0, total - cumulative);
+      today = vList.reduce((s, v) => {
+        const totCh = v.chalthas ? Number(v.chalthas) : Math.max(2, Math.round((parseFloat(v.extent) || 500) / 75));
+        const compCh = isComplete(v.vectorization_status) ? totCh : (v.vectorization_status === 'In Progress' ? Math.round(totCh * 0.65) : 0);
+        return s + (isComplete(v.vectorization_status) && ((v.id && v.id.charCodeAt(0) % 7 === 0) || (parseFloat(v.today_gt_extent) || 0) > 0) ? Math.min(compCh, Math.max(1, Math.round(totCh * 0.3))) : 0);
+      }, 0) || 145;
+    }
 
     todayFormatted = '+' + today.toLocaleString('en-IN') + ' Chalthas';
     cumulativeFormatted = cumulative.toLocaleString('en-IN') + ' Chalthas';
     balanceFormatted = balance.toLocaleString('en-IN') + ' Chalthas';
     totalFormatted = total.toLocaleString('en-IN') + ' Chalthas';
   } else if (meta.isEntries) {
-    // 3. DLR LOGINS: STRICTLY NUMBER OF ENTRIES (ZERO VILLAGE COUNTS)
-    total = vList.reduce((s, v) => s + (Number(v.dlr_total_entries) || Number(v.khatas) || 1000), 0);
-    cumulative = vList.reduce((s, v) => {
-      const totEnt = Number(v.dlr_total_entries) || Number(v.khatas) || 1000;
-      return s + (isComplete(v[stageKey]) ? totEnt : (v[stageKey] === 'In Progress' ? Math.round(totEnt * 0.5) : 0));
-    }, 0);
-    balance = Math.max(0, total - cumulative);
+    // 3. DLR LOGINS: DIRECT TELEMETRY FROM GOOGLE SPREADSHEETS
+    const stageSum = state.dashboard?.dlrSummary?.byStage?.[stageKey];
+    if (stageSum && vList.length >= totalVillages - 20) {
+      today = Number(stageSum.today) || 0;
+      cumulative = Number(stageSum.cumulative) || 0;
+      balance = Number(stageSum.balance) || 0;
+      total = Number(stageSum.total) || (cumulative + balance);
+    } else {
+      total = vList.reduce((s, v) => s + (Number(v.dlr_total_entries) || Number(v.khatas) || 1000), 0);
+      cumulative = vList.reduce((s, v) => {
+        const totEnt = Number(v.dlr_total_entries) || Number(v.khatas) || 1000;
+        return s + (isComplete(v[stageKey]) ? totEnt : (v[stageKey] === 'In Progress' ? Math.round(totEnt * 0.5) : 0));
+      }, 0);
+      balance = Math.max(0, total - cumulative);
 
-    const baseToday = vList.reduce((s, v) => s + (Number(v.dlr_entries_today) || 0), 0) || 285;
-    if (stageKey === 'vs_status') today = baseToday;
-    else if (stageKey === 'vro_status') today = Math.round(baseToday * 0.85);
-    else if (stageKey === 'tahsildar_status') today = Math.round(baseToday * 0.74);
-    else if (stageKey === 'rdo_status') today = Math.round(baseToday * 0.62);
-    else if (stageKey === 'jc_status') today = Math.round(baseToday * 0.56);
-    else today = baseToday;
+      const baseToday = vList.reduce((s, v) => s + (Number(v.dlr_entries_today) || 0), 0) || 285;
+      if (stageKey === 'vs_status') today = baseToday;
+      else if (stageKey === 'vro_status') today = Math.round(baseToday * 0.85);
+      else if (stageKey === 'tahsildar_status') today = Math.round(baseToday * 0.74);
+      else if (stageKey === 'rdo_status') today = Math.round(baseToday * 0.62);
+      else if (stageKey === 'jc_status') today = Math.round(baseToday * 0.56);
+      else today = baseToday;
+    }
 
     todayFormatted = '+' + today.toLocaleString('en-IN') + ' Entries';
     cumulativeFormatted = cumulative.toLocaleString('en-IN') + ' Entries';
@@ -4438,7 +4509,7 @@ function renderStagePerformanceCard(stageDetails) {
         <div class="stage-kpi-box box-today">
           <span class="stage-kpi-label">${stageDetails.isExtent ? 'GT EXTENT COMPLETED TODAY' : stageDetails.isChalthas ? 'CHALTHAS COMPLETED TODAY' : 'ENTRIES COMPLETED TODAY'}</span>
           <strong class="stage-kpi-value text-emerald">${stageDetails.todayFormatted}</strong>
-          <span class="stage-kpi-sub">${stageDetails.isExtent ? 'Acres Verified & Completed Today' : stageDetails.isChalthas ? 'Cadastral Vectorization Done Today' : 'Officer Login Entries Completed Today'}</span>
+          <span class="stage-kpi-sub">${stageDetails.isExtent ? 'Acres Verified & Completed Today' : stageDetails.isChalthas ? 'Vectorization & Correlation Done Today' : 'Officer Login Entries Completed Today'}</span>
         </div>
         <div class="stage-kpi-box box-cum">
           <span class="stage-kpi-label">${stageDetails.isExtent ? 'CUMULATIVE GT EXTENT COMPLETED' : stageDetails.isChalthas ? 'CUMULATIVE CHALTHAS COMPLETED' : 'CUMULATIVE ENTRIES COMPLETED'}</span>
@@ -4709,16 +4780,16 @@ const RESURVEY_STAGES_CONFIG = [
   },
   {
     key: 'vectorization',
-    filterVal: 'Vectorization',
+    filterVal: 'Vectorization & Correlation',
     step: 3,
-    name: 'Cadastral Vectorization',
-    short: 'Vectorization',
+    name: 'Vectorization & Correlation',
+    short: 'Vectorization & Correlation',
     telugu: 'కడస్ట్రల్ వెక్టరైజేషన్ & కోరిలేషన్',
-    authority: 'GIS Vectorization Unit',
+    authority: 'GIS Vectorization & Correlation Unit',
     icon: '📐',
     color: '#8b5cf6',
-    spreadsheetName: 'Phase-IV DLR & Vectorization Status',
-    spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/1p3tJ-9sgTFM8Qrj3f0rLnbfWfc2zP8TnznJH-lAc-b4/edit?gid=1111910402#gid=1111910402',
+    spreadsheetName: 'Phase-IV/V/VI Vectorization & Correlation Sheets',
+    spreadsheetUrl: 'https://docs.google.com/spreadsheets/d/1i8JU7Dc18TFvF2kPFkU2Z6rZRf0SukaYwaW9jNoZtT0/edit?gid=2048120699#gid=2048120699',
     description: 'Vector correlation, area computation, parcel digitization, and boundary reconciliation conducted by GIS teams.',
     match: v => getVillageResurveyStage(v) === 'vectorization'
   },
@@ -5285,13 +5356,13 @@ function renderPpbStageRadioBar(counts, activeRadio, activeLabel, showingCount, 
           <span class="ppb-radio-count-badge ${counts.gt > 0 ? 'has-count' : ''}">${counts.gt}</span>
         </label>
 
-        <!-- 3. Cadastral Vectorization -->
-        <label class="ppb-radio-pill ${activeRadio === 'vectorization' ? 'is-checked' : ''}" title="Filter Cadastral Vectorization & Correlation villages">
+        <!-- 3. Vectorization & Correlation -->
+        <label class="ppb-radio-pill ${activeRadio === 'vectorization' ? 'is-checked' : ''}" title="Filter Vectorization & Correlation villages">
           <input type="radio" name="ppb_stage_filter" value="vectorization" ${activeRadio === 'vectorization' ? 'checked' : ''} />
           <span class="ppb-radio-dot"></span>
           <span class="ppb-radio-label-wrap">
-            <span class="ppb-radio-name">📐 Vectorization</span>
-            <span class="ppb-radio-sub">GIS Digitization</span>
+            <span class="ppb-radio-name">📐 Vectorization & Correlation</span>
+            <span class="ppb-radio-sub">GIS Digitization &amp; Correlation</span>
           </span>
           <span class="ppb-radio-count-badge ${counts.vectorization > 0 ? 'has-count' : ''}">${counts.vectorization}</span>
         </label>
@@ -5456,7 +5527,7 @@ function renderPpbDistribution() {
     activeRadioLabel = 'Ground Truthing (GT)';
   } else if (activeRadio === 'vectorization') {
     cycleVillages = cycleVillages.filter(v => getVillageResurveyStage(v) === 'vectorization');
-    activeRadioLabel = 'Cadastral Vectorization';
+    activeRadioLabel = 'Vectorization & Correlation';
   } else if (activeRadio === 'dlr') {
     if (state.ppbDlrSubStage && state.ppbDlrSubStage !== 'all') {
       cycleVillages = cycleVillages.filter(v => getVillageResurveyStage(v) === state.ppbDlrSubStage);
@@ -5833,7 +5904,7 @@ function renderReferenceFilterPanel(d, filtered) {
   ];
   const divisionsList = ['All', 'Chittoor', 'Nagari', 'Palamaner', 'Kuppam'];
   const stagesList = [
-    'All stages', 'GT', 'Vectorization', 'VS Login', 'VRO Login', 'Tahsildar Login', 'RDO Login', 'JC Login', 'Final RoR', 'Ported'
+    'All stages', 'GT', 'Vectorization & Correlation', 'VS Login', 'VRO Login', 'Tahsildar Login', 'RDO Login', 'JC Login', 'Final RoR', 'Ported'
   ];
   const mandalsList = [...new Set((state.villages || []).map(v => v.mandal).filter(Boolean))].sort();
 
@@ -5992,16 +6063,16 @@ function renderReferenceFourKpiCards(d, filtered) {
         </div>
       </div>
 
-      <!-- 4. VECTORIZATION -->
-      <div class="ref-kpi-box border-orange" data-stage-focus="vectorization_status" title="GIS mapping and cadastral vectorization completion">
+      <!-- 4. VECTORIZATION & CORRELATION -->
+      <div class="ref-kpi-box border-orange" data-stage-focus="vectorization_status" title="GIS mapping and cadastral vectorization & correlation completion">
         <div class="kpi-box-top">
-          <span class="kpi-box-title">VECTORIZATION</span>
+          <span class="kpi-box-title">VECTORIZATION & CORRELATION</span>
           <svg class="kpi-box-icon text-orange" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke-width="2"/><polyline points="14 2 14 8 20 8" stroke-width="2"/><line x1="16" y1="13" x2="8" y2="13" stroke-width="2"/><line x1="16" y1="17" x2="8" y2="17" stroke-width="2"/></svg>
         </div>
-        <div class="kpi-box-val font-mono">${vecPct}%</div>
-        <div class="kpi-box-sub">${vecCount} / ${totalScope} chalthas · ${vsCount} entries</div>
+        <div class="kpi-box-val font-mono">${d?.vectorizationSummary?.pctTotal ? `${d.vectorizationSummary.pctTotal}%` : `${vecPct}%`}</div>
+        <div class="kpi-box-sub">${d?.vectorizationSummary?.villageCount ? `${d.vectorizationSummary.villageCount} live villages · ${d.vectorizationSummary.pendingVillagesCount} pending in spreadsheet` : `${vecCount} / ${totalScope} chalthas · ${vsCount} entries`}</div>
         <div class="kpi-prog-track">
-          <div class="kpi-prog-fill fill-orange" style="width:${vecPct}%;"></div>
+          <div class="kpi-prog-fill fill-orange" style="width:${d?.vectorizationSummary?.pctTotal || vecPct}%;"></div>
         </div>
       </div>
     </section>
@@ -6010,9 +6081,10 @@ function renderReferenceFourKpiCards(d, filtered) {
 
 function renderResurveyStagePipeline(d, filtered) {
   const total = filtered.length;
+  const allCount = (state.villages && state.villages.length) || (d?.villageRecordCount || 736);
   const stages = [
     { key: 'gt_status', name: 'GT', fullName: 'Ground Truthing', unit: 'Acres', icon: '🌾' },
-    { key: 'vectorization_status', name: 'Vectorization', fullName: 'Cadastral Vectorization', unit: 'Chalthas', icon: '📐' },
+    { key: 'vectorization_status', name: 'Vectorization & Correlation', fullName: 'Cadastral Vectorization & Correlation', unit: 'Chalthas', icon: '📐' },
     { key: 'vs_status', name: 'VS Login', fullName: 'Village Surveyor Login', unit: 'Entries', icon: '🔐' },
     { key: 'vro_status', name: 'VRO Login', fullName: 'Village Revenue Officer', unit: 'Entries', icon: '🔐' },
     { key: 'tahsildar_status', name: 'Tahsildar Login', fullName: 'Mandal Revenue Officer', unit: 'Entries', icon: '⭐', highlight: true },
@@ -6033,8 +6105,14 @@ function renderResurveyStagePipeline(d, filtered) {
 
       <div class="ref-pipeline-track">
         ${stages.map((st, idx) => {
-          const cleared = filtered.filter(v => v.ported_to_webland || isComplete(v[st.key])).length;
-          const pending = total - cleared;
+          let cleared = filtered.filter(v => v.ported_to_webland || isComplete(v[st.key])).length;
+          let pending = total - cleared;
+          if (filtered.length >= allCount - 10) {
+            if (st.key === 'vectorization_status' && d?.vectorizationSummary?.pendingVillagesCount !== undefined) {
+              pending = d.vectorizationSummary.pendingVillagesCount;
+              cleared = Math.max(0, total - pending);
+            }
+          }
           const pct = total > 0 ? Math.round((cleared / total) * 100) : 0;
           return `
             <div class="ref-pipeline-card ${st.highlight ? 'pipeline-tahsildar' : ''}" data-overview-stage="${st.key}" title="Click to inspect ${st.fullName} village progress below">
@@ -6331,7 +6409,7 @@ function renderMandalWiseDailyProformaSection(d, filtered) {
               <th>EXTENT (AC)</th>
               <th>TODAY</th>
               <th>GT PROGRESS</th>
-              <th>VECTORIZATION</th>
+              <th>VECTORIZATION &amp; CORRELATION</th>
             </tr>
           </thead>
           <tbody>
@@ -6753,7 +6831,7 @@ function renderPhaseProgressSection(d, has) {
 
               <div class="phase-activities-strip">
                 <span class="activity-pill ${p.gt_status === 100 ? 'done' : ''}" title="GT: ${formatPct(p.gt_status)}">GT: ${formatPct(p.gt_status)}</span>
-                <span class="activity-pill ${p.vectorization_status === 100 ? 'done' : ''}" title="Vectorization/Correlation: ${formatPct(p.vectorization_status)}">Vec: ${formatPct(p.vectorization_status)}</span>
+                <span class="activity-pill ${p.vectorization_status === 100 ? 'done' : ''}" title="Vectorization & Correlation: ${formatPct(p.vectorization_status)}">Vec & Corr: ${formatPct(p.vectorization_status)}</span>
                 <span class="activity-pill ${p.vs_status === 100 ? 'done' : ''}" title="DLR@VS Login: ${formatPct(p.vs_status)}">VS: ${formatPct(p.vs_status)}</span>
                 <span class="activity-pill ${p.vro_status === 100 ? 'done' : ''}" title="DLR@VRO Login: ${formatPct(p.vro_status)}">VRO: ${formatPct(p.vro_status)}</span>
                 <span class="activity-pill ${p.final_ror_status === 100 ? 'done' : ''}" title="Final RoR: ${formatPct(p.final_ror_status)}">Final RoR: ${formatPct(p.final_ror_status)}</span>
@@ -6794,7 +6872,7 @@ function renderPhaseProgressSection(d, has) {
                 <th class="mono">VILLAGES</th>
                 <th class="mono">EXTENT (AC)</th>
                 <th class="mono">GT</th>
-                <th class="mono">VEC/CORR</th>
+                <th class="mono">VEC &amp; CORR</th>
                 <th class="mono">DLR@VS</th>
                 <th class="mono">DLR@VRO</th>
                 <th class="mono">DLR@TAH</th>
@@ -7083,7 +7161,7 @@ function renderVillageMonitoring() {
           1. GT (Ground Truthing)
         </button>
         <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'vectorization_status' ? 'active' : ''}" data-stage-focus="vectorization_status">
-          2. Vectorization
+          2. Vectorization & Correlation
         </button>
         <button type="button" class="stage-focus-chip ${state.selectedStageFocus === 'vs_status' ? 'active' : ''}" data-stage-focus="vs_status">
           3. DLR@VS Login
@@ -7172,14 +7250,14 @@ function renderVillageMonitoring() {
         <div class="adv-filter-grid">
           <div class="filter-field-box">
             <label>Current Resurvey Stage</label>
-            ${selectFilter('current_stage', 'All Current Stages', (f.stages || ['GT', 'Vectorization/Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed']), active.current_stage)}
+            ${selectFilter('current_stage', 'All Current Stages', (f.stages || ['GT', 'Vectorization & Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed']), active.current_stage)}
           </div>
           <div class="filter-field-box">
             <label>1. GT (Ground Truthing)</label>
             ${selectFilter('gt_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.gt_status)}
           </div>
           <div class="filter-field-box">
-            <label>2. Vectorization/Correlation</label>
+            <label>2. Vectorization & Correlation</label>
             ${selectFilter('vectorization_status', 'Any Status', ['Completed', 'In Progress', 'Pending', 'Not Started'], active.vectorization_status)}
           </div>
           <div class="filter-field-box">
@@ -7283,7 +7361,7 @@ function villageTable(rows) {
     return `
       <div class="focused-table-topbar">
         <div class="focused-table-meta">
-          <span class="focused-badge">${isExt ? 'GT EXTENT MODE' : isCh ? 'CHALTHAS VECTORIZATION MODE' : 'DLR ENTRIES MODE'}</span>
+          <span class="focused-badge">${isExt ? 'GT EXTENT MODE' : isCh ? 'VECTORIZATION & CORRELATION MODE' : 'DLR ENTRIES MODE'}</span>
           <strong>${h(stageDetails.name)}</strong>
           <span class="focused-rule-pill">Rule: ${h(stageDetails.benchmarkRule)}</span>
         </div>
@@ -7806,7 +7884,7 @@ function renderDivisionAnalysis(d) {
             <th>VILLAGES</th>
             <th>FINAL ROR PROGRESS</th>
             <th>GT %</th>
-            <th>VECTORIZATION %</th>
+            <th>VECTORIZATION &amp; CORRELATION %</th>
             <th>PENDING</th>
             <th>DELAYED</th>
             <th style="width:8%;text-align:center;">ACTION</th>
@@ -8277,7 +8355,7 @@ function getFrontendVillageProgress(v) {
     const isDone = isComplete(v.vectorization_status);
     return {
       stageKey: 'vectorization',
-      stageLabel: 'Cadastral Vectorization',
+      stageLabel: 'Vectorization & Correlation',
       stageIcon: '📐',
       stageColor: 'indigo',
       paramType: 'Boundary Vectorization',
@@ -8562,7 +8640,7 @@ function renderMandalReportView() {
               <option value="tahsildar_status" ${state.mandalReportStageFilter === 'tahsildar_status' ? 'selected' : ''}>⭐ DLR @ Tahsildar Login</option>
               <option value="rdo_status" ${state.mandalReportStageFilter === 'rdo_status' ? 'selected' : ''}>🏛️ DLR @ RDO Login</option>
               <option value="jc_status" ${state.mandalReportStageFilter === 'jc_status' ? 'selected' : ''}>⚖️ DLR @ JC Login</option>
-              <option value="vectorization" ${state.mandalReportStageFilter === 'vectorization' ? 'selected' : ''}>📐 Cadastral Vectorization</option>
+              <option value="vectorization" ${state.mandalReportStageFilter === 'vectorization' ? 'selected' : ''}>📐 Vectorization & Correlation</option>
               <option value="draft_ror" ${state.mandalReportStageFilter === 'draft_ror' ? 'selected' : ''}>📑 Draft RoR &amp; 13 Notice</option>
               <option value="final_ror" ${state.mandalReportStageFilter === 'final_ror' ? 'selected' : ''}>📜 Final RoR Completed</option>
               <option value="webland" ${state.mandalReportStageFilter === 'webland' ? 'selected' : ''}>🌐 Webland 2.0 Ported</option>
@@ -8791,7 +8869,7 @@ function renderReports() {
             Mandal-Wise Detailed Village Status Report (Colourful PDF)
           </h3>
           <p style="font-size:12.5px;color:#475569;line-height:1.6;margin-bottom:14px;">
-            Download the official high-resolution statutory report showing every single village in Chittoor District (736 Villages across 29 Mandals) with attractive Plus Jakarta Sans typography, colourful stage badges (GT, Vectorization, DLR @ VS/VRO/Tah/RDO/JC, Draft RoR, Final RoR, Webland 2.0 Ported), extent, and delivery milestones.
+            Download the official high-resolution statutory report showing every single village in Chittoor District (736 Villages across 29 Mandals) with attractive Plus Jakarta Sans typography, colourful stage badges (GT, Vectorization & Correlation, DLR @ VS/VRO/Tah/RDO/JC, Draft RoR, Final RoR, Webland 2.0 Ported), extent, and delivery milestones.
           </p>
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
             <a href="/api/reports/mandal-villages-pdf" class="primary-button" download style="background:linear-gradient(135deg, #2563eb, #1d4ed8);color:#fff;padding:9px 18px;font-size:12.5px;text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
@@ -11168,7 +11246,7 @@ async function openVillage(id) {
 
     const citizenSteps = [
       { key: 'gt_status', stageKey: 'gt', num: 1, title: 'GT', desc: 'DGPS ground truthing & preliminary perimeter survey by survey team.', tier: 'Survey Field Team (RSDT / MLSO)' },
-      { key: 'vectorization_status', stageKey: 'vectorization', num: 2, title: 'Vectorization/Correlation', desc: 'Computerized boundary digitization, GIS shapefile correlation, and parcel map generation.', tier: 'GIS Vectorization Team' },
+      { key: 'vectorization_status', stageKey: 'vectorization', num: 2, title: 'Vectorization & Correlation', desc: 'Computerized boundary digitization, GIS shapefile correlation, and parcel map generation.', tier: 'GIS Vectorization Team' },
       { key: 'vs_status', stageKey: 'vs', num: 3, title: 'DLR@VS Login', desc: 'Secretariat data synchronization, Grama Sabha review, and landholder record linking.', tier: 'Village Secretariat Staff' },
       { key: 'vro_status', stageKey: 'vro', num: 4, title: 'DLR@VRO Login', desc: 'Village Revenue Officer field inspection, ownership cross-check with 1B Webland register.', tier: 'Village Revenue Officer (VRO)' },
       { key: 'tahsildar_status', stageKey: 'tahsildar', num: 5, title: 'DLR@Tahsildar Login', desc: 'Mandal Revenue Officer statutory scrutiny, discrepancy resolution, and sign-off.', tier: 'Tahsildar Office' },
@@ -11225,6 +11303,19 @@ async function openVillage(id) {
           </div>
         </div>
 
+        <div class="village-officer-banner" style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <span style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;display:block;">Assigned Village Surveyor &amp; Secretariat</span>
+            <strong style="font-size:13px;color:var(--navy);">👤 ${h(v.vs_name || 'Village Surveyor Assigned')}</strong>
+            <span style="font-size:12px;color:var(--muted);">(${h(v.secretariat || 'Grama Sachivalayam')})</span>
+            ${v.vs_phone ? `<span style="margin-left:8px;"><a href="tel:${h(v.vs_phone)}" class="officer-phone-link" style="color:#2563eb;font-weight:700;">📞 ${h(v.vs_phone)}</a></span>` : ''}
+          </div>
+          <div style="font-size:11.5px;color:#334155;max-width:450px;">
+            <strong style="color:#1e40af;">📍 Jurisdiction Villages (from Google Spreadsheet):</strong>
+            <span style="color:#475569;">${h(v.vs_jurisdiction || (v.vs_jurisdiction_villages ? v.vs_jurisdiction_villages.join(', ') : v.village_name))}</span>
+          </div>
+        </div>
+
         ${isPorted ? `
           <div class="ported-webland-alert">
             <span class="ported-icon">${icon('shield')}</span>
@@ -11273,7 +11364,7 @@ async function openVillage(id) {
         <div class="citizen-stage-banner" style="${isPorted ? 'border-color:#bbf7d0;background:#f0fdf4;' : ''}">
           <span style="${isPorted ? 'color:#16a34a;' : ''}">${isPorted ? 'RESURVEY STATUS' : 'CURRENT WORKFLOW MILESTONE'}</span>
           <h3 style="${isPorted ? 'color:#15803d;' : ''}">${isPorted ? 'All 11 Resurvey Activities Completed' : `Step ${activeStep.num} of 11: ${h(activeStep.title)}`}</h3>
-          <p style="${isPorted ? 'color:#166534;' : ''}">${isPorted ? 'GT, Vectorization/Correlation, DLR@VS, DLR@VRO, DLR@Tahsildar, DLR@RDO, DLR@JC, 13 Notification, Draft RoR, Final RoR and Porting DLR to Webland-2.0 are verified and completed.' : h(activeStep.desc)}</p>
+          <p style="${isPorted ? 'color:#166534;' : ''}">${isPorted ? 'GT, Vectorization & Correlation, DLR@VS, DLR@VRO, DLR@Tahsildar, DLR@RDO, DLR@JC, 13 Notification, Draft RoR, Final RoR and Porting DLR to Webland-2.0 are verified and completed.' : h(activeStep.desc)}</p>
         </div>
 
         <!-- Interactive Stage Capture via Radio Buttons (DLR & Draft RoR Stages Supported) -->
@@ -11296,7 +11387,7 @@ async function openVillage(id) {
             <label class="capture-radio-pill ${activeStageRadioKey === 'vectorization_status' ? 'selected' : ''}">
               <input type="radio" name="modal_stage_radio" value="vectorization_status" ${activeStageRadioKey === 'vectorization_status' ? 'checked' : ''} />
               <span class="capture-radio-dot"></span>
-              <span class="capture-radio-name">📐 Vectorization</span>
+              <span class="capture-radio-name">📐 Vectorization & Correlation</span>
             </label>
 
             <label class="capture-radio-pill highlight-dlr ${activeStageRadioKey === 'vs_status' ? 'selected' : ''}">
@@ -11484,7 +11575,7 @@ function exportExcel() {
   const rows = getFilteredHomeVillages();
   if (!rows.length) { toast('No village records to export.', 'error'); return; }
   let tableHtml = '<table border="1"><thead><tr>';
-  const cols = ['Division', 'Mandal', 'Village Code', 'Village Name', 'Govt Extent (Ac)', 'Patta Extent (Ac)', 'Total Extent (Ac)', 'PPBs Target', 'Phase', 'PPB Cycle', 'Current Stage', 'Status', 'GT Status', 'Vectorization', 'VS Login', 'VRO Login', 'Tah Login', 'RDO Login', 'JC Login', '13 Notice', 'Draft RoR', 'Final RoR', 'Webland-2.0'];
+  const cols = ['Division', 'Mandal', 'Village Code', 'Village Name', 'Govt Extent (Ac)', 'Patta Extent (Ac)', 'Total Extent (Ac)', 'PPBs Target', 'Phase', 'PPB Cycle', 'Current Stage', 'Status', 'GT Status', 'Vectorization & Correlation', 'VS Login', 'VRO Login', 'Tah Login', 'RDO Login', 'JC Login', '13 Notice', 'Draft RoR', 'Final RoR', 'Webland-2.0'];
   cols.forEach(c => tableHtml += `<th style="background:#0f172a;color:#ffffff;font-weight:bold;padding:6px 10px;">${c}</th>`);
   tableHtml += '</tr></thead><tbody>';
   rows.forEach(r => {
@@ -12350,7 +12441,7 @@ document.addEventListener('input', event => {
 function handleModalStageRadioChange(chosenRadioKey) {
   const stagesOrder = [
     { key: 'gt_status', radio: 'gt_status', label: 'GT Ongoing' },
-    { key: 'vectorization_status', radio: 'vectorization_status', label: 'Vectorization' },
+    { key: 'vectorization_status', radio: 'vectorization_status', label: 'Vectorization & Correlation' },
     { key: 'vs_status', radio: 'vs_status', label: 'Village Surveyor Login (VS)' },
     { key: 'vro_status', radio: 'vro_status', label: 'Village Revenue Officer Login (VRO)' },
     { key: 'tahsildar_status', radio: 'tahsildar_status', label: 'Tahsildar Login (Tah)' },
@@ -12548,12 +12639,14 @@ function getActiveDlrStage(v) {
   if (cs.includes('tah') || ds.includes('tah') || v.tahsildar_status === 'In Progress') return 'tah';
   if (cs.includes('vro') || ds.includes('vro') || v.vro_status === 'In Progress') return 'vro';
   if (cs.includes('vs') || ds.includes('vs') || v.vs_status === 'In Progress') return 'vs';
+  if (cs.includes('vector') || cs.includes('corr') || v.vectorization_status === 'In Progress') return 'vectorization';
+  if (cs.includes('gt') || v.gt_status === 'In Progress') return 'gt';
   return 'other';
 }
 
 const MANDAL_PLAN_STAGES_CONFIG = [
   { key: 'gt', label: 'GT', fullName: 'Ground Truth (GT)', badge: 'Stage 1' },
-  { key: 'vectorization', label: 'Vectorization', fullName: 'Vectorization & Correlation', badge: 'Stage 2' },
+  { key: 'vectorization', label: 'Vec & Corr', fullName: 'Vectorization & Correlation', badge: 'Stage 2' },
   { key: 'vs', label: 'VS Login', fullName: 'Village Surveyor / Secretariat Login', badge: 'Stage 3' },
   { key: 'vro', label: 'VRO Login', fullName: 'VRO Login (DLR)', badge: 'Stage 4' },
   { key: 'tahsildar', label: 'Tahsildar', fullName: 'Tahsildar (MRO) Login', badge: 'Stage 5' },
@@ -12790,6 +12883,36 @@ function calculateMandalActionPlan(villages) {
 
 function getSecretariatsForMandal(mandalName) {
   const normM = mandalName === '__ALL__' ? 'All' : normalizeMandal(mandalName);
+  const surveyors = (state.dashboard && state.dashboard.villageSurveyors) || state.villageSurveyors || [];
+
+  if (surveyors && surveyors.length > 0) {
+    let filtered = surveyors;
+    if (normM !== 'All') {
+      const targetMandalClean = normM.toLowerCase().replace(/[^a-z0-9]/g, '');
+      filtered = surveyors.filter(s => {
+        const smClean = (s.mandal || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return smClean === targetMandalClean || normalizeMandal(s.mandal).toLowerCase() === normM.toLowerCase();
+      });
+    }
+    return filtered.map((s, idx) => ({
+      sno: s.sno || idx + 1,
+      mandal: s.mandal,
+      division: s.division || '—',
+      secretariat_name: s.secretariat_name || s.secretariat || '—',
+      secretariat_code: s.secretariat_code || String(11090000 + ((idx + 1) * 17)),
+      surveyor_name: s.surveyor_name || s.name || 'Village Surveyor',
+      name: s.surveyor_name || s.name || 'Village Surveyor',
+      phone: s.phone || '',
+      vs_designation: s.vs_designation || 'Village Surveyor (Grade-II)',
+      staff_team: s.staff_team || 'Panchayat Secretary · VRO · Digital Asst',
+      jurisdiction: s.jurisdiction_raw || s.jurisdiction || ((s.jurisdiction_villages && s.jurisdiction_villages.length) ? s.jurisdiction_villages.join(', ') : '—'),
+      jurisdiction_raw: s.jurisdiction_raw || s.jurisdiction || '',
+      jurisdiction_villages: s.jurisdiction_villages || [],
+      status: s.status || 'Active on Field Resurvey'
+    }));
+  }
+
+  // Fallback if surveyors not yet retrieved
   const mandalsToInspect = normM === 'All' ? Object.keys(VS_PER_MANDAL) : [normM];
   const list = [];
   let counter = 1;
@@ -12799,7 +12922,7 @@ function getSecretariatsForMandal(mandalName) {
     const mVlgs = (state.villages || []).filter(v => normalizeMandal(v.mandal) === m);
     for (let i = 0; i < targetCount; i++) {
       const vSample = mVlgs[i % (mVlgs.length || 1)];
-      const secName = i === 0 ? `${m}-1 (HQ)` : (i === 1 ? `${m}-2` : (vSample ? vSample.village_name.replace(/\s*\(.*\)/, '') : `${m} Sec-${i + 1}`));
+      const secName = vSample?.secretariat || (i === 0 ? `${m}-1 (HQ)` : (i === 1 ? `${m}-2` : (vSample ? vSample.village_name.replace(/\s*\(.*\)/, '') : `${m} Sec-${i + 1}`)));
       const codeNum = 11090000 + (counter * 17);
       list.push({
         sno: counter++,
@@ -12807,9 +12930,13 @@ function getSecretariatsForMandal(mandalName) {
         division: vSample ? vSample.division : '—',
         secretariat_name: secName,
         secretariat_code: String(codeNum),
+        surveyor_name: vSample?.vs_name || 'Village Surveyor',
+        phone: vSample?.vs_phone || '',
         vs_designation: 'Village Surveyor (Grade-II)',
         staff_team: 'Panchayat Secretary · VRO · Digital Asst',
-        jurisdiction: vSample ? vSample.village_name : `${m} Cluster-${i + 1}`,
+        jurisdiction: vSample?.vs_jurisdiction || (vSample ? vSample.village_name : `${m} Cluster-${i + 1}`),
+        jurisdiction_raw: vSample?.vs_jurisdiction || '',
+        jurisdiction_villages: vSample?.vs_jurisdiction_villages || [],
         status: 'Active on Field Resurvey'
       });
     }
@@ -13445,11 +13572,12 @@ function openMandalFigureModal(mandalName, metricKey) {
             <tr>
               <th style="width:40px;">SL</th>
               <th>MANDAL</th>
-              <th>SECRETARIAT NAME</th>
+              <th>SECRETARIAT</th>
               <th>CODE</th>
+              <th>VILLAGE SURVEYOR</th>
+              <th>CONTACT NO</th>
               <th>DESIGNATION</th>
-              <th>TEAM / STAFF</th>
-              <th>JURISDICTION VILLAGES</th>
+              <th>JURISDICTION VILLAGES (GOOGLE SPREADSHEET)</th>
               <th>STATUS</th>
             </tr>
           </thead>
@@ -13460,10 +13588,20 @@ function openMandalFigureModal(mandalName, metricKey) {
                 <td><strong>${h(s.mandal)}</strong> <small class="text-muted">(${h(s.division)})</small></td>
                 <td><strong>${h(s.secretariat_name)}</strong></td>
                 <td class="font-mono">${h(s.secretariat_code)}</td>
+                <td><strong class="text-navy">${h(s.surveyor_name || s.name || '—')}</strong></td>
+                <td class="font-mono">${s.phone ? `<a href="tel:${h(s.phone)}" class="officer-phone-link">📞 ${h(s.phone)}</a>` : '<span class="text-muted">—</span>'}</td>
                 <td><span class="status-pill in-progress">${h(s.vs_designation)}</span></td>
-                <td class="text-muted">${h(s.staff_team)}</td>
-                <td>${h(s.jurisdiction)}</td>
-                <td><span class="status-pill completed">${h(s.status)}</span></td>
+                <td>
+                  <div style="font-size:11.5px;line-height:1.4;">
+                    <strong>${h(s.jurisdiction)}</strong>
+                    ${(s.jurisdiction_villages && s.jurisdiction_villages.length > 1) ? `
+                      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">
+                        ${s.jurisdiction_villages.map(jv => `<span style="display:inline-block;background:#eff6ff;color:#1e40af;padding:1px 6px;border-radius:3px;font-size:10.5px;border:1px solid #bfdbfe;">🏷️ ${h(jv)}</span>`).join('')}
+                      </div>
+                    ` : ''}
+                  </div>
+                </td>
+                <td><span class="status-pill ${/suspen/i.test(s.surveyor_name || s.status) ? 'delayed' : 'completed'}">${h(s.status)}</span></td>
               </tr>
             `).join('')}
           </tbody>

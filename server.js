@@ -46,7 +46,7 @@ const DATA_DIR = path.join(ROOT, 'data');
 const STORE_FILE = path.join(DATA_DIR, 'store.json');
 const STAGES = [
   ['gt_status', 'GT'],
-  ['vectorization_status', 'Vectorization/Correlation'],
+  ['vectorization_status', 'Vectorization & Correlation'],
   ['vs_status', 'Village Surveyor Login'],
   ['vro_status', 'DLR@VRO Login'],
   ['tahsildar_status', 'DLR@Tahsildar Login'],
@@ -61,7 +61,7 @@ const STAGES = [
 const DEFAULT_MAPPINGS = {
   village_code: 'Village Code', village_name: 'Village Name', mandal: 'Mandal', division: 'Division',
   phase: 'Phase', extent: 'Extent', target_date: 'Target Date', gt_status: 'GT',
-  vectorization_status: 'Vectorization/Correlation', vs_status: 'DLR@VS Login', vro_status: 'DLR@VRO Login',
+  vectorization_status: 'Vectorization & Correlation', vs_status: 'DLR@VS Login', vro_status: 'DLR@VRO Login',
   tahsildar_status: 'DLR@Tahsildar Login', rdo_status: 'DLR@RDO Login', jc_status: 'DLR@JC Login',
   section13_status: '13 Notification', draft_ror_status: 'Draft RoR', final_ror_status: 'Final RoR',
   webland_2_status: 'Porting DLR to Webland-2.0', ppb_status: 'PPB'
@@ -255,7 +255,7 @@ function normalizeStage(raw) {
   if (/tah(?:sildar)?\s*login|^tah(?:sildar)?$/i.test(s)) return 'Tah Login';
   if (/vro\s*login|^vro$/i.test(s)) return 'VRO Login';
   if (/vs\s*login|village\s*surveyor/i.test(s)) return 'VS Login';
-  if (/vector/i.test(s) || /correlation/i.test(s)) return 'Vectorization';
+  if (/vector/i.test(s) || /correlation/i.test(s)) return 'Vectorization & Correlation';
   if (/gt\s*ongoing|^gt$/i.test(s)) return 'GT Ongoing';
   if (/gt\s*not\s*started/i.test(s)) return 'GT Not Started';
   return s;
@@ -314,7 +314,7 @@ function cascadeStageFlags(rawStage, village = {}) {
   } else if (norm === 'Village Surveyor Login' || norm === 'VS Login') {
     gt = 'Completed'; vec = 'Completed';
     vs = 'In Progress';
-  } else if (norm === 'Vectorization') {
+  } else if (norm === 'Vectorization & Correlation' || norm === 'Vectorization') {
     gt = 'Completed';
     vec = 'In Progress';
   } else if (norm === 'GT Ongoing') {
@@ -546,16 +546,19 @@ function getVillageActiveDlrStage(v) {
   if (cs.includes('tah') || ds.includes('tah') || v.tahsildar_status === 'In Progress') return 'tah';
   if (cs.includes('vro') || ds.includes('vro') || v.vro_status === 'In Progress') return 'vro';
   if (cs.includes('vs') || ds.includes('vs') || v.vs_status === 'In Progress') return 'vs';
+  if (cs.includes('vector') || cs.includes('corr') || v.vectorization_status === 'In Progress') return 'vectorization';
   return 'other';
 }
 
 function buildMandalActionPlan(store) {
   const villages = store.villages || [];
   const mandalMap = {};
+  const surveyors = store.villageSurveyors || [];
 
   villages.forEach(v => {
     const m = normalizeMandal(v.mandal, store);
     if (!mandalMap[m]) {
+      const liveVsForMandal = surveyors.filter(s => normalizeMandal(s.mandal, store).toLowerCase() === m.toLowerCase()).length;
       mandalMap[m] = {
         mandal: m,
         division: v.division || '',
@@ -563,10 +566,11 @@ function buildMandalActionPlan(store) {
         total_extent: 0,
         govt_land: 0,
         patta_land: 0,
-        vs_available: VS_PER_MANDAL[m] || 15,
+        vs_available: liveVsForMandal || VS_PER_MANDAL[m] || 15,
         rovers_available: ROVERS_PER_MANDAL[m] || 0,
         resurvey_completed: 0,
         balance_villages: 0,
+        vectorization: 0,
         dlr_vs: 0,
         dlr_vro: 0,
         dlr_tah: 0,
@@ -593,7 +597,8 @@ function buildMandalActionPlan(store) {
     } else {
       d.balance_villages++;
       const stage = getVillageActiveDlrStage(v);
-      if (stage === 'vs') d.dlr_vs++;
+      if (stage === 'vectorization') d.vectorization++;
+      else if (stage === 'vs') d.dlr_vs++;
       else if (stage === 'vro') d.dlr_vro++;
       else if (stage === 'tah') d.dlr_tah++;
       else if (stage === 'rdo') d.dlr_rdo++;
@@ -627,6 +632,7 @@ function buildMandalActionPlan(store) {
     rovers_available: mandalRows.reduce((s, r) => s + r.rovers_available, 0),
     resurvey_completed: mandalRows.reduce((s, r) => s + r.resurvey_completed, 0),
     balance_villages: mandalRows.reduce((s, r) => s + r.balance_villages, 0),
+    vectorization: mandalRows.reduce((s, r) => s + (r.vectorization || 0), 0),
     dlr_vs: mandalRows.reduce((s, r) => s + r.dlr_vs, 0),
     dlr_vro: mandalRows.reduce((s, r) => s + r.dlr_vro, 0),
     dlr_tah: mandalRows.reduce((s, r) => s + r.dlr_tah, 0),
@@ -732,8 +738,12 @@ function dashboard(store) {
   const totalExtent = Math.round(villages.reduce((sum, v) => sum + (parseFloat(v.extent) || 0), 0) * 100) / 100;
 
   const stagePendency = STAGES.map(([key, label], idx) => {
-    const completed = villages.filter(v => isComplete(v[key])).length;
-    const pending = Math.max(0, total - completed);
+    let completed = villages.filter(v => isComplete(v[key])).length;
+    let pending = Math.max(0, total - completed);
+    if (key === 'vectorization_status' && store.vectorizationSummary?.pendingVillagesCount !== undefined) {
+      pending = store.vectorizationSummary.pendingVillagesCount;
+      completed = Math.max(0, total - pending);
+    }
     return {
       stageNumber: idx + 1,
       key,
@@ -759,11 +769,19 @@ function dashboard(store) {
     const phaseVlgs = villages.filter(v => v.phase === p.name);
     const stages = {};
     STAGES.forEach(([key, label]) => {
-      const comp = phaseVlgs.filter(v => isComplete(v[key])).length;
+      let comp = phaseVlgs.filter(v => isComplete(v[key])).length;
+      let pend = Math.max(0, phaseVlgs.length - comp);
+      if (key === 'vectorization_status' && store.vectorization_records?.length) {
+        const phaseRecs = store.vectorization_records.filter(r => r.phase === p.name);
+        if (phaseRecs.length > 0) {
+          pend = phaseRecs.filter(r => r.balance > 0 || (r.cumulative === 0 && r.balance === 0)).length;
+          comp = phaseRecs.filter(r => r.balance === 0 && r.cumulative > 0).length;
+        }
+      }
       stages[key] = {
         label,
         completed: comp,
-        pending: Math.max(0, phaseVlgs.length - comp),
+        pending: pend,
         percent: percent(comp, phaseVlgs.length)
       };
     });
@@ -822,7 +840,9 @@ function dashboard(store) {
       // 12 Primary Officer Milestones
       gtCompleted: villages.filter(v => isComplete(v.gt_status)).length,
       gtPending: villages.filter(v => !isComplete(v.gt_status)).length,
-      vectorizationCompleted: villages.filter(v => isComplete(v.vectorization_status)).length,
+      vectorizationCompleted: store.vectorizationSummary ? store.vectorizationSummary.completedVillagesCount : villages.filter(v => isComplete(v.vectorization_status)).length,
+      vectorizationPending: store.vectorizationSummary ? store.vectorizationSummary.pendingVillagesCount : villages.filter(v => !isComplete(v.vectorization_status)).length,
+      vectorizationTotal: store.vectorizationSummary ? store.vectorizationSummary.villageCount : villages.length,
       vsCompleted: villages.filter(v => isComplete(v.vs_status)).length,
       vroCompleted: villages.filter(v => isComplete(v.vro_status)).length,
       tahsildarCompleted: villages.filter(v => isComplete(v.tahsildar_status)).length,
@@ -859,7 +879,7 @@ function dashboard(store) {
       ];
       const tierAccountability = [
         'Survey Field Team (RSDT / MLSO)',
-        'GIS & Vectorization Team',
+        'GIS Vectorization & Correlation Team',
         'Village Secretariat Staff',
         'Village Revenue Officer (VRO)',
         'Tahsildar Office',
@@ -1063,6 +1083,9 @@ function dashboard(store) {
     bottleneck, observations, attention: delayed.slice(0, 10), mandals, divisions, phases,
     quality, conflicts, recentChanges: store.changeFeed.slice(0, 8), lastSync: store.syncLogs[0] || null,
     dlrRecords: store.dlr_records || [],
+    vectorizationRecords: store.vectorization_records || [],
+    vectorizationSummary: store.vectorizationSummary || null,
+    villageSurveyors: store.villageSurveyors || [],
     gtSummary: store.gtSummary || null,
     dlrSummary: store.dlrSummary || null,
     mandalActionPlan: buildMandalActionPlan(store)
@@ -1910,6 +1933,8 @@ async function handleApi(req, res, url) {
 
   const store = load();
   if (req.method === 'GET' && pathname === '/api/dashboard') return json(res, 200, dashboard(store));
+  if (req.method === 'GET' && pathname === '/api/surveyors') return json(res, 200, { total: (store.villageSurveyors || []).length, surveyors: store.villageSurveyors || [] });
+  if (req.method === 'GET' && pathname === '/api/vectorization') return json(res, 200, { summary: store.vectorizationSummary || null, records: store.vectorization_records || [] });
   if (req.method === 'GET' && pathname === '/api/health') return json(res, 200, { status: 'ok', tokenConfigured: Boolean(getToken()), dashboard: dashboard(store).sourceSummary });
   if (req.method === 'GET' && pathname === '/api/sources') return json(res, 200, { sources: store.sources, defaultMappings: DEFAULT_MAPPINGS });
   if (req.method === 'GET' && pathname === '/api/mandal-aliases') return json(res, 200, { aliases: { ...MANDAL_ALIASES, ...(store.customMandalAliases || {}) } });
@@ -1929,7 +1954,7 @@ async function handleApi(req, res, url) {
     });
     const stageDefinitions = [
       { key: 'gt_status', label: 'GT (Ground Truthing)', short: 'GT', stageNumber: 1 },
-      { key: 'vectorization_status', label: 'Vectorization/Correlation', short: 'Vectorization/Correlation', stageNumber: 2 },
+      { key: 'vectorization_status', label: 'Vectorization & Correlation', short: 'Vectorization & Correlation', stageNumber: 2 },
       { key: 'vs_status', label: 'DLR@VS Login', short: 'DLR@VS Login', stageNumber: 3 },
       { key: 'vro_status', label: 'DLR@VRO Login', short: 'DLR@VRO Login', stageNumber: 4 },
       { key: 'tahsildar_status', label: 'DLR@Tahsildar Login', short: 'DLR@Tahsildar Login', stageNumber: 5 },
@@ -1940,7 +1965,7 @@ async function handleApi(req, res, url) {
       { key: 'final_ror_status', label: 'Final RoR', short: 'Final RoR', stageNumber: 10 },
       { key: 'webland_2_status', label: 'Porting DLR to Webland-2.0', short: 'Porting DLR to Webland-2.0', stageNumber: 11 }
     ];
-    const stageNames = ['GT', 'Vectorization/Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed'];
+    const stageNames = ['GT', 'Vectorization & Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed'];
     return json(res, 200, {
       villages,
       totalCount: villages.length,
