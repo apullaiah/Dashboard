@@ -9,7 +9,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { syncAllLiveData, fetchGviz, fetchUrl } = require('./lib/syncService.js');
+const { syncAllLiveData, syncContactsFromGoogleSheet, fetchGviz, fetchUrl } = require('./lib/syncService.js');
 const { generateMandalReportHtml, generateMandalReportPdf } = require('./lib/reportService.js');
 const {
   verifyWebhook,
@@ -2531,12 +2531,15 @@ async function handleApi(req, res, url) {
     });
 
     const msList = [];
+    const seenMs = new Set();
     const mandalKeys = Object.keys(MANDAL_SURVEYOR_DIRECTORY);
     mandalKeys.forEach(m => {
       const norm = normalizeMandal(m, store);
+      if (seenMs.has(norm)) return;
+      seenMs.add(norm);
       const storeMs = (store.mandalSurveyors && (store.mandalSurveyors[norm] || store.mandalSurveyors[m])) || null;
-      const ph = storeMs?.phone || MANDAL_SURVEYOR_DIRECTORY[m]?.phone || '';
-      const nm = storeMs?.name || MANDAL_SURVEYOR_DIRECTORY[m]?.name || `${norm} Mandal Surveyor`;
+      const ph = storeMs?.phone || MANDAL_SURVEYOR_DIRECTORY[norm]?.phone || MANDAL_SURVEYOR_DIRECTORY[m]?.phone || '';
+      const nm = storeMs?.name || MANDAL_SURVEYOR_DIRECTORY[norm]?.name || MANDAL_SURVEYOR_DIRECTORY[m]?.name || `${norm} Mandal Surveyor`;
       msList.push({
         id: 'ms_' + norm.toLowerCase().replace(/[^a-z0-9]/g, '_'),
         name: nm,
@@ -2549,14 +2552,19 @@ async function handleApi(req, res, url) {
     });
 
     const diosList = [];
+    const seenDios = new Set();
     Object.values(DIOS_DIRECTORY).forEach(d => {
-      const storeDios = (store.dios && (store.dios[d.name] || Object.values(store.dios || {}).find(x => normalKey(x.name) === normalKey(d.name)))) || null;
+      const dKey = normalKey(d.name);
+      if (seenDios.has(dKey)) return;
+      seenDios.add(dKey);
+      const storeDios = (store.dios && (store.dios[d.name] || Object.values(store.dios || {}).find(x => normalKey(x.name) === dKey))) || null;
       const ph = storeDios?.phone || DIOS_DIRECTORY[d.name]?.phone || d.phone || '';
       diosList.push({
         id: 'dios_' + d.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
         name: d.name,
         role: 'Deputy Inspector of Survey (DIOS)',
         phone: ph,
+        division: d.division || storeDios?.division || 'Chittoor',
         mandals: d.mandals,
         hasSheetPhone: Boolean(ph && ph.length >= 10),
         source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
@@ -2577,6 +2585,23 @@ async function handleApi(req, res, url) {
         diosWithPhone: diosList.filter(x => x.hasSheetPhone).length
       }
     });
+  }
+
+  // Explicitly trigger synchronization of DIOS & MLSO contacts strictly from Google Spreadsheet
+  if ((req.method === 'GET' || req.method === 'POST') && pathname === '/api/whatsapp/sync-contacts') {
+    try {
+      await syncContactsFromGoogleSheet(store);
+      save(store);
+      return json(res, 200, {
+        success: true,
+        message: 'Successfully synchronized DIOS and MLSO phone numbers strictly from Google Spreadsheet',
+        diosCount: Object.keys(store.dios || {}).length,
+        msCount: Object.keys(store.mandalSurveyors || {}).length,
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      return json(res, 500, { success: false, error: err.message });
+    }
   }
 
   // Test Message Delivery to MS, VS, or DIOS contact numbers

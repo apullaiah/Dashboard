@@ -9651,6 +9651,7 @@ async function renderWhatsApp() {
             <p style="font-size:12px;">Settings saved to secure persistent configuration.</p>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" class="outline-button" id="wa-sync-sheet-contacts-btn" style="padding:4px 10px;font-size:11px;font-weight:700;color:#047857;border-color:#a7f3d0;background:#f0fdf4;">🔄 Sync Sheet Contacts</button>
             <span class="tiny-status completed">Config Valid</span>
             <button type="button" class="outline-button" id="wa-card-open-dialog-btn" style="padding:4px 10px;font-size:11px;font-weight:700;">⚙️ Settings Dialog</button>
           </div>
@@ -10810,6 +10811,45 @@ Chittoor District, Government of Andhra Pradesh`;
   if (cardOpenBtn) {
     cardOpenBtn.onclick = () => {
       triggerSettingsModal();
+    };
+  }
+
+  const syncContactsBtn = document.getElementById('wa-sync-sheet-contacts-btn');
+  if (syncContactsBtn) {
+    syncContactsBtn.onclick = async () => {
+      syncContactsBtn.disabled = true;
+      syncContactsBtn.innerHTML = '⏳ Syncing...';
+      try {
+        const res = await api('/api/whatsapp/sync-contacts', { method: 'POST' });
+        toast(`Contacts synced from Google Spreadsheet! DIOS: ${res.diosCount}, MS: ${res.msCount}`, 'success');
+        syncContactsBtn.innerHTML = '✓ Synced';
+        syncContactsBtn.style.background = '#059669';
+        syncContactsBtn.style.color = '#fff';
+        setTimeout(() => {
+          syncContactsBtn.disabled = false;
+          syncContactsBtn.innerHTML = '🔄 Sync Sheet Contacts';
+          syncContactsBtn.style.background = '#f0fdf4';
+          syncContactsBtn.style.color = '#047857';
+        }, 3000);
+        const [newDir, newDios, newMlso] = await Promise.all([
+          api('/api/whatsapp/officers-directory').catch(() => directoryData),
+          api('/api/whatsapp/poor-officers?tier=dios').catch(() => ({ officers: [] })),
+          api('/api/whatsapp/poor-officers?tier=mlso').catch(() => ({ officers: [] }))
+        ]);
+        directoryData = newDir;
+        tierData.dios = newDios.officers || [];
+        tierData.mlso = newMlso.officers || [];
+        tierData.ms = tierData.mlso;
+        if (testSyncChip && directoryData.summary) {
+          const s = directoryData.summary;
+          testSyncChip.innerHTML = `🟢 <b>MS:</b> ${s.msWithPhone || 0}/${s.totalMs || 0} Synced &nbsp;·&nbsp; <b>DIOS:</b> ${s.diosWithPhone || 0}/${s.totalDios || 0} Synced &nbsp;·&nbsp; <b>VS:</b> ${s.vsWithPhone || 0}/${s.totalVs || 0} Synced`;
+        }
+        updateView();
+      } catch (e) {
+        toast(`Failed to sync contacts: ${e.message}`, 'error');
+        syncContactsBtn.disabled = false;
+        syncContactsBtn.innerHTML = '🔄 Sync Sheet Contacts';
+      }
     };
   }
 
