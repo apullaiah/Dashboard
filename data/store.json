@@ -173313,7 +173313,7 @@
         "villageCount": 8
       }
     },
-    "lastSynced": "2026-10-14T16:34:04.606Z"
+    "lastSynced": "2026-10-14T16:37:04.310Z"
   },
   "gtSummary": {
     "todayTotal": 1098.24,
@@ -173326,7 +173326,7 @@
     "completionPct": "18.9",
     "pacePct": "73.2",
     "activeVillagesToday": 55,
-    "lastSynced": "2026-10-14T16:34:04.606Z"
+    "lastSynced": "2026-10-14T16:37:04.310Z"
   },
   "dlr_records": [
     {
@@ -177621,10 +177621,10 @@
     }
   ],
   "lastSync": {
-    "id": "sync_1791995646767",
+    "id": "sync_1791995826422",
     "source": "Google Spreadsheets Live Sync",
     "status": "Success",
-    "dateTime": "2026-10-14T16:34:06.767Z",
+    "dateTime": "2026-10-14T16:37:06.422Z",
     "recordsProcessed": 736,
     "dlrRecordsCount": 165,
     "gtTodayAc": 1098.24,
@@ -191484,7 +191484,7 @@
     "completedVillagesCount": 2,
     "pendingVillagesCount": 21,
     "pctTotal": "40.3",
-    "lastSynced": "2026-10-14T16:34:02.753Z"
+    "lastSynced": "2026-10-14T16:37:02.798Z"
   },
   "villageSurveyors": [
     {
