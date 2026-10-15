@@ -52,19 +52,17 @@ const STAGES = [
   ['tahsildar_status', 'DLR@Tahsildar Login'],
   ['rdo_status', 'DLR@RDO Login'],
   ['jc_status', 'DLR@JC Login'],
-  ['section13_status', '13 Notification'],
-  ['draft_ror_status', 'Draft RoR'],
+  ['dlr_completed_status', 'DLR Completed'],
   ['final_ror_status', 'Final RoR'],
-  ['webland_2_status', 'Webland Porting'],
-  ['blockchain_status', 'Block Chain Tech Stage']
+  ['blockchain_status', 'Block Chain Technology Stage']
 ];
 const DEFAULT_MAPPINGS = {
   village_code: 'Village Code', village_name: 'Village Name', mandal: 'Mandal', division: 'Division',
   phase: 'Phase', extent: 'Extent', target_date: 'Target Date', gt_status: 'GT',
   vectorization_status: 'Vectorization & Correlation', vs_status: 'DLR@VS Login', vro_status: 'DLR@VRO Login',
   tahsildar_status: 'DLR@Tahsildar Login', rdo_status: 'DLR@RDO Login', jc_status: 'DLR@JC Login',
-  section13_status: '13 Notification', draft_ror_status: 'Draft RoR', final_ror_status: 'Final RoR',
-  webland_2_status: 'Porting DLR to Webland-2.0', ppb_status: 'PPB'
+  dlr_completed_status: 'DLR Completed', final_ror_status: 'Final RoR',
+  blockchain_status: 'Block Chain Technology Stage', ppb_status: 'PPB'
 };
 const MANDAL_ALIASES = {
   gudupalle: 'Gudipalle', gudipalle: 'Gudipalle', palamaneru: 'Palamaner', palamaner: 'Palamaner',
@@ -245,10 +243,9 @@ function parseDate(v) {
 function normalizeStage(raw) {
   const s = String(raw || '').trim();
   if (!s) return 'Not Started';
-  if (/blockchain|block\s*chain/i.test(s)) return 'Block Chain Tech Stage';
-  if (/webland|ported|porting/i.test(s)) return 'Webland Porting';
+  if (/blockchain|block\s*chain/i.test(s)) return 'Block Chain Technology Stage';
   if (/final\s*ror|^completed$|ror\s*completed/i.test(s)) return 'Final ROR Completed';
-  if (/draft\s*ror|13\s*completed|section\s*13|13\s*notification|13\s*notice/i.test(s)) return 'Draft RoR';
+  if (/dlr\s*completed?|dlr_completed/i.test(s)) return 'DLR Completed';
   if (/^dlr$|^dlr\s*stage/i.test(s)) return 'DLR Stage';
   if (/jc\s*login|joint\s*collector/i.test(s)) return 'JC Login';
   if (/rdo\s*login|^rdo$/i.test(s)) return 'RDO Login';
@@ -270,61 +267,59 @@ function cascadeStageFlags(rawStage, village = {}) {
   let tah = 'Pending';
   let rdo = 'Pending';
   let jc = 'Pending';
+  let dlrComp = 'Pending';
   let finalRor = 'Pending';
-  let webland = 'Pending';
   let blockchain = 'Pending';
   let overall = 'In Progress';
 
-  if (norm === 'Block Chain Tech Stage') {
+  if (norm === 'Block Chain Technology Stage' || norm === 'Completed') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
-    finalRor = 'Completed'; webland = 'Completed'; blockchain = 'Completed';
+    dlrComp = 'Completed'; finalRor = 'Completed'; blockchain = 'Completed';
     overall = 'Completed';
-  } else if (norm === 'Webland Porting') {
+  } else if (norm === 'Final ROR Completed') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
-    finalRor = 'Completed'; webland = 'Completed'; blockchain = 'Pending';
-    overall = 'Completed';
-  } else if (norm === 'Final ROR Completed' || norm === 'Completed' || village.ported_to_webland) {
-    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
-    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
-    finalRor = 'Completed'; webland = 'Pending'; blockchain = 'Pending';
-    overall = 'Completed';
-  } else if (norm === 'Draft RoR') {
-    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
-    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    dlrComp = 'Completed'; finalRor = 'Completed'; blockchain = 'Pending';
     overall = 'In Progress';
-  } else if (norm === 'DLR Stage') {
-    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'In Progress';
+  } else if (norm === 'DLR Completed') {
+    gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
+    tah = 'Completed'; rdo = 'Completed'; jc = 'Completed';
+    dlrComp = 'Completed'; finalRor = 'Pending'; blockchain = 'Pending';
     overall = 'In Progress';
   } else if (norm === 'JC Login') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'Completed'; rdo = 'Completed';
     jc = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'RDO Login') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'Completed';
     rdo = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'Tah Login') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed'; vro = 'Completed';
     tah = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'VRO Login') {
     gt = 'Completed'; vec = 'Completed'; vs = 'Completed';
     vro = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'Village Surveyor Login' || norm === 'VS Login') {
     gt = 'Completed'; vec = 'Completed';
     vs = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'Vectorization & Correlation' || norm === 'Vectorization') {
     gt = 'Completed';
     vec = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'GT Ongoing') {
     gt = 'In Progress';
+    overall = 'In Progress';
   } else if (norm === 'GT Not Started') {
     gt = 'Not Started';
     overall = 'Pending';
   }
-
-  const isDraftOrAbove = norm === 'Draft RoR' || finalRor === 'Completed' || norm === 'Block Chain Tech Stage' || norm === 'Webland Porting';
 
   return {
     current_stage: norm,
@@ -336,17 +331,15 @@ function cascadeStageFlags(rawStage, village = {}) {
     tahsildar_status: tah,
     rdo_status: rdo,
     jc_status: jc,
-    section13_status: isDraftOrAbove ? 'Completed' : 'Pending',
-    draft_ror_status: isDraftOrAbove ? (norm === 'Draft RoR' ? 'In Progress' : 'Completed') : 'Pending',
+    dlr_completed_status: dlrComp,
     final_ror_status: finalRor,
-    webland_2_status: webland,
     blockchain_status: blockchain
   };
 }
 
-function allComplete(v) { return Boolean(v.ported_to_webland || isComplete(v.webland_2_status) || (isComplete(v.final_ror_status) && isComplete(v.draft_ror_status))); }
+function allComplete(v) { return Boolean(isComplete(v.blockchain_status) || (v.current_stage || '').toLowerCase().includes('blockchain') || v.status === 'Completed'); }
 function currentStage(v) {
-  if (v.ported_to_webland || isComplete(v.webland_2_status)) return 'Completed';
+  if (isComplete(v.blockchain_status)) return 'Block Chain Technology Stage';
   if (v.current_stage && v.current_stage !== 'DLR@VS Login') return normalizeStage(v.current_stage);
   const next = STAGES.find(([key]) => !isComplete(v[key]));
   return next ? next[1] : 'Completed';
@@ -372,7 +365,7 @@ function daysDelayed(v) {
 }
 const VS_AND_ABOVE_STAGES = [
   'vs_status', 'vro_status', 'tahsildar_status', 'rdo_status',
-  'jc_status', 'section13_status', 'draft_ror_status', 'final_ror_status', 'webland_2_status'
+  'jc_status', 'dlr_completed_status', 'final_ror_status', 'blockchain_status'
 ];
 
 function isVsOrAbove(v) {
@@ -411,7 +404,7 @@ function recordView(v, store) {
       division,
       phase,
       ported_to_webland: true,
-      webland_2_status: 'Ported',
+      blockchain_status: 'Completed',
       gt_status: 'Completed',
       vectorization_status: 'Completed',
       vs_status: 'Completed',
@@ -419,11 +412,10 @@ function recordView(v, store) {
       tahsildar_status: 'Completed',
       rdo_status: 'Completed',
       jc_status: 'Completed',
-      section13_status: 'Completed',
-      draft_ror_status: 'Completed',
+      dlr_completed_status: 'Completed',
       final_ror_status: 'Completed',
       ppb_status: 'Completed',
-      current_stage: 'Final ROR Completed',
+      current_stage: 'Block Chain Technology Stage',
       status: 'Completed',
       days_delayed: 0,
       has_conflict: false,
@@ -435,7 +427,7 @@ function recordView(v, store) {
   const cascade = cascadeStageFlags(rawStage, v);
 
   const isJcDone = isComplete(v.jc_status) || cascade.jc_status === 'Completed' || v.dlr_active_stage === 'Completed' || Boolean(v.dlr_stages_detail && v.dlr_stages_detail.jc_status && isComplete(v.dlr_stages_detail.jc_status.status));
-  const isSec13Done = isJcDone || isComplete(v.section13_status) || cascade.section13_status === 'Completed';
+  const isDlrCompDone = isJcDone || isComplete(v.dlr_completed_status || v.dlr_completed) || cascade.dlr_completed_status === 'Completed';
 
   const enriched = {
     ...v,
@@ -449,15 +441,15 @@ function recordView(v, store) {
     tahsildar_status: isComplete(v.tahsildar_status) ? 'Completed' : cascade.tahsildar_status,
     rdo_status: isComplete(v.rdo_status) ? 'Completed' : cascade.rdo_status,
     jc_status: isJcDone ? 'Completed' : cascade.jc_status,
-    section13_status: isSec13Done ? 'Completed' : cascade.section13_status,
-    draft_ror_status: isComplete(v.draft_ror_status) ? 'Completed' : cascade.draft_ror_status,
+    dlr_completed_status: isDlrCompDone ? 'Completed' : cascade.dlr_completed_status,
     final_ror_status: isComplete(v.final_ror_status) ? 'Completed' : cascade.final_ror_status,
+    blockchain_status: isComplete(v.blockchain_status) ? 'Completed' : cascade.blockchain_status,
     ppb_status: isComplete(v.ppb_status) ? 'Completed' : cascade.ppb_status
   };
 
   let determinedStage = rawStage ? cascade.current_stage : currentStage(enriched);
-  if (isSec13Done && (/jc\s*login/i.test(determinedStage) || /rdo\s*login/i.test(determinedStage) || /tah\s*login/i.test(determinedStage))) {
-    determinedStage = '13 Completed';
+  if (isJcDone && (/jc\s*login/i.test(determinedStage) || /rdo\s*login/i.test(determinedStage) || /tah\s*login/i.test(determinedStage))) {
+    determinedStage = isComplete(enriched.final_ror_status) ? 'Final ROR Completed' : 'DLR Completed';
   }
 
   return {
@@ -534,7 +526,7 @@ const VS_PER_MANDAL = {
 };
 
 function isVillageResurveyCompleted(v) {
-  return Boolean(v.ported_to_webland || v.webland_2_status === 'Ported' || isComplete(v.final_ror_status) || v.status === 'Completed');
+  return Boolean(isComplete(v.blockchain_status) || (v.current_stage || '').toLowerCase().includes('blockchain') || v.status === 'Completed');
 }
 
 function getVillageActiveDlrStage(v) {
@@ -576,8 +568,9 @@ function buildMandalActionPlan(store) {
         dlr_tah: 0,
         dlr_rdo: 0,
         dlr_jc: 0,
-        sec13_notified: 0,
-        ported_webland2: 0,
+        dlr_completed: 0,
+        final_ror: 0,
+        blockchain: 0,
         village_ids: []
       };
     }
@@ -605,12 +598,14 @@ function buildMandalActionPlan(store) {
       else if (stage === 'jc') d.dlr_jc++;
     }
 
-    if (isComplete(v.section13_status) || completed) {
-      d.sec13_notified++;
+    if (isComplete(v.blockchain_status)) {
+      d.blockchain++;
     }
-
-    if (Boolean(v.ported_to_webland || v.webland_2_status === 'Ported')) {
-      d.ported_webland2++;
+    if (isComplete(v.final_ror_status)) {
+      d.final_ror++;
+    }
+    if (isComplete(v.dlr_completed_status || v.dlr_completed) || v.dlr_active_stage === 'Completed' || isComplete(v.jc_status)) {
+      d.dlr_completed++;
     }
   });
 
@@ -638,8 +633,9 @@ function buildMandalActionPlan(store) {
     dlr_tah: mandalRows.reduce((s, r) => s + r.dlr_tah, 0),
     dlr_rdo: mandalRows.reduce((s, r) => s + r.dlr_rdo, 0),
     dlr_jc: mandalRows.reduce((s, r) => s + r.dlr_jc, 0),
-    sec13_notified: mandalRows.reduce((s, r) => s + r.sec13_notified, 0),
-    ported_webland2: mandalRows.reduce((s, r) => s + r.ported_webland2, 0),
+    dlr_completed: mandalRows.reduce((s, r) => s + (r.dlr_completed || 0), 0),
+    final_ror: mandalRows.reduce((s, r) => s + (r.final_ror || 0), 0),
+    blockchain: mandalRows.reduce((s, r) => s + (r.blockchain || 0), 0),
   };
   summary.completion_pct = summary.villages > 0 ? Math.round((summary.resurvey_completed / summary.villages) * 1000) / 10 : 0;
 
@@ -848,10 +844,9 @@ function dashboard(store) {
       tahsildarCompleted: villages.filter(v => isComplete(v.tahsildar_status)).length,
       rdoCompleted: villages.filter(v => isComplete(v.rdo_status)).length,
       jcCompleted: villages.filter(v => isComplete(v.jc_status)).length,
-      section13Completed: villages.filter(v => isComplete(v.section13_status) || isComplete(v.jc_status)).length,
-      draftRorCompleted: villages.filter(v => isComplete(v.draft_ror_status)).length,
+      dlrCompleted: villages.filter(v => isComplete(v.dlr_completed_status || v.dlr_completed) || isComplete(v.jc_status)).length,
       finalRorCompleted: villages.filter(v => isComplete(v.final_ror_status)).length,
-      webland2Completed: villages.filter(v => isComplete(v.webland_2_status) || v.ported_to_webland).length,
+      blockchainCompleted: villages.filter(v => isComplete(v.blockchain_status) || isComplete(v.webland_2_status) || v.ported_to_webland).length,
       totalKhatas,
       totalExtent,
       inProgress: villages.filter(v => v.status === 'In Progress').length,
@@ -872,10 +867,9 @@ function dashboard(store) {
         'Tahsildar statutory inspection, error rectification & sign-off',
         'Revenue Divisional Officer (RDO) appellate review & vetting',
         'Joint Collector final administrative sanction & clearance',
-        'Section 13 statutory public notice inviting landowner claims',
-        'Draft Record of Rights (1B) published for public claims & objections',
+        'Digital Land Records (DLR) completion & sealing',
         'Final Record of Rights confirmed and Pattadar Passbooks issued',
-        'Porting digital land records to Webland-2.0 portal for official mutation & registry'
+        'Anchoring verified land records and titles onto state Blockchain ledger'
       ];
       const tierAccountability = [
         'Survey Field Team (RSDT / MLSO)',
@@ -885,10 +879,9 @@ function dashboard(store) {
         'Tahsildar Office',
         'Revenue Divisional Officer (RDO)',
         'Joint Collectorate',
-        'Revenue Notification Cell',
-        'Tahsildar & VRO Field Unit',
-        'Collectorate SSLR Wing',
-        'District SSLR & Webland-2.0 Portal Wing'
+        'Joint Collector & District Administration',
+        'Collectorate SSLR Wing & Revenue Authority',
+        'Blockchain & Land Records Authority'
       ];
       const cleared = villages.filter(v => isComplete(v[key])).length;
       const currentAtStage = villages.filter(v => v.current_stage === label).length;
@@ -1596,10 +1589,9 @@ async function syncSource(store, source) {
         const tahIdx = headers.findIndex(h => /tah/i.test(h) || /mro/i.test(h));
         const rdoIdx = headers.findIndex(h => /rdo/i.test(h));
         const jcIdx = headers.findIndex(h => /jc/i.test(h));
-        const sec13Idx = headers.findIndex(h => /section\s*13/i.test(h) || /13\s*notif/i.test(h) || /13\s*notice/i.test(h));
-        const draftRorIdx = headers.findIndex(h => /draft\s*ror/i.test(h) || /6\s*\(\s*1\s*\)/i.test(h));
-        const finalRorIdx = headers.findIndex(h => /final\s*ror/i.test(h) || /13\s*\(\s*1\s*\)/i.test(h));
-        const weblandIdx = headers.findIndex(h => /webland/i.test(h) || /porting/i.test(h) || /handover/i.test(h));
+        const dlrCompIdx = headers.findIndex(h => /dlr\s*comp/i.test(h) || (/dlr/i.test(h) && !/vs|vro|tah|rdo|jc/i.test(h)));
+        const finalRorIdx = headers.findIndex(h => /final\s*ror/i.test(h) || /13\s*\(\s*1\s*\)/i.test(h) || /ror/i.test(h));
+        const blockchainIdx = headers.findIndex(h => /block\s*chain/i.test(h) || /blockchain/i.test(h) || /webland/i.test(h));
         const ppbIdx = headers.findIndex(h => /ppb/i.test(h));
         const targetDateIdx = headers.findIndex(h => /target\s*date/i.test(h) || /completion\s*date/i.test(h) || /timeline/i.test(h));
 
@@ -1622,10 +1614,9 @@ async function syncSource(store, source) {
           { key: 'tahsildar', idx: tahIdx },
           { key: 'rdo', idx: rdoIdx },
           { key: 'jc', idx: jcIdx },
-          { key: 'section13', idx: sec13Idx },
-          { key: 'draft_ror', idx: draftRorIdx },
+          { key: 'dlr_completed', idx: dlrCompIdx },
           { key: 'final_ror', idx: finalRorIdx },
-          { key: 'webland_2', idx: weblandIdx },
+          { key: 'blockchain', idx: blockchainIdx },
           { key: 'ppb', idx: ppbIdx }
         ].forEach(sc => {
           if (sc.idx >= 0 && row[sc.idx]) {
@@ -1639,7 +1630,7 @@ async function syncSource(store, source) {
 
         const jcVal = jcIdx >= 0 && row[jcIdx] ? clean(row[jcIdx]) : '';
         const explicitTarget = targetDateIdx >= 0 && row[targetDateIdx] ? clean(row[targetDateIdx]) : '';
-        const finalTarget = explicitTarget || (stageTargets.webland_2 || stageTargets.final_ror || stageTargets.draft_ror || (jcVal && !jcVal.toLowerCase().includes('stop') ? jcVal : (dates.length ? dates[dates.length - 1] : '')));
+        const finalTarget = explicitTarget || (stageTargets.blockchain || stageTargets.final_ror || stageTargets.dlr_completed || (jcVal && !jcVal.toLowerCase().includes('stop') ? jcVal : (dates.length ? dates[dates.length - 1] : '')));
         const presentStageRaw = stgIdx >= 0 && row[stgIdx] ? clean(row[stgIdx]) : '';
 
         incoming = {
@@ -1832,8 +1823,8 @@ function readBody(req) {
 function requireAuthorized(req, res) { return 'ADMIN'; }
 const STAGE_KEYS = [
   'gt_status', 'vectorization_status', 'vs_status', 'vro_status',
-  'tahsildar_status', 'rdo_status', 'jc_status', 'section13_status',
-  'draft_ror_status', 'final_ror_status', 'webland_2_status'
+  'tahsildar_status', 'rdo_status', 'jc_status', 'dlr_completed_status',
+  'final_ror_status', 'blockchain_status'
 ];
 
 function filterVillages(items, query) {
@@ -1960,12 +1951,11 @@ async function handleApi(req, res, url) {
       { key: 'tahsildar_status', label: 'DLR@Tahsildar Login', short: 'DLR@Tahsildar Login', stageNumber: 5 },
       { key: 'rdo_status', label: 'DLR@RDO Login', short: 'DLR@RDO Login', stageNumber: 6 },
       { key: 'jc_status', label: 'DLR@JC Login', short: 'DLR@JC Login', stageNumber: 7 },
-      { key: 'section13_status', label: '13 Notification', short: '13 Notification', stageNumber: 8 },
-      { key: 'draft_ror_status', label: 'Draft RoR', short: 'Draft RoR', stageNumber: 9 },
-      { key: 'final_ror_status', label: 'Final RoR', short: 'Final RoR', stageNumber: 10 },
-      { key: 'webland_2_status', label: 'Porting DLR to Webland-2.0', short: 'Porting DLR to Webland-2.0', stageNumber: 11 }
+      { key: 'dlr_completed_status', label: 'DLR Completed', short: 'DLR Completed', stageNumber: 8 },
+      { key: 'final_ror_status', label: 'Final RoR', short: 'Final RoR', stageNumber: 9 },
+      { key: 'blockchain_status', label: 'Block Chain Technology Stage', short: 'Block Chain Tech Stage', stageNumber: 10 }
     ];
-    const stageNames = ['GT', 'Vectorization & Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', '13 Notification', 'Draft RoR', 'Final RoR', 'Porting DLR to Webland-2.0', 'Completed'];
+    const stageNames = ['GT', 'Vectorization & Correlation', 'DLR@VS Login', 'DLR@VRO Login', 'DLR@Tahsildar Login', 'DLR@RDO Login', 'DLR@JC Login', 'DLR Completed', 'Final RoR', 'Block Chain Technology Stage', 'Completed'];
     return json(res, 200, {
       villages,
       totalCount: villages.length,

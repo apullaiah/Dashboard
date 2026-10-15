@@ -3218,6 +3218,7 @@ tr[data-drill-type]:hover, .attention-row.clickable:hover{background:#f6f8fd}
 /* Resurvey Segmented Switch Toggle */
 .resurvey-toggle-group {
   display: inline-flex;
+  flex-wrap: wrap;
   background: #f1f5f9;
   border-radius: 10px;
   padding: 4px;
@@ -3228,16 +3229,17 @@ tr[data-drill-type]:hover, .attention-row.clickable:hover{background:#f6f8fd}
 .resurvey-tab-btn {
   border: none;
   background: transparent;
-  padding: 8px 18px;
-  font-size: 13.5px;
+  padding: 7px 14px;
+  font-size: 13px;
   font-weight: 700;
   color: #475569;
   border-radius: 8px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
 }
 
 .resurvey-tab-btn:hover {
@@ -3249,6 +3251,12 @@ tr[data-drill-type]:hover, .attention-row.clickable:hover{background:#f6f8fd}
   background: #0f172a;
   color: #f8fafc;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+}
+
+.resurvey-tab-btn.tab-tahsildar.active {
+  background: #b45309;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.35);
 }
 
 .tab-active-dot {
@@ -3291,6 +3299,12 @@ tr[data-drill-type]:hover, .attention-row.clickable:hover{background:#f6f8fd}
   background: #ecfdf5;
   color: #047857;
   border: 1px solid #a7f3d0;
+}
+
+.pill-vec {
+  background: #f5f3ff;
+  color: #7c3aed;
+  border: 1px solid #ddd6fe;
 }
 
 .pill-dlr {
@@ -8242,6 +8256,7 @@ body {
 .ivw-data-table,
 .home-village-table,
 .gt-exact-table,
+.vec-exact-table,
 .dlr-exact-table,
 .focused-stage-table {
   width: 100% !important;
