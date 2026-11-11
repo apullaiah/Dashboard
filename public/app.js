@@ -9619,6 +9619,11 @@ async function renderWhatsApp() {
                     <div style="font-size:10.5px;color:#dc2626;font-weight:800;margin-top:2px;">
                       ⚠️ ${o.laggingCount || 0} lagging village(s)
                     </div>
+                    ${(o.p6Count > 0) ? `
+                      <div style="font-size:10.5px;color:#047857;background:#ecfdf5;border:1px solid #a7f3d0;padding:2px 5px;border-radius:4px;margin-top:3px;font-weight:700;">
+                        🎯 <b>Phase-6:</b> ${o.p6Count} vil · ${formatExtent(o.p6DailyTarget)} Ac/day
+                      </div>
+                    ` : ''}
                   </td>
                   <td>
                     ${(o.lagReasons || []).map(r => `
@@ -10450,10 +10455,11 @@ async function renderWhatsApp() {
       const laggingMandalsStr = (officer.laggingMandals || []).join(', ') || 'None';
       const breakdownLines = Object.entries(officer.mandalProgress || {}).map(([m, p]) => {
         const isLag = p.lagging > 0 || (p.balGt > 0 && p.todayGt === 0);
-        return `• *${m}:* Today: ${formatExtent(p.todayGt)} Ac · Bal: ${formatExtent(p.balGt)} Ac ${isLag ? `(⚠️ ${p.lagging} Lagging)` : '✅'}`;
+        const p6Info = (p.p6Count > 0) ? ` · P6: ${p.p6Count} Vil (${formatExtent(p.p6DailyTarget)} Ac/day)` : '';
+        return `• *${m}:* Today: ${formatExtent(p.todayGt)} Ac · Bal: ${formatExtent(p.balGt)} Ac${p6Info} ${isLag ? `(⚠️ ${p.lagging} Lagging)` : '✅'}`;
       }).join('\n');
 
-      return `🚨 *DIVISION RESURVEY MONITORING DIRECTIVE*
+      return `🚨 *CRITICAL RESURVEY STATUTORY DIRECTIVE: PHASE-6 GT TARGET 31-DEC-2026*
 🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -10461,21 +10467,26 @@ To: *${officer.name}* (Deputy Inspector of Survey - DIOS)
 Jurisdiction: *${officer.assignedMandalsCount || (officer.assignedMandals || []).length} Mandals Assigned* (${mandalsStr})
 Total Universe: *${officer.totalVillagesInDivision} Revenue Villages*
 
-⚠️ *FLAGGED: DIVISION PERFORMANCE REVIEW & LAG ALERT*
-In your assigned jurisdiction of ${officer.assignedMandalsCount || (officer.assignedMandals || []).length} Mandals, *${officer.laggingMandalsCount || 0} Mandals* and *${officer.laggingCount} Villages* are lagging behind district milestones.
+⚠️ *FLAGGED: DIVISION PERFORMANCE REVIEW & PHASE-6 COMPLETION DIRECTIVE*
+By order of the District Administration, Ground Truthing (GT) for all *Phase-6 revenue villages* must be 100% completed on or before *31st December, 2026*.
+In your assigned division (${officer.assignedMandalsCount || (officer.assignedMandals || []).length} Mandals), *${officer.p6Count || 0} Phase-6 villages* with *${formatExtent(officer.p6Bal || 0)} Acres* balance GT extent are pending. With *50 days remaining*, your division is assigned a compulsory minimum progress of *${formatExtent(officer.p6DailyTarget || 0)} Acres/day* in Phase-6 villages to achieve zero balance.
 
-📊 *DIVISION DAILY EXTRACTED PERFORMANCE:*
+📊 *DIVISION PERFORMANCE & DAILY TARGETS:*
+• Mandated Daily Division GT Target (Phase-6): *${formatExtent(officer.p6DailyTarget || 0)} Acres/day*
 • Today's Division GT Out-turn: *${formatExtent(officer.today_gt_extent)} Acres*
-• Division Balance GT Extent: *${formatExtent(officer.balance_gt_extent)} Acres*
+• Total Division Balance GT Extent: *${formatExtent(officer.balance_gt_extent)} Acres* (Phase-6: *${formatExtent(officer.p6Bal || 0)} Ac*)
 • Division DLR Logins Today: *${officer.dlr_entries_today || 0} Entries*
 • Division DLR Pending Balance: *${officer.dlr_entries_balance || 0} Khatas*
 • Critical Lagging Mandals: *${laggingMandalsStr}*
 
-📋 *MANDAL PROGRESS BREAKDOWN IN YOUR CHARGE:*
+📋 *MANDAL PROGRESS & DAILY TARGET BREAKDOWN:*
 ${breakdownLines}
 
-⚠️ *URGENT DIRECTIVE FROM DSLRO, CHITTOOR:*
-As Deputy Inspector of Survey (DIOS), you are instructed to conduct immediate physical field inspections across lagging Mandals in your jurisdiction. Review all Mandal Surveyors and Village Surveyors without delay and submit action taken report.
+⚠️ *STATUTORY DIRECTIVES FROM DSLRO, CHITTOOR:*
+1. Ground Truthing (GT) across all Phase-6 revenue villages in your jurisdiction must be 100% concluded on or before *31st December, 2026* without exception.
+2. Conduct daily morning field inspections (08:30 AM) across lagging mandals and verify rover deployment on the ground.
+3. Ensure every Mandal Surveyor (MLSO) and Village Surveyor achieves their mandated daily village GT extent quota.
+4. Review progress daily at 06:00 PM and submit action taken report to DSLRO, Chittoor. Any laxity will invite strict disciplinary proceedings under CCA Rules.
 
 🌐 *Live District Resurvey Dashboard:*
 ${publicVercelBase}/
@@ -10489,32 +10500,47 @@ Chittoor District, Government of Andhra Pradesh`;
     // 2. MLSO Notice (Survey Cadre)
     if (tier === 'mlso' || tier === 'ms') {
       const zeroVillages = (officer.laggingVillages || []).filter(v => (v.today_gt_extent || 0) === 0).length;
-      const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
-        `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, Bal: ${formatExtent(v.balance_gt_extent)} Ac`
-      ).join('\n');
+      
+      let villageSection = '';
+      if (officer.p6Villages && officer.p6Villages.length > 0) {
+        const p6Active = officer.p6Villages.filter(v => (v.balance_gt_extent || 0) > 0);
+        const p6Lines = (p6Active.length > 0 ? p6Active : officer.p6Villages).map(v => 
+          `• *${v.village_name}* (Code: \`${v.village_code}\`): Bal: ${formatExtent(v.balance_gt_extent)} Ac → *Target: ${formatExtent(v.daily_target_gt_extent)} Ac/day* [Phase VI]`
+        ).join('\n');
+        villageSection = `🎯 *PHASE-6 VILLAGES GT BALANCE & MANDATED DAILY TARGETS (50 DAYS LEFT):*\n${p6Lines}`;
+      } else {
+        const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
+          `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, Bal: ${formatExtent(v.balance_gt_extent)} Ac`
+        ).join('\n');
+        villageSection = `⚠️ *KEY LAGGING REVENUE VILLAGES:*\n${sampleVillages}`;
+      }
 
-      return `🚨 *MANDAL LEVEL SURVEY OFFICER (MLSO) DIRECTIVE*
+      return `🚨 *CRITICAL MLSO STATUTORY DIRECTIVE: PHASE-6 GT TARGET 31-DEC-2026*
 🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 To: *${officer.name}* (Mandal Level Survey Officer - MLSO)
 Jurisdiction: *${officer.mandal} Mandal* (${officer.jurisdictionCount} Revenue Villages)
 
-⚠️ *FLAGGED: POOR RESURVEY PERFORMANCE IN MANDAL*
-Resurvey progress in *${officer.mandal} Mandal* is lagging behind the target schedule. Out of ${officer.jurisdictionCount} revenue villages, *${officer.laggingCount} villages are flagged for severe lag*.
+⚠️ *FLAGGED: MANDAL PERFORMANCE REVIEW & PHASE-6 GT DEADLINE*
+By order of the District Administration, Ground Truthing (GT) for all *Phase-6 villages* must be 100% completed on or before *31st December, 2026*.
+In *${officer.mandal} Mandal*, *${officer.p6Count || 0} Phase-6 villages* have a pending balance of *${formatExtent(officer.p6Bal || 0)} Acres*. With *50 days remaining*, your mandal is assigned a compulsory minimum target of *${formatExtent(officer.p6DailyTarget || 0)} Acres/day* for Phase-6 villages to achieve zero balance by 31-12-2026.
 
-📊 *MANDAL DAILY EXTRACTED PERFORMANCE:*
+📊 *MANDAL DAILY PERFORMANCE & TARGETS:*
+• Mandated Daily Mandal GT Target (Phase-6): *${formatExtent(officer.p6DailyTarget || 0)} Acres/day*
 • Today's Mandal GT Out-Turn: *${formatExtent(officer.today_gt_extent)} Acres*
 • Total Pending GT Balance: *${formatExtent(officer.balance_gt_extent)} Acres*
 • Today's DLR Clearances: *${officer.dlr_entries_today || 0} Entries*
 • DLR Pending Khatas: *${officer.dlr_entries_balance || 0} Khatas*
 • Villages with Zero Progress Today: *${zeroVillages} Villages*
 
-⚠️ *KEY LAGGING REVENUE VILLAGES:*
-${sampleVillages}
+${villageSection}
 
-⚠️ *DIRECTIVE FOR MANDAL LEVEL SURVEY OFFICER (MLSO):*
-Convene an immediate review with all Village Surveyors in ${officer.mandal} Mandal. Inspect rover ground positions, resolve boundary conflicts, and ensure daily out-turn benchmark is met.
+⚠️ *COMPULSORY DIRECTIVES FROM DSLRO, CHITTOOR:*
+1. 100% Ground Truthing of Phase-6 villages must be concluded strictly by *31st December, 2026*.
+2. Convene a daily morning assembly (08:30 AM) with all Village Surveyors to assign daily rover coordinates and target acreages.
+3. Personally inspect field teams on the ground and ensure each village achieves its daily extent target.
+4. Submit daily compliance out-turn to the DIOS and DSLRO Chittoor by 06:00 PM without fail. Non-achievement will lead to immediate disciplinary action under CCA Rules.
 
 🌐 *Live Mandal Village Dashboard:*
 ${publicVercelBase}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
