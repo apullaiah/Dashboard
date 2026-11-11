@@ -35,7 +35,8 @@ function saveStoredWhatsAppConfig(cfg) {
       senderName: cfg.senderName || existing.senderName || 'DSLRO, Chittoor',
       surveySenderName: cfg.surveySenderName || existing.surveySenderName || 'DSLRO, Chittoor',
       revenueSenderName: cfg.revenueSenderName || existing.revenueSenderName || 'Joint Collector, Chittoor',
-      webhookUrl: cfg.webhookUrl || existing.webhookUrl || `${window.location.origin}/api/whatsapp/webhook`,
+      vercelUrl: cfg.vercelUrl || existing.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app',
+      webhookUrl: cfg.webhookUrl || existing.webhookUrl || `${(cfg.vercelUrl || existing.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app').replace(/\/+$/, '')}/api/whatsapp/webhook`,
       savedAt: cfg.savedAt || new Date().toISOString()
     };
     window._ctrWhatsAppConfig = merged;
@@ -9323,6 +9324,9 @@ async function renderWhatsApp() {
   const localConfig = getStoredWhatsAppConfig() || {};
   const serverConfig = cfgData.config || {};
 
+  const DEFAULT_VERCEL_APP_URL = 'https://chittor-resurvey-dashboard.vercel.app';
+  const resolvedVercelUrl = localConfig.vercelUrl || serverConfig.vercelUrl || DEFAULT_VERCEL_APP_URL;
+
   const c = {
     enabled: localConfig.enabled ?? serverConfig.enabled ?? true,
     verifyToken: localConfig.verifyToken || serverConfig.verifyToken || 'CTR_RESURVEY_WA_2026',
@@ -9333,7 +9337,8 @@ async function renderWhatsApp() {
     senderName: localConfig.senderName || serverConfig.senderName || 'DSLRO, Chittoor',
     surveySenderName: localConfig.surveySenderName || serverConfig.surveySenderName || 'DSLRO, Chittoor',
     revenueSenderName: localConfig.revenueSenderName || serverConfig.revenueSenderName || 'Joint Collector, Chittoor',
-    webhookUrl: serverConfig.webhookUrl || `${window.location.origin}/api/whatsapp/webhook`
+    vercelUrl: resolvedVercelUrl,
+    webhookUrl: serverConfig.webhookUrl || `${resolvedVercelUrl.replace(/\/+$/, '')}/api/whatsapp/webhook`
   };
 
   const isLiveMode = Boolean(c.phoneNumberId && c.accessToken);
@@ -9629,6 +9634,11 @@ async function renderWhatsApp() {
                     <button type="button" class="wa-single-send-btn" data-action="send-officer" data-oid="${o.id}" title="Send notice to ${h(o.name)} via WhatsApp">
                       ➤ Send Notice
                     </button>
+                    ${o.phone && o.phone.trim().length >= 10 ? `
+                      <button type="button" class="wa-direct-wa-pill" data-action="direct-wa-officer" data-oid="${o.id}" style="background:#25d366;color:#ffffff;border:none;padding:5px 11px;border-radius:18px;font-size:11px;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;gap:4px;margin-left:4px;box-shadow:0 1px 3px rgba(37,211,102,0.3);" title="Open WhatsApp directly with pre-filled directive for ${h(o.name)}">
+                        💬 WhatsApp
+                      </button>
+                    ` : ''}
                   </td>
                 </tr>
               `;
@@ -10058,6 +10068,15 @@ async function renderWhatsApp() {
 
         <div class="form-grid" style="display:grid;gap:10px;">
           <label class="form-field">
+            <span style="font-size:11px;font-weight:700;">Live Vercel Application URL (Public HTTPS)</span>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input type="text" value="${h(c.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app')}" id="wa-vercel-url-input" style="font-family:var(--mono);font-size:11px;" placeholder="https://chittor-resurvey-dashboard.vercel.app" />
+              <button type="button" class="table-action-button copy-badge-btn" data-copy-input="wa-vercel-url-input">Copy</button>
+            </div>
+            <span style="font-size:10px;color:#64748b;margin-top:2px;">Live Vercel link embedded in WhatsApp notices sent to officers.</span>
+          </label>
+
+          <label class="form-field">
             <span style="font-size:11px;font-weight:700;">Callback Webhook URL (Public Vercel HTTPS)</span>
             <div style="display:flex;gap:6px;align-items:center;">
               <input type="text" readonly value="${h(webhookUrl)}" id="wa-webhook-url-input" style="font-family:var(--mono);font-size:11px;background:#f8fafc;" />
@@ -10122,9 +10141,14 @@ async function renderWhatsApp() {
         <div style="padding:16px;overflow-y:auto;flex:1;background:#efeae2;">
           <div id="wa-modal-notice-content" style="background:#ffffff;padding:14px;border-radius:8px;font-family:sans-serif;font-size:12.5px;line-height:1.5;white-space:pre-wrap;box-shadow:0 1px 2px rgba(0,0,0,0.1);color:#111b21;"></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e2e8f0;background:#f8fafc;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-top:1px solid #e2e8f0;background:#f8fafc;flex-wrap:wrap;gap:8px;">
           <button type="button" id="wa-modal-cancel-btn" style="padding:7px 14px;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;">Cancel</button>
-          <button type="button" id="wa-modal-send-btn" class="wa-single-send-btn" style="margin:0;">➤ Send WhatsApp Notice Now</button>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <a id="wa-modal-direct-link" href="#" target="_blank" rel="noopener noreferrer" style="background:#25d366;color:#ffffff;text-decoration:none;padding:7px 14px;border-radius:6px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;gap:5px;box-shadow:0 2px 4px rgba(37,211,102,0.25);">
+              💬 Open in WhatsApp (wa.me)
+            </a>
+            <button type="button" id="wa-modal-send-btn" class="wa-single-send-btn" style="margin:0;">➤ Send Cloud Notice</button>
+          </div>
         </div>
       </div>
     </div>
@@ -10418,6 +10442,7 @@ async function renderWhatsApp() {
   function formatModalNoticeText(officer, tier, senderTitle) {
     const meta = getTierMeta();
     const effectiveSender = senderTitle || meta.defaultSender;
+    const publicVercelBase = (c.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app').replace(/\/+$/, '');
 
     // 1. DIOS Notice (Survey Cadre)
     if (tier === 'dios') {
@@ -10453,7 +10478,7 @@ ${breakdownLines}
 As Deputy Inspector of Survey (DIOS), you are instructed to conduct immediate physical field inspections across lagging Mandals in your jurisdiction. Review all Mandal Surveyors and Village Surveyors without delay and submit action taken report.
 
 🌐 *Live District Resurvey Dashboard:*
-${window.location.origin}/
+${publicVercelBase}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10492,7 +10517,7 @@ ${sampleVillages}
 Convene an immediate review with all Village Surveyors in ${officer.mandal} Mandal. Inspect rover ground positions, resolve boundary conflicts, and ensure daily out-turn benchmark is met.
 
 🌐 *Live Mandal Village Dashboard:*
-${window.location.origin}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
+${publicVercelBase}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10531,7 +10556,7 @@ ${sampleVillages}
 Immediately clear all pending Khatas in DLR @ VRO Login. Coordinate closely with Village Surveyors in field ground truthing, resolve land dispute objections on the ground, and submit action taken report by evening.
 
 🌐 *Live District Resurvey Dashboard:*
-${window.location.origin}/
+${publicVercelBase}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10569,7 +10594,7 @@ ${sampleVillages}
 As Tahsildar, convene immediate coordination review with all VROs and MLSOs in ${officer.mandal} Mandal. Ensure zero pendency at Tahsildar login, issue Section 13 notices on schedule, and clear bottleneck disputes.
 
 🌐 *Live Mandal Dashboard:*
-${window.location.origin}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
+${publicVercelBase}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10603,7 +10628,7 @@ In *${officer.division} Division*, *${officer.laggingMandalsCount || 0} Mandals*
 Conduct an immediate divisional review with Tahsildars, MLSOs, and DIOS in your jurisdiction. Inspect rover field operations in lagging villages and ensure target milestones are met without fail.
 
 🌐 *Live District Resurvey Dashboard:*
-${window.location.origin}/
+${publicVercelBase}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10641,7 +10666,7 @@ ${sampleVillages}
 Accelerate ground truthing and DLR verification in your assigned revenue villages immediately. Field teams must be mobilized and daily progress uploaded without fail.
 
 🌐 *Live District Resurvey Dashboard:*
-${window.location.origin}/
+${publicVercelBase}/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 *${effectiveSender}*
@@ -10660,7 +10685,41 @@ Chittoor District, Government of Andhra Pradesh`;
         const sender = senderOverride?.value.trim() || meta.defaultSender;
         const text = formatModalNoticeText(officer, currentTier, sender);
         if (modalNoticeBody) modalNoticeBody.textContent = text;
+
+        const cleanDigits = (officer.phone || '').replace(/\D/g, '').slice(-10);
+        const modalDirectLink = document.getElementById('wa-modal-direct-link');
+        if (modalDirectLink) {
+          if (cleanDigits.length === 10) {
+            modalDirectLink.href = `https://wa.me/91${cleanDigits}?text=${encodeURIComponent(text)}`;
+          } else {
+            modalDirectLink.href = '#';
+          }
+        }
+
         if (modalBackdrop) modalBackdrop.style.display = 'flex';
+      };
+    });
+
+    document.querySelectorAll('[data-action="direct-wa-officer"]').forEach(btn => {
+      btn.onclick = () => {
+        const oid = btn.dataset.oid;
+        const officer = getActiveOfficers().find(x => x.id === oid);
+        if (!officer) return;
+        const meta = getTierMeta();
+        const sender = senderOverride?.value.trim() || meta.defaultSender;
+        const text = formatModalNoticeText(officer, currentTier, sender);
+        let phone = (officer.phone || '').replace(/\D/g, '').slice(-10);
+        if (!phone || phone.length < 10) {
+          const entered = prompt(`Phone number for ${officer.name} (${officer.role}) is missing in Google Spreadsheet.\n\nEnter 10-digit mobile number to open directly in WhatsApp:`, '');
+          if (!entered) return;
+          phone = entered.replace(/\D/g, '').slice(-10);
+          if (phone.length < 10) {
+            toast('Please enter a valid 10-digit mobile number.', 'error');
+            return;
+          }
+        }
+        const waUrl = `https://wa.me/91${phone}?text=${encodeURIComponent(text)}`;
+        window.open(waUrl, '_blank', 'noopener,noreferrer');
       };
     });
 
@@ -10694,7 +10753,15 @@ Chittoor District, Government of Andhra Pradesh`;
             method: 'POST',
             body: JSON.stringify({ officerId: oid, tier: currentTier, senderTitle, phoneOverride })
           });
-          toast(`Notice sent to ${officer.name} (${officer.role}) from ${senderTitle}!`, 'success');
+          const isSim = res.sendResult?.simulated || res.status === 'Simulated';
+          if (isSim) {
+            toast(`Notice logged for ${officer.name} (Simulation mode). Opening WhatsApp direct dispatch...`, 'info');
+            if (res.waLink) {
+              window.open(res.waLink, '_blank', 'noopener,noreferrer');
+            }
+          } else {
+            toast(`Notice sent to ${officer.name} (${officer.role}) from ${senderTitle}!`, 'success');
+          }
           btn.textContent = '✓ Sent';
           btn.style.background = '#059669';
           const freshLogs = await api('/api/whatsapp/logs');
@@ -10707,6 +10774,28 @@ Chittoor District, Government of Andhra Pradesh`;
         }
       };
     });
+  }
+
+  const modalDirectLinkEl = document.getElementById('wa-modal-direct-link');
+  if (modalDirectLinkEl) {
+    modalDirectLinkEl.onclick = (e) => {
+      if (!currentModalOfficer) return;
+      let phone = (currentModalOfficer.phone || '').replace(/\D/g, '').slice(-10);
+      if (phone.length < 10) {
+        e.preventDefault();
+        const entered = prompt(`Phone number for ${currentModalOfficer.name} (${currentModalOfficer.role}) is missing in Google Spreadsheet.\n\nEnter 10-digit mobile number to open directly in WhatsApp:`, '');
+        if (!entered) return;
+        phone = entered.replace(/\D/g, '').slice(-10);
+        if (phone.length < 10) {
+          toast('Please enter a valid 10-digit mobile number.', 'error');
+          return;
+        }
+        const meta = getTierMeta();
+        const sender = senderOverride?.value.trim() || meta.defaultSender;
+        const text = formatModalNoticeText(currentModalOfficer, currentTier, sender);
+        window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+      }
+    };
   }
 
   if (modalSendBtn) {
@@ -10734,11 +10823,19 @@ Chittoor District, Government of Andhra Pradesh`;
       modalSendBtn.textContent = '⏳ Sending...';
 
       try {
-        await api('/api/whatsapp/send-officer-notice', {
+        const res = await api('/api/whatsapp/send-officer-notice', {
           method: 'POST',
           body: JSON.stringify({ officerId: officer.id, tier: currentTier, senderTitle, phoneOverride })
         });
-        toast(`Notice sent to ${officer.name} from ${senderTitle}!`, 'success');
+        const isSim = res.sendResult?.simulated || res.status === 'Simulated';
+        if (isSim) {
+          toast(`Notice logged for ${officer.name} (Simulation mode). Opening WhatsApp direct dispatch...`, 'info');
+          if (res.waLink) {
+            window.open(res.waLink, '_blank', 'noopener,noreferrer');
+          }
+        } else {
+          toast(`Notice sent to ${officer.name} from ${senderTitle}!`, 'success');
+        }
         closeModal();
         const freshLogs = await api('/api/whatsapp/logs');
         const logsWrap = document.getElementById('wa-logs-table-container');
@@ -10747,7 +10844,7 @@ Chittoor District, Government of Andhra Pradesh`;
         toast(`Failed to send notice: ${err.message}`, 'error');
       } finally {
         modalSendBtn.disabled = false;
-        modalSendBtn.textContent = '➤ Send WhatsApp Notice Now';
+        modalSendBtn.textContent = '➤ Send Cloud Notice';
       }
     };
   }
@@ -10873,6 +10970,7 @@ Chittoor District, Government of Andhra Pradesh`;
   // Function to show the Settings Dialogue Box
   function openWhatsAppSettingsModal() {
     const local = getStoredWhatsAppConfig() || {};
+    const curVercelUrl = local.vercelUrl || c.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app';
     const curVerifyToken = local.verifyToken || c.verifyToken || 'CTR_RESURVEY_WA_2026';
     const curPhoneId = local.phoneNumberId || c.phoneNumberId || '';
     const curWabaId = local.wabaId || c.wabaId || '';
@@ -10904,14 +11002,23 @@ Chittoor District, Government of Andhra Pradesh`;
         <!-- 1. Webhook URL & Verification -->
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;">
           <div style="font-size:12px;font-weight:800;color:var(--navy);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-            <span>🔗</span> 1. Webhook Endpoint Configuration
+            <span>🔗</span> 1. Webhook Endpoint &amp; Production Vercel Domain
           </div>
           <div style="display:grid;gap:12px;">
+            <label class="form-field full" style="display:block;">
+              <span style="font-size:11px;font-weight:700;color:#334155;">Live Vercel Application URL (Production Domain) *</span>
+              <div style="display:flex;gap:6px;align-items:center;margin-top:4px;">
+                <input type="text" value="${h(curVercelUrl)}" id="wa-modal-vercel-input" placeholder="https://chittor-resurvey-dashboard.vercel.app" style="font-family:var(--mono);font-size:11px;border:1px solid #cbd5e1;padding:8px 10px;border-radius:6px;flex:1;" />
+                <button type="button" class="table-action-button copy-badge-btn" data-copy-input="wa-modal-vercel-input" style="padding:8px 14px;background:#059669;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;">Copy</button>
+              </div>
+              <span style="font-size:10px;color:#64748b;margin-top:4px;display:block;">All dashboard monitoring links dispatched to officers in WhatsApp notices will point to this Vercel domain.</span>
+            </label>
+
             <label class="form-field full" style="display:block;">
               <span style="font-size:11px;font-weight:700;color:#334155;">Callback Webhook URL (Public HTTPS)</span>
               <div style="display:flex;gap:6px;align-items:center;margin-top:4px;">
                 <input type="text" readonly value="${h(webhookUrl)}" id="wa-modal-url-input" style="font-family:var(--mono);font-size:11px;background:#ffffff;border:1px solid #cbd5e1;padding:8px 10px;border-radius:6px;flex:1;" />
-                <button type="button" class="table-action-button copy-badge-btn" data-copy="${h(webhookUrl)}" style="padding:8px 14px;background:#0284c7;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;">Copy</button>
+                <button type="button" class="table-action-button copy-badge-btn" data-copy-input="wa-modal-url-input" style="padding:8px 14px;background:#0284c7;color:#fff;border:none;border-radius:6px;font-weight:700;cursor:pointer;">Copy</button>
               </div>
               <span style="font-size:10px;color:#64748b;margin-top:4px;display:block;">Configure this exact URL in Meta App Dashboard under WhatsApp &gt; Configuration &gt; Callback URL.</span>
             </label>
@@ -11071,6 +11178,15 @@ Chittoor District, Government of Andhra Pradesh`;
 
         const modalSaveRadioCard = document.getElementById('wa-modal-save-radio-card');
 
+    const modalVercelInp = document.getElementById('wa-modal-vercel-input');
+    const modalUrlInp = document.getElementById('wa-modal-url-input');
+    if (modalVercelInp && modalUrlInp) {
+      modalVercelInp.oninput = () => {
+        const v = modalVercelInp.value.trim().replace(/\/+$/, '');
+        modalUrlInp.value = v ? `${v}/api/whatsapp/webhook` : '';
+      };
+    }
+
     async function executeSaveSettings() {
       if (modalSaveBtn) {
         modalSaveBtn.disabled = true;
@@ -11080,6 +11196,8 @@ Chittoor District, Government of Andhra Pradesh`;
         modalSaveRadioCard.classList.add('active');
       }
 
+      const newVercel = document.getElementById('wa-modal-vercel-input')?.value.trim() || c.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app';
+      const cleanVercel = newVercel.replace(/\/+$/, '');
       const newVerify = document.getElementById('wa-modal-verify-input')?.value.trim() || 'CTR_RESURVEY_WA_2026';
       const newPhone = document.getElementById('wa-modal-phone-input')?.value.trim() || '';
       const newWaba = document.getElementById('wa-modal-waba-input')?.value.trim() || '';
@@ -11096,7 +11214,8 @@ Chittoor District, Government of Andhra Pradesh`;
         senderName: newSurveySender,
         surveySenderName: newSurveySender,
         revenueSenderName: newRevenueSender,
-        webhookUrl: `${window.location.origin}/api/whatsapp/webhook`,
+        vercelUrl: cleanVercel,
+        webhookUrl: `${cleanVercel}/api/whatsapp/webhook`,
         updatedAt: new Date().toISOString()
       };
 
@@ -11119,11 +11238,15 @@ Chittoor District, Government of Andhra Pradesh`;
       c.mode = liveNow ? 'LIVE' : 'SIMULATION';
 
       // 4. Update on-page inputs if present
+      const pageVercel = document.getElementById('wa-vercel-url-input');
+      const pageWebhook = document.getElementById('wa-webhook-url-input');
       const pageVerify = document.getElementById('wa-verify-token-input');
       const pagePhone = document.getElementById('wa-phone-id-input');
       const pageWaba = document.getElementById('wa-waba-input');
       const pageToken = document.getElementById('wa-token-input');
       const pageSender = document.getElementById('wa-sender-name-input');
+      if (pageVercel) pageVercel.value = cleanVercel;
+      if (pageWebhook) pageWebhook.value = `${cleanVercel}/api/whatsapp/webhook`;
       if (pageVerify) pageVerify.value = newVerify;
       if (pagePhone) pagePhone.value = newPhone;
       if (pageWaba) pageWaba.value = newWaba;
@@ -11180,6 +11303,26 @@ Chittoor District, Government of Andhra Pradesh`;
   // Webhook Settings Radio Button & Buttons -> Opens Settings Dialogue Box
   const settingsRadioCard = document.getElementById('wa-settings-radio-card');
   const settingsRadioInput = document.getElementById('wa-webhook-settings-radio-input');
+
+  const pageVercelInp = document.getElementById('wa-vercel-url-input');
+  if (pageVercelInp) {
+    pageVercelInp.onchange = async () => {
+      const cleanVal = pageVercelInp.value.trim().replace(/\/+$/, '');
+      if (cleanVal) {
+        c.vercelUrl = cleanVal;
+        c.webhookUrl = `${cleanVal}/api/whatsapp/webhook`;
+        const pageWebhookInp = document.getElementById('wa-webhook-url-input');
+        if (pageWebhookInp) pageWebhookInp.value = c.webhookUrl;
+        saveStoredWhatsAppConfig(c);
+        try {
+          await api('/api/whatsapp/config', { method: 'POST', body: JSON.stringify(c) });
+          toast('Live Vercel Application URL updated successfully!', 'success');
+        } catch (e) {
+          console.warn('Config save error:', e);
+        }
+      }
+    };
+  }
 
   function triggerSettingsModal() {
     if (settingsRadioInput) settingsRadioInput.checked = true;
@@ -11281,7 +11424,7 @@ Chittoor District, Government of Andhra Pradesh`;
       `Date & Time: ${timeNow}\n\n` +
       `⚠️ *TEST VERIFICATION NOTICE:*\n` +
       `This is an authorized test message dispatch from the A.P. Land Resurvey Project 2.0 Chittoor Monitoring Dashboard. Kindly acknowledge receipt of this test transmission.\n\n` +
-      `🌐 *Monitoring Portal:* ${window.location.origin}/\n` +
+      `🌐 *Monitoring Portal:* ${(c.vercelUrl || 'https://chittor-resurvey-dashboard.vercel.app').replace(/\/+$/, '')}/\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `*${sender || 'DSLRO, Chittoor'}*\n` +
       `District Survey & Land Records Officer`;
@@ -11426,8 +11569,12 @@ Chittoor District, Government of Andhra Pradesh`;
   // Copy badges
   document.querySelectorAll('.copy-badge-btn').forEach(btn => {
     btn.onclick = () => {
-      const val = btn.dataset.copy;
-      if (navigator.clipboard) {
+      let val = btn.dataset.copy;
+      if (!val && btn.dataset.copyInput) {
+        const inp = document.getElementById(btn.dataset.copyInput);
+        if (inp) val = inp.value;
+      }
+      if (val && navigator.clipboard) {
         navigator.clipboard.writeText(val);
         const originalText = btn.textContent;
         btn.textContent = 'Copied! ✓';

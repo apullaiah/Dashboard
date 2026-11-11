@@ -2150,6 +2150,24 @@ async function handleApi(req, res, url) {
   }
 
   // --- Meta WhatsApp Cloud API Webhook Integration ---
+  const DEFAULT_VERCEL_BASE_URL = 'https://chittor-resurvey-dashboard.vercel.app';
+
+  function getPublicBaseUrl(reqUrl, currentStore) {
+    if (currentStore?.whatsappConfig?.vercelUrl && /^https?:\/\//i.test(currentStore.whatsappConfig.vercelUrl)) {
+      return currentStore.whatsappConfig.vercelUrl.replace(/\/+$/, '');
+    }
+    if (process.env.PUBLIC_APP_URL && /^https?:\/\//i.test(process.env.PUBLIC_APP_URL)) {
+      return process.env.PUBLIC_APP_URL.replace(/\/+$/, '');
+    }
+    if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`.replace(/\/+$/, '');
+    }
+    if (reqUrl && reqUrl.host && !reqUrl.host.includes('localhost') && !reqUrl.host.includes('127.0.0.1')) {
+      return `${reqUrl.protocol}//${reqUrl.host}`.replace(/\/+$/, '');
+    }
+    return DEFAULT_VERCEL_BASE_URL;
+  }
+
   // Webhook Verification (GET)
   if (req.method === 'GET' && pathname === '/api/whatsapp/webhook') {
     const query = Object.fromEntries(url.searchParams.entries());
@@ -2171,7 +2189,7 @@ async function handleApi(req, res, url) {
     const body = await readBody(req);
     const messages = extractInboundMessages(body);
     const config = store.whatsappConfig || {};
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
 
     if (!store.whatsappLogs) store.whatsappLogs = [];
 
@@ -2214,6 +2232,8 @@ async function handleApi(req, res, url) {
     const senderName = process.env.WHATSAPP_SENDER_NAME || rawConfig.senderName || 'DSLRO, Chittoor';
     const surveySenderName = rawConfig.surveySenderName || rawConfig.senderName || 'DSLRO, Chittoor';
     const revenueSenderName = rawConfig.revenueSenderName || 'Joint Collector, Chittoor';
+    const vercelUrl = rawConfig.vercelUrl || DEFAULT_VERCEL_BASE_URL;
+    const publicBaseUrl = getPublicBaseUrl(url, store);
     const isLive = Boolean(phoneNumberId && accessToken);
 
     return json(res, 200, {
@@ -2226,7 +2246,8 @@ async function handleApi(req, res, url) {
         senderName,
         surveySenderName,
         revenueSenderName,
-        webhookUrl: `${url.protocol}//${url.host}/api/whatsapp/webhook`,
+        vercelUrl,
+        webhookUrl: `${publicBaseUrl}/api/whatsapp/webhook`,
         accessToken: accessToken || '',
         maskedAccessToken: accessToken ? '••••••••' + accessToken.slice(-4) : '',
         mode: isLive ? 'LIVE' : 'SIMULATION'
@@ -2241,12 +2262,15 @@ async function handleApi(req, res, url) {
   if (req.method === 'POST' && pathname === '/api/whatsapp/config') {
     const b = await readBody(req);
     const existing = store.whatsappConfig || {};
+    const cleanVercelUrl = clean(b.vercelUrl) || existing.vercelUrl || DEFAULT_VERCEL_BASE_URL;
     store.whatsappConfig = {
       enabled: b.enabled !== false,
       verifyToken: clean(b.verifyToken) || existing.verifyToken || DEFAULT_VERIFY_TOKEN,
       phoneNumberId: clean(b.phoneNumberId) || existing.phoneNumberId || '',
       accessToken: b.accessToken && !b.accessToken.includes('••••') ? clean(b.accessToken) : (existing.accessToken || process.env.WHATSAPP_ACCESS_TOKEN || ''),
       wabaId: clean(b.wabaId) || existing.wabaId || '',
+      vercelUrl: cleanVercelUrl,
+      webhookUrl: `${cleanVercelUrl.replace(/\/+$/, '')}/api/whatsapp/webhook`,
       senderName: clean(b.senderName) || clean(b.surveySenderName) || existing.senderName || 'DSLRO, Chittoor',
       surveySenderName: clean(b.surveySenderName) || clean(b.senderName) || existing.surveySenderName || 'DSLRO, Chittoor',
       revenueSenderName: clean(b.revenueSenderName) || existing.revenueSenderName || 'Joint Collector, Chittoor',
@@ -2288,7 +2312,7 @@ async function handleApi(req, res, url) {
   // Bulk dispatch notices to Village Surveyors of poor performing villages
   if (req.method === 'POST' && pathname === '/api/whatsapp/send-poor-notices') {
     const b = await readBody(req);
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const report = await sendPoorVillagesNotices(b, store, baseUrl);
     save(store);
     return json(res, 200, { success: true, report });
@@ -2301,9 +2325,9 @@ async function handleApi(req, res, url) {
     const v = store.villages.find(x => x.id === villageId || x.village_code === villageId);
     if (!v) return json(res, 404, { error: 'Village not found' });
 
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const config = store.whatsappConfig || {};
-    const effectiveSender = clean(b.senderTitle) || getDefaultSenderForTier(tier);
+    const effectiveSender = clean(b.senderTitle) || getDefaultSenderForTier('vs');
     const contacts = getVillageSurveyorContacts(v, store);
 
     if (!contacts.length) {
@@ -2315,6 +2339,9 @@ async function handleApi(req, res, url) {
 
     for (const contact of contacts) {
       const noticeText = formatPoorVillageNotice(v, contact, baseUrl, effectiveSender);
+      const cleanDigits = contact.phone ? contact.phone.replace(/\D/g, '').slice(-10) : '';
+      const waLink = cleanDigits.length === 10 ? `https://wa.me/91${cleanDigits}?text=${encodeURIComponent(noticeText)}` : '';
+
       const sendResult = b.dryRun 
         ? { simulated: true, delivered: true, to: contact.phone, preview: noticeText.slice(0, 140) }
         : await sendWhatsAppCloudMessage(contact.phone, noticeText, config);
@@ -2343,7 +2370,7 @@ async function handleApi(req, res, url) {
 
       store.whatsappLogs.unshift(logEntry);
       if (store.whatsappLogs.length > 300) store.whatsappLogs.pop();
-      dispatchResults.push({ contact, status, sendResult, noticePreview: noticeText.slice(0, 200) });
+      dispatchResults.push({ contact, status, waLink, sendResult, noticePreview: noticeText.slice(0, 200) });
     }
 
     save(store);
@@ -2424,11 +2451,14 @@ async function handleApi(req, res, url) {
       });
     }
 
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const config = store.whatsappConfig || {};
     const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
 
     const noticeText = formatOfficerNotice(officer, tier, baseUrl, effectiveSender);
+    const cleanDigits = targetPhone.replace(/\D/g, '').slice(-10);
+    const waLink = cleanDigits.length === 10 ? `https://wa.me/91${cleanDigits}?text=${encodeURIComponent(noticeText)}` : '';
+
     const sendResult = b.dryRun 
       ? { simulated: true, delivered: true, to: targetPhone, preview: noticeText.slice(0, 140) }
       : await sendWhatsAppCloudMessage(targetPhone, noticeText, config);
@@ -2468,6 +2498,7 @@ async function handleApi(req, res, url) {
       status,
       noticePreview: noticeText.slice(0, 240),
       fullNotice: noticeText,
+      waLink,
       sendResult
     });
   }
@@ -2475,7 +2506,7 @@ async function handleApi(req, res, url) {
   // Bulk tier notices broadcast (alerts all flagged officers in specified cadre tier)
   if (req.method === 'POST' && pathname === '/api/whatsapp/broadcast-tier-notices') {
     const b = await readBody(req);
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const tier = clean(b.tier || 'vs').toLowerCase();
     const senderTitle = clean(b.senderTitle) || getDefaultSenderForTier(tier);
     const report = await sendOfficerNotices({
@@ -2492,7 +2523,7 @@ async function handleApi(req, res, url) {
   // Cadre A: VS, MLSO, DIOS -> Dispatched by DSLRO, Chittoor
   // Cadre B: VRO, Tahsildar, RDO -> Dispatched by Joint Collector, Chittoor
   if ((req.method === 'GET' || req.method === 'POST') && (pathname === '/api/cron/daily-whatsapp-alerts' || pathname === '/api/whatsapp/trigger-daily-alerts')) {
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const summary = await executeDaily6AMWhatsAppBroadcast(store, baseUrl);
     save(store);
     return json(res, 200, {
@@ -2676,7 +2707,7 @@ async function handleApi(req, res, url) {
   if (req.method === 'POST' && pathname === '/api/whatsapp/test') {
     const b = await readBody(req);
     const query = clean(b.query || 'Bangarupalem');
-    const baseUrl = `${url.protocol}//${url.host}`;
+    const baseUrl = getPublicBaseUrl(url, store);
     const result = processWhatsAppQuery(query, store, baseUrl);
     return json(res, 200, { query, result });
   }
