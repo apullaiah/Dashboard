@@ -8680,7 +8680,15 @@ body {
   border-collapse: separate;
   border-spacing: 0;
   font-size: 12px;
-  min-width: 1720px;
+  min-width: 1560px;
+}
+
+.action-plan-table th.col-half-width,
+.action-plan-table td.col-half-width {
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+  text-align: center;
+  box-sizing: border-box;
 }
 
 .action-plan-table thead th {

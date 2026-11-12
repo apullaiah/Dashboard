@@ -10501,46 +10501,49 @@ Chittoor District, Government of Andhra Pradesh`;
     if (tier === 'mlso' || tier === 'ms') {
       const zeroVillages = (officer.laggingVillages || []).filter(v => (v.today_gt_extent || 0) === 0).length;
       
-      let villageSection = '';
-      if (officer.p6Villages && officer.p6Villages.length > 0) {
-        const p6Active = officer.p6Villages.filter(v => (v.balance_gt_extent || 0) > 0);
-        const p6Lines = (p6Active.length > 0 ? p6Active : officer.p6Villages).map(v => 
-          `• *${v.village_name}* (Code: \`${v.village_code}\`): Bal: ${formatExtent(v.balance_gt_extent)} Ac → *Target: ${formatExtent(v.daily_target_gt_extent)} Ac/day* [Phase VI]`
-        ).join('\n');
-        villageSection = `🎯 *PHASE-6 VILLAGES GT BALANCE & MANDATED DAILY TARGETS (50 DAYS LEFT):*\n${p6Lines}`;
-      } else {
-        const sampleVillages = (officer.laggingVillages || []).slice(0, 4).map(v => 
-          `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent)} Ac, Bal: ${formatExtent(v.balance_gt_extent)} Ac`
-        ).join('\n');
-        villageSection = `⚠️ *KEY LAGGING REVENUE VILLAGES:*\n${sampleVillages}`;
-      }
+      // Key Villages Breakdown
+      const activeVillages = (officer.villageBreakdown || []).filter(v => (v.balance_patta_gt || 0) > 0);
+      const displayVillages = activeVillages.length > 0 ? activeVillages.slice(0, 5) : (officer.laggingVillages || []).slice(0, 5);
+      const villageLines = displayVillages.map(v => {
+        const vBal = v.balance_patta_gt !== undefined ? v.balance_patta_gt : (parseFloat(v.balance_gt_extent) || 0);
+        const vRate = v.daily_rate || ((v.rovers >= 2) ? 50 : 25);
+        const vTarget = v.target_date || 'As Scheduled';
+        return `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent || v.today_gt || 0)} Ac · Patta: ${formatExtent(v.patta_extent || 0)} Ac · GT Comp: ${formatExtent(v.cumulative_gt_extent || 0)} Ac · *Bal: ${formatExtent(vBal)} Ac* (${v.rovers || 1} Rover @ ${vRate} Ac/d) → *Target: ${vTarget}*`;
+      }).join('\n') || '• All assigned revenue villages on track.';
 
-      return `🚨 *CRITICAL MLSO STATUTORY DIRECTIVE: PHASE-6 GT TARGET 31-DEC-2026*
+      return `🚨 *MANDAL LEVEL SURVEY OFFICER (MLSO) GROUND TRUTHING & DLR DIRECTIVE*
 🏛️ *OFFICE OF THE DISTRICT SURVEY & LAND RECORDS OFFICER (DSLRO)*
 *Survey & Land Records, Chittoor District*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 To: *${officer.name}* (Mandal Level Survey Officer - MLSO)
 Jurisdiction: *${officer.mandal} Mandal* (${officer.jurisdictionCount} Revenue Villages)
 
-⚠️ *FLAGGED: MANDAL PERFORMANCE REVIEW & PHASE-6 GT DEADLINE*
-By order of the District Administration, Ground Truthing (GT) for all *Phase-6 villages* must be 100% completed on or before *31st December, 2026*.
-In *${officer.mandal} Mandal*, *${officer.p6Count || 0} Phase-6 villages* have a pending balance of *${formatExtent(officer.p6Bal || 0)} Acres*. With *50 days remaining*, your mandal is assigned a compulsory minimum target of *${formatExtent(officer.p6DailyTarget || 0)} Acres/day* for Phase-6 villages to achieve zero balance by 31-12-2026.
+⚠️ *FLAGGED: POOR GROUND TRUTHING (GT) & DLR PERFORMANCE REVIEW*
+Performance review for *${officer.mandal} Mandal* indicates lagging progress in Ground Truthing (GT) and Digital Land Records (DLR) verification. You are hereby issued this statutory performance directive.
 
-📊 *MANDAL DAILY PERFORMANCE & TARGETS:*
-• Mandated Daily Mandal GT Target (Phase-6): *${formatExtent(officer.p6DailyTarget || 0)} Acres/day*
-• Today's Mandal GT Out-Turn: *${formatExtent(officer.today_gt_extent)} Acres*
-• Total Pending GT Balance: *${formatExtent(officer.balance_gt_extent)} Acres*
-• Today's DLR Clearances: *${officer.dlr_entries_today || 0} Entries*
-• DLR Pending Khatas: *${officer.dlr_entries_balance || 0} Khatas*
-• Villages with Zero Progress Today: *${zeroVillages} Villages*
+📊 *GROUND TRUTHING (GT) EXTRACTED STATUS:*
+• GT Extent Completed Today: *${formatExtent(officer.today_gt_extent)} Acres*
+• Cumulative GT Extent Completed: *${formatExtent(officer.cumulative_gt_extent)} Acres*
+• Total Patta Land Extent: *${formatExtent(officer.patta_extent)} Acres*
+• *Balance GT (Patta Land Extent - GT Completed):* *${formatExtent(officer.balance_patta_gt)} Acres*
+• Active Rovers Deployed: *${officer.rovers_available || 1} Rover(s)* (Daily Benchmark: *${officer.daily_rate_benchmark || 25} Ac/day*)
+• *Mandated Target Date of GT Completion:* *${officer.target_date_gt_completion}*
+  *(Calculated: Remaining ${formatExtent(officer.balance_patta_gt)} Ac ÷ ${officer.daily_rate_benchmark} Ac/day = ${officer.days_needed_gt} working days)*
 
-${villageSection}
+🔒 *DIGITAL LAND RECORDS (DLR) ENTRIES STATUS:*
+• DLR Entries Completed Today: *${officer.dlr_entries_today || 0} Entries*
+• Cumulative DLR Entries Completed: *${officer.dlr_entries_cumulative || 0} Entries*
+• Pending DLR Entries (Balance Khatas): *${officer.dlr_entries_balance || 0} Khatas*
+• Flagged Lagging Villages: *${officer.laggingCount} Villages* (Zero GT Today: *${zeroVillages} Villages*)
 
-⚠️ *COMPULSORY DIRECTIVES FROM DSLRO, CHITTOOR:*
-1. 100% Ground Truthing of Phase-6 villages must be concluded strictly by *31st December, 2026*.
-2. Convene a daily morning assembly (08:30 AM) with all Village Surveyors to assign daily rover coordinates and target acreages.
-3. Personally inspect field teams on the ground and ensure each village achieves its daily extent target.
-4. Submit daily compliance out-turn to the DIOS and DSLRO Chittoor by 06:00 PM without fail. Non-achievement will lead to immediate disciplinary action under CCA Rules.
+🎯 *KEY REVENUE VILLAGES: GT BALANCE & TARGET COMPLETION DATES:*
+${villageLines}
+
+⚠️ *COMPULSORY STATUTORY DIRECTIVES FROM DSLRO, CHITTOOR:*
+1. Maintain mandated minimum daily GT extent out-turn (25 Ac/day for 1 rover, 50 Ac/day for 2 rovers) in every village without exception.
+2. Complete 100% Ground Truthing on or before the mandated target date (*${officer.target_date_gt_completion}*).
+3. Expedite clearance of pending DLR entries across VS, VRO, and Tahsildar logins to eliminate khata pendency.
+4. Convene daily morning muster (08:30 AM) with all Village Surveyors to assign rover coordinates and submit evening compliance out-turn to DIOS and DSLRO by 06:00 PM. Non-compliance will invite disciplinary action under CCA Rules.
 
 🌐 *Live Mandal Village Dashboard:*
 ${publicVercelBase}/report/mandal-villages?mandal=${encodeURIComponent(officer.mandal)}
@@ -13783,10 +13786,10 @@ function renderMandalActionPlan() {
                 <th rowspan="2" style="width:105px;" class="sortable ${col === 'total_extent' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="total_extent">TOTAL EXTENT (AC) ⇅</th>
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'govt_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="govt_land">GOVT LAND (AC) ⇅</th>
                 <th rowspan="2" style="width:100px;" class="sortable ${col === 'patta_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="patta_land">PATTA LAND (AC) ⇅</th>
-                <th rowspan="2" style="width:70px;" class="sortable ${col === 'vs_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="vs_available">NO. OF VS AVAILABLE ⇅</th>
-                <th rowspan="2" style="width:70px;" class="sortable ${col === 'rovers_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="rovers_available">NO. OF ROVERS ⇅</th>
-                <th rowspan="2" style="width:95px;" class="sortable ${col === 'resurvey_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="resurvey_completed">RESURVEY COMPLETED ⇅</th>
-                <th rowspan="2" style="width:90px;" class="sortable ${col === 'balance_villages' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="balance_villages">BALANCE VILLAGES ⇅</th>
+                <th rowspan="2" style="width:35px;max-width:38px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'vs_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="vs_available">NO. OF VS AVAILABLE ⇅</th>
+                <th rowspan="2" style="width:35px;max-width:38px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'rovers_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="rovers_available">NO. OF ROVERS ⇅</th>
+                <th rowspan="2" style="width:48px;max-width:50px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'resurvey_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="resurvey_completed">RESURVEY COMPLETED ⇅</th>
+                <th rowspan="2" style="width:45px;max-width:48px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'balance_villages' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="balance_villages">BALANCE VILLAGES ⇅</th>
                 <th colspan="5" class="group-dlr">NUMBER OF VILLAGES IN DLR LOGINS (5 WORKFLOW STAGES)</th>
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'dlr_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_completed">
                   DLR COMPLETED
@@ -13869,23 +13872,23 @@ function renderMandalActionPlan() {
                       ${formatExtent(m.patta_land)}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn fig-btn-purple" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="vs_available" title="Click to view ${m.vs_available} Village Surveyors directory for ${h(m.mandal)}">
+                  <td style="padding:6px 2px;" class="col-half-width">
+                    <button class="fig-btn fig-btn-purple" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="vs_available" title="Click to view ${m.vs_available} Village Surveyors directory for ${h(m.mandal)}">
                       ${m.vs_available}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn ${m.rovers_available > 0 ? 'fig-btn-purple' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="rovers_available" title="Click to view ${m.rovers_available} rovers allotment in ${h(m.mandal)}">
+                  <td style="padding:6px 2px;" class="col-half-width">
+                    <button class="fig-btn ${m.rovers_available > 0 ? 'fig-btn-purple' : 'fig-btn-zero'}" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="rovers_available" title="Click to view ${m.rovers_available} rovers allotment in ${h(m.mandal)}">
                       ${m.rovers_available}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn fig-btn-emerald" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="resurvey_completed" title="Click to view ${m.resurvey_completed} resurvey completed villages of ${h(m.mandal)}">
+                  <td style="padding:6px 2px;" class="col-half-width">
+                    <button class="fig-btn fig-btn-emerald" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="resurvey_completed" title="Click to view ${m.resurvey_completed} resurvey completed villages of ${h(m.mandal)}">
                       ${m.resurvey_completed}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn ${m.balance_villages > 0 ? 'fig-btn-amber' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="balance_villages" title="Click to view ${m.balance_villages} balance villages of ${h(m.mandal)}">
+                  <td style="padding:6px 2px;" class="col-half-width">
+                    <button class="fig-btn ${m.balance_villages > 0 ? 'fig-btn-amber' : 'fig-btn-zero'}" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="balance_villages" title="Click to view ${m.balance_villages} balance villages of ${h(m.mandal)}">
                       ${m.balance_villages}
                     </button>
                   </td>
@@ -14010,23 +14013,23 @@ function renderMandalActionPlan() {
                     ${formatExtent(summary.patta_land)}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="vs_available" title="Click to view all ${summary.vs_available} Village Surveyors across the district">
+                <td style="padding:6px 2px;" class="col-half-width">
+                  <button class="fig-total-btn" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="vs_available" title="Click to view all ${summary.vs_available} Village Surveyors across the district">
                     ${summary.vs_available}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="rovers_available" title="Click to view all ${summary.rovers_available} active rovers deployed">
+                <td style="padding:6px 2px;" class="col-half-width">
+                  <button class="fig-total-btn" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="rovers_available" title="Click to view all ${summary.rovers_available} active rovers deployed">
                     ${summary.rovers_available}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn btn-total-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="resurvey_completed" title="Click to view all ${summary.resurvey_completed} completed villages">
+                <td style="padding:6px 2px;" class="col-half-width">
+                  <button class="fig-total-btn btn-total-emerald" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="resurvey_completed" title="Click to view all ${summary.resurvey_completed} completed villages">
                     ${summary.resurvey_completed}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" style="background:#d97706;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="balance_villages" title="Click to view all ${summary.balance_villages} balance villages">
+                <td style="padding:6px 2px;" class="col-half-width">
+                  <button class="fig-total-btn" style="min-width:28px;padding:2px 3px;font-size:11px;background:#d97706;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="balance_villages" title="Click to view all ${summary.balance_villages} balance villages">
                     ${summary.balance_villages}
                   </button>
                 </td>
