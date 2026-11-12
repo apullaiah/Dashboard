@@ -8892,6 +8892,17 @@ body {
   border-color: #67e8f9;
 }
 
+.fig-btn-red {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
+}
+.fig-btn-red:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
 .fig-btn-extent {
   font-family: 'DM Mono', monospace;
   font-weight: 600;

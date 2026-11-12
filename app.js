@@ -10508,7 +10508,7 @@ Chittoor District, Government of Andhra Pradesh`;
         const vBal = v.balance_patta_gt !== undefined ? v.balance_patta_gt : (parseFloat(v.balance_gt_extent) || 0);
         const vRate = v.daily_rate || ((v.rovers >= 2) ? 50 : 25);
         const vTarget = v.target_date || 'As Scheduled';
-        return `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent || v.today_gt || 0)} Ac · Patta: ${formatExtent(v.patta_extent || 0)} Ac · GT Comp: ${formatExtent(v.cumulative_gt_extent || 0)} Ac · *Bal: ${formatExtent(vBal)} Ac* (${v.rovers || 1} Rover @ ${vRate} Ac/d) → *Target: ${vTarget}*`;
+        return `• *${v.village_name}* (Code: \`${v.village_code}\`): Today: ${formatExtent(v.today_gt_extent || v.today_gt || 0)} Ac · Patta: ${formatExtent(v.patta_extent || 0)} Ac · GT Comp: ${formatExtent(v.cumulative_gt_extent || 0)} Ac · *Bal: ${formatExtent(vBal)} Ac* (${v.rovers || 1} Rover @ ${vRate} Ac/d) → *Actual Target (Patta Extent): ${vTarget}* | *Final Phase-6 Target: 31.12.2026*`;
       }).join('\n') || '• All assigned revenue villages on track.';
 
       return `🚨 *MANDAL LEVEL SURVEY OFFICER (MLSO) GROUND TRUTHING & DLR DIRECTIVE*
@@ -10521,14 +10521,19 @@ Jurisdiction: *${officer.mandal} Mandal* (${officer.jurisdictionCount} Revenue V
 ⚠️ *FLAGGED: POOR GROUND TRUTHING (GT) & DLR PERFORMANCE REVIEW*
 Performance review for *${officer.mandal} Mandal* indicates lagging progress in Ground Truthing (GT) and Digital Land Records (DLR) verification. You are hereby issued this statutory performance directive.
 
-📊 *GROUND TRUTHING (GT) EXTRACTED STATUS:*
+📊 *GROUND TRUTHING (GT) PROGRESS & EXTENT DETAILS:*
 • GT Extent Completed Today: *${formatExtent(officer.today_gt_extent)} Acres*
 • Cumulative GT Extent Completed: *${formatExtent(officer.cumulative_gt_extent)} Acres*
 • Total Patta Land Extent: *${formatExtent(officer.patta_extent)} Acres*
-• *Balance GT (Patta Land Extent - GT Completed):* *${formatExtent(officer.balance_patta_gt)} Acres*
+• *Balance GT (Pattaland Extent - GT Completed):* *${formatExtent(officer.balance_patta_gt)} Acres*
 • Active Rovers Deployed: *${officer.rovers_available || 1} Rover(s)* (Daily Benchmark: *${officer.daily_rate_benchmark || 25} Ac/day*)
-• *Mandated Target Date of GT Completion:* *${officer.target_date_gt_completion}*
-  *(Calculated: Remaining ${formatExtent(officer.balance_patta_gt)} Ac ÷ ${officer.daily_rate_benchmark} Ac/day = ${officer.days_needed_gt} working days)*
+
+🎯 *GROUND TRUTHING TARGET DATES & STATUTORY DEADLINE:*
+• 🏆 *FINAL STATUTORY TARGET (ALL PHASE-6 VILLAGES):* *31.12.2026*
+  *(Mandatory completion deadline for all Phase-6 revenue villages: 31st December, 2026)*
+  *(Phase-6 Scope: ${officer.p6Count || 0} villages · ${formatExtent(officer.p6Bal || 0)} Ac balance · Required daily quota: ${formatExtent(officer.p6DailyTarget || 0)} Ac/day)*
+• 📅 *ACTUAL TARGET DATE AS PER PATTALAND EXTENT:* *${officer.target_date_gt_completion}*
+  *(Calculated as per Pattaland Extent: Remaining Patta GT ${formatExtent(officer.balance_patta_gt)} Ac ÷ ${officer.daily_rate_benchmark} Ac/day [${officer.rovers_available || 1} Rover(s) @ 25 Ac/day/rover] = ${officer.days_needed_gt} working days)*
 
 🔒 *DIGITAL LAND RECORDS (DLR) ENTRIES STATUS:*
 • DLR Entries Completed Today: *${officer.dlr_entries_today || 0} Entries*
@@ -10536,13 +10541,13 @@ Performance review for *${officer.mandal} Mandal* indicates lagging progress in 
 • Pending DLR Entries (Balance Khatas): *${officer.dlr_entries_balance || 0} Khatas*
 • Flagged Lagging Villages: *${officer.laggingCount} Villages* (Zero GT Today: *${zeroVillages} Villages*)
 
-🎯 *KEY REVENUE VILLAGES: GT BALANCE & TARGET COMPLETION DATES:*
+🎯 *KEY REVENUE VILLAGES: GT BALANCE & TARGET DATES:*
 ${villageLines}
 
 ⚠️ *COMPULSORY STATUTORY DIRECTIVES FROM DSLRO, CHITTOOR:*
-1. Maintain mandated minimum daily GT extent out-turn (25 Ac/day for 1 rover, 50 Ac/day for 2 rovers) in every village without exception.
-2. Complete 100% Ground Truthing on or before the mandated target date (*${officer.target_date_gt_completion}*).
-3. Expedite clearance of pending DLR entries across VS, VRO, and Tahsildar logins to eliminate khata pendency.
+1. Final statutory target for all Phase-6 villages to complete GT is 31.12.2026 without delay.
+2. Fix and achieve the village-level daily GT extent out-turn (25 Ac/day for 1 rover, 50 Ac/day for 2 rovers) to meet the actual Pattaland extent target date (*${officer.target_date_gt_completion}*).
+3. Ensure daily entry clearance in DLR logins (VS, VRO, Tahsildar) to clear all pending Khatas.
 4. Convene daily morning muster (08:30 AM) with all Village Surveyors to assign rover coordinates and submit evening compliance out-turn to DIOS and DSLRO by 06:00 PM. Non-compliance will invite disciplinary action under CCA Rules.
 
 🌐 *Live Mandal Village Dashboard:*
@@ -13286,6 +13291,8 @@ function getVillagesForMetric(villages, mandal, metric) {
       case 'patta_land': return (parseFloat(v.patta_extent) || 0) > 0;
       case 'resurvey_completed': return isResurveyCompleted(v);
       case 'balance_villages': return !isResurveyCompleted(v);
+      case 'gt_not_started': return (v.current_stage || '').toLowerCase().includes('not started') || v.gt_status === 'Not Started';
+      case 'dlr_pending_all': return ['vs', 'vro', 'tah', 'rdo', 'jc'].includes(getActiveDlrStage(v));
       case 'dlr_vs': return getActiveDlrStage(v) === 'vs';
       case 'dlr_vro': return getActiveDlrStage(v) === 'vro';
       case 'dlr_tah': return getActiveDlrStage(v) === 'tah';
@@ -13328,6 +13335,7 @@ function calculateMandalActionPlan(villages) {
         rovers_available: ROVERS_PER_MANDAL[m] || 0,
         resurvey_completed: 0,
         balance_villages: 0,
+        gt_not_started: 0,
         dlr_vs: 0,
         dlr_vro: 0,
         dlr_tah: 0,
@@ -13368,6 +13376,11 @@ function calculateMandalActionPlan(villages) {
       else if (stage === 'tah') d.dlr_tah++;
       else if (stage === 'rdo') d.dlr_rdo++;
       else if (stage === 'jc') d.dlr_jc++;
+    }
+
+    const isNotStarted = (v.current_stage || '').toLowerCase().includes('not started') || v.gt_status === 'Not Started';
+    if (isNotStarted) {
+      d.gt_not_started++;
     }
 
     if (isComplete(v.blockchain_status)) {
@@ -13412,6 +13425,7 @@ function calculateMandalActionPlan(villages) {
     rovers_available: mandalRows.reduce((s, r) => s + r.rovers_available, 0),
     resurvey_completed: mandalRows.reduce((s, r) => s + r.resurvey_completed, 0),
     balance_villages: mandalRows.reduce((s, r) => s + r.balance_villages, 0),
+    gt_not_started: mandalRows.reduce((s, r) => s + r.gt_not_started, 0),
     dlr_vs: mandalRows.reduce((s, r) => s + r.dlr_vs, 0),
     dlr_vro: mandalRows.reduce((s, r) => s + r.dlr_vro, 0),
     dlr_tah: mandalRows.reduce((s, r) => s + r.dlr_tah, 0),
@@ -13646,6 +13660,18 @@ function renderMandalActionPlan() {
           <div class="ap-kpi-sub">Work in Progress / Scheduled</div>
         </div>
 
+        <div class="ap-kpi-card kpi-accent-amber" data-mandal-figure="1" data-mandal="__ALL__" data-metric="gt_not_started" title="Click to view all ${summary.gt_not_started} villages where GT is not started">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">GT NOT STARTED</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
+          <div class="ap-kpi-val" style="color:#dc2626;">${summary.gt_not_started} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
+          <div class="ap-kpi-sub">Priority for Ground Truthing</div>
+        </div>
+
+        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_pending_all" title="Click to view all ${summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc} villages pending in DLR logins">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">PENDING IN DLR LOGINS</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
+          <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
+          <div class="ap-kpi-sub">VS: ${summary.dlr_vs} · VRO: ${summary.dlr_vro} · Tah: ${summary.dlr_tah} · RDO: ${summary.dlr_rdo} · JC: ${summary.dlr_jc}</div>
+        </div>
+
         <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_tah" title="Click to view DLR Tahsildar login villages">
           <div class="ap-kpi-header"><span class="ap-kpi-label">DLR IN TAH LOGIN</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
           <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_tah} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
@@ -13783,14 +13809,15 @@ function renderMandalActionPlan() {
                 <th rowspan="2" style="width:160px;" class="col-sticky-2 sortable ${col === 'mandal' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="mandal">MANDAL NAME ⇅</th>
                 <th rowspan="2" style="width:110px;" class="sortable ${col === 'division' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="division">DIVISION ⇅</th>
                 <th rowspan="2" style="width:75px;" class="sortable ${col === 'villages' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="villages">NO. OF VILLAGES ⇅</th>
-                <th rowspan="2" style="width:105px;" class="sortable ${col === 'total_extent' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="total_extent">TOTAL EXTENT (AC) ⇅</th>
-                <th rowspan="2" style="width:95px;" class="sortable ${col === 'govt_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="govt_land">GOVT LAND (AC) ⇅</th>
-                <th rowspan="2" style="width:100px;" class="sortable ${col === 'patta_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="patta_land">PATTA LAND (AC) ⇅</th>
+                <th rowspan="2" style="width:84px;max-width:84px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.2;" class="sortable ${col === 'total_extent' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="total_extent">TOTAL EXTENT (AC) ⇅</th>
+                <th rowspan="2" style="width:76px;max-width:76px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.2;" class="sortable ${col === 'govt_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="govt_land">GOVT LAND (AC) ⇅</th>
+                <th rowspan="2" style="width:80px;max-width:80px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.2;" class="sortable ${col === 'patta_land' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="patta_land">PATTA LAND (AC) ⇅</th>
                 <th rowspan="2" style="width:35px;max-width:38px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'vs_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="vs_available">NO. OF VS AVAILABLE ⇅</th>
                 <th rowspan="2" style="width:35px;max-width:38px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'rovers_available' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="rovers_available">NO. OF ROVERS ⇅</th>
                 <th rowspan="2" style="width:48px;max-width:50px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'resurvey_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="resurvey_completed">RESURVEY COMPLETED ⇅</th>
                 <th rowspan="2" style="width:45px;max-width:48px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;" class="sortable col-half-width ${col === 'balance_villages' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="balance_villages">BALANCE VILLAGES ⇅</th>
-                <th colspan="5" class="group-dlr">NUMBER OF VILLAGES IN DLR LOGINS (5 WORKFLOW STAGES)</th>
+                <th rowspan="2" style="width:48px;max-width:52px;padding:6px 2px;font-size:9px;white-space:normal;line-height:1.15;color:#fca5a5;" class="sortable col-half-width ${col === 'gt_not_started' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="gt_not_started">GT NOT STARTED ⇅</th>
+                <th colspan="5" class="group-dlr">NUMBER OF VILLAGES PENDING IN DLR LOGINS (5 WORKFLOW STAGES)</th>
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'dlr_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_completed">
                   DLR COMPLETED
                   <div class="th-target-date">📅 ${h(summary.stage_target_dates.dlr_completed || '—')}</div>
@@ -13799,11 +13826,6 @@ function renderMandalActionPlan() {
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'final_ror' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="final_ror">
                   FINAL ROR
                   <div class="th-target-date">📅 ${h(summary.stage_target_dates.final_ror || '—')}</div>
-                  ⇅
-                </th>
-                <th rowspan="2" style="width:105px;" class="sortable ${col === 'blockchain' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="blockchain">
-                  BLOCKCHAIN TECH
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.blockchain || '—')}</div>
                   ⇅
                 </th>
                 <th rowspan="2" style="width:130px;" class="sortable ${col === 'completion_pct' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="completion_pct">PROGRESS % ⇅</th>
@@ -13838,7 +13860,7 @@ function renderMandalActionPlan() {
             </thead>
             <tbody>
               ${filteredMandals.length === 0 ? `
-                <tr><td colspan="19" class="text-center empty-table-cell" style="padding:40px;">No mandals found matching current filters.</td></tr>
+                <tr><td colspan="20" class="text-center empty-table-cell" style="padding:40px;">No mandals found matching current filters.</td></tr>
               ` : filteredMandals.map((m, idx) => `
                 <tr>
                   <td class="col-sticky-1 font-mono text-muted">${idx + 1}</td>
@@ -13857,18 +13879,18 @@ function renderMandalActionPlan() {
                       ${m.villages}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn fig-btn-extent" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="extent" title="Click to view extent breakdown of ${h(m.mandal)}">
+                  <td style="padding:6px 2px;">
+                    <button class="fig-btn fig-btn-extent" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="extent" title="Click to view extent breakdown of ${h(m.mandal)}">
                       ${formatExtent(m.total_extent)}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn fig-btn-extent" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="govt_land" title="Click to view govt land breakdown of ${h(m.mandal)}">
+                  <td style="padding:6px 2px;">
+                    <button class="fig-btn fig-btn-extent" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="govt_land" title="Click to view govt land breakdown of ${h(m.mandal)}">
                       ${formatExtent(m.govt_land)}
                     </button>
                   </td>
-                  <td>
-                    <button class="fig-btn fig-btn-extent" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="patta_land" title="Click to view patta land breakdown of ${h(m.mandal)}">
+                  <td style="padding:6px 2px;">
+                    <button class="fig-btn fig-btn-extent" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="patta_land" title="Click to view patta land breakdown of ${h(m.mandal)}">
                       ${formatExtent(m.patta_land)}
                     </button>
                   </td>
@@ -13890,6 +13912,11 @@ function renderMandalActionPlan() {
                   <td style="padding:6px 2px;" class="col-half-width">
                     <button class="fig-btn ${m.balance_villages > 0 ? 'fig-btn-amber' : 'fig-btn-zero'}" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="balance_villages" title="Click to view ${m.balance_villages} balance villages of ${h(m.mandal)}">
                       ${m.balance_villages}
+                    </button>
+                  </td>
+                  <td style="padding:6px 2px;" class="col-half-width">
+                    <button class="fig-btn ${m.gt_not_started > 0 ? 'fig-btn-red' : 'fig-btn-zero'}" style="min-width:28px;padding:2px 3px;font-size:11px;" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="gt_not_started" title="Click to view ${m.gt_not_started} GT not started villages of ${h(m.mandal)}">
+                      ${m.gt_not_started}
                     </button>
                   </td>
                   <!-- DLR Stages with Trailed Badges -->
@@ -13943,7 +13970,7 @@ function renderMandalActionPlan() {
                       </button>
                     ` : ''}
                   </td>
-                  <!-- DLR Completed, Final RoR, Blockchain with Trailed Badges -->
+                  <!-- DLR Completed, Final RoR with Trailed Badges -->
                   <td>
                     <button class="fig-btn ${m.dlr_completed > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_completed" title="Click to view ${m.dlr_completed} DLR completed villages of ${h(m.mandal)}">
                       ${m.dlr_completed}
@@ -13961,16 +13988,6 @@ function renderMandalActionPlan() {
                     ${m.stage_trailed.final_ror > 0 ? `
                       <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_final_ror" title="${m.stage_trailed.final_ror} villages trailed Final RoR target date in ${h(m.mandal)}">
                         ⚠️ ${m.stage_trailed.final_ror}
-                      </button>
-                    ` : ''}
-                  </td>
-                  <td>
-                    <button class="fig-btn ${m.blockchain > 0 ? 'fig-btn-emerald' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="blockchain" title="Click to view ${m.blockchain} Blockchain secured villages of ${h(m.mandal)}">
-                      ${m.blockchain}
-                    </button>
-                    ${m.stage_trailed.blockchain > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_blockchain" title="${m.stage_trailed.blockchain} villages trailed Blockchain target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.blockchain}
                       </button>
                     ` : ''}
                   </td>
@@ -13998,18 +14015,18 @@ function renderMandalActionPlan() {
                     ${summary.villages}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="extent" title="Click to view total extent across all mandals">
+                <td style="padding:6px 2px;">
+                  <button class="fig-total-btn" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="extent" title="Click to view total extent across all mandals">
                     ${formatExtent(summary.total_extent)}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="govt_land" title="Click to view total govt land across all mandals">
+                <td style="padding:6px 2px;">
+                  <button class="fig-total-btn" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="govt_land" title="Click to view total govt land across all mandals">
                     ${formatExtent(summary.govt_land)}
                   </button>
                 </td>
-                <td>
-                  <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="patta_land" title="Click to view total patta land across all mandals">
+                <td style="padding:6px 2px;">
+                  <button class="fig-total-btn" style="min-width:0;width:100%;padding:2px 2px;font-size:10px;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="patta_land" title="Click to view total patta land across all mandals">
                     ${formatExtent(summary.patta_land)}
                   </button>
                 </td>
@@ -14031,6 +14048,11 @@ function renderMandalActionPlan() {
                 <td style="padding:6px 2px;" class="col-half-width">
                   <button class="fig-total-btn" style="min-width:28px;padding:2px 3px;font-size:11px;background:#d97706;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="balance_villages" title="Click to view all ${summary.balance_villages} balance villages">
                     ${summary.balance_villages}
+                  </button>
+                </td>
+                <td style="padding:6px 2px;" class="col-half-width">
+                  <button class="fig-total-btn" style="min-width:28px;padding:2px 3px;font-size:11px;background:#dc2626;" data-mandal-figure="1" data-mandal="__ALL__" data-metric="gt_not_started" title="Click to view all ${summary.gt_not_started} GT not started villages across district">
+                    ${summary.gt_not_started}
                   </button>
                 </td>
                 <!-- Total DLR Stages with District Trailed Counts -->
@@ -14059,7 +14081,7 @@ function renderMandalActionPlan() {
                     ${summary.dlr_tah}
                   </button>
                   ${summary.stage_trailed.tahsildar > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_tahsildar" title="${summary.stage_trailed.tahsildar} villages across district trailed Tahsildar target date">
+                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_tahsildar" title="${summary.stage_trailed.tahsildar} villages trailed Tahsildar target date in ${h(summary.stage_target_dates.tahsildar || '')}">
                       ⚠️ ${summary.stage_trailed.tahsildar}
                     </button>
                   ` : ''}
@@ -14084,7 +14106,7 @@ function renderMandalActionPlan() {
                     </button>
                   ` : ''}
                 </td>
-                <!-- Total DLR Completed, Final RoR, Blockchain with District Trailed Counts -->
+                <!-- Total DLR Completed, Final RoR with District Trailed Counts -->
                 <td>
                   <button class="fig-total-btn btn-total-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_completed" title="Click to view all ${summary.dlr_completed} DLR completed villages">
                     ${summary.dlr_completed}
@@ -14102,16 +14124,6 @@ function renderMandalActionPlan() {
                   ${summary.stage_trailed.final_ror > 0 ? `
                     <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_final_ror" title="${summary.stage_trailed.final_ror} villages across district trailed Final RoR target date">
                       ⚠️ ${summary.stage_trailed.final_ror}
-                    </button>
-                  ` : ''}
-                </td>
-                <td>
-                  <button class="fig-total-btn btn-total-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="blockchain" title="Click to view all ${summary.blockchain} Blockchain secured villages">
-                    ${summary.blockchain}
-                  </button>
-                  ${summary.stage_trailed.blockchain > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_blockchain" title="${summary.stage_trailed.blockchain} villages across district trailed Blockchain target date">
-                      ⚠️ ${summary.stage_trailed.blockchain}
                     </button>
                   ` : ''}
                 </td>
@@ -14272,6 +14284,8 @@ function openMandalFigureModal(mandalName, metricKey) {
     patta_land: 'Patta Land Details',
     resurvey_completed: 'Resurvey Completed Villages',
     balance_villages: 'Balance Villages for Resurvey',
+    gt_not_started: 'GT Not Started Villages',
+    dlr_pending_all: 'Villages Pending in DLR Logins (VS, VRO, Tahsildar, RDO, JC)',
     dlr_vs: 'Villages in DLR Village Surveyor (VS) Login',
     dlr_vro: 'Villages in DLR VRO Login',
     dlr_tah: 'Villages in DLR Tahsildar Login',
@@ -14459,7 +14473,7 @@ function exportMandalPlanCsv() {
   const { mandalRows, summary } = calculateMandalActionPlan(state.villages || []);
   const headers = [
     'SL', 'MANDAL', 'DIVISION', 'TOTAL_VILLAGES', 'TOTAL_EXTENT_AC', 'GOVT_LAND_AC', 'PATTA_LAND_AC',
-    'VS_AVAILABLE', 'ROVERS_AVAILABLE', 'RESURVEY_COMPLETED', 'BALANCE_VILLAGES',
+    'VS_AVAILABLE', 'ROVERS_AVAILABLE', 'RESURVEY_COMPLETED', 'BALANCE_VILLAGES', 'GT_NOT_STARTED',
     'DLR_VS_LOGIN', 'DLR_VRO_LOGIN', 'DLR_TAH_LOGIN', 'DLR_RDO_LOGIN', 'DLR_JC_LOGIN',
     'SEC13_NOTIFIED_VILLAGES', 'PORTED_TO_WEBLAND2', 'COMPLETION_PERCENT'
   ];
@@ -14476,6 +14490,7 @@ function exportMandalPlanCsv() {
     m.rovers_available,
     m.resurvey_completed,
     m.balance_villages,
+    m.gt_not_started,
     m.dlr_vs,
     m.dlr_vro,
     m.dlr_tah,
@@ -14498,6 +14513,7 @@ function exportMandalPlanCsv() {
     summary.rovers_available,
     summary.resurvey_completed,
     summary.balance_villages,
+    summary.gt_not_started,
     summary.dlr_vs,
     summary.dlr_vro,
     summary.dlr_tah,
@@ -14585,6 +14601,8 @@ function getMetricLabel(metricKey) {
     patta_land: 'Patta Land Details',
     resurvey_completed: 'Resurvey Completed Villages',
     balance_villages: 'Balance Villages for Resurvey',
+    gt_not_started: 'GT Not Started Villages',
+    dlr_pending_all: 'Villages Pending in DLR Logins (VS, VRO, Tahsildar, RDO, JC)',
     dlr_vs: 'Villages in DLR Village Surveyor (VS) Login',
     dlr_vro: 'Villages in DLR VRO Login',
     dlr_tah: 'Villages in DLR Tahsildar Login',
