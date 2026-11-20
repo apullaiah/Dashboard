@@ -8484,11 +8484,19 @@ body {
   background: linear-gradient(135deg, #fbbf24, #f59e0b);
 }
 
-/* 12-KPI Grid */
+/* 5-KPI Ongoing Activity Grid */
 .action-plan-kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 12px;
+}
+.ap-kpi-grid-five {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+@media (min-width: 1200px) {
+  .ap-kpi-grid-five {
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .ap-kpi-card {

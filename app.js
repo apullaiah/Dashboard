@@ -660,7 +660,7 @@ function renderPhaseStagePendencySection(d, has) {
             </span>
           </div>
           <h3>Phase-Wise & Stage-Wise Resurvey Pendency</h3>
-          <p>Real-time backlog analysis across all 10 statutory resurvey milestones and 8 phase categories (774 villages universe).</p>
+          <p>Real-time backlog analysis across all 10 statutory resurvey milestones and 8 phase categories (736 villages universe).</p>
         </div>
         <div class="pendency-header-meta">
           <div class="pendency-stat-badge alert">
@@ -3191,37 +3191,37 @@ function renderPart1ResurveyProgress(filtered, d) {
         <div class="resurvey-toggle-group resurvey-stage-switcher-bar">
           <button type="button" class="resurvey-tab-btn ${isGt ? 'active' : ''}" data-overview-stage="gt_status" id="toggle-tab-gt" title="Click to view Ground Truthing (GT) progress">
             <span class="tab-icon">🌾</span>
-            <span class="tab-text">1. GT Progress (Acres)</span>
+            <span class="tab-text">🌾 Ground Truthing (GT)</span>
             ${isGt ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isVec ? 'active' : ''}" data-overview-stage="vectorization_status" id="toggle-tab-vectorization" title="Click to view Cadastral Vectorization & Correlation progress">
             <span class="tab-icon">📐</span>
-            <span class="tab-text">2. Vectorization</span>
+            <span class="tab-text">📐 Vectorization</span>
             ${isVec ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isDlr && activeDlr === 'vs_status' ? 'active' : ''}" data-overview-stage="vs_status" id="toggle-tab-vs" title="Click to view Village Surveyor Login (VS) progress">
             <span class="tab-icon">🔐</span>
-            <span class="tab-text">3. VS Login</span>
+            <span class="tab-text">🔐 VS Login</span>
             ${isDlr && activeDlr === 'vs_status' ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isDlr && activeDlr === 'vro_status' ? 'active' : ''}" data-overview-stage="vro_status" id="toggle-tab-vro" title="Click to view Village Revenue Officer Login (VRO) progress">
             <span class="tab-icon">🔐</span>
-            <span class="tab-text">4. VRO Login</span>
+            <span class="tab-text">🔐 VRO Login</span>
             ${isDlr && activeDlr === 'vro_status' ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isDlr && activeDlr === 'tahsildar_status' ? 'active tab-tahsildar' : ''}" data-overview-stage="tahsildar_status" id="toggle-tab-tah" title="Click to view Tahsildar Login progress">
             <span class="tab-icon">⭐</span>
-            <span class="tab-text">5. Tahsildar Login</span>
+            <span class="tab-text">⭐ Tahsildar Login</span>
             ${isDlr && activeDlr === 'tahsildar_status' ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isDlr && activeDlr === 'rdo_status' ? 'active' : ''}" data-overview-stage="rdo_status" id="toggle-tab-rdo" title="Click to view RDO Login progress">
             <span class="tab-icon">🔐</span>
-            <span class="tab-text">6. RDO Login</span>
+            <span class="tab-text">🔐 RDO Login</span>
             ${isDlr && activeDlr === 'rdo_status' ? '<span class="tab-active-dot"></span>' : ''}
           </button>
           <button type="button" class="resurvey-tab-btn ${isDlr && activeDlr === 'jc_status' ? 'active' : ''}" data-overview-stage="jc_status" id="toggle-tab-jc" title="Click to view JC Login progress">
             <span class="tab-icon">🔐</span>
-            <span class="tab-text">7. JC Login</span>
+            <span class="tab-text">🔐 JC Login</span>
             ${isDlr && activeDlr === 'jc_status' ? '<span class="tab-active-dot"></span>' : ''}
           </button>
         </div>
@@ -3232,9 +3232,9 @@ function renderPart1ResurveyProgress(filtered, d) {
         <div class="stream-content-panel gt-stream-panel abstract-table-card gt-extent-abstract-card" id="gt-extent-abstract-card">
           <div class="stream-panel-header">
             <div class="stream-badge-title">
-              <span class="stream-type-pill pill-gt">🌾 GROUND TRUTHING (GT) EXTENT ABSTRACT · MEASURED STRICTLY IN ACRES</span>
+              <span class="stream-type-pill pill-gt">🌾 GROUND TRUTHING (GT) STATUS · EXTENT IN ACRES</span>
               <span class="stream-benchmark-callout">
-                ⭐ <strong>Benchmark Rule:</strong> Every day one team should complete <strong>25 Ac of GT per day per rover</strong>.
+                ⭐ <strong>Benchmark:</strong> 25 Ac / Rover / Day
               </span>
               ${!isDistrictAll ? `<span class="scope-filtered-pill font-mono" style="background:#0f172a;color:#38bdf8;padding:3px 9px;border-radius:4px;font-size:11px;font-weight:700;">📍 Filtered Scope: ${gt.filteredVillagesCount} Village${gt.filteredVillagesCount > 1 ? 's' : ''}</span>` : ''}
             </div>
@@ -3249,41 +3249,37 @@ function renderPart1ResurveyProgress(filtered, d) {
             <table class="abstract-data-table abstract-two-row-table gt-extent-table">
               <thead>
                 <tr class="row-parameters">
-                  <th class="col-highlight-today clickable-th clickable-figure-cell ${state.gtFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="gt_today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">GT COMPLETED TODAY (00:00 TO 23:59 HRS · RAILWAY TIMINGS) ↗</th>
-                  <th class="col-highlight-cum clickable-th clickable-figure-cell ${state.gtFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="gt_cumulative" title="Click to view Completed Villages with cumulative GT extent">CUMULATIVE EXTENT COMPLETED (IN ACRES) ↗</th>
-                  <th class="col-highlight-bal clickable-th clickable-figure-cell ${state.gtFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="gt_balance" title="Click to view Villages with Balance GT extent remaining">BALANCE EXTENT TO BE COMPLETED (IN ACRES) ↗</th>
-                  <th class="clickable-th clickable-figure-cell ${state.gtFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="gt_total" title="Click to view All Scope Villages">TOTAL TARGET EXTENT (IN ACRES) ↗</th>
-                  <th>DAILY BENCHMARK RULE (25 ACRES / ROVER / DAY)</th>
+                  <th class="col-highlight-today clickable-th clickable-figure-cell ${state.gtFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="gt_today" title="Click to view Active Villages with GT extent completed today (00:00 to 23:59 Hrs · Railway Timings)">GT COMPLETED TODAY (AC) ↗</th>
+                  <th class="col-highlight-cum clickable-th clickable-figure-cell ${state.gtFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="gt_cumulative" title="Click to view Completed Villages with cumulative GT extent">CUMULATIVE GT COMPLETED (AC) ↗</th>
+                  <th class="col-highlight-bal clickable-th clickable-figure-cell ${state.gtFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="gt_balance" title="Click to view Villages with Balance GT extent remaining">BALANCE GT REMAINING (AC) ↗</th>
+                  <th class="clickable-th clickable-figure-cell ${state.gtFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="gt_total" title="Click to view All Scope Villages">TOTAL TARGET EXTENT (AC) ↗</th>
+                  <th>DAILY BENCHMARK</th>
                   <th class="clickable-th clickable-figure-cell" data-overview-figure="gt_today" title="Click to view Active Villages where Rovers worked today">ACTIVE ROVERS ↗</th>
-                  <th>DAILY BENCHMARK CAPACITY (ACRES / DAY)</th>
-                  <th>TODAY PACING VS BENCHMARK</th>
-                  <th class="clickable-th clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click to view Completed Villages">GT CLEARANCE % ↗</th>
+                  <th>DAILY CAPACITY (AC)</th>
+                  <th>PACING %</th>
+                  <th class="clickable-th clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click to view Completed Villages">CLEARANCE % ↗</th>
                 </tr>
               </thead>
               <tbody>
                 <tr class="row-numerics">
                   <td class="col-highlight-today font-mono num-bold num-today today-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="gt_today" title="Click to display the 55 Active Villages with GT completed today directly below">
-                    <div class="twenty-four-hr-badge">TODAY'S WORK (00:00 TO 23:59 HRS)</div>
+                    
                     <span class="extent-big-today figure-number-huge">+${formatExtent(gt.todayGtExtent)}</span> <small>Acres Today</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-cum font-mono num-bold num-cum cum-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="gt_cumulative" title="Click to display Completed Villages directly below">
                     <span class="extent-val-cum figure-number-huge">${formatExtent(gt.cumulativeGtExtent)}</span> <small>Acres</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-bal font-mono num-bold num-bal bal-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="gt_balance" title="Click to display Villages with Balance Extent directly below">
                     <span class="extent-val-bal figure-number-huge">${formatExtent(gt.balanceGtExtent)}</span> <small>Acres</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono total-extent-cell clickable-figure-cell ${state.gtFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="gt_total" title="Click to display All Scope Villages directly below">
                     <strong class="total-extent-val figure-number-huge">${formatExtent(gt.totalTargetExtent)}</strong> <small>Acres</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono text-benchmark"><span class="bm-fig-val">25</span> <small>Acres / Rover / Day</small></td>
-                  <td class="font-mono bold-dark clickable-figure-cell" data-overview-figure="gt_today" title="Click to view villages with rovers"><span class="rover-fig-val">${gt.rovers}</span> <small>Rovers</small><span class="fig-click-hint">👆 Click</span></td>
+                  <td class="font-mono bold-dark clickable-figure-cell" data-overview-figure="gt_today" title="Click to view villages with rovers"><span class="rover-fig-val">${gt.rovers}</span> <small>Rovers</small></td>
                   <td class="font-mono"><span class="cap-fig-val">${formatExtent(gt.dailyCapacityAc)}</span> <small>Acres / Day</small></td>
                   <td class="font-mono text-emerald bold-dark"><span class="pacing-fig-val">${gt.gtPacePct}%</span> <small>Pacing</small></td>
-                  <td class="font-mono text-emerald num-bold clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click for completed list"><span class="clearance-fig-val">${gt.gtCompletionPct}%</span><span class="fig-click-hint">👆 Click</span></td>
+                  <td class="font-mono text-emerald num-bold clickable-figure-cell" data-overview-figure="gt_cumulative" title="Click for completed list"><span class="clearance-fig-val">${gt.gtCompletionPct}%</span></td>
                 </tr>
               </tbody>
             </table>
@@ -3293,8 +3289,8 @@ function renderPart1ResurveyProgress(filtered, d) {
           <div class="benchmark-summary-bar">
             <div class="benchmark-icon-cell">🌾</div>
             <div class="benchmark-info-cell">
-              <strong>Ground Truthing Capacity & Benchmark Pacing Analysis:</strong>
-              <div>Every day one team should complete <strong>25 Acres of GT per day per rover</strong>. For the active scope (${gt.filteredVillagesCount} villages with <strong>${gt.rovers} rovers</strong>), the daily capacity is <strong>${formatExtent(gt.dailyCapacityAc)} Acres/day</strong>. Today achieved <strong>${formatExtent(gt.todayGtExtent)} Acres</strong> (work done today during 00:00 to 23:59 Hrs Railway timings) (${gt.gtPacePct}% pacing vs benchmark). Cumulative completed extent is <strong>${formatExtent(gt.cumulativeGtExtent)} Acres</strong> (${gt.gtCompletionPct}% of target ${formatExtent(gt.totalTargetExtent)} Acres, balance: ${formatExtent(gt.balanceGtExtent)} Acres).</div>
+              <strong>GT Benchmark & Daily Capacity:</strong>
+              <div>Benchmark: <strong>25 Ac/day/rover</strong> · Scope: <strong>${gt.filteredVillagesCount} villages</strong> with <strong>${gt.rovers} rovers</strong> · Daily Target Capacity: <strong>${formatExtent(gt.dailyCapacityAc)} Ac/day</strong> · Today Achieved: <strong>+${formatExtent(gt.todayGtExtent)} Ac</strong> (${gt.gtPacePct}% pacing)</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">GT Clearance: <strong>${gt.gtCompletionPct}%</strong></div>
@@ -3341,19 +3337,15 @@ function renderPart1ResurveyProgress(filtered, d) {
                 <tr class="row-numerics vec-total-row">
                   <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-figure-cell" data-vec-perf="active_today">
                     <span class="entries-today-val figure-number-huge">+${vecTodayLpms.toLocaleString('en-IN')}</span> <small>LPMs Today</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-figure-cell" data-vec-perf="completed">
                     <span class="entries-cum-val figure-number-huge">${vecCumLpms.toLocaleString('en-IN')}</span> <small>LPMs</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-figure-cell" data-vec-perf="poor">
                     <span class="entries-bal-val figure-number-huge">${vecBalLpms.toLocaleString('en-IN')}</span> <small>LPMs</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono clickable-figure-cell" data-vec-perf="all">
                     <span class="entries-total-val figure-number-huge">${vecTotLpms.toLocaleString('en-IN')}</span>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono bold-dark"><span class="chalthas-fig-val">${vecTotChalthas.toLocaleString('en-IN')}</span> <small>Chalthas</small></td>
                   <td class="font-mono"><span class="extent-fig-val">${formatExtent(vecTotExtent)}</span> <small>Acres</small></td>
@@ -3367,8 +3359,8 @@ function renderPart1ResurveyProgress(filtered, d) {
           <div class="benchmark-summary-bar">
             <div class="benchmark-icon-cell">📐</div>
             <div class="benchmark-info-cell">
-              <strong>Cadastral Vectorization & Correlation Pacing Analysis:</strong>
-              <div>Cadastral map vectorization & correlation across <strong>${vecRecords.length} villages</strong> with <strong>${vecTotChalthas.toLocaleString('en-IN')} total chalthas</strong> and <strong>${vecTotLpms.toLocaleString('en-IN')} total LPMs</strong>. Today achieved <strong>+${vecTodayLpms.toLocaleString('en-IN')} LPMs</strong>. Cumulative completed is <strong>${vecCumLpms.toLocaleString('en-IN')} LPMs</strong> (${vecPct}% cleared, <strong>${vecBalLpms.toLocaleString('en-IN')}</strong> balance LPMs remaining).</div>
+              <strong>Vectorization Status & Pacing:</strong>
+              <div>Scope: <strong>${vecRecords.length} villages</strong> · <strong>${vecTotChalthas.toLocaleString('en-IN')} total chalthas</strong> · Today: <strong>+${vecTodayLpms.toLocaleString('en-IN')} LPMs</strong> · Cumulative: <strong>${vecCumLpms.toLocaleString('en-IN')} / ${vecTotLpms.toLocaleString('en-IN')} LPMs</strong> (${vecPct}% cleared, balance: ${vecBalLpms.toLocaleString('en-IN')})</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">Vectorization: <strong>${vecPct}%</strong></div>
@@ -3415,19 +3407,15 @@ function renderPart1ResurveyProgress(filtered, d) {
                 <tr class="row-numerics dlr-total-row">
                   <td class="col-highlight-today font-mono num-bold num-today today-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="dlr_today">
                     <span class="entries-today-val figure-number-huge">+${dlr.todayTotal}</span> <small>Today</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-cum font-mono num-bold num-cum cum-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'cumulative' ? 'is-figure-active' : ''}" data-overview-figure="dlr_cumulative">
                     <span class="entries-cum-val figure-number-huge">${(dlr.cumulativeTotal || 0).toLocaleString('en-IN')}</span> <small>Cumulative</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="col-highlight-bal font-mono num-bold num-bal bal-entries-cell clickable-figure-cell ${state.dlrFigureFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="dlr_balance">
                     <span class="entries-bal-val figure-number-huge">${(dlr.balanceTotal || 0).toLocaleString('en-IN')}</span> <small>Balance</small>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono clickable-figure-cell ${state.dlrFigureFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="dlr_total">
                     <span class="entries-total-val figure-number-huge">${(dlr.totalSteps || 0).toLocaleString('en-IN')}</span>
-                    <span class="fig-click-hint">👆 Click for village list</span>
                   </td>
                   <td class="font-mono text-benchmark"><span class="bm-fig-val">200</span> <small>Entries / Day</small></td>
                   <td class="font-mono highlight-blue bold-dark"><span class="pacing-fig-val">${dlr.pacePct}%</span> <small>(+${dlr.todayTotal}/200)</small></td>
@@ -3441,8 +3429,8 @@ function renderPart1ResurveyProgress(filtered, d) {
           <div class="benchmark-summary-bar">
             <div class="benchmark-icon-cell">🔐</div>
             <div class="benchmark-info-cell">
-              <strong>DLR Revenue Officer Entries & Benchmark Pacing Analysis:</strong>
-              <div>Target benchmark output is <strong>DLR entries@200 per day (Number of Entries)</strong>. Today recorded <strong>${dlr.todayTotal} entries</strong> across all 5 officer approval tiers (${dlr.pacePct}% pacing). Cumulative clearances stand at <strong>${dlr.cumulativeTotal} entries</strong> of <strong>${dlr.totalSteps} total workflow entries</strong> across ${filtered.length} villages (${dlr.pctTotal}% cleared, ${dlr.balanceTotal} balance entries remaining).</div>
+              <strong>DLR Officer Entries Status:</strong>
+              <div>Target output: <strong>200 entries/day</strong> · Today: <strong>+${dlr.todayTotal} entries</strong> (${dlr.pacePct}% pacing) · Cumulative: <strong>${dlr.cumulativeTotal} / ${dlr.totalSteps} entries</strong> (${dlr.pctTotal}% cleared across ${filtered.length} villages, ${dlr.balanceTotal} balance)</div>
             </div>
             <div class="benchmark-progress-cell">
               <div class="bm-pct-label">DLR Clearance: <strong>${dlr.pctTotal}%</strong></div>
@@ -3510,122 +3498,26 @@ function renderPart2PpbDistributionStatus(filtered, d = {}) {
             <tr class="row-numerics">
               <td class="font-mono bold-dark clickable-figure-cell ${pFilter === 'total' ? 'is-figure-active' : ''}" data-overview-figure="ppb_total">
                 <span class="ppb-fig-val figure-number-huge">${totalTargetPpbs.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="font-mono clickable-figure-cell ${pFilter === 'printed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_printed">
                 <span class="ppb-fig-val figure-number-huge">${printedPpbs.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="col-highlight-cum font-mono num-bold text-emerald clickable-figure-cell ${pFilter === 'distributed' ? 'is-figure-active' : ''}" data-overview-figure="ppb_distributed">
                 <span class="ppb-fig-cum figure-number-huge">${distributedPpbs.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="col-highlight-bal font-mono num-bold text-amber clickable-figure-cell ${pFilter === 'balance' ? 'is-figure-active' : ''}" data-overview-figure="ppb_balance">
                 <span class="ppb-fig-bal figure-number-huge">${balancePendingPpbs.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="col-highlight-today font-mono num-bold num-today clickable-figure-cell ${pFilter === 'today' ? 'is-figure-active' : ''}" data-overview-figure="ppb_today">
                 <span class="ppb-fig-today figure-number-huge">+${todayDistributed.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="font-mono highlight-blue bold-dark clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">
                 <span class="ppb-fig-val figure-number-huge">${currentCycleTarget.toLocaleString()}</span> <small>(${currentCycleVillages} Vlgs)</small>
-                <span class="fig-click-hint">👆 Click for 37 villages</span>
               </td>
               <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">
                 <span class="ppb-fig-val figure-number-huge">${priorDistributed.toLocaleString()}</span>
-                <span class="fig-click-hint">👆 Click for village list</span>
               </td>
               <td class="font-mono text-emerald num-bold"><span class="clearance-fig-val">${clearancePct}%</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Month-Wise PPBs Distribution Delivery Cycles (Strict 2-Row Table) -->
-      <div class="abstract-subtable-heading">
-        <span>MONTH-WISE PPBs DISTRIBUTION CYCLES (AUG 2026 — MAR 2027 DELIVERY TIMELINES)</span>
-      </div>
-      <div class="abstract-two-row-table-wrap">
-        <table class="abstract-data-table abstract-two-row-table ppb-cycles-table">
-          <thead>
-            <tr class="row-parameters">
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">PRIOR COMPLETED ↗</th>
-              <th class="col-highlight-active-cycle clickable-th clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">SEP-26 (ACTIVE DRIVE) ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Oct-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Oct-26">OCT-26 ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Nov-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Nov-26">NOV-26 ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Dec-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Dec-26">DEC-26 ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Jan-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Jan-27">JAN-27 ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Feb-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Feb-27">FEB-27 ↗</th>
-              <th class="clickable-th clickable-figure-cell ${pFilter === 'cycle_Mar-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Mar-27">MAR-27 (PEAK TARGET) ↗</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="row-numerics">
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Prior' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Prior">
-                <div class="cycle-cell-box">
-                  <span class="text-emerald bold-dark">59,533+ Done</span>
-                  <small>Phase I–III Villages</small>
-                  <span class="cycle-badge-completed">100% Cleared</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="col-highlight-active-cycle font-mono clickable-figure-cell ${pFilter === 'cycle_Sep-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Sep-26">
-                <div class="cycle-cell-box active-cycle-box">
-                  <span class="num-bold text-navy">22,375 PPBs</span>
-                  <small>37 Villages · 10 Mandals</small>
-                  <span class="cycle-badge-active">Active Distribution</span>
-                  <span class="fig-click-hint">👆 Click for 37 vlgs</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Oct-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Oct-26">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">29,800 PPBs</span>
-                  <small>48 Villages</small>
-                  <span class="cycle-badge-scheduled">Scheduled</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Nov-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Nov-26">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">34,200 PPBs</span>
-                  <small>55 Villages</small>
-                  <span class="cycle-badge-scheduled">Scheduled</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Dec-26' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Dec-26">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">38,900 PPBs</span>
-                  <small>62 Villages</small>
-                  <span class="cycle-badge-scheduled">Scheduled</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Jan-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Jan-27">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">44,100 PPBs</span>
-                  <small>70 Villages</small>
-                  <span class="cycle-badge-scheduled">Scheduled</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Feb-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Feb-27">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">48,200 PPBs</span>
-                  <small>74 Villages</small>
-                  <span class="cycle-badge-scheduled">Scheduled</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
-              <td class="font-mono clickable-figure-cell ${pFilter === 'cycle_Mar-27' ? 'is-figure-active' : ''}" data-overview-figure="ppb_cycle_Mar-27">
-                <div class="cycle-cell-box">
-                  <span class="bold-dark">54,438 PPBs</span>
-                  <small>88 Villages</small>
-                  <span class="cycle-badge-peak">Peak Target</span>
-                  <span class="fig-click-hint">👆 Click</span>
-                </div>
-              </td>
             </tr>
           </tbody>
         </table>
@@ -7086,16 +6978,6 @@ function renderDashboard() {
       ${renderPart2PpbDistributionStatus(filtered, d)}
     </div>
 
-    <!-- 3.5 Dedicated Section: GT Not Started & All Phase-7 Villages -->
-    ${renderGtNotStartedAndPhase7Section(d, state.villages || [])}
-
-    <!-- Persistent Floating Reset Button (Visible at any scroll position) -->
-    <button type="button" class="floating-reset-btn" data-action="reset-all-filters" title="Click to reset all section filters across the dashboard">
-      ↺ Reset All Filters
-    </button>
-
-    <!-- Floating Local Time Widget -->
-    ${renderFloatingTimeWidget()}
   `;
 
   attachGtUnstartedEvents();
@@ -7334,7 +7216,7 @@ function renderDashboardPpbCycleSection(d, has) {
             <h4 style="font-size:13px;font-weight:800;color:var(--ink);margin:0 0 2px;">PPBs Cycle Performance & Rollout Schedule</h4>
             <p style="font-size:11px;color:var(--muted);margin:0;">Click any monthly cycle row to drill down into its village records.</p>
           </div>
-          <button class="inline-link" data-view-link="villages">View all 774 villages ${icon('arrow')}</button>
+          <button class="inline-link" data-view-link="villages">View all 736 villages ${icon('arrow')}</button>
         </div>
         <table class="performance-table ppb-cycle-table">
           <thead>
@@ -7384,7 +7266,7 @@ function renderDashboardPpbCycleSection(d, has) {
             `).join('')}
             <tr class="total-summary-row">
               <td><b>DISTRICT TOTAL (ALL CYCLES)</b></td>
-              <td><b>774 VILLAGE UNIVERSE</b></td>
+              <td><b>736 VILLAGE UNIVERSE</b></td>
               <td class="mono"><b>${d.kpis?.total || 774}</b></td>
               <td class="mono"><b>391,546</b></td>
               <td class="mono" style="color:var(--teal);"><b>${d.kpis?.finalRorCompleted || d.kpis?.completed || 0}</b></td>
@@ -7475,7 +7357,7 @@ function renderVillageMonitoring() {
     <div class="content-heading">
       <div>
         <h3>Village Monitoring & Land Records</h3>
-        <p>Citizen-friendly tracker across all 774 revenue villages in Chittoor district.</p>
+        <p>Citizen-friendly tracker across all 736 revenue villages in Chittoor district.</p>
       </div>
       <div class="content-actions">
         <button class="outline-button" data-action="export-csv">${icon('download')} Export CSV</button>
@@ -7918,7 +7800,7 @@ function renderPpbCycleAnalysis(d) {
         <h3>${icon('grid')} Month-Wise PPBs Distribution Cycle Analytics</h3>
         <p>Comprehensive operational tracking across the 8 Collectorate monthly delivery cycles (Aug 2026 to Mar 2027) covering 434 target villages (332,013 PPBs) and prior completions.</p>
       </div>
-      <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 774 Villages</button>
+      <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 736 Villages</button>
     </div>
 
     <div class="khata-metrics-grid" style="margin-bottom:22px;border:1px solid var(--line);border-radius:9px;overflow:hidden;">
@@ -8054,7 +7936,7 @@ function renderPhaseAnalysis(d) {
         <h3>${icon('map')} Government Phase-Wise Resurvey Tracking</h3>
         <p>The resurvey across Chittoor district is scheduled across 7 government phases, plus remaining unscheduled villages. Click any phase to inspect its villages.</p>
       </div>
-      <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 774 Villages</button>
+      <button class="outline-button" data-view-link="villages">${icon('arrow')} View All 736 Villages</button>
     </div>
 
     <div class="phase-deep-grid">
@@ -8316,7 +8198,7 @@ function renderMatrixAnalysis(d) {
     <div class="analysis-intro-box">
       <div>
         <h3>${icon('document')} Executive Summary & Cross-Tabulation Matrix</h3>
-        <p>Distribution of all 774 villages across Revenue Divisions and Government Phases, alongside district-wide resurvey totals.</p>
+        <p>Distribution of all 736 villages across Revenue Divisions and Government Phases, alongside district-wide resurvey totals.</p>
       </div>
     </div>
 
@@ -8347,7 +8229,7 @@ function renderMatrixAnalysis(d) {
       <div class="section-header">
         <div>
           <h3>Division × Phase Cross-Tabulation Matrix (Villages)</h3>
-          <p>Distribution of the 774-village universe across the 4 Divisions and 7 Phases + Unscheduled.</p>
+          <p>Distribution of the 736-village universe across the 4 Divisions and 7 Phases + Unscheduled.</p>
         </div>
       </div>
       <div class="matrix-table-wrap">
@@ -13610,158 +13492,36 @@ function renderMandalActionPlan() {
         </div>
       </section>
 
-      <!-- 12 EXECUTIVE SUMMARY KPI CARDS -->
-      <section class="action-plan-kpi-grid">
+      <!-- 5 EXECUTIVE ONGOING ACTIVITY STATUS CARDS -->
+      <section class="action-plan-kpi-grid ap-kpi-grid-five">
         <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="villages" title="Click to view all 736 villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">TOTAL MANDALS & VILLAGES</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${summary.total_mandals} <small style="font-size:14px;color:var(--muted);font-weight:600;">/ ${summary.villages} Vlgs</small></div>
-          <div class="ap-kpi-sub">Across 4 Revenue Divisions</div>
+          <div class="ap-kpi-header"><span class="ap-kpi-label">TOTAL UNIVERSE</span><span class="ap-kpi-click-tag">View All ↗</span></div>
+          <div class="ap-kpi-val">${summary.villages} <small style="font-size:13px;color:var(--muted);font-weight:600;">Vlgs · ${summary.total_mandals} Mandals</small></div>
+          <div class="ap-kpi-sub">4 Divisions · ${formatExtent(summary.total_extent)} Ac (Govt: ${formatExtent(summary.govt_land)} Ac · Patta: ${formatExtent(summary.patta_land)} Ac)</div>
         </div>
 
-        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="extent" title="Click to view total extent breakdown">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">TOTAL EXTENT</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${formatExtent(summary.total_extent)} <small style="font-size:12px;color:var(--muted);">Ac</small></div>
-          <div class="ap-kpi-sub">District Land Universe Scope</div>
+        <div class="ap-kpi-card kpi-accent-purple" data-mandal-figure="1" data-mandal="__ALL__" data-metric="gt_not_started" title="Click to view Ground Truthing status">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">GROUND TRUTHING (GT) ONGOING</span><span class="ap-kpi-click-tag">View ↗</span></div>
+          <div class="ap-kpi-val" style="color:#8b5cf6;">${Math.max(0, summary.balance_villages - (summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc) - summary.gt_not_started)} <small style="font-size:13px;color:var(--muted);font-weight:600;">Ongoing · ${summary.gt_not_started} Not Started</small></div>
+          <div class="ap-kpi-sub">${summary.rovers_available} Active Rovers · ${summary.vs_available} VS · Capacity: ${summary.rovers_available * 25} Ac/Day</div>
         </div>
 
-        <div class="ap-kpi-card kpi-accent-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="govt_land" title="Click to view government land details">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">GOVT LAND</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${formatExtent(summary.govt_land)} <small style="font-size:12px;color:var(--muted);">Ac</small></div>
-          <div class="ap-kpi-sub">${Math.round((summary.govt_land / (summary.total_extent || 1)) * 100)}% of Total Extent</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-purple" data-mandal-figure="1" data-mandal="__ALL__" data-metric="patta_land" title="Click to view patta land details">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">PATTA LAND</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${formatExtent(summary.patta_land)} <small style="font-size:12px;color:var(--muted);">Ac</small></div>
-          <div class="ap-kpi-sub">${Math.round((summary.patta_land / (summary.total_extent || 1)) * 100)}% of Total Extent</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-purple" data-mandal-figure="1" data-mandal="__ALL__" data-metric="vs_available" title="Click to view Village Surveyors allocation">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">VS AVAILABLE</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${summary.vs_available} <small style="font-size:12px;color:var(--muted);">VS</small></div>
-          <div class="ap-kpi-sub">Grama Sachivalayam Surveyors</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-purple" data-mandal-figure="1" data-mandal="__ALL__" data-metric="rovers_available" title="Click to view Rovers deployment">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">ROVERS AVAILABLE</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val">${summary.rovers_available} <small style="font-size:12px;color:var(--muted);">Rovers</small></div>
-          <div class="ap-kpi-sub">Capacity: ${summary.rovers_available * 25} Ac / Day</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="resurvey_completed" title="Click to view completed villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">RESURVEY COMPLETED</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#059669;">${summary.resurvey_completed} <small style="font-size:12px;color:var(--muted);">(${summary.completion_pct}%)</small></div>
-          <div class="ap-kpi-sub">Final RoR / Webland-2 Ported</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-amber" data-mandal-figure="1" data-mandal="__ALL__" data-metric="balance_villages" title="Click to view balance villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">BALANCE VILLAGES</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#d97706;">${summary.balance_villages} <small style="font-size:12px;color:var(--muted);">(${Math.round((summary.balance_villages / (summary.villages || 1)) * 100)}%)</small></div>
-          <div class="ap-kpi-sub">Work in Progress / Scheduled</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-amber" data-mandal-figure="1" data-mandal="__ALL__" data-metric="gt_not_started" title="Click to view all ${summary.gt_not_started} villages where GT is not started">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">GT NOT STARTED</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#dc2626;">${summary.gt_not_started} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
-          <div class="ap-kpi-sub">Priority for Ground Truthing</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_pending_all" title="Click to view all ${summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc} villages pending in DLR logins">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">PENDING IN DLR LOGINS</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
+        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_pending_all" title="Click to view all villages pending in DLR officer logins">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">PENDING IN DLR LOGINS</span><span class="ap-kpi-click-tag">View ↗</span></div>
+          <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_vs + summary.dlr_vro + summary.dlr_tah + summary.dlr_rdo + summary.dlr_jc} <small style="font-size:13px;color:var(--muted);font-weight:600;">Villages Pending</small></div>
           <div class="ap-kpi-sub">VS: ${summary.dlr_vs} · VRO: ${summary.dlr_vro} · Tah: ${summary.dlr_tah} · RDO: ${summary.dlr_rdo} · JC: ${summary.dlr_jc}</div>
         </div>
 
-        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_tah" title="Click to view DLR Tahsildar login villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">DLR IN TAH LOGIN</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_tah} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
-          <div class="ap-kpi-sub">Mandal Executive Review</div>
+        <div class="ap-kpi-card kpi-accent-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="resurvey_completed" title="Click to view completed villages">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">RESURVEY COMPLETED</span><span class="ap-kpi-click-tag">View ↗</span></div>
+          <div class="ap-kpi-val" style="color:#059669;">${summary.resurvey_completed} <small style="font-size:13px;color:var(--muted);font-weight:600;">(${summary.completion_pct}%)</small></div>
+          <div class="ap-kpi-sub">Final RoR / Webland-2.0 Ported</div>
         </div>
 
-        <div class="ap-kpi-card kpi-accent-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_rdo" title="Click to view DLR RDO login villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">DLR IN RDO LOGIN</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#2563eb;">${summary.dlr_rdo} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
-          <div class="ap-kpi-sub">Divisional Officer Scrutiny</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="sec13_notified" title="Click to view 13 notified villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">13 NOTIFIED VILLAGES</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#059669;">${summary.sec13_notified} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
-          <div class="ap-kpi-sub">Sec 13 Statutory Gazette Done</div>
-        </div>
-
-        <div class="ap-kpi-card kpi-accent-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="ported_webland2" title="Click to view Webland-2 ported villages">
-          <div class="ap-kpi-header"><span class="ap-kpi-label">PORTED TO WEBLAND-2</span><span class="ap-kpi-click-tag">Click to inspect ↗</span></div>
-          <div class="ap-kpi-val" style="color:#059669;">${summary.ported_webland2} <small style="font-size:12px;color:var(--muted);">Vlgs</small></div>
-          <div class="ap-kpi-sub">Live in Webland-2.0 Portal</div>
-        </div>
-      </section>
-
-      <!-- ⏱️ RESURVEY STAGES STATUTORY TIMELINES & TARGET DATE COMPLIANCE TRACKER (11 STAGES) -->
-      <section class="mandal-plan-stages-timeline">
-        <div class="mandal-stages-timeline-header">
-          <div class="mandal-stages-timeline-title">
-            <span style="font-size:22px;">⏱️</span>
-            <div>
-              <h3 style="margin:0;font-size:15px;font-weight:800;color:#0f172a;letter-spacing:-0.2px;">
-                RESURVEY STAGES STATUTORY TIMELINES &amp; TARGET DATE COMPLIANCE (11 STAGES)
-              </h3>
-              <p style="margin:2px 0 0;font-size:11.5px;color:#64748b;">
-                Target dates mapped from uploaded Google Spreadsheet (<b>stage_targets</b>). Villages trailing their statutory stage target dates are highlighted for administrative intervention. Click any trailed badge to inspect villages.
-              </p>
-            </div>
-          </div>
-          <div class="mandal-stages-timeline-badge">
-            <span class="badge-total-trailed ${summary.stages.reduce((s, x) => s + x.trailed, 0) > 0 ? 'is-warning' : 'is-success'}">
-              ⚠️ Total Trailed Occurrences: <strong>${summary.stages.reduce((s, x) => s + x.trailed, 0)}</strong>
-            </span>
-          </div>
-        </div>
-
-        <div class="mandal-stages-timeline-scroll">
-          <div class="mandal-stages-cards-grid">
-            ${summary.stages.map(stg => {
-              const pct = summary.villages > 0 ? Math.round((stg.completed / summary.villages) * 100) : 0;
-              return `
-                <div class="stage-timeline-card ${stg.trailed > 0 ? 'has-trailed' : 'is-clean'}">
-                  <div class="stage-card-top">
-                    <span class="stage-step-tag">${stg.badge}</span>
-                    <span class="stage-status-chip ${stg.completed > 0 ? 'is-active' : ''}">${pct}% Done</span>
-                  </div>
-                  <div class="stage-card-name" title="${h(stg.fullName)}">${h(stg.fullName)}</div>
-                  
-                  <div class="stage-card-target-box">
-                    <span class="stage-target-icon">📅</span>
-                    <div>
-                      <div class="stage-target-label">Target Date:</div>
-                      <div class="stage-target-val">${h(stg.target_date || 'As Scheduled')}</div>
-                    </div>
-                  </div>
-
-                  <div class="stage-card-metrics">
-                    <div class="stage-metric-row">
-                      <span class="stage-metric-label">Completed:</span>
-                      <span class="stage-metric-val is-comp">${stg.completed} Vlgs</span>
-                    </div>
-                    <div class="stage-metric-row">
-                      <span class="stage-metric-label">Pending / WIP:</span>
-                      <span class="stage-metric-val is-pending">${stg.pending} Vlgs</span>
-                    </div>
-                  </div>
-
-                  <div class="stage-card-footer">
-                    ${stg.trailed > 0 ? `
-                      <button type="button" class="stage-trailed-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_${stg.key}" title="Click to inspect all ${stg.trailed} villages trailing target date for ${h(stg.label)}">
-                        ⚠️ <b>${stg.trailed}</b> Trailed Target Date ↗
-                      </button>
-                    ` : `
-                      <div class="stage-trailed-zero">✓ 0 Trailed (On Track)</div>
-                    `}
-                  </div>
-                </div>
-              `;
-            }).join('')}
-          </div>
+        <div class="ap-kpi-card kpi-accent-amber" data-mandal-figure="1" data-mandal="__ALL__" data-metric="patta_land" title="Click to view patta land pending GT">
+          <div class="ap-kpi-header"><span class="ap-kpi-label">PATTA LAND BALANCE</span><span class="ap-kpi-click-tag">View ↗</span></div>
+          <div class="ap-kpi-val" style="color:#d97706;">${formatExtent(summary.patta_land)} <small style="font-size:13px;color:var(--muted);font-weight:600;">Ac Pending GT</small></div>
+          <div class="ap-kpi-sub">Phase-6 Target: 31.12.2026</div>
         </div>
       </section>
 
@@ -13820,12 +13580,12 @@ function renderMandalActionPlan() {
                 <th colspan="5" class="group-dlr">NUMBER OF VILLAGES PENDING IN DLR LOGINS (5 WORKFLOW STAGES)</th>
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'dlr_completed' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_completed">
                   DLR COMPLETED
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.dlr_completed || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th rowspan="2" style="width:95px;" class="sortable ${col === 'final_ror' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="final_ror">
                   FINAL ROR
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.final_ror || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th rowspan="2" style="width:130px;" class="sortable ${col === 'completion_pct' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="completion_pct">PROGRESS % ⇅</th>
@@ -13833,27 +13593,27 @@ function renderMandalActionPlan() {
               <tr>
                 <th style="width:72px;" class="sortable ${col === 'dlr_vs' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vs">
                   VS
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.vs || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th style="width:72px;" class="sortable ${col === 'dlr_vro' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_vro">
                   VRO
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.vro || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th style="width:72px;" class="sortable ${col === 'dlr_tah' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_tah">
                   TAH
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.tahsildar || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th style="width:72px;" class="sortable ${col === 'dlr_rdo' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_rdo">
                   RDO
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.rdo || '—')}</div>
+                  
                   ⇅
                 </th>
                 <th style="width:72px;" class="sortable ${col === 'dlr_jc' ? 'active' : ''}" data-action="sort-mandal-plan" data-col="dlr_jc">
                   JC
-                  <div class="th-target-date">📅 ${h(summary.stage_target_dates.jc || '—')}</div>
+                  
                   ⇅
                 </th>
               </tr>
@@ -13924,72 +13684,37 @@ function renderMandalActionPlan() {
                     <button class="fig-btn ${m.dlr_vs > 0 ? 'fig-btn-cyan' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_vs" title="Click to view ${m.dlr_vs} villages in DLR Village Surveyor login for ${h(m.mandal)}">
                       ${m.dlr_vs}
                     </button>
-                    ${m.stage_trailed.vs > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_vs" title="${m.stage_trailed.vs} villages trailed VS target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.vs}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_vro > 0 ? 'fig-btn-cyan' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_vro" title="Click to view ${m.dlr_vro} villages in DLR VRO login for ${h(m.mandal)}">
                       ${m.dlr_vro}
                     </button>
-                    ${m.stage_trailed.vro > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_vro" title="${m.stage_trailed.vro} villages trailed VRO target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.vro}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_tah > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_tah" title="Click to view ${m.dlr_tah} villages in DLR Tahsildar login for ${h(m.mandal)}">
                       ${m.dlr_tah}
                     </button>
-                    ${m.stage_trailed.tahsildar > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_tahsildar" title="${m.stage_trailed.tahsildar} villages trailed Tahsildar target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.tahsildar}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_rdo > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_rdo" title="Click to view ${m.dlr_rdo} villages in DLR RDO login for ${h(m.mandal)}">
                       ${m.dlr_rdo}
                     </button>
-                    ${m.stage_trailed.rdo > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_rdo" title="${m.stage_trailed.rdo} villages trailed RDO target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.rdo}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.dlr_jc > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_jc" title="Click to view ${m.dlr_jc} villages in DLR JC login for ${h(m.mandal)}">
                       ${m.dlr_jc}
                     </button>
-                    ${m.stage_trailed.jc > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_jc" title="${m.stage_trailed.jc} villages trailed JC target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.jc}
-                      </button>
-                    ` : ''}
                   </td>
                   <!-- DLR Completed, Final RoR with Trailed Badges -->
                   <td>
                     <button class="fig-btn ${m.dlr_completed > 0 ? 'fig-btn-blue' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="dlr_completed" title="Click to view ${m.dlr_completed} DLR completed villages of ${h(m.mandal)}">
                       ${m.dlr_completed}
                     </button>
-                    ${m.stage_trailed.dlr_completed > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_dlr_completed" title="${m.stage_trailed.dlr_completed} villages trailed DLR completed target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.dlr_completed}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <button class="fig-btn ${m.final_ror > 0 ? 'fig-btn-emerald' : 'fig-btn-zero'}" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="final_ror" title="Click to view ${m.final_ror} Final RoR villages of ${h(m.mandal)}">
                       ${m.final_ror}
                     </button>
-                    ${m.stage_trailed.final_ror > 0 ? `
-                      <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="${h(m.mandal)}" data-metric="trailed_final_ror" title="${m.stage_trailed.final_ror} villages trailed Final RoR target date in ${h(m.mandal)}">
-                        ⚠️ ${m.stage_trailed.final_ror}
-                      </button>
-                    ` : ''}
                   </td>
                   <td>
                     <div style="display:flex;align-items:center;gap:6px;">
@@ -14060,72 +13785,37 @@ function renderMandalActionPlan() {
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_vs" title="Click to view all ${summary.dlr_vs} villages in VS login">
                     ${summary.dlr_vs}
                   </button>
-                  ${summary.stage_trailed.vs > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_vs" title="${summary.stage_trailed.vs} villages across district trailed VS target date">
-                      ⚠️ ${summary.stage_trailed.vs}
-                    </button>
-                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_vro" title="Click to view all ${summary.dlr_vro} villages in VRO login">
                     ${summary.dlr_vro}
                   </button>
-                  ${summary.stage_trailed.vro > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_vro" title="${summary.stage_trailed.vro} villages across district trailed VRO target date">
-                      ⚠️ ${summary.stage_trailed.vro}
-                    </button>
-                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_tah" title="Click to view all ${summary.dlr_tah} villages in Tahsildar login">
                     ${summary.dlr_tah}
                   </button>
-                  ${summary.stage_trailed.tahsildar > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_tahsildar" title="${summary.stage_trailed.tahsildar} villages trailed Tahsildar target date in ${h(summary.stage_target_dates.tahsildar || '')}">
-                      ⚠️ ${summary.stage_trailed.tahsildar}
-                    </button>
-                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_rdo" title="Click to view all ${summary.dlr_rdo} villages in RDO login">
                     ${summary.dlr_rdo}
                   </button>
-                  ${summary.stage_trailed.rdo > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_rdo" title="${summary.stage_trailed.rdo} villages across district trailed RDO target date">
-                      ⚠️ ${summary.stage_trailed.rdo}
-                    </button>
-                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_jc" title="Click to view all ${summary.dlr_jc} villages in JC login">
                     ${summary.dlr_jc}
                   </button>
-                  ${summary.stage_trailed.jc > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_jc" title="${summary.stage_trailed.jc} villages across district trailed JC target date">
-                      ⚠️ ${summary.stage_trailed.jc}
-                    </button>
-                  ` : ''}
                 </td>
                 <!-- Total DLR Completed, Final RoR with District Trailed Counts -->
                 <td>
                   <button class="fig-total-btn btn-total-blue" data-mandal-figure="1" data-mandal="__ALL__" data-metric="dlr_completed" title="Click to view all ${summary.dlr_completed} DLR completed villages">
                     ${summary.dlr_completed}
                   </button>
-                  ${summary.stage_trailed.dlr_completed > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_dlr_completed" title="${summary.stage_trailed.dlr_completed} villages across district trailed DLR completed target date">
-                      ⚠️ ${summary.stage_trailed.dlr_completed}
-                    </button>
-                  ` : ''}
                 </td>
                 <td>
                   <button class="fig-total-btn btn-total-emerald" data-mandal-figure="1" data-mandal="__ALL__" data-metric="final_ror" title="Click to view all ${summary.final_ror} Final RoR villages">
                     ${summary.final_ror}
                   </button>
-                  ${summary.stage_trailed.final_ror > 0 ? `
-                    <button class="badge-trailed-mini" data-mandal-figure="1" data-mandal="__ALL__" data-metric="trailed_final_ror" title="${summary.stage_trailed.final_ror} villages across district trailed Final RoR target date">
-                      ⚠️ ${summary.stage_trailed.final_ror}
-                    </button>
-                  ` : ''}
                 </td>
                 <td style="font-family:'DM Mono',monospace;font-weight:800;color:#facc15;">${summary.completion_pct}%</td>
               </tr>
