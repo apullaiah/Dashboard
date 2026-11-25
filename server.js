@@ -36,7 +36,8 @@ const {
   formatOfficerNotice,
   sendPoorVillagesNotices,
   sendOfficerNotices,
-  executeDaily6AMWhatsAppBroadcast
+  executeDaily6AMWhatsAppBroadcast,
+  buildUnifiedOfficersDirectory
 } = require('./lib/whatsappService.js');
 
 const PORT = Number(process.env.PORT || 4173);
@@ -2325,7 +2326,6 @@ async function handleApi(req, res, url) {
     const v = store.villages.find(x => x.id === villageId || x.village_code === villageId);
     if (!v) return json(res, 404, { error: 'Village not found' });
 
-    const baseUrl = getPublicBaseUrl(url, store);
     const config = store.whatsappConfig || {};
     const effectiveSender = clean(b.senderTitle) || getDefaultSenderForTier('vs');
     const contacts = getVillageSurveyorContacts(v, store);
@@ -2440,8 +2440,14 @@ async function handleApi(req, res, url) {
     const b = await readBody(req);
     const tier = clean(b.tier || 'vs').toLowerCase();
     const officerId = clean(b.officerId || b.id || b.phone);
+    const baseUrl = getPublicBaseUrl(url, store);
     const officers = getPoorOfficersByTier(tier, store);
-    const officer = officers.find(o => o.id === officerId || o.phone === officerId || o.name.toLowerCase() === officerId.toLowerCase());
+    let officer = officers.find(o => o.id === officerId || o.phone === officerId || o.name.toLowerCase() === officerId.toLowerCase());
+    if (!officer) {
+      const dir = buildUnifiedOfficersDirectory(store, baseUrl);
+      const allList = [...dir.dios, ...dir.mlso, ...dir.vs, ...dir.tahsildars, ...dir.rdos, ...dir.vro];
+      officer = allList.find(o => o.id === officerId || o.phone === officerId || o.name.toLowerCase() === officerId.toLowerCase());
+    }
     if (!officer) return json(res, 404, { error: `Officer not found in tier ${tier}` });
 
     const targetPhone = b.phoneOverride ? String(b.phoneOverride).replace(/\D/g, '') : (officer.phone ? String(officer.phone).replace(/\D/g, '') : '');
@@ -2451,7 +2457,6 @@ async function handleApi(req, res, url) {
       });
     }
 
-    const baseUrl = getPublicBaseUrl(url, store);
     const config = store.whatsappConfig || {};
     const effectiveSender = clean(b.senderTitle) || config.senderName || process.env.WHATSAPP_SENDER_NAME || 'AD, Chittoor';
 
@@ -2551,85 +2556,81 @@ async function handleApi(req, res, url) {
     return json(res, 200, { logs: (store.whatsappLogs || []).slice(0, 100) });
   }
 
-  // Complete directory of VS, MS/MLSO, and DIOS officers with synced Google Sheet contacts
-  if (req.method === 'GET' && pathname === '/api/whatsapp/officers-directory') {
-    const vsMap = new Map();
-    (store.villages || []).forEach(v => {
-      const contacts = getVillageSurveyorContacts(v, store);
-      contacts.forEach(c => {
-        const ph = clean(c.phone).replace(/\D/g, '').slice(-10);
-        const key = `${v.mandal}_${v.village_name}_${c.name}_${ph}`;
-        if (!vsMap.has(key)) {
-          vsMap.set(key, {
-            id: 'vs_' + (v.village_code || v.id),
-            name: c.name || 'Village Surveyor',
-            role: c.role || 'Village Surveyor (VS)',
-            phone: ph,
-            village: v.village_name,
-            villageCode: v.village_code,
-            mandal: v.mandal,
-            division: v.division,
-            hasSheetPhone: Boolean(ph && ph.length >= 10),
-            source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
-          });
-        }
-      });
-    });
+  // Complete unified directory of VS, MLSO, DIOS, VRO, Tahsildars, RDOs, and Leadership with synced Google Sheet contacts & live DLR login status
+  if (req.method === 'GET' && (pathname === '/api/whatsapp/officers-directory' || pathname === '/api/officers-directory')) {
+    const baseUrl = getPublicBaseUrl(url, store);
+    const directory = buildUnifiedOfficersDirectory(store, baseUrl);
+    return json(res, 200, directory);
+  }
 
-    const msList = [];
-    const seenMs = new Set();
-    const mandalKeys = Object.keys(MANDAL_SURVEYOR_DIRECTORY);
-    mandalKeys.forEach(m => {
-      const norm = normalizeMandal(m, store);
-      if (seenMs.has(norm)) return;
-      seenMs.add(norm);
-      const storeMs = (store.mandalSurveyors && (store.mandalSurveyors[norm] || store.mandalSurveyors[m])) || null;
-      const ph = storeMs?.phone || MANDAL_SURVEYOR_DIRECTORY[norm]?.phone || MANDAL_SURVEYOR_DIRECTORY[m]?.phone || '';
-      const nm = storeMs?.name || MANDAL_SURVEYOR_DIRECTORY[norm]?.name || MANDAL_SURVEYOR_DIRECTORY[m]?.name || `${norm} Mandal Surveyor`;
-      msList.push({
-        id: 'ms_' + norm.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-        name: nm,
-        role: 'Mandal Surveyor (MS / MLSO)',
-        phone: ph,
-        mandal: norm,
-        hasSheetPhone: Boolean(ph && ph.length >= 10),
-        source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
-      });
-    });
+  // Synchronize and broadcast WhatsApp notices to responsible officers from VS to DIOS
+  if (req.method === 'POST' && pathname === '/api/whatsapp/broadcast-survey-cadre') {
+    const b = await readBody(req);
+    const baseUrl = getPublicBaseUrl(url, store);
+    const dryRun = Boolean(b.dryRun ?? false);
+    const targetScope = clean(b.scope || 'all').toLowerCase(); // 'all' (all 366 survey officers) | 'flagged' | 'dios' | 'mlso' | 'vs'
+    const syncFirst = Boolean(b.syncFirst ?? true);
 
-    const diosList = [];
-    const seenDios = new Set();
-    Object.values(DIOS_DIRECTORY).forEach(d => {
-      const dKey = normalKey(d.name);
-      if (seenDios.has(dKey)) return;
-      seenDios.add(dKey);
-      const storeDios = (store.dios && (store.dios[d.name] || Object.values(store.dios || {}).find(x => normalKey(x.name) === dKey))) || null;
-      const ph = storeDios?.phone || DIOS_DIRECTORY[d.name]?.phone || d.phone || '';
-      diosList.push({
-        id: 'dios_' + d.name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-        name: d.name,
-        role: 'Deputy Inspector of Survey (DIOS)',
-        phone: ph,
-        division: d.division || storeDios?.division || 'Chittoor',
-        mandals: d.mandals,
-        hasSheetPhone: Boolean(ph && ph.length >= 10),
-        source: (ph && ph.length >= 10) ? 'Google Spreadsheet' : 'Awaiting in Google Spreadsheet'
-      });
-    });
-
-    const vsList = Array.from(vsMap.values());
-    return json(res, 200, {
-      vs: vsList,
-      ms: msList,
-      dios: diosList,
-      summary: {
-        totalVs: vsList.length,
-        vsWithPhone: vsList.filter(x => x.hasSheetPhone).length,
-        totalMs: msList.length,
-        msWithPhone: msList.filter(x => x.hasSheetPhone).length,
-        totalDios: diosList.length,
-        diosWithPhone: diosList.filter(x => x.hasSheetPhone).length
+    if (syncFirst) {
+      try {
+        await syncContactsFromGoogleSheet(store);
+      } catch (e) {
+        console.warn('Sync contacts error before broadcast:', e.message);
       }
+    }
+
+    const directory = buildUnifiedOfficersDirectory(store, baseUrl);
+    let targetOfficers = [];
+    if (targetScope === 'dios') targetOfficers = directory.dios;
+    else if (targetScope === 'mlso' || targetScope === 'ms') targetOfficers = directory.mlso;
+    else if (targetScope === 'vs') targetOfficers = directory.vs;
+    else if (targetScope === 'flagged') {
+      targetOfficers = [...directory.dios, ...directory.mlso, ...directory.vs].filter(o => o.hasPendingLogin || o.balance_gt_extent > 0);
+    } else {
+      // all survey cadre: DIOS, MLSO, VS
+      targetOfficers = [...directory.dios, ...directory.mlso, ...directory.vs];
+    }
+
+    const config = store.whatsappConfig || {};
+    const results = [];
+    let sentCount = 0;
+    let simulatedCount = 0;
+    let skippedCount = 0;
+
+    for (const officer of targetOfficers) {
+      if (!officer.phone || officer.phone.length < 10) {
+        skippedCount++;
+        results.push({ officerId: officer.id, name: officer.name, role: officer.role, status: 'SKIPPED_NO_PHONE', phone: '' });
+        continue;
+      }
+
+      const notice = officer.noticeText || formatOfficerNotice(officer, officer.tier, baseUrl, 'DSLRO, Chittoor');
+      const sendRes = dryRun ? { simulated: true, delivered: true } : await sendWhatsAppCloudMessage(officer.phone, notice, config);
+
+      if (sendRes.success) sentCount++;
+      else if (sendRes.simulated) simulatedCount++;
+
+      results.push({
+        officerId: officer.id,
+        name: officer.name,
+        role: officer.role,
+        tier: officer.tier,
+        phone: officer.phone,
+        status: sendRes.success ? 'SENT' : (sendRes.simulated ? 'SIMULATED' : 'FAILED'),
+        waLink: officer.whatsappUrl
+      });
+    }
+
+    return json(res, 200, {
+      success: true,
+      totalTargeted: targetOfficers.length,
+      sentCount,
+      simulatedCount,
+      skippedCount,
+      scope: targetScope,
+      dryRun,
+      results: results.slice(0, 100),
+      timestamp: new Date().toISOString()
     });
   }
 
